@@ -1,0 +1,29 @@
+#RootDiv {
+	background:#ccc
+}
+
+#DartStatus {
+	background:#fff
+}
+
+#MainView {
+	width:640px;
+	height:360px;
+	overflow:hidden;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#webGLFrontBuffer {
+	width: 100%;
+	height: 100%;
+}
+
+#SpectreLog {
+	width:100%;
+	height:360px;
+	overflow:auto;
+	position:absolute;
+	bottom:0;
+	background:#aaa
+}
