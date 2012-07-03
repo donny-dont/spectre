@@ -68,7 +68,8 @@ Future<bool> initSpectre(String canvasName) {
   spectreImmediateContext = new ImmediateContext();
   spectreDDM = new DebugDrawManager();
   spectreRM = new ResourceManager();
-  spectreRM.setBaseURL('http://127.0.0.1:3030/Users/johnmccutchan/workspace/spectre/data/');
+  var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
+  spectreRM.setBaseURL(baseUrl);
   print('Started Spectre');
   List loadedResources = [];
   loadedResources.add(spectreRM.load('/shaders/debug_line.vs'));
