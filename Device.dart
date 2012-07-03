@@ -20,6 +20,8 @@
 
 */
 
+/// A resource created by a device
+/// All resources have a [name]
 class DeviceChild implements Hashable {
   String name;
   int hashCode() {
@@ -27,6 +29,7 @@ class DeviceChild implements Hashable {
   }
 }
 
+/// Format describing a vertex buffer element
 class DeviceFormat {
   final int type;
   final int count;
@@ -49,6 +52,12 @@ class _InputLayoutElement {
   }
 }
 
+/// Description used to create an input layout
+/// Attribute [name] must match name in shader program
+/// Attribute [format] device format for attribute
+/// Attribute [elementStride] bytes between successive elements
+/// Attribute [vertexBufferSlot] the vertex buffer slot to pull elements from
+/// Attribute [vertexBufferOffset] the offset into the vertex buffer to pull the first element
 class InputElementDescription {
   String name;
   DeviceFormat format;
@@ -59,11 +68,17 @@ class InputElementDescription {
   InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
 }
 
+/// A mapping of vertex buffers to shader program input attributes
+/// Create using [Device.createInputLayout]
+/// Set using [ImmediateContext.setInputLayout]
 class InputLayout extends DeviceChild {
   int _maxAttributeIndex;
   List<_InputLayoutElement> _elements;
 }
 
+/// Rendering viewport
+/// Create using [Device.createViewport]
+/// Set using [ImmediateContext.setViewport]
 class Viewport extends DeviceChild {
   int x;
   int y;
@@ -85,6 +100,9 @@ class Viewport extends DeviceChild {
   }
 }
 
+/// BlendState controls how output from your fragment shader is blended onto the framebuffer
+/// Create using [Device.createBlendState]
+/// Set using [ImmediateContext.setBlendState]
 class BlendState extends DeviceChild {
   static final int BlendSourceZero = WebGLRenderingContext.ZERO;
   static final int BlendSourceOne = WebGLRenderingContext.ONE;
@@ -187,6 +205,9 @@ class BlendState extends DeviceChild {
   }
 }
 
+/// DepthState controls depth testing and writing to a depth buffer
+/// Create using [Device.createDepthState]
+/// Set using [ImmediateContext.setDepthState]
 class DepthState extends DeviceChild {
   static final int DepthComparisonOpNever = WebGLRenderingContext.NEVER;
   static final int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
@@ -251,6 +272,9 @@ class StencilState extends DeviceChild {
   }
 }
 
+/// RasterizerState controls how the GPU rasterizer functions including primitive culling and width of rasterized lines
+/// Create using [Device.createRasterizerState]
+/// Set using [ImmediateContext.setRasterizerState]
 class RasterizerState extends DeviceChild {
   static final int CullFront = WebGLRenderingContext.FRONT;
   static final int CullBack = WebGLRenderingContext.BACK;
@@ -321,18 +345,27 @@ class Shader extends DeviceChild {
   }
 }
 
+/// A vertex shader
+/// Create using [Device.createVertexShader]
+/// Must be linked into a ShaderProgram before use
 class VertexShader extends Shader {
   void fillProps(Map props) {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
 }
 
+/// A fragment shader
+/// Create using [Device.createFragmentShader]
+/// Must be linked into a ShaderProgram before use
 class FragmentShader extends Shader {
   void fillProps(Map props) {
     _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
 }
 
+/// A shader program defines how the programmable units of the GPU pipeline function
+/// Create using [Device.createShaderProgram]
+/// Set using [ImmediateContext.setShaderProgram]
 class ShaderProgram extends DeviceChild {
   VertexShader vs;
   FragmentShader fs;
@@ -455,6 +488,10 @@ class Texture extends DeviceChild {
   WebGLTexture _buffer;
 }
 
+/// Texture2D defines the storage for a 2D texture including Mipmaps
+/// Create using [Device.createTexture2D]
+/// Set using [immediateContext.setTextures]
+/// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
 class Texture2D extends Texture {
   Texture2D() {
     _target = WebGLRenderingContext.TEXTURE_2D;
@@ -473,6 +510,9 @@ class Texture2D extends Texture {
   }
 }
 
+/// SamplerState defines how a texture is sampled
+/// Create using [Device.createSamplerState]
+/// Set using [immediateContext.setSamplerStates]
 class SamplerState extends DeviceChild {
   static final int TextureWrapClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE;
   static final int TextureWrapMirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT;
@@ -530,6 +570,9 @@ class SpectreBuffer extends DeviceChild {
   int _size;
 }
 
+/// IndexBuffer defines the storage for indexes used to construct primitives
+/// Create using [Device.createIndexBuffer]
+/// Set using [Device.setIndexBuffer]
 class IndexBuffer extends SpectreBuffer {
   void fillProps(Map props) {
     _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
@@ -552,6 +595,9 @@ class IndexBuffer extends SpectreBuffer {
   }
 }
 
+/// VertexBuffer defines storage for vertex attribute elements
+/// Create using [Device.createVertexBuffer]
+/// Set using [Device.setVertexBuffers]
 class VertexBuffer extends SpectreBuffer {
   void fillProps(Map props) {
     _target = WebGLRenderingContext.ARRAY_BUFFER;
@@ -574,6 +620,13 @@ class VertexBuffer extends SpectreBuffer {
   }
 }
 
+/// Spectre GPU Device
+
+/// All GPU resources are created and destroyed through a Device.
+
+/// Each resource requires a unique name.
+
+/// An existing resource can be looked up using its name.
 class Device {
   static final DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
   static final DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
@@ -595,6 +648,7 @@ class Device {
   Map<String, RasterizerState> _rasterizerStates;
   Map<String, InputLayout> _inputLayouts;
   
+  /// Constructs a GPU device
   Device() {
     _indexBuffers = new Map<String, IndexBuffer>();
     _vertexBuffers = new Map<String, VertexBuffer>();
@@ -612,6 +666,7 @@ class Device {
     _inputLayouts = new Map<String, InputLayout>();
   }
 
+  /// Returns the [IndexBuffer] named [name]
   IndexBuffer findIndexBuffer(String name) {
     IndexBuffer ib = _indexBuffers[name];
     if (ib == null) {
@@ -620,6 +675,10 @@ class Device {
     return ib;
   }
 
+  /// Create a [IndexBuffer] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [IndexBuffer] being created
   IndexBuffer createIndexBuffer(String name, Object props) {
     if (_indexBuffers.containsKey(name)){
       spectreLog.Error('Attempting to create index buffer with same name $name');
@@ -647,6 +706,7 @@ class Device {
     return ib;
   }
 
+  /// Deletes [IndexBuffer] [ib]
   void deleteIndexBuffer(IndexBuffer ib) {
     if (ib == null) {
       spectreLog.Warning('Attempting to delete null index buffer');
@@ -656,6 +716,7 @@ class Device {
     webGL.deleteBuffer(ib._buffer);
   }
 
+  /// Returns the [VertexBuffer] named [name]
   VertexBuffer findVertexBuffer(String name) {
     VertexBuffer vb = _vertexBuffers[name];
     if (vb == null) {
@@ -664,6 +725,10 @@ class Device {
     return vb;
   }
 
+  /// Create a [VertexBuffer] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [VertexBuffer] being created
   VertexBuffer createVertexBuffer(String name, Object props) {
     if (_vertexBuffers.containsKey(name)){
       spectreLog.Error('Attempting to create vertex buffer with same name $name');
@@ -687,6 +752,7 @@ class Device {
     return vb;
   }
 
+  /// Deletes [VertexBuffer] [vb]
   void deleteVertexBuffer(VertexBuffer vb) {
     if (vb == null) {
       spectreLog.Warning('Attempting to delete null vertex buffer');
@@ -696,6 +762,7 @@ class Device {
     webGL.deleteBuffer(vb._buffer);
   }
 
+  /// Returns the [RenderBuffer] named [name]
   RenderBuffer findRenderBuffer(String name) {
     RenderBuffer b = _renderBuffers[name];
     if (b == null) {
@@ -704,6 +771,10 @@ class Device {
     return b;
   }
 
+  /// Create a [RenderBuffer] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [RenderBuffer] being created
   RenderBuffer createRenderBuffer(String name, Object props) {
     if (_renderBuffers.containsKey(name)){
       spectreLog.Error('Attempting to create render buffer with same name $name');
@@ -728,11 +799,13 @@ class Device {
     return rb;
   }
 
+  /// Deletes [RenderBuffer] [rb]
   void deleteRenderBuffer(RenderBuffer rb) {
     _renderBuffers.remove(rb.name);
     webGL.deleteRenderbuffer(rb._buffer);
   }
 
+  /// Returns the [RenderTarget] named [name]
   RenderTarget findRenderTarget(String name) {
     RenderTarget t = _renderTargets[name];
     if (t == null) {
@@ -740,7 +813,11 @@ class Device {
     }
     return t;
   }
-
+  
+  /// Create a [RenderTarget] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [RenderTarget] being created
   RenderTarget createRenderTarget(String name, Object props) {
     if (_renderTargets.containsKey(name)){
       spectreLog.Error('Attempting to create render target with same name $name');
@@ -783,7 +860,14 @@ class Device {
     _renderTargets[rt.name] = rt;
     return rt;
   }
+  
+  /// Deletes [RenderTarget] [rt]
+  void deleteRenderTarget(RenderTarget rt) {
+    _renderTargets.remove(rt.name);
+    webGL.deleteFramebuffer(rt._buffer);
+  }
 
+  /// Returns the [Texture2D] named [name]
   Texture2D findTexture2D(String name) {
     Texture t = _texture2Ds[name];
     if (t == null) {
@@ -792,7 +876,11 @@ class Device {
     return t;
   }
 
-  Texture createTexture2D(String name, Object props) {
+  /// Create a [Texture2D] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [Texture2D] being created
+  Texture2D createTexture2D(String name, Object props) {
     if (_texture2Ds.containsKey(name)){
       spectreLog.Error('Attempting to create Texture2D with same name $name');
       return _texture2Ds[name];
@@ -817,11 +905,13 @@ class Device {
     return rt;
   }
 
-  void deleteTexture(Texture t) {
+  /// Deletes [Texture2D] [t]
+  void deleteTexture2D(Texture2D t) {
     _texture2Ds.remove(t.name);
     webGL.deleteTexture(t._buffer);
   }
 
+  /// Returns the [SamplerState] named [name]
   SamplerState findSamplerState(String name) {
     SamplerState s = _samplerStates[name];
     if (s == null) {
@@ -830,6 +920,10 @@ class Device {
     return s;
   }
 
+  /// Create a [SamplerState] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [SamplerState] being created
   SamplerState createSamplerState(String name, Object props) {
     if (_samplerStates.containsKey(name)){
       spectreLog.Error('Attempting to create sampler with same name $name');
@@ -848,15 +942,12 @@ class Device {
     return sampler;
   }
 
+  /// Deletes [SamplerState] [sampler]
   void deleteSamplerState(SamplerState sampler) {
     _samplerStates.remove(sampler.name);
   }
-
-  void deleteRenderTarget(RenderTarget rt) {
-    _renderTargets.remove(rt.name);
-    webGL.deleteFramebuffer(rt._buffer);
-  }
-
+  
+  /// Returns the [VertexShader] named [name]
   VertexShader findVertexShader(String name) {
     VertexShader vs = _vertexShaders[name];
     if (vs == null) {
@@ -865,6 +956,10 @@ class Device {
     return vs;
   }
 
+  /// Create a [VertexShader] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [VertexShader] being created
   VertexShader createVertexShader(String name, Object props) {
     if (_vertexShaders.containsKey(name)){
       spectreLog.Error('Attempting to create render target with same name $name');
@@ -885,11 +980,13 @@ class Device {
     return rt;
   }
 
+  /// Deletes [VertexShader] [shader]
   void deleteVertexShader(VertexShader shader) {
     _vertexShaders.remove(shader.name);
     webGL.deleteShader(shader._shader);
   }
-
+  
+  /// Returns the [FragmentShader] named [name]
   FragmentShader findFragmentShader(String name) {
     FragmentShader vs = _fragmentShaders[name];
     if (vs == null) {
@@ -898,6 +995,10 @@ class Device {
     return vs;
   }
 
+  /// Create a [FragmentShader] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [FragmentShader] being created
   FragmentShader createFragmentShader(String name, Object props) {
     if (_fragmentShaders.containsKey(name)) {
       spectreLog.Error('Attempting to create fragment shader with same name $name');
@@ -917,6 +1018,7 @@ class Device {
     return rt;
   }
 
+  /// Deletes [FragmentShader] [fs]
   void deleteFragmentShader(FragmentShader fs) {
     if (fs == null) {
       spectreLog.Warning('Attempting to delete null fragment shader');
@@ -926,6 +1028,7 @@ class Device {
     webGL.deleteShader(fs._shader);
   }
 
+  /// Returns the [ShaderProgram] named [name]
   ShaderProgram findShaderProgram(String name) {
     ShaderProgram vs = _shaderPrograms[name];
     if (vs == null) {
@@ -934,6 +1037,10 @@ class Device {
     return vs;
   }
 
+  /// Create a [ShaderProgram] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [ShaderProgram] being created
   ShaderProgram createShaderProgram(String name, Object props) {
     if (_shaderPrograms.containsKey(name)) {
       spectreLog.Error('Attempting to create shader program with same name $name');
@@ -955,12 +1062,14 @@ class Device {
     _shaderPrograms[rt.name] = rt;
     return rt;
   }
-
+  
+  /// Deletes [ShaderProgram] [sp]
   void deleteShaderProgram(ShaderProgram sp) {
     _shaderPrograms.remove(sp.name);
     webGL.deleteProgram(sp._program);
   }
 
+  /// Returns the [Viewport] named [name]
   Viewport findViewport(String name) {
     Dynamic o = _viewports[name];
     if (o == null) {
@@ -969,6 +1078,10 @@ class Device {
     return o;
   }
 
+  /// Create a [Viewport] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [Viewport] being created
   Viewport createViewport(String name, Object props) {
     if (_viewports.containsKey(name)) {
       spectreLog.Error('Attempting to create viewport with same name $name');
@@ -987,10 +1100,12 @@ class Device {
     return rt;
   }
 
+  /// Deletes [Viewport] [vp]
   void deleteViewport(Viewport vp) {
     _viewports.remove(vp.name);
   }
 
+  /// Returns the [DepthState] named [name]
   DepthState findDepthState(String name) {
     Dynamic o = _depthStates[name];
     if (o == null) {
@@ -999,6 +1114,10 @@ class Device {
     return o;
   }
 
+  /// Create a [DepthState] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [DepthState] being created
   DepthState createDepthState(String name, Object props) {
     if (_depthStates.containsKey(name)) {
       spectreLog.Error('Attempting to create Depth Stencil State with same name $name');
@@ -1017,10 +1136,12 @@ class Device {
     return rt;
   }
 
+  /// Deletes [DepthState] [ds]
   void deleteDepthState(DepthState ds) {
     _depthStates.remove(ds.name);
   }
 
+  /// Returns the [BlendState] named [name]
   BlendState findBlendState(String name) {
     Dynamic o = _blendStates[name];
     if (o == null) {
@@ -1029,6 +1150,10 @@ class Device {
     return o;
   }
 
+  /// Create a [BlendState] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [BlendState] being created
   BlendState createBlendState(String name, Object props) {
     if (_blendStates.containsKey(name)) {
       spectreLog.Error('Attempting to create Blend State with same name $name');
@@ -1047,10 +1172,12 @@ class Device {
     return rt;
   }
 
+  /// Deletes [BlendState] [bs]
   void deleteBlendState(BlendState bs) {
     _blendStates.remove(bs.name);
   }
 
+  /// Returns the [RasterizerState] named [name]
   RasterizerState findRasterizerState(String name) {
     Dynamic o = _rasterizerStates[name];
     if (o == null) {
@@ -1059,6 +1186,10 @@ class Device {
     return o;
   }
 
+  /// Create a [RasterizerState] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [RasterizerState] being created
   RasterizerState createRasterizerState(String name, Object props) {
     if (_rasterizerStates.containsKey(name)) {
       spectreLog.Error('Attempting to create Rasterizer State with same name $name');
@@ -1077,10 +1208,12 @@ class Device {
     return rt;
   }
 
+  /// Deletes [RasterizerState] [rs]
   void deleteRasterizerState(RasterizerState rs) {
     _rasterizerStates.remove(rs.name);
   }
 
+  /// Returns the [InputLayout] named [name]
   InputLayout findInputLayout(String name) {
     Dynamic o = _inputLayouts[name];
     if (o == null) {
@@ -1089,6 +1222,7 @@ class Device {
     return o;
   }
   
+  /// Create an [InputLayout] named [name] for [elements] and [sp] 
   InputLayout createInputLayout(String name, List<InputElementDescription> elements, ShaderProgram sp) {
     if (_inputLayouts.containsKey(name)) {
       spectreLog.Error('Attempting to create input layout with same name $name');
@@ -1120,6 +1254,7 @@ class Device {
     return il;
   }
   
+  /// Deletes [InputLayout] [il]
   void deleteInputLayout(InputLayout il) {
     _inputLayouts.remove(il.name);
   }

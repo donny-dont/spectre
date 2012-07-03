@@ -20,6 +20,8 @@
 
 */
 
+/** Spectre Library */
+
 #library('Spectre');
 #import('dart:html');
 #import('dart:json');
@@ -42,17 +44,19 @@
 
 // We have a single WebGL context
 WebGLRenderingContext webGL;
-// We have a single SpectreDevice
+/// [spectreDevice] is the global Spectre GPU device instance
 Device spectreDevice;
-// We have a single ImmediateContext
+/// [spectreImmediateContext] is the global Spectre GPU Immediate context instance
 ImmediateContext spectreImmediateContext;
-// We have a global DebugDrawManager
+/// [spectreDDM] is the global Spectre debug draw manager instance
 DebugDrawManager spectreDDM;
 // We have a single logger
 Logger spectreLog;
-// We have a single resource manager
+/// [spectreRM] is the global Sprectre resource manager instance
 ResourceManager spectreRM;
 
+/// Initializes the Spectre graphis engine. [canvasName] is the CSS id of the canvas to render to
+/// Returns a Future that will complete when all required resources are loaded and the engine is running
 Future<bool> initSpectre(String canvasName) {
   if (spectreLog == null) {
     spectreLog = new PrintLogger();

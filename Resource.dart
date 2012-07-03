@@ -20,6 +20,7 @@
 
 */
 
+/// A resource
 class Resource implements Hashable {
   String name;
   
@@ -48,6 +49,9 @@ class Resource implements Hashable {
   }
 }
 
+/// A Mesh resource
+///
+/// Mesh data is loaded into [IndexBuffer] and [VertexBuffer]
 class MeshResource extends Resource {
   Map meshData;
   IndexBuffer indexBuffer;
@@ -110,6 +114,9 @@ class MeshResource extends Resource {
   }
 }
 
+/// A Vertex Shader resource
+///
+/// Vertex program is compiled into a [VertexShader]
 class VertexShaderResource extends Resource {
   String shaderSource;
   VertexShader shader;
@@ -143,6 +150,9 @@ class VertexShaderResource extends Resource {
   }
 }
 
+/// A Fragment Shader resource
+///
+/// Fragment program is compiled into a [Fragment]
 class FragmentShaderResource extends Resource {
   String shaderSource;
   FragmentShader shader;
@@ -176,6 +186,9 @@ class FragmentShaderResource extends Resource {
   }
 }
 
+/// An Image resource
+///
+/// No device resources are created
 class ImageResource extends Resource {
   String url;
   ImageElement image;

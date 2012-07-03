@@ -164,6 +164,24 @@ class _DebugDrawSphereManager {
   }
 }
 
+/** DebugDrawManager allows you to draw the following primitives:
+  *
+  * - Lines
+  * - Crosses
+  * - Spheres
+  * - Circles
+  * - Transformations (coordinate axes)
+  * - Triangles
+  * - AABB (Axis Aligned Bounding Boxes)
+  *
+  * Each of the above primitives can be displayed for a specific time period, for example, 1.5 seconds
+  *
+  * Each of the above primitives can have depth testing enabled or disabled
+  *
+  * Most of the above primitives can be configured with size and / or color
+  *
+  * You will have to call update, prepareForRender, and render once per frame 
+  */
 class DebugDrawManager {
   DepthState _depthEnabledState;
   DepthState _depthDisabledState;
@@ -177,18 +195,18 @@ class DebugDrawManager {
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
   
-  final String depthStateEnabledName = 'Debug Depth Enabled State';
-  final String depthStateDisabledName = 'Debug Depth Disabled State';
-  final String blendStateName = 'Debug Blend State';
-  final String rasterStateName = 'Debug Rasterizer State';
-  final String lineShaderProgramName = 'Debug Line Program';
-  final String depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
-  final String depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
-  final String cameraTransformUniformName = 'cameraTransform';
+  final String _depthStateEnabledName = 'Debug Depth Enabled State';
+  final String _depthStateDisabledName = 'Debug Depth Disabled State';
+  final String _blendStateName = 'Debug Blend State';
+  final String _rasterStateName = 'Debug Rasterizer State';
+  final String _lineShaderProgramName = 'Debug Line Program';
+  final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
+  final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
+  final String _cameraTransformUniformName = 'cameraTransform';
   
   DebugDrawManager() {
-    _depthEnabledState = spectreDevice.createDepthState(depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
-    _depthDisabledState = spectreDevice.createDepthState(depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
+    _depthEnabledState = spectreDevice.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
+    _depthDisabledState = spectreDevice.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
     _blendState = spectreDevice.createBlendState(blendStateName, {});
     _rasterState = spectreDevice.createRasterizerState(rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
     _cameraMatrix = new Float32Array(16);
@@ -203,6 +221,9 @@ class DebugDrawManager {
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
   }
   
+  /// Add a line segment from [start] to [finish] with [color]
+  ///  
+  /// Options: [duration] and [depthEnabled]
   void addLine(vec3 start, vec3 finish, vec4 color, [num duration = 0.0, bool depthEnabled=true]) {
     _DebugDrawVertex v1 = new _DebugDrawVertex();
     v1.color = new vec4.copy(color);
@@ -221,6 +242,9 @@ class DebugDrawManager {
     }
   }
   
+  /// Add a cross at [point] with [color]
+  ///
+  /// Options: [size], [duration], and [depthEnabled]
   void addCross(vec3 point, vec4 color, [num size = 1.0, num duration = 0.0, bool depthEnabled=true]) {
     num half_size = size * 0.5;
     addLine(point, point + new vec3(half_size, 0.0, 0.0), color, duration, depthEnabled);
@@ -231,6 +255,9 @@ class DebugDrawManager {
     addLine(point, point + new vec3(0.0, 0.0, -half_size), color, duration, depthEnabled);
   }
   
+  /// Add a sphere located at [center] with [radius] and [color]
+  ///
+  /// Options: [duration] and [depthEnabled]
   void addSphere(vec3 center, num radius, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
     _DebugDrawSphere sphere = new _DebugDrawSphere();
     sphere.color = new vec4.copy(color);
@@ -244,6 +271,9 @@ class DebugDrawManager {
     }
   }
   
+  /// Add a circle located at [center] perpindicular to [planeNormal] with [radius] and [color]
+  ///
+  /// Options: [duration] and [depthEnabled]
   void addCircle(vec3 center, vec3 planeNormal, num radius, vec4 color, [num duration = 0.0, bool depthEnabled = true, int numSegments = 12]) {
     vec3 u = new vec3.zero();
     vec3 v = new vec3.zero();
@@ -262,6 +292,11 @@ class DebugDrawManager {
     addLine(last, center + u * radius, color, duration);
   }
   
+  /// Add a transformation (rotation & translation) from [xform]. Size is controlled with [size] 
+  ///
+  /// X,Y, and Z axes are colored Red,Green, and Blue
+  ///
+  /// Options: [duration] and [depthEnabled]
   void addAxes(mat4x4 xform, num size, [num duration = 0.0, bool depthEnabled = true]) {
     vec4 origin = new vec4.raw(0.0, 0.0, 0.0, 1.0);
     num size_90p = 0.9 * size;
@@ -330,12 +365,18 @@ class DebugDrawManager {
     addLine(Z.xyz, Z_head_3.xyz, color, duration, depthEnabled);
   }
   
+  /// Add a triangle with vertices [vertex0], [vertex1], and [vertex2]. Color [color]
+  ///
+  /// Options: [duration] and [depthEnabled] 
   void addTriangle(vec3 vertex0, vec3 vertex1, vec3 vertex2, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
     addLine(vertex0, vertex1, color, duration, depthEnabled);
     addLine(vertex1, vertex2, color, duration, depthEnabled);
     addLine(vertex2, vertex0, color, duration, depthEnabled);
   }
   
+  /// Add an AABB from [boxMin] to [boxMax] with [color].
+  ///
+  /// Options: [duration] and [depthEnabled]
   void addAABB(vec3 boxMin, vec3 boxMax, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
     vec3 vertex_a;
     vec3 vertex_b;
@@ -386,6 +427,7 @@ class DebugDrawManager {
     addLine(vertex_a, vertex_b, color, duration, depthEnabled);
   }
   
+  /// Prepare to render debug primitives
   void prepareForRender() {
     _depthEnabled._prepareForRender();
     _depthDisabled._prepareForRender();
@@ -394,7 +436,7 @@ class DebugDrawManager {
     _commandBuffer.clear();
     _commandBuffer.addCommand(new CommandSetBlendState(blendStateName));
     _commandBuffer.addCommand(new CommandSetRasterizerState(rasterStateName));
-    _commandBuffer.addCommand(new CommandSetDepthState(depthStateEnabledName));
+    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
     _commandBuffer.addCommand(new CommandSetShaderProgram(lineShaderProgramName));
     _commandBuffer.addCommand(new CommandSetUniformMatrix4(cameraTransformUniformName, _cameraMatrix));
     _commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
@@ -402,12 +444,13 @@ class DebugDrawManager {
     _commandBuffer.addCommand(new CommandSetIndexBuffer(null));
     _commandBuffer.addCommand(new CommandSetInputLayout('$depthEnabledLineVBOName Layout'));
     _commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
-    _commandBuffer.addCommand(new CommandSetDepthState(depthStateDisabledName));
+    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
     _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [depthDisabledLineVBOName]));
     _commandBuffer.addCommand(new CommandSetInputLayout('$depthDisabledLineVBOName Layout'));
     _commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
   }
   
+  /// Render debug primitives for [Camera] [cam]
   void render(Camera cam) {
     {
       mat4x4 pm = cam.projectionMatrix;
@@ -418,6 +461,7 @@ class DebugDrawManager {
     _commandBuffer.apply(spectreRM, spectreDevice, spectreImmediateContext);
   }
   
+  /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
     _depthEnabled.update(seconds);
     _depthDisabled.update(seconds);
