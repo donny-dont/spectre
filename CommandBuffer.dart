@@ -20,27 +20,39 @@
 
 */
 
+/** CommandBuffer stores a queue of commands for an [ImmediateContext]
+  */
 class CommandBuffer {
   List<Command> _commands;
   
+  /// Constructs an empty [CommandBuffer]
   CommandBuffer() {
     _commands = new List<Command>();
   }
   
+  /// Adds a [Command] to the [CommandBuffer]
   void addCommand(Command cmd) {
     _commands.add(cmd);
   }
   
+  /// Clears all commands
   void clear() {
     _commands.clear();
   }
   
+  /// Executes the commands against [ImmediateContext] [context]
+  ///
+  /// Uses [ResourceManager] [resourceManager] and [Device] [device] to find resources referenced by the commands
   void apply(ResourceManager resourceManager, Device device, ImmediateContext context) {
     for (final Command cmd in _commands) {
       cmd.apply(resourceManager, device, context);
     }
   }
-  
+
+  /// Binds all commands and append them to [commands]
+  ///
+  /// Binding is looks up all resources in the commands and references them directly rather than through name.
+  /// BoundCommands are faster to execute but are less friendly to resource changes. 
   void bind(ResourceManager resourceManager, Device device, List<BoundCommand> commands) {
     for (final Command cmd in _commands) {
       commands.add(cmd.bind(resourceManager, device));

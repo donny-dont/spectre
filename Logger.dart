@@ -20,12 +20,17 @@
 
 */
 
+/// Spectre Logging interface
 interface Logger {
+  // Report an error
   void Error(String e);
+  // Report a warning
   void Warning(String w);
+  // Report information
   void Info(String i);
 }
 
+/// An implementation of [Logger] that calls print
 class PrintLogger implements Logger {
   void Error(String e) {
     print('Error: $e');
@@ -40,6 +45,7 @@ class PrintLogger implements Logger {
   }
 }
 
+/// An implementation of [Logger] that does nothing
 class NullLogger implements Logger {
   void Error(String e) {
   }
@@ -50,9 +56,11 @@ class NullLogger implements Logger {
   }
 }
 
+/// An implementation of [Logger] that appends to an HTML element
 class HtmlLogger implements Logger {
   Element _logElement;
   int _line_num;
+  /// element is the CSS id of the HTML element to log into
   HtmlLogger(String element) {
     _logElement = document.query(element);
     _line_num = 0;

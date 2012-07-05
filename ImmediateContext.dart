@@ -20,6 +20,7 @@
 
 */
 
+/** The [ImmediateContext] configures the GPU pipeline and executes draw commands */
 class ImmediateContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
@@ -122,6 +123,7 @@ class ImmediateContext {
     _vertexAttributeArrayEnabledIndex = 0;
   }
 
+  /// Resets the cached GPU pipeline state
   void reset() {
     // TODO: Update state
     _primitiveTopology = 0;
@@ -144,11 +146,12 @@ class ImmediateContext {
     _renderTarget = null;
   }
 
-  /* Pipeline Configuration */
+  /// Configure the primitive topology
   void setPrimitiveTopology(int topology) {
     _primitiveTopology = topology;
   }
 
+  /// Set the [IndexBuffer] [ib]
   void setIndexBuffer(IndexBuffer ib) {
     if (_indexBuffer == ib) {
       return;
@@ -156,6 +159,7 @@ class ImmediateContext {
     _indexBuffer = ib;
   }
 
+  /// Set multiple [VertexBuffers] in [vbs] starting at [startSlot]
   void setVertexBuffers(int startSlot, List<VertexBuffer> vbs) {
     int limit = vbs.length + startSlot;
     for (int i = startSlot; i < limit; i++) {
@@ -163,10 +167,12 @@ class ImmediateContext {
     }
   }
   
+  /// Set [InputLayout] [il]
   void setInputLayout(InputLayout il) {
     _inputLayout = il;
   }
 
+  /// Set [ShaderProgram] [sp]
   void setShaderProgram(ShaderProgram sp) {
     if (sp == null) {
       return;
@@ -178,7 +184,7 @@ class ImmediateContext {
     webGL.useProgram(_shaderProgram._program);
   }
 
-  /* TODO: Uniform setters */
+  /// Set [RasterizerState] [rs]
   void setRasterizerState(RasterizerState rs) {
     if (rs == null) {
       return;
@@ -198,6 +204,7 @@ class ImmediateContext {
     }
   }
 
+  /// Set [Viewport] [vp]
   void setViewport(Viewport vp) {
     if (vp == null) {
       return;
@@ -210,6 +217,7 @@ class ImmediateContext {
     //print('(${vp.x},${vp.y}) -> (${vp.width}, ${vp.height})');
   }
 
+  /// Set [BlendState] [bs]
   void setBlendState(BlendState bs) {
     if (bs == null) {
       return;
@@ -233,6 +241,7 @@ class ImmediateContext {
     webGL.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
   }
 
+  /// Set [DepthState] [ds]
   void setDepthState(DepthState ds) {
     if (ds == null) {
       return;
@@ -261,6 +270,7 @@ class ImmediateContext {
     }
   }
 
+  /// Set [RenderTarget] [rt]
   void setRenderTarget(RenderTarget rt) {
     if (_renderTarget == rt) {
       return;
@@ -268,18 +278,8 @@ class ImmediateContext {
     _renderTarget = rt;
     webGL.bindFramebuffer(rt._target, rt._buffer);
   }
-
-  void setProgram(ShaderProgram sp) {
-    if (sp == null) {
-      return;
-    }
-    if (_shaderProgram == sp) {
-      return;
-    }
-    _shaderProgram = sp;
-    webGL.useProgram(_shaderProgram._program);
-  }
   
+  /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
     if (_shaderProgram == null) {
       spectreLog.Error('Attempting to set uniform with no program bound.');
@@ -293,6 +293,7 @@ class ImmediateContext {
     webGL.uniform3f(index,v0, v1, v2);
   }
   
+  /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform4f(String name, num v0, num v1, num v2, num v3) {
     if (_shaderProgram == null) {
       spectreLog.Error('Attempting to set uniform with no program bound.');
@@ -306,6 +307,7 @@ class ImmediateContext {
     webGL.uniform4f(index,v0, v1, v2, v3);
   }
   
+  /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
     if (_shaderProgram == null) {
       spectreLog.Error('Attempting to set uniform with no program bound.');
@@ -319,6 +321,7 @@ class ImmediateContext {
     webGL.uniformMatrix3fv(index, transpose, matrix);
   }
   
+  /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
     if (_shaderProgram == null) {
       spectreLog.Error('Attempting to set uniform with no program bound.');
@@ -333,7 +336,7 @@ class ImmediateContext {
     //spectreLog.Info('Setting $name to ${matrix[0]} ${matrix[1]} ${matrix[2]} ${matrix[3]}');
   }
   
-  // Actions
+  /// Update the contents of [buffer] with the contents of [data]
   void updateBuffer(SpectreBuffer buffer, ArrayBufferView data) {
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
@@ -354,6 +357,7 @@ class ImmediateContext {
     webGL.bindBuffer(buffer._target,  oldBind);
   }
   
+  /// Update the contents of [buffer] with the contents of [data] starting at [offset]
   void updateSubBuffer(SpectreBuffer buffer, ArrayBufferView data, num offset) {
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
@@ -371,6 +375,9 @@ class ImmediateContext {
     webGL.bindBuffer(buffer._target, oldBind);
   }
   
+  /// Update the pixels of [tex] with the pixels of [img]
+  ///
+  /// Only updates the top level mip map
   void updateTexture2D(Texture2D tex, ImageElement img) {
     webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = webGL.getParameter(tex._target_param);
@@ -379,6 +386,7 @@ class ImmediateContext {
     webGL.bindTexture(tex._target, oldBind);
   }
   
+  /// Generate the full mipmap pyramid for [tex]
   void generateMipmap(Texture2D tex) {
     webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = webGL.getParameter(tex._target_param);
@@ -387,18 +395,21 @@ class ImmediateContext {
     webGL.bindTexture(tex._target, oldBind);
   }
   
+  /// Sets a list of [textures] starting at [texUnitOffset]
   void setTextures(int texUnitOffset, List<Texture> textures) {
     for (int i = texUnitOffset; i < numTextures; i++) {
       _textures[i] = textures[i-texUnitOffset];
     }
   }
   
+  /// Sets a list of [samplers] starting at [texUnitOffset]
   void setSamplers(int texUnitOffset, List<SamplerState> samplers) {
     for (int i = texUnitOffset; i < numTextures; i++) {
       _samplerStates[i] = samplers[i-texUnitOffset];
     }
   }
   
+  /// Draw an indexed mesh with [numIndices] starting at [indexOffset]
   void drawIndexed(int numIndices, int indexOffset) {
     if (numIndices == 0) {
       return;
@@ -408,6 +419,7 @@ class ImmediateContext {
     webGL.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
   }
   
+  /// Draw a mesh with [numVertices] starting at [vertexOffset]
   void draw(int numVertices, int vertexOffset) {
     if (numVertices == 0) {
       return;

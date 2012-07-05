@@ -23,7 +23,7 @@
 typedef void OnResourceLoad(Object resource, String name, String type, Completer<Resource> completer);
 typedef void OnResourceLoadFailure(String name, String type, Completer<Resource> completer);
 
-class ResourceLoader {
+class _ResourceLoader {
   static String contentTypeForType(String type) {
     if (type == 'jpeg' || type == 'jpeg') {
       return 'image/jpeg';
@@ -57,16 +57,21 @@ class ResourceLoader {
   }
 }
 
+/// Resource Manager
+///
+/// Loads resources from URLs
 class ResourceManager {
   Map<String, Resource> _resources;
 
   String _baseURL;
 
+  /// Constructs a [ResourceManager]
   ResourceManager() {
     _baseURL = null;
     _resources = new Map();
   }
 
+  /// Sets the base URL to load resources from
   void setBaseURL(String baseURL) {
     _baseURL = baseURL;
     spectreLog.Info('Resource manager serving from $baseURL');
@@ -127,10 +132,13 @@ class ResourceManager {
       });
       ir.image.src = ir.url;
     } else {
-      ResourceLoader.load(url, name, type, _onLoad, _onLoadFailure, completer);  
+      _ResourceLoader.load(url, name, type, _onLoad, _onLoadFailure, completer);  
     }
   }
 
+  /// Loads the resource in [name]
+  ///
+  /// Returns a future that will complete when the resource has been fetched and loaded
   Future<Resource> load(String name) {
     if (_resources.containsKey(name)) {
       spectreLog.Warning('Requested load of $name but it is already loaded.');
@@ -145,6 +153,7 @@ class ResourceManager {
     return completer.future;
   }
 
+  /// Unloads a resource [name]
   void unload(String name) {
     if (_resources.containsKey(name) == false) {
       spectreLog.Warning('Unload of $name but not loaded.');
@@ -155,6 +164,7 @@ class ResourceManager {
     _remove(r);
   }
 
+  /// Refreshes a resource [name]
   void refresh(String name) {
     if (_resources.containsKey(name)) {
       Resource r = _resources[name];
