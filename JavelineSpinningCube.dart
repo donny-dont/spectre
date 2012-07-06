@@ -89,7 +89,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     }
     spectreImmediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
     spectreImmediateContext.setRasterizerState(rs);
-    spectreImmediateContext.setProgram(cubeProgram);
+    spectreImmediateContext.setShaderProgram(cubeProgram);
     spectreImmediateContext.setUniformMatrix4('objectTransform', objectTransform);
     spectreImmediateContext.setUniformMatrix4('cameraTransform', cameraTransform);
     spectreImmediateContext.setTextures(0, [texture]);

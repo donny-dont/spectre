@@ -207,16 +207,16 @@ class DebugDrawManager {
   DebugDrawManager() {
     _depthEnabledState = spectreDevice.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
     _depthDisabledState = spectreDevice.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
-    _blendState = spectreDevice.createBlendState(blendStateName, {});
-    _rasterState = spectreDevice.createRasterizerState(rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
+    _blendState = spectreDevice.createBlendState(_blendStateName, {});
+    _rasterState = spectreDevice.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
     _cameraMatrix = new Float32Array(16);
     _commandBuffer = new CommandBuffer();
   }
   
   void Init(VertexShaderResource lineVShader, FragmentShaderResource linePShader, VertexShaderResource sphereVShader, FragmentShaderResource spherePShader, MeshResource unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
-    ShaderProgram lineProgram = spectreDevice.createShaderProgram(lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
-    _depthEnabled = new _DebugDrawVertexManager(depthEnabledLineVBOName, vboSize, lineProgram);
-    _depthDisabled = new _DebugDrawVertexManager(depthDisabledLineVBOName, vboSize, lineProgram);
+    ShaderProgram lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
+    _depthEnabled = new _DebugDrawVertexManager(_depthEnabledLineVBOName, vboSize, lineProgram);
+    _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
   }
@@ -434,19 +434,19 @@ class DebugDrawManager {
     _depthEnabledSpheres._prepareForRender();
     _depthDisabledSpheres._prepareForRender();
     _commandBuffer.clear();
-    _commandBuffer.addCommand(new CommandSetBlendState(blendStateName));
-    _commandBuffer.addCommand(new CommandSetRasterizerState(rasterStateName));
+    _commandBuffer.addCommand(new CommandSetBlendState(_blendStateName));
+    _commandBuffer.addCommand(new CommandSetRasterizerState(_rasterStateName));
     _commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
-    _commandBuffer.addCommand(new CommandSetShaderProgram(lineShaderProgramName));
-    _commandBuffer.addCommand(new CommandSetUniformMatrix4(cameraTransformUniformName, _cameraMatrix));
+    _commandBuffer.addCommand(new CommandSetShaderProgram(_lineShaderProgramName));
+    _commandBuffer.addCommand(new CommandSetUniformMatrix4(_cameraTransformUniformName, _cameraMatrix));
     _commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [depthEnabledLineVBOName]));
+    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthEnabledLineVBOName]));
     _commandBuffer.addCommand(new CommandSetIndexBuffer(null));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$depthEnabledLineVBOName Layout'));
+    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthEnabledLineVBOName Layout'));
     _commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
     _commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [depthDisabledLineVBOName]));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$depthDisabledLineVBOName Layout'));
+    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthDisabledLineVBOName]));
+    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthDisabledLineVBOName Layout'));
     _commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
   }
   

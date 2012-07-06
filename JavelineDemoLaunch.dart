@@ -25,11 +25,25 @@
 #import('VectorMath/VectorMath.dart');
 #import('Javeline.dart');
 
-class JavelienDemoLaunch {
+class JavelineDemoDescription {
+  String name;
+  Function constructDemo;
+}
+
+class JavelineDemoLaunch {
   JavelineDemoInterface _demo;
+  List<JavelineDemoDescription> demos;
   
-  JavelienDemoLaunch() {
+  void registerDemo(String name, Function constructDemo) {
+    JavelineDemoDescription jdd = new JavelineDemoDescription();
+    jdd.name = name;
+    jdd.constructDemo = constructDemo;
+    demos.add(jdd);
+  }
+  
+  JavelineDemoLaunch() { 
     _demo = null;
+    demos = new List<JavelineDemoDescription>();
   }
   
   void updateStatus(String message) {
@@ -49,6 +63,9 @@ class JavelienDemoLaunch {
       webGL.clearDepth(1.0);
       webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
       
+      registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(); });
+      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(); });
+
       // Select demo
       //_demo = new JavelineImmediateTest();
       //_demo = new JavelineDebugDrawTest();
@@ -62,10 +79,28 @@ class JavelienDemoLaunch {
       });
     });
   }
+  
+  void switchToDemo(String name) {
+    Future shut;
+    if (_demo != null) {
+      shut = _demo.shutdown();
+    } else {
+      shut = new Future.immediate(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
+    }
+    shut.then((statusValue) {
+      _demo = null;
+      for (final JavelineDemoDescription jdd in demos) {
+        if (jdd.name == name) {
+          _demo = jdd.constructDemo();
+          break;
+        }
+      }
+    });
+  }
 }
 
 void main() {
   JavelineConfigStorage.init();
   JavelineConfigStorage.load();
-  new JavelienDemoLaunch().run();
+  new JavelineDemoLaunch().run();
 }
