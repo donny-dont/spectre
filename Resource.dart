@@ -28,24 +28,17 @@ class Resource implements Hashable {
     return name.hashCode();
   }
   
-  void createDeviceObjects() {
-    spectreLog.Error('createDeviceObjects called on base resource');
-  }
-  bool hasDeviceObjects() {
-    spectreLog.Error('hasDeviceObjects called on base resource');
-  }
-  void deleteDeviceObjects() {
-    spectreLog.Error('deleteDeviceObjects called on base resource');
-  }
+  abstract String get type();
+  
+  abstract void createDeviceObjects();
+  abstract bool hasDeviceObjects();
+  abstract void deleteDeviceObjects();
+  abstract bool hasData();
+  abstract void releaseData();
+  
   void refreshDeviceObjects() {
     deleteDeviceObjects();
     createDeviceObjects();
-  }
-  bool hasData() {
-    spectreLog.Error('hasData called on base resource');
-  }
-  void releaseData() {
-    spectreLog.Error('releaseData called on base resource');
   }
 }
 
@@ -56,6 +49,10 @@ class MeshResource extends Resource {
   Map meshData;
   IndexBuffer indexBuffer;
   VertexBuffer vertexBuffer;
+  
+  String get type() {
+    return 'Mesh';
+  }
   
   MeshResource(String name, Dynamic mesh) {
     this.name = name;
@@ -121,6 +118,10 @@ class VertexShaderResource extends Resource {
   String shaderSource;
   VertexShader shader;
   
+  String get type() {
+    return 'VertexShader';
+  }
+  
   VertexShaderResource(String name, String source) {
     this.name = name;
     shaderSource = source;
@@ -157,6 +158,10 @@ class FragmentShaderResource extends Resource {
   String shaderSource;
   FragmentShader shader;
   
+  String get type() {
+    return 'FragmentShader';
+  }
+  
   FragmentShaderResource(String name, String source) {
     this.name = name;
     shaderSource = source;
@@ -192,6 +197,11 @@ class FragmentShaderResource extends Resource {
 class ImageResource extends Resource {
   String url;
   ImageElement image;
+  
+  String get type() {
+    return 'Image';
+  }
+  
   ImageResource(String name, this.url) {
     this.name = name;
     image = new ImageElement();

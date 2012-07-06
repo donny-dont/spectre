@@ -39,6 +39,7 @@ class JavelineDemoLaunch {
     jdd.name = name;
     jdd.constructDemo = constructDemo;
     demos.add(jdd);
+    refreshDemoList('#DemoPicker');
   }
   
   JavelineDemoLaunch() { 
@@ -51,32 +52,65 @@ class JavelineDemoLaunch {
     document.query('#DartStatus').innerHTML = message;
   }
   
+  void refreshDemoList(String listDiv) {
+    DivElement d = document.query(listDiv);
+    if (d == null) {
+      return;
+    }
+    d.nodes.clear();
+    for (final JavelineDemoDescription jdd in demos) {
+      DivElement demod = new DivElement();
+      demod.on.click.add((Event event) {
+        switchToDemo(jdd.name);
+      });
+      demod.innerHTML = '${jdd.name}';
+      demod.classes.add('DemoButton');
+      d.nodes.add(demod);
+    }
+  }
+  
+  void refreshResourceManagerTable() {
+    final String divName = '#ResourceManagerTable';
+    DivElement d = document.query(divName);
+    if (d == null) {
+      return;
+    }
+    d.nodes.clear();
+    ParagraphElement pe = new ParagraphElement();
+    pe.innerHTML = 'Loaded Resources:';
+    d.nodes.add(pe);
+    spectreRM.forEach((name, resource) {
+      DivElement resourceDiv = new DivElement();
+      resourceDiv.innerHTML = '${name} (${resource.type})';
+      d.nodes.add(resourceDiv);
+    });
+  }
+  
+  void refreshDeviceManagerTable() {
+    final String divName = '#DeviceChildTable';
+    DivElement d = document.query(divName);
+    d.nodes.clear();
+    ParagraphElement pe = new ParagraphElement();
+    pe.innerHTML = 'Device Objects: Not implemented';
+    d.nodes.add(pe);
+    if (d == null) {
+      return;
+    }
+  }
+  
   void run() {
+    updateStatus("Pick a demo: ");
     // Start spectre
-    updateStatus("(Dart Is Running)");
-    spectreLog = new HtmlLogger('#SpectreLog');
     Future<bool> spectreStarted = initSpectre("#webGLFrontBuffer");
-    
     spectreStarted.then((value) {
-      print('Launching demo');
+      print('Spectre Launched');
       webGL.clearColor(0.0, 0.0, 0.0, 1.0);
       webGL.clearDepth(1.0);
       webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
-      
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(); });
-
-      // Select demo
-      //_demo = new JavelineImmediateTest();
-      //_demo = new JavelineDebugDrawTest();
-      _demo = new JavelineSpinningCube();
-      
-      // Start demo
-      Future<JavelineDemoStatus> started = _demo.startup();
-      started.then((statusValue) {
-        _demo.run();
-        print('Running demo');
-      });
+      window.setInterval(refreshResourceManagerTable, 1000);
+      window.setInterval(refreshDeviceManagerTable, 1000);
     });
   }
   
@@ -95,6 +129,14 @@ class JavelineDemoLaunch {
           break;
         }
       }
+      if (_demo != null) {
+        print('Starting demo $name');
+        Future<JavelineDemoStatus> started = _demo.startup();
+        started.then((sv) {
+          print('Running demo $name');
+          _demo.run();
+        });
+      }
     });
   }
 }
@@ -102,5 +144,6 @@ class JavelineDemoLaunch {
 void main() {
   JavelineConfigStorage.init();
   JavelineConfigStorage.load();
+  spectreLog = new HtmlLogger('#SpectreLog');
   new JavelineDemoLaunch().run();
 }

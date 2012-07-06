@@ -60,6 +60,8 @@ class _ResourceLoader {
 /// Resource Manager
 ///
 /// Loads resources from URLs
+typedef void ResourceManagerForEach(String name, Resource res);
+
 class ResourceManager {
   Map<String, Resource> _resources;
 
@@ -163,6 +165,19 @@ class ResourceManager {
     spectreLog.Info('Unloading $name');
     _remove(r);
   }
+  
+  void unloadAll() {
+    _resources.forEach((k, v) {
+      spectreLog.Info('Unloading $k');
+      _remove(v);
+    });
+  }
+  
+  void unloadBatch(List<String> resources) {
+    resources.forEach((name) {
+      unload(name);
+    });
+  }
 
   /// Refreshes a resource [name]
   void refresh(String name) {
@@ -172,5 +187,9 @@ class ResourceManager {
       spectreLog.Warning('Requested refresh of $name but no resource exists. Loading instead.');
       load(name);
     }
+  }
+  
+  void forEach(ResourceManagerForEach f) {
+    _resources.forEach(f);
   }
 }

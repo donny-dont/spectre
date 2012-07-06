@@ -75,6 +75,12 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   }
   
   Future<JavelineDemoStatus> shutdown() {
+    spectreRM.unloadBatch(['/meshes/TexturedCube.mesh', '/shaders/simple_texture.vs', '/shaders/simple_texture.fs', '/textures/WoodPlank.jpg']);
+    spectreDevice.deleteInputLayout(il);
+    spectreDevice.deleteRasterizerState(rs);
+    spectreDevice.deleteSamplerState(sampler);
+    spectreDevice.deleteTexture2D(texture);
+    spectreDevice.deleteShaderProgram(cubeProgram);
     Future<JavelineDemoStatus> base = super.shutdown();
     return base;
   }

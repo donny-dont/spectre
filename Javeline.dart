@@ -29,8 +29,8 @@
 #source('JavelineDemoInterface.dart');
 #source('JavelineKeyboard.dart');
 #source('JavelineMouse.dart');
-#source('JavelineBaseDemo.dart');
 
+#source('JavelineBaseDemo.dart');
 #source('JavelineImmediateTest.dart');
 #source('JavelineDebugDrawTest.dart');
 #source('JavelineSpinningCube.dart');

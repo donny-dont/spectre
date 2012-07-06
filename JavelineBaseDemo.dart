@@ -70,17 +70,21 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     document.on.mouseMove.add(_mouseMoveHandler);
     document.on.mouseDown.add(_mouseDownHandler);
     document.on.mouseUp.add(_mouseUpHandler);
-    
+    spectreImmediateContext.reset();
     return completer.future;
   }
   
   Future<JavelineDemoStatus> shutdown() {
-    _quit = true;
     document.on.keyDown.remove(_keyDownHandler);
     document.on.keyUp.remove(_keyUpHandler);
     document.on.mouseMove.remove(_mouseMoveHandler);
     document.on.mouseDown.remove(_mouseDownHandler);
     document.on.mouseUp.remove(_mouseUpHandler);
+    spectreDevice.deleteRasterizerState(_rasterizerState);
+    spectreDevice.deleteDepthState(_depthState);
+    spectreDevice.deleteBlendState(_blendState);
+    spectreDevice.deleteViewport(_viewPort);
+    _quit = true;
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
     status.code = JavelineDemoStatus.DemoStatusOKAY;

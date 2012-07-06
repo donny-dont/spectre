@@ -1,9 +1,11 @@
 #RootDiv {
-	background:#ccc
+	background: #fff;
 }
 
 #DartStatus {
-	background:#fff
+	background: #fff;
+	text-align: center;
+    vertical-align: middle;
 }
 
 #MainView {
@@ -26,4 +28,40 @@
 	position:absolute;
 	bottom:0;
 	background:#aaa
+}
+
+#ResourceTable {
+ 	min-height: 100%;
+    height: auto !important;
+    width: auto;
+	overflow: auto;
+	position: relative;
+}
+
+#DemoPicker {
+	display: -webkit-flex;
+}
+
+#StatusBar {
+	display: -webkit-flex;
+	
+}
+
+.DemoButton {
+	padding: 5px;
+	margin: 5px;
+	border-style: solid;
+	border-width: medium;
+}
+
+#ResourceManagerTable {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-justify-content: center;
+}
+
+#DeviceChildTable {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-justify-content: center;
 }
