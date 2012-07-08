@@ -40,7 +40,8 @@
 #source('MouseKeyboardCameraController.dart');
 #source('InputLayoutHelper.dart');
 #source('DebugDrawManager.dart');
-
+#source('Handle.dart');
+#source('HandleSystem.dart');
 
 // We have a single WebGL context
 WebGLRenderingContext webGL;
