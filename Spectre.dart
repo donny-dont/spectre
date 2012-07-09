@@ -27,21 +27,18 @@
 #import('dart:json');
 #import('VectorMath/VectorMath.dart');
 #source('Logger.dart');
+#source('Handle.dart');
+#source('HandleSystem.dart');
 #source('Device.dart');
 #source('ImmediateContext.dart');
 #source('Resource.dart');
 #source('ResourceManager.dart');
 #source('StaticResources.dart');
-#source('BoundCommands.dart');
-#source('Commands.dart');
-#source('CommandBuffer.dart');
 #source('Camera.dart');
 #source('CameraController.dart');
 #source('MouseKeyboardCameraController.dart');
 #source('InputLayoutHelper.dart');
 #source('DebugDrawManager.dart');
-#source('Handle.dart');
-#source('HandleSystem.dart');
 
 // We have a single WebGL context
 WebGLRenderingContext webGL;
