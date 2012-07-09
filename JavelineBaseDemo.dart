@@ -28,10 +28,10 @@ class JavelineBaseDemo implements JavelineDemoInterface {
   num _accumTime;
   num _lastYaw;
   num _lastPitch;
-  Viewport _viewPort;
-  BlendState _blendState;
-  DepthState _depthState;
-  RasterizerState _rasterizerState;
+  int _viewPort;
+  int _blendState;
+  int _depthState;
+  int _rasterizerState;
   
   bool _quit;
   Camera _camera;
@@ -80,10 +80,10 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     document.on.mouseMove.remove(_mouseMoveHandler);
     document.on.mouseDown.remove(_mouseDownHandler);
     document.on.mouseUp.remove(_mouseUpHandler);
-    spectreDevice.deleteRasterizerState(_rasterizerState);
-    spectreDevice.deleteDepthState(_depthState);
-    spectreDevice.deleteBlendState(_blendState);
-    spectreDevice.deleteViewport(_viewPort);
+    spectreDevice.deleteDeviceChild(_rasterizerState);
+    spectreDevice.deleteDeviceChild(_depthState);
+    spectreDevice.deleteDeviceChild(_blendState);
+    spectreDevice.deleteDeviceChild(_viewPort);
     _quit = true;
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');

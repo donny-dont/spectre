@@ -47,8 +47,8 @@ class Resource implements Hashable {
 /// Mesh data is loaded into [IndexBuffer] and [VertexBuffer]
 class MeshResource extends Resource {
   Map meshData;
-  IndexBuffer indexBuffer;
-  VertexBuffer vertexBuffer;
+  int indexBuffer;
+  int vertexBuffer;
   
   String get type() {
     return 'Mesh';
@@ -95,9 +95,9 @@ class MeshResource extends Resource {
   }
   
   void deleteDeviceObjects() {
-    spectreDevice.deleteIndexBuffer(indexBuffer);
-    spectreDevice.deleteVertexBuffer(vertexBuffer);
-    spectreLog.Info('Deleted (${indexBuffer.name},${vertexBuffer.name}) for $name');
+    spectreLog.Info('Deleted (${spectreDevice.getDeviceChildName(indexBuffer)},${spectreDevice.getDeviceChildName(vertexBuffer)}) for $name');
+    spectreDevice.deleteDeviceChild(indexBuffer);
+    spectreDevice.deleteDeviceChild(vertexBuffer);
     indexBuffer = null;
     vertexBuffer = null;
   }
@@ -116,7 +116,7 @@ class MeshResource extends Resource {
 /// Vertex program is compiled into a [VertexShader]
 class VertexShaderResource extends Resource {
   String shaderSource;
-  VertexShader shader;
+  int shader;
   
   String get type() {
     return 'VertexShader';
@@ -129,8 +129,7 @@ class VertexShaderResource extends Resource {
   
   void createDeviceObjects() {
     shader = spectreDevice.createVertexShader(name, {});
-    shader.source = shaderSource;
-    shader.compile();
+    spectreImmediateContext.compileShader(shader, shaderSource);
   }
   
   bool hasDeviceObjects() {
@@ -138,7 +137,7 @@ class VertexShaderResource extends Resource {
   }
   
   void deleteDeviceObjects() {
-    spectreDevice.deleteVertexShader(shader);
+    spectreDevice.deleteDeviceChild(shader);
     shader = null;
   }
   
@@ -156,7 +155,7 @@ class VertexShaderResource extends Resource {
 /// Fragment program is compiled into a [Fragment]
 class FragmentShaderResource extends Resource {
   String shaderSource;
-  FragmentShader shader;
+  int shader;
   
   String get type() {
     return 'FragmentShader';
@@ -169,8 +168,7 @@ class FragmentShaderResource extends Resource {
   
   void createDeviceObjects() {
     shader = spectreDevice.createFragmentShader(name, {});
-    shader.source = shaderSource;
-    shader.compile();
+    spectreImmediateContext.compileShader(shader, shaderSource);
   }
   
   bool hasDeviceObjects() {
@@ -178,7 +176,7 @@ class FragmentShaderResource extends Resource {
   }
   
   void deleteDeviceObjects() {
-    spectreDevice.deleteFragmentShader(shader);
+    spectreDevice.deleteDeviceChild(shader);
     shader = null;
   }
 

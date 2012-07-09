@@ -91,11 +91,17 @@ class JavelineDemoLaunch {
     DivElement d = document.query(divName);
     d.nodes.clear();
     ParagraphElement pe = new ParagraphElement();
-    pe.innerHTML = 'Device Objects: Not implemented';
+    pe.innerHTML = 'Device Objects:';
     d.nodes.add(pe);
     if (d == null) {
       return;
     }
+    spectreDevice.children.forEach((name, handle) {
+      DivElement resourceDiv = new DivElement();
+      String type = spectreDevice.getHandleType(handle);
+      resourceDiv.innerHTML = '${name} ($type)';
+      d.nodes.add(resourceDiv);
+    });
   }
   
   void run() {

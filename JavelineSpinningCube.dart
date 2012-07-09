@@ -25,11 +25,11 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   VertexShaderResource vertexShader;
   FragmentShaderResource fragmentShader;
   ImageResource textureImage;
-  ShaderProgram cubeProgram;
-  Texture2D texture;
-  SamplerState sampler;
-  RasterizerState rs;
-  InputLayout il;
+  int cubeProgram;
+  int texture;
+  int sampler;
+  int rs;
+  int il;
   Float32Array cameraTransform;
   Float32Array objectTransform;
   num _angle;
@@ -76,11 +76,11 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   
   Future<JavelineDemoStatus> shutdown() {
     spectreRM.unloadBatch(['/meshes/TexturedCube.mesh', '/shaders/simple_texture.vs', '/shaders/simple_texture.fs', '/textures/WoodPlank.jpg']);
-    spectreDevice.deleteInputLayout(il);
-    spectreDevice.deleteRasterizerState(rs);
-    spectreDevice.deleteSamplerState(sampler);
-    spectreDevice.deleteTexture2D(texture);
-    spectreDevice.deleteShaderProgram(cubeProgram);
+    spectreDevice.deleteDeviceChild(il);
+    spectreDevice.deleteDeviceChild(rs);
+    spectreDevice.deleteDeviceChild(sampler);
+    spectreDevice.deleteDeviceChild(texture);
+    spectreDevice.deleteDeviceChild(cubeProgram);
     Future<JavelineDemoStatus> base = super.shutdown();
     return base;
   }

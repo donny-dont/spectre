@@ -151,29 +151,31 @@ class ImmediateContext {
     _primitiveTopology = topology;
   }
 
-  /// Set the [IndexBuffer] [ib]
-  void setIndexBuffer(IndexBuffer ib) {
+  /// Set the IndexBuffer to [indexBufferHandle]
+  void setIndexBuffer(int indexBufferHandle) {
+    IndexBuffer ib = spectreDevice.getDeviceChild(indexBufferHandle);
     if (_indexBuffer == ib) {
       return;
     }
     _indexBuffer = ib;
   }
 
-  /// Set multiple [VertexBuffers] in [vbs] starting at [startSlot]
-  void setVertexBuffers(int startSlot, List<VertexBuffer> vbs) {
-    int limit = vbs.length + startSlot;
+  /// Set multiple VertexBuffers in [vertexBufferHandles] starting at [startSlot]
+  void setVertexBuffers(int startSlot, List<int> vertexBufferHandles) {
+    int limit = vertexBufferHandles.length + startSlot;
     for (int i = startSlot; i < limit; i++) {
-      _vertexBuffers[i] = vbs[i-startSlot];
+      _vertexBuffers[i] = spectreDevice.getDeviceChild(vertexBufferHandles[i-startSlot]);
     }
   }
   
-  /// Set [InputLayout] [il]
-  void setInputLayout(InputLayout il) {
-    _inputLayout = il;
+  /// Set InputLayout to [inputLayoutHandle]
+  void setInputLayout(int inputLayoutHandle) {
+    _inputLayout = spectreDevice.getDeviceChild(inputLayoutHandle);
   }
 
-  /// Set [ShaderProgram] [sp]
-  void setShaderProgram(ShaderProgram sp) {
+  /// Set ShaderProgram to [shaderProgramHandle]
+  void setShaderProgram(int shaderProgramHandle) {
+    ShaderProgram sp = spectreDevice.getDeviceChild(shaderProgramHandle);
     if (sp == null) {
       return;
     }
@@ -184,8 +186,9 @@ class ImmediateContext {
     webGL.useProgram(_shaderProgram._program);
   }
 
-  /// Set [RasterizerState] [rs]
-  void setRasterizerState(RasterizerState rs) {
+  /// Set RasterizerState to [rasterizerStateHandle]
+  void setRasterizerState(int rasterizerStateHandle) {
+    RasterizerState rs = spectreDevice.getDeviceChild(rasterizerStateHandle);
     if (rs == null) {
       return;
     }
@@ -204,8 +207,9 @@ class ImmediateContext {
     }
   }
 
-  /// Set [Viewport] [vp]
-  void setViewport(Viewport vp) {
+  /// Set Viewport to [viewPortHandle]
+  void setViewport(int viewPortHandle) {
+    Viewport vp = spectreDevice.getDeviceChild(viewPortHandle);
     if (vp == null) {
       return;
     }
@@ -217,8 +221,9 @@ class ImmediateContext {
     //print('(${vp.x},${vp.y}) -> (${vp.width}, ${vp.height})');
   }
 
-  /// Set [BlendState] [bs]
-  void setBlendState(BlendState bs) {
+  /// Set BlendState to [blendStateHandle]
+  void setBlendState(int blendStateHandle) {
+    BlendState bs = spectreDevice.getDeviceChild(blendStateHandle);
     if (bs == null) {
       return;
     }
@@ -241,8 +246,9 @@ class ImmediateContext {
     webGL.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
   }
 
-  /// Set [DepthState] [ds]
-  void setDepthState(DepthState ds) {
+  /// Set DepthState to [depthStateHandle]
+  void setDepthState(int depthStateHandle) {
+    DepthState ds = spectreDevice.getDeviceChild(depthStateHandle);
     if (ds == null) {
       return;
     }
@@ -270,8 +276,9 @@ class ImmediateContext {
     }
   }
 
-  /// Set [RenderTarget] [rt]
-  void setRenderTarget(RenderTarget rt) {
+  /// Set RenderTarget to [renderTargetHandle]
+  void setRenderTarget(int renderTargetHandle) {
+    RenderTarget rt = spectreDevice.getDeviceChild(renderTargetHandle);
     if (_renderTarget == rt) {
       return;
     }
@@ -336,8 +343,9 @@ class ImmediateContext {
     //spectreLog.Info('Setting $name to ${matrix[0]} ${matrix[1]} ${matrix[2]} ${matrix[3]}');
   }
   
-  /// Update the contents of [buffer] with the contents of [data]
-  void updateBuffer(SpectreBuffer buffer, ArrayBufferView data) {
+  /// Update the contents of [bufferHandle] with the contents of [data]
+  void updateBuffer(int bufferHandle, ArrayBufferView data) {
+    SpectreBuffer buffer = spectreDevice.getDeviceChild(bufferHandle);
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
       return;
@@ -357,8 +365,9 @@ class ImmediateContext {
     webGL.bindBuffer(buffer._target,  oldBind);
   }
   
-  /// Update the contents of [buffer] with the contents of [data] starting at [offset]
-  void updateSubBuffer(SpectreBuffer buffer, ArrayBufferView data, num offset) {
+  /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
+  void updateSubBuffer(int bufferHandle, ArrayBufferView data, num offset) {
+    SpectreBuffer buffer = spectreDevice.getDeviceChild(bufferHandle);
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
       return;
@@ -375,10 +384,11 @@ class ImmediateContext {
     webGL.bindBuffer(buffer._target, oldBind);
   }
   
-  /// Update the pixels of [tex] with the pixels of [img]
+  /// Update the pixels of [textureHandle] with the pixels of [img]
   ///
   /// Only updates the top level mip map
-  void updateTexture2D(Texture2D tex, ImageElement img) {
+  void updateTexture2D(int textureHandle, ImageElement img) {
+    Texture2D tex = spectreDevice.getDeviceChild(textureHandle);
     webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = webGL.getParameter(tex._target_param);
     webGL.bindTexture(tex._target, tex._buffer);
@@ -386,8 +396,9 @@ class ImmediateContext {
     webGL.bindTexture(tex._target, oldBind);
   }
   
-  /// Generate the full mipmap pyramid for [tex]
-  void generateMipmap(Texture2D tex) {
+  /// Generate the full mipmap pyramid for [textureHandle]
+  void generateMipmap(int textureHandle) {
+    Texture2D tex = spectreDevice.getDeviceChild(textureHandle);
     webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = webGL.getParameter(tex._target_param);
     webGL.bindTexture(tex._target, tex._buffer);
@@ -395,17 +406,34 @@ class ImmediateContext {
     webGL.bindTexture(tex._target, oldBind);
   }
   
-  /// Sets a list of [textures] starting at [texUnitOffset]
-  void setTextures(int texUnitOffset, List<Texture> textures) {
+  void compileShader(int shaderHandle, String source) {
+    Shader shader = spectreDevice.getDeviceChild(shaderHandle);
+    shader.source = source;
+    shader.compile();
+    String shaderCompileLog = webGL.getShaderInfoLog(shader._shader);
+    spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
+  }
+  
+  void linkShaderProgram(int shaderProgramHandle, int vertexShaderHandle, int fragmentShaderHandle) {
+    ShaderProgram sp = spectreDevice.getDeviceChild(shaderProgramHandle);
+    VertexShader vs = spectreDevice.getDeviceChild(vertexShaderHandle);
+    FragmentShader fs = spectreDevice.getDeviceChild(fragmentShaderHandle);
+    webGL.attachShader(sp._program, vs._shader);
+    webGL.attachShader(sp._program, fs._shader);
+    sp.link();
+  }
+  
+  /// Sets a list of [textureHandles] starting at [texUnitOffset]
+  void setTextures(int texUnitOffset, List<int> textureHandles) {
     for (int i = texUnitOffset; i < numTextures; i++) {
-      _textures[i] = textures[i-texUnitOffset];
+      _textures[i] = spectreDevice.getDeviceChild(textureHandles[i-texUnitOffset]);
     }
   }
   
-  /// Sets a list of [samplers] starting at [texUnitOffset]
-  void setSamplers(int texUnitOffset, List<SamplerState> samplers) {
+  /// Sets a list of [samplerHandles] starting at [texUnitOffset]
+  void setSamplers(int texUnitOffset, List<int> samplerHandles) {
     for (int i = texUnitOffset; i < numTextures; i++) {
-      _samplerStates[i] = samplers[i-texUnitOffset];
+      _samplerStates[i] = spectreDevice.getDeviceChild(samplerHandles[i-texUnitOffset]);
     }
   }
   

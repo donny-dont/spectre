@@ -32,9 +32,9 @@ class _DebugDrawVertexManager {
   List<_DebugDrawVertex> _vertices;
   Float32Array _vboStorage;
   int _vboUsed;
-  VertexBuffer _vbo;
-  InputLayout _vboLayout;
-  ShaderProgram _lineShader;
+  int _vbo;
+  int _vboLayout;
+  int _lineShader;
   
   _DebugDrawVertexManager(String name, int vboSize, this._lineShader) {
     _maxVertices = vboSize;
@@ -103,7 +103,7 @@ class _DebugDrawVertexManager {
     spectreImmediateContext.setUniformMatrix4('cameraTransform', cameraMatrix);
     spectreImmediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
     spectreImmediateContext.setVertexBuffers(0, [_vbo]);
-    spectreImmediateContext.setIndexBuffer(null);
+    spectreImmediateContext.setIndexBuffer(0);
     spectreImmediateContext.setInputLayout(_vboLayout);
     spectreImmediateContext.draw(verts, 0);
   }
@@ -183,11 +183,11 @@ class _DebugDrawSphereManager {
   * You will have to call update, prepareForRender, and render once per frame 
   */
 class DebugDrawManager {
-  DepthState _depthEnabledState;
-  DepthState _depthDisabledState;
-  BlendState _blendState;
-  RasterizerState _rasterState;
-  CommandBuffer _commandBuffer;
+  int _depthEnabledState;
+  int _depthDisabledState;
+  int _blendState;
+  int _rasterState;
+  //CommandBuffer _commandBuffer;
   
   _DebugDrawVertexManager _depthEnabled;
   _DebugDrawVertexManager _depthDisabled;
@@ -210,11 +210,11 @@ class DebugDrawManager {
     _blendState = spectreDevice.createBlendState(_blendStateName, {});
     _rasterState = spectreDevice.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
     _cameraMatrix = new Float32Array(16);
-    _commandBuffer = new CommandBuffer();
+    //_commandBuffer = new CommandBuffer();
   }
   
   void Init(VertexShaderResource lineVShader, FragmentShaderResource linePShader, VertexShaderResource sphereVShader, FragmentShaderResource spherePShader, MeshResource unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
-    ShaderProgram lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
+    int lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
     _depthEnabled = new _DebugDrawVertexManager(_depthEnabledLineVBOName, vboSize, lineProgram);
     _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
@@ -433,21 +433,21 @@ class DebugDrawManager {
     _depthDisabled._prepareForRender();
     _depthEnabledSpheres._prepareForRender();
     _depthDisabledSpheres._prepareForRender();
-    _commandBuffer.clear();
-    _commandBuffer.addCommand(new CommandSetBlendState(_blendStateName));
-    _commandBuffer.addCommand(new CommandSetRasterizerState(_rasterStateName));
-    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
-    _commandBuffer.addCommand(new CommandSetShaderProgram(_lineShaderProgramName));
-    _commandBuffer.addCommand(new CommandSetUniformMatrix4(_cameraTransformUniformName, _cameraMatrix));
-    _commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthEnabledLineVBOName]));
-    _commandBuffer.addCommand(new CommandSetIndexBuffer(null));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthEnabledLineVBOName Layout'));
-    _commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
-    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthDisabledLineVBOName]));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthDisabledLineVBOName Layout'));
-    _commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
+    //_commandBuffer.clear();
+    //_commandBuffer.addCommand(new CommandSetBlendState(_blendStateName));
+    //_commandBuffer.addCommand(new CommandSetRasterizerState(_rasterStateName));
+    //_commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
+    //_commandBuffer.addCommand(new CommandSetShaderProgram(_lineShaderProgramName));
+    //_commandBuffer.addCommand(new CommandSetUniformMatrix4(_cameraTransformUniformName, _cameraMatrix));
+    //_commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
+    //_commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthEnabledLineVBOName]));
+    //_commandBuffer.addCommand(new CommandSetIndexBuffer(null));
+    //_commandBuffer.addCommand(new CommandSetInputLayout('$_depthEnabledLineVBOName Layout'));
+    //_commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
+    //_commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
+    //_commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthDisabledLineVBOName]));
+    //_commandBuffer.addCommand(new CommandSetInputLayout('$_depthDisabledLineVBOName Layout'));
+    //_commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
   }
   
   /// Render debug primitives for [Camera] [cam]
@@ -458,7 +458,9 @@ class DebugDrawManager {
       pm.selfMultiply(la);
       pm.copyIntoArray(_cameraMatrix);
     }
-    _commandBuffer.apply(spectreRM, spectreDevice, spectreImmediateContext);
+    _depthEnabled.render(_cameraMatrix);
+    _depthDisabled.render(_cameraMatrix);
+    //_commandBuffer.apply(spectreRM, spectreDevice, spectreImmediateContext);
   }
   
   /// Update time [seconds], removing any dead debug primitives
