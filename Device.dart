@@ -407,9 +407,21 @@ class ShaderProgram extends DeviceChild {
   int numAttributes;
   int numUniforms;
   
+  ShaderProgram() {
+    vs = 0;
+    fs = 0;
+    numUniforms = 0;
+    numAttributes = 0;
+    _program = null;
+  }
+  
   void _fillProps(Map props) {
-    vs = props['VertexProgram'];
-    fs = props['FragmentProgram'];
+    Object o = null;
+    
+    o = props['VertexProgram']; 
+    vs = o != null ? o : 0;
+    o = props['FragmentProgram'];
+    fs = o != null ? o : 0;
   }
   
   void _cleanup() {
@@ -1191,10 +1203,12 @@ class Device {
     shaderprogram._program = webGL.createProgram();
     VertexShader vs = getDeviceChild(shaderprogram.vs);
     FragmentShader fs = getDeviceChild(shaderprogram.fs);
-    webGL.attachShader(shaderprogram._program, vs._shader);
-    webGL.attachShader(shaderprogram._program, fs._shader);
-    shaderprogram.link();
-    
+    if (vs != null && fs != null) {
+      webGL.attachShader(shaderprogram._program, vs._shader);
+      webGL.attachShader(shaderprogram._program, fs._shader);
+      shaderprogram.link();
+    }
+
     _setChildObject(handle, shaderprogram);
     _nameMapping[name] = handle;
     return handle;
