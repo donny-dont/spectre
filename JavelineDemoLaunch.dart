@@ -79,9 +79,9 @@ class JavelineDemoLaunch {
     ParagraphElement pe = new ParagraphElement();
     pe.innerHTML = 'Loaded Resources:';
     d.nodes.add(pe);
-    spectreRM.forEach((name, resource) {
+    spectreRM.children.forEach((name, resource) {
       DivElement resourceDiv = new DivElement();
-      resourceDiv.innerHTML = '${name} (${resource.type})';
+      resourceDiv.innerHTML = '${name}';
       d.nodes.add(resourceDiv);
     });
   }
@@ -113,6 +113,7 @@ class JavelineDemoLaunch {
       webGL.clearColor(0.0, 0.0, 0.0, 1.0);
       webGL.clearDepth(1.0);
       webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(); });
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(); });
       window.setInterval(refreshResourceManagerTable, 1000);

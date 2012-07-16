@@ -21,10 +21,15 @@
 */
 
 class JavelineSpinningCube extends JavelineBaseDemo {
-  MeshResource cube;
-  VertexShaderResource vertexShader;
-  FragmentShaderResource fragmentShader;
-  ImageResource textureImage;
+  int cubeMeshResource;
+  int cubeVertexBuffer;
+  int cubeIndexBuffer;
+  int cubeNumIndices;
+  int cubeVertexShaderResource;
+  int cubeVertexShader;
+  int cubeFragmentShaderResource;
+  int cubeFragmentShader;
+  int cubeTextureResource;
   int cubeProgram;
   int texture;
   int sampler;
@@ -34,9 +39,10 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   Float32Array objectTransform;
   num _angle;
   JavelineSpinningCube() {
-    cube = null;
-    vertexShader = null;
-    fragmentShader = null;
+    cubeMeshResource = 0;
+    cubeVertexShaderResource = 0;
+    cubeFragmentShaderResource = 0;
+    cubeTextureResource = 0;
     cameraTransform = new Float32Array(16);
     objectTransform = new Float32Array(16);
     _angle = 0.0;
@@ -45,28 +51,38 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
+    cubeMeshResource = spectreRM.registerResource('/meshes/TexturedCube.mesh');
+    cubeVertexShaderResource = spectreRM.registerResource('/shaders/simple_texture.vs');
+    cubeFragmentShaderResource = spectreRM.registerResource('/shaders/simple_texture.fs');
+    cubeTextureResource = spectreRM.registerResource('/textures/WoodPlank.jpg');
     base.then((value) {
       List loadedResources = [];
-      loadedResources.add(spectreRM.load('/meshes/TexturedCube.mesh'));
-      loadedResources.add(spectreRM.load('/shaders/simple_texture.vs'));
-      loadedResources.add(spectreRM.load('/shaders/simple_texture.fs'));
-      loadedResources.add(spectreRM.load('/textures/WoodPlank.jpg'));
+      loadedResources.add(spectreRM.loadResource(cubeMeshResource));
+      loadedResources.add(spectreRM.loadResource(cubeVertexShaderResource));
+      loadedResources.add(spectreRM.loadResource(cubeFragmentShaderResource));
+      loadedResources.add(spectreRM.loadResource(cubeTextureResource));
       Future allLoaded = Futures.wait(loadedResources);
       allLoaded.then((list) {
-        cube = list[0];
-        vertexShader = list[1];
-        fragmentShader = list[2];
-        textureImage = list[3];
-        cubeProgram = spectreDevice.createShaderProgram('Cube Program', { 'VertexProgram': vertexShader.shader, 'FragmentProgram': fragmentShader.shader});
+        cubeVertexShader = spectreDevice.createVertexShader('Cube Vertex Shader',{});
+        cubeFragmentShader = spectreDevice.createFragmentShader('Cube Fragment Shader', {});
+        spectreImmediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource);
+        spectreImmediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource);
+        cubeProgram = spectreDevice.createShaderProgram('Cube Program', { 'VertexProgram': cubeVertexShader, 'FragmentProgram': cubeFragmentShader});
         texture = spectreDevice.createTexture2D('Cube Texture', { 'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGB, 'pixelFormat': Texture.PixelFormatUnsignedByte});
-        spectreImmediateContext.updateTexture2D(texture, textureImage.image);
+        spectreImmediateContext.updateTexture2DFromResource(texture, cubeTextureResource);
         spectreImmediateContext.generateMipmap(texture);
         sampler = spectreDevice.createSamplerState('Cube Texture Sampler', {});
         rs = spectreDevice.createRasterizerState('Cube Rasterizer State', {'cullEnabled': true, 'cullMode': RasterizerState.CullBack, 'cullFrontFace': RasterizerState.FrontCCW});
         {
+          MeshResource cube = spectreRM.getResource(cubeMeshResource);
           var elements = [InputLayoutHelper.inputElementDescriptionFromMesh('vPosition', 0, 'POSITION', cube),
                           InputLayoutHelper.inputElementDescriptionFromMesh('vTexCoord', 0, 'TEXCOORD0', cube)];
           il = spectreDevice.createInputLayout('Cube Input Layout', elements, cubeProgram);
+          cubeVertexBuffer = spectreDevice.createVertexBuffer('Cube Vertex Buffer', {'usage': 'static', 'size': cube.vertexArray.byteLength});
+          cubeIndexBuffer = spectreDevice.createIndexBuffer('Cube Index Buffer', {'usage':'static', 'size': cube.indexArray.byteLength});
+          cubeNumIndices = cube.numIndices;
+          spectreImmediateContext.updateBuffer(cubeVertexBuffer, cube.vertexArray);
+          spectreImmediateContext.updateBuffer(cubeIndexBuffer, cube.indexArray);
         }
         complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
       });  
@@ -74,13 +90,17 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     return complete.future;
   }
   
-  Future<JavelineDemoStatus> shutdown() {
-    spectreRM.unloadBatch(['/meshes/TexturedCube.mesh', '/shaders/simple_texture.vs', '/shaders/simple_texture.fs', '/textures/WoodPlank.jpg']);
+  Future<JavelineDemoStatus> shutdown() {   
+    spectreRM.batchUnload([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource], true);
     spectreDevice.deleteDeviceChild(il);
     spectreDevice.deleteDeviceChild(rs);
     spectreDevice.deleteDeviceChild(sampler);
     spectreDevice.deleteDeviceChild(texture);
     spectreDevice.deleteDeviceChild(cubeProgram);
+    spectreDevice.deleteDeviceChild(cubeVertexBuffer);
+    spectreDevice.deleteDeviceChild(cubeIndexBuffer);
+    spectreDevice.deleteDeviceChild(cubeVertexShader);
+    spectreDevice.deleteDeviceChild(cubeFragmentShader);
     Future<JavelineDemoStatus> base = super.shutdown();
     return base;
   }
@@ -101,9 +121,9 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     spectreImmediateContext.setTextures(0, [texture]);
     spectreImmediateContext.setSamplers(0, [sampler]);
     spectreImmediateContext.setInputLayout(il);
-    spectreImmediateContext.setIndexBuffer(cube.indexBuffer);
-    spectreImmediateContext.setVertexBuffers(0, [cube.vertexBuffer]);
-    spectreImmediateContext.drawIndexed(cube.numIndices, 0);
+    spectreImmediateContext.setIndexBuffer(cubeIndexBuffer);
+    spectreImmediateContext.setVertexBuffers(0, [cubeVertexBuffer]);
+    spectreImmediateContext.drawIndexed(cubeNumIndices, 0);
   }
   
   void update(num time, num dt) {

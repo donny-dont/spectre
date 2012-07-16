@@ -370,15 +370,19 @@ class ImmediateContext {
     webGL.bindBuffer(buffer._target, oldBind);
   }
   
-  /// Update the pixels of [textureHandle] with the pixels of [img]
+  /// Update the pixels of [textureHandle] from the [imageResourceHandle]
   ///
   /// Only updates the top level mip map
-  void updateTexture2D(int textureHandle, ImageElement img) {
+  void updateTexture2DFromResource(int textureHandle, int imageResourceHandle) {
+    ImageResource ir = spectreRM.getResource(imageResourceHandle);
+    if (ir == null) {
+      return;
+    }
     Texture2D tex = spectreDevice.getDeviceChild(textureHandle);
     webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = webGL.getParameter(tex._target_param);
     webGL.bindTexture(tex._target, tex._buffer);
-    webGL.texImage2D(tex._target, 0, tex._textureFormat, tex._textureFormat, tex._pixelFormat, img);
+    webGL.texImage2D(tex._target, 0, tex._textureFormat, tex._textureFormat, tex._pixelFormat, ir.image);
     webGL.bindTexture(tex._target, oldBind);
   }
   
@@ -398,6 +402,14 @@ class ImmediateContext {
     shader.compile();
     String shaderCompileLog = webGL.getShaderInfoLog(shader._shader);
     spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
+  }
+  
+  void compileShaderFromResource(int shaderHandle, int shaderSourceHandle) {
+    ShaderResource sr = spectreRM.getResource(shaderSourceHandle);
+    if (sr == null) {
+      return;
+    }
+    compileShader(shaderHandle, sr.source);
   }
   
   void linkShaderProgram(int shaderProgramHandle, int vertexShaderHandle, int fragmentShaderHandle) {

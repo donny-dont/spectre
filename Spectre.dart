@@ -31,9 +31,9 @@
 #source('HandleSystem.dart');
 #source('Device.dart');
 #source('ImmediateContext.dart');
+#source('ResourceLoader.dart');
 #source('Resource.dart');
 #source('ResourceManager.dart');
-#source('StaticResources.dart');
 #source('Camera.dart');
 #source('CameraController.dart');
 #source('MouseKeyboardCameraController.dart');
@@ -70,14 +70,16 @@ Future<bool> initSpectre(String canvasName) {
   spectreRM.setBaseURL(baseUrl);
   print('Started Spectre');
   List loadedResources = [];
-  loadedResources.add(spectreRM.load('/shaders/debug_line.vs'));
-  loadedResources.add(spectreRM.load('/shaders/debug_line.fs'));
+  {
+    int debugLineVSResource = spectreRM.registerResource('/shaders/debug_line.vs');
+    int debugLineFSResource = spectreRM.registerResource('/shaders/debug_line.fs');
+    loadedResources.add(spectreRM.loadResource(debugLineVSResource));
+    loadedResources.add(spectreRM.loadResource(debugLineFSResource));
+  }
   Future allLoaded = Futures.wait(loadedResources);
   Completer<bool> inited = new Completer<bool>();
   allLoaded.then((resourceList) {
-    VertexShaderResource lineVShader = resourceList[0];
-    FragmentShaderResource linePShader = resourceList[1];
-    spectreDDM.Init(lineVShader, linePShader, null, null, null);
+    spectreDDM.init(resourceList[0], resourceList[1], null, null, null);
     inited.complete(true);
   });
   return inited.future;

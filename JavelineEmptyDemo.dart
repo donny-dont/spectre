@@ -20,18 +20,24 @@
 
 */
 
-#library('Javeline');
-#import('dart:html');
-#import('dart:json');
-#import('VectorMath/VectorMath.dart');
-#import('Spectre.dart');
-#source('JavelineConfig.dart');
-#source('JavelineDemoInterface.dart');
-#source('JavelineKeyboard.dart');
-#source('JavelineMouse.dart');
-
-#source('JavelineBaseDemo.dart');
-#source('JavelineEmptyDemo.dart');
-#source('JavelineImmediateTest.dart');
-#source('JavelineDebugDrawTest.dart');
-#source('JavelineSpinningCube.dart');
+class JavelineEmptyDemo extends JavelineBaseDemo {
+  JavelineEmptyDemo() {
+  }
+  
+  Future<JavelineDemoStatus> startup() {
+    Future<JavelineDemoStatus> base = super.startup();
+    return base;
+  }
+  
+  Future<JavelineDemoStatus> shutdown() {
+    Future<JavelineDemoStatus> base = super.shutdown();
+    return base;
+  }
+  
+  void update(num time, num dt) {
+    super.update(time, dt);
+    
+    spectreDDM.prepareForRender();
+    spectreDDM.render(_camera);
+  }
+}

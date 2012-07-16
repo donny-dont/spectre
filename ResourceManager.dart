@@ -20,176 +20,172 @@
 
 */
 
-typedef void OnResourceLoad(Object resource, String name, String type, Completer<Resource> completer);
-typedef void OnResourceLoadFailure(String name, String type, Completer<Resource> completer);
-
-class _ResourceLoader {
-  static String contentTypeForType(String type) {
-    if (type == 'jpeg' || type == 'jpeg') {
-      return 'image/jpeg';
-    } else if (type == 'png') {
-      return 'image/png';
-    }
-    return 'text/plain';
-  }
-  
-  static String responseTypeForType(String type) {
-    if (type == 'jpg' || type == 'jpeg' || type == 'png') {
-      return 'arraybuffer';
-    }
-    return '';
-  }
-  static void load(String url, String name, String type, OnResourceLoad onLoad, OnResourceLoadFailure onFailure, Completer<Resource> completer) {
-    var req = new XMLHttpRequest();
-    req.open("GET", url, true);
-    req.responseType = responseTypeForType(type);
-    print('Requesting $url ${req.responseType}');
-    req.on.load.add((event) {
-      if (req.response != null) {
-        spectreLog.Info('Request for $url was successful. Fetched ${req.responseType}');
-        onLoad(req.response, name, type, completer);
-      } else {
-        spectreLog.Info('Request for $url was unsuccessful. ${req.statusText}');
-        onFailure(name, type, completer);
-      }
-    });
-    req.send();
-  }
-}
-
-/// Resource Manager
-///
-/// Loads resources from URLs
-typedef void ResourceManagerForEach(String name, Resource res);
-
 class ResourceManager {
-  Map<String, Resource> _resources;
-
+  static final int MaxResources = 2048;
+  static final int MaxStaticResources = 512;
+  static final int ResourceType = 0x1;
+  
+  ResourceLoaders _loaders;
+  
+  HandleSystem _handleSystem;
+  List<ResourceBase> _resources;
+  
   String _baseURL;
-
-  /// Constructs a [ResourceManager]
+  
+  Map<String, int> _urlToHandle;
+  
   ResourceManager() {
-    _baseURL = null;
-    _resources = new Map();
+    _handleSystem = new HandleSystem(MaxResources, MaxStaticResources);
+    _resources = new List(MaxResources);
+    _urlToHandle = new Map<String, int>();
+    _loaders = new ResourceLoaders();
   }
 
-  /// Sets the base URL to load resources from
   void setBaseURL(String baseURL) {
     _baseURL = baseURL;
-    spectreLog.Info('Resource manager serving from $baseURL');
   }
-
-  void _add(Resource r) {
-    print('Adding resource ${r.name}');
-    _resources[r.name] = r;
-  }
-
-  void _remove(Resource r) {
-    r.deleteDeviceObjects();
-    r.releaseData();
-    _resources.remove(r.name);
-  }
-
-  void _onLoad(Object resource, String name, String type, Completer<Resource> completer) {
-    switch (type) {
-      case 'mesh':
-        MeshResource mr = new MeshResource(name, resource);
-        mr.createDeviceObjects();
-        _add(mr);
-        completer.complete(mr);
-      break;
-      case 'vs':
-        VertexShaderResource vsr = new VertexShaderResource(name, resource);
-        vsr.createDeviceObjects();
-        _add(vsr);
-        completer.complete(vsr);
-      break;
-      case 'fs':
-        FragmentShaderResource fsr = new FragmentShaderResource(name, resource);
-        fsr.createDeviceObjects();
-        _add(fsr);
-        completer.complete(fsr);
-      break;
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-        _add(resource);
-        completer.complete(resource);
-      break;
-      default:
-        spectreLog.Error('Resource manager does not understand $type');
-      break;
+  
+  Map<String, int> get children() => _urlToHandle; 
+  
+  ResourceBase getResource(int handle) {
+    if (handle == 0) {
+      return null;
     }
+    if (_handleSystem.validHandle(handle) == false) {
+      spectreLog.Warning('getResource - $handle is not a valid handle');
+      return null;
+    }
+    int index = Handle.getIndex(handle);
+    return _resources[index];
   }
 
-  void _onLoadFailure(String name, String type, Completer<Resource> completer) {
-    spectreLog.Info('Failed to load $name ($type)');
+  String getResourceURL(int handle) {
+    ResourceBase rb = getResource(handle);
+    if (rb != null) {
+      return rb.url;
+    }
+    return null;
   }
-
-  void _load(String url, String name, String type, Completer<Resource> completer) {
-    if (type == 'jpeg' || type == 'jpg' || type == 'png') {
-      ImageResource ir = new ImageResource(name, url);
-      ir.image.on.load.add((event) {
-        _onLoad(ir, name, type, completer);
-      });
-      ir.image.src = ir.url;
+  
+  int getResourceHandle(String url) {
+    int handle = _urlToHandle[url];
+    if (handle == null) {
+      return Handle.BadHandle;
+    }
+    return handle;
+  }
+  
+  int registerResource(String url, [int handle = Handle.BadHandle]) {
+    {
+      // Resource already exists
+      int existingHandle = getResourceHandle(url);
+      if (existingHandle != Handle.BadHandle) {
+        return existingHandle;
+      }
+    }
+    
+    ResourceLoader rl = _loaders.findResourceLoader(url);
+    if (rl == null) {
+      spectreLog.Error('Resource Manager cannot load $url.');
+      return Handle.BadHandle;
+    }
+    
+    ResourceBase rb = rl.createResource(url);
+    
+    if (handle != Handle.BadHandle) {
+      // Static handle
+      int r = _handleSystem.setStaticHandle(handle);
+      if (r != handle) {
+        spectreLog.Error('Registering a static handle $handle failed.');
+        return Handle.BadHandle;
+      }
     } else {
-      _ResourceLoader.load(url, name, type, _onLoad, _onLoadFailure, completer);  
+      // Dynamic handle
+      handle = _handleSystem.allocateHandle(ResourceType);
+      if (handle == Handle.BadHandle) {
+        spectreLog.Error('Registering dynamic handle failed.');
+        return Handle.BadHandle;
+      }
     }
+    assert(_handleSystem.validHandle(handle));
+     
+    int index = Handle.getIndex(handle);
+    if (_resources[index] != null) {
+      spectreLog.Warning('Registering a resource t at $index but there is already something there.');
+      _resources[index].unload();
+      _resources[index] = null;
+    }
+    
+    _resources[index] = rb;
+    _urlToHandle[url] = handle;
+    return handle;
   }
-
-  /// Loads the resource in [name]
-  ///
-  /// Returns a future that will complete when the resource has been fetched and loaded
-  Future<Resource> load(String name) {
-    if (_resources.containsKey(name)) {
-      spectreLog.Warning('Requested load of $name but it is already loaded.');
-      return new Future.immediate(_resources[name]);
+  
+  bool deregisterResource(int handle) {
+    if (handle == 0) {
+      return true;
     }
-    String url = '$_baseURL$name';
-    String type = name.split('.').last();
-    spectreLog.Info('Loading $name ($type) from $url');
-    Completer<Resource> completer = new Completer();
-    _load(url, name, type, completer);
-    spectreLog.Info('Returning future for $name');
+    if (_handleSystem.validHandle(handle) == false) {
+      spectreLog.Warning('deregisterHandle - $handle is not a valid handle');
+      return false;
+    }
+    int index = Handle.getIndex(handle);
+    ResourceBase rb = _resources[index];
+    if (rb != null) {
+      rb.unload();
+      _urlToHandle.remove(rb.url);
+    }
+    _resources[index] = null;
+    _handleSystem.freeHandle(handle);
+  }
+  
+  /// Load the resource [handle]. Can be called again to reload.
+  Future<int> loadResource(int handle) {
+    ResourceBase rb = getResource(handle);
+    if (rb == null) {
+      return null;
+    }
+    ResourceLoader rl = _loaders.findResourceLoader(rb.url);
+    if (rl == null) {
+      return null;
+    }
+    // Start the load...    
+    Future<ResourceLoaderResult> futureResult = rl.load('$_baseURL${rb.url}');
+    Completer<int> completer = new Completer<int>();
+    if (futureResult != null) {
+      futureResult.then((result) {
+        rb.load(result);
+        completer.complete(handle);
+      });
+    }
     return completer.future;
   }
-
-  /// Unloads a resource [name]
-  void unload(String name) {
-    if (_resources.containsKey(name) == false) {
-      spectreLog.Warning('Unload of $name but not loaded.');
+  
+  /// Unload the resource [handle]. [handle] remains registered and can be reloaded.
+  void unloadResource(int handle) {
+    if (handle == 0) {
       return;
     }
-    Resource r = _resources[name];
-    spectreLog.Info('Unloading $name');
-    _remove(r);
-  }
-  
-  void unloadAll() {
-    _resources.forEach((k, v) {
-      spectreLog.Info('Unloading $k');
-      _remove(v);
-    });
-  }
-  
-  void unloadBatch(List<String> resources) {
-    resources.forEach((name) {
-      unload(name);
-    });
-  }
-
-  /// Refreshes a resource [name]
-  void refresh(String name) {
-    if (_resources.containsKey(name)) {
-      Resource r = _resources[name];
-    } else {
-      spectreLog.Warning('Requested refresh of $name but no resource exists. Loading instead.');
-      load(name);
+    if (_handleSystem.validHandle(handle) == false) {
+      spectreLog.Warning('deregisterHandle - $handle is not a valid handle');
+      return;
+    }
+    int index = Handle.getIndex(handle);
+    if (_resources[index] != null) {
+      _resources[index].unload();
     }
   }
   
-  void forEach(ResourceManagerForEach f) {
-    _resources.forEach(f);
+  void batchUnload(List<int> handles, [bool deregister=false]) {
+    if (deregister) {
+      for (int h in handles) {
+        deregisterResource(h);
+      }  
+    } else {
+      for (int h in handles) {
+        unloadResource(h);
+      }
+    }
+    
   }
 }

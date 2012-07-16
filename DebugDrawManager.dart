@@ -119,12 +119,12 @@ class _DebugDrawSphere {
 class _DebugDrawSphereManager {
   int _maxSpheres;
   List<_DebugDrawSphere> _spheres;
-  MeshResource _unitSphere;
-  InputLayout _vboLayout;
-  ShaderProgram _sphereShader;
+  int _unitSphere;
+  int _vboLayout;
+  int _sphereShader;
   Float32Array _sphereColor;
   
-  _DebugDrawSphereManager(MeshResource unitSphere, int maxSpheres) {
+  _DebugDrawSphereManager(int unitSphere, int maxSpheres) {
     _unitSphere = unitSphere;
     _maxSpheres = maxSpheres;
     _spheres = new List<_DebugDrawSphere>();
@@ -195,10 +195,13 @@ class DebugDrawManager {
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
   
+  
   final String _depthStateEnabledName = 'Debug Depth Enabled State';
   final String _depthStateDisabledName = 'Debug Depth Disabled State';
   final String _blendStateName = 'Debug Blend State';
   final String _rasterStateName = 'Debug Rasterizer State';
+  final String _lineVertexShader = 'Debug Line Vertex Shader';
+  final String _lineFragmentShader = 'Debug Line Fragment Shader';
   final String _lineShaderProgramName = 'Debug Line Program';
   final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
   final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
@@ -213,8 +216,13 @@ class DebugDrawManager {
     //_commandBuffer = new CommandBuffer();
   }
   
-  void Init(VertexShaderResource lineVShader, FragmentShaderResource linePShader, VertexShaderResource sphereVShader, FragmentShaderResource spherePShader, MeshResource unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
-    int lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
+  void init(int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
+    int lineVS = spectreDevice.createVertexShader(_lineVertexShader, {});
+    int lineFS = spectreDevice.createFragmentShader(_lineFragmentShader, {});
+    spectreImmediateContext.compileShaderFromResource(lineVS, lineVSResourceHandle);
+    spectreImmediateContext.compileShaderFromResource(lineFS, lineFSResourceHandle);
+    int lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {});
+    spectreImmediateContext.linkShaderProgram(lineProgram, lineVS, lineFS);
     _depthEnabled = new _DebugDrawVertexManager(_depthEnabledLineVBOName, vboSize, lineProgram);
     _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
