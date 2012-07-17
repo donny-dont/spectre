@@ -34,6 +34,8 @@
 #source('ResourceLoader.dart');
 #source('Resource.dart');
 #source('ResourceManager.dart');
+#source('Interpreter.dart');
+
 #source('Camera.dart');
 #source('CameraController.dart');
 #source('MouseKeyboardCameraController.dart');
