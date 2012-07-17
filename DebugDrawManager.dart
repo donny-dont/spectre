@@ -187,7 +187,8 @@ class DebugDrawManager {
   int _depthDisabledState;
   int _blendState;
   int _rasterState;
-  //CommandBuffer _commandBuffer;
+  
+  List _drawCommands;
   
   _DebugDrawVertexManager _depthEnabled;
   _DebugDrawVertexManager _depthDisabled;
@@ -213,7 +214,6 @@ class DebugDrawManager {
     _blendState = spectreDevice.createBlendState(_blendStateName, {});
     _rasterState = spectreDevice.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
     _cameraMatrix = new Float32Array(16);
-    //_commandBuffer = new CommandBuffer();
   }
   
   void init(int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
@@ -227,6 +227,32 @@ class DebugDrawManager {
     _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
+    
+    // Build the program
+    ProgramBuilder pb = new ProgramBuilder();
+    // General
+    pb.setBlendState(_blendState);
+    pb.setRasterizerState(_rasterState);
+    pb.setShaderProgram(lineProgram);
+    pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
+    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    pb.setIndexBuffer(0);
+    // Depth enabled lines
+    pb.setDepthState(_depthEnabledState);
+    pb.setVertexBuffers(0, [_depthEnabled._vbo]);
+    pb.setInputLayout(_depthEnabled._vboLayout);
+    // draw Indirect takes vertexCount from register 0
+    // draw Indirect takes vertexOffset from register 1
+    pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    // Depth disabled lines
+    pb.setDepthState(_depthDisabledState);
+    pb.setVertexBuffers(0, [_depthDisabled._vbo]);
+    pb.setInputLayout(_depthDisabled._vboLayout);
+    // draw Indirect takes vertexCount from register 2
+    // draw Indirect takes vertexOffset from register 3
+    pb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
+    // Save built program
+    _drawCommands = pb.ops;
   }
   
   /// Add a line segment from [start] to [finish] with [color]
@@ -441,21 +467,6 @@ class DebugDrawManager {
     _depthDisabled._prepareForRender();
     _depthEnabledSpheres._prepareForRender();
     _depthDisabledSpheres._prepareForRender();
-    //_commandBuffer.clear();
-    //_commandBuffer.addCommand(new CommandSetBlendState(_blendStateName));
-    //_commandBuffer.addCommand(new CommandSetRasterizerState(_rasterStateName));
-    //_commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
-    //_commandBuffer.addCommand(new CommandSetShaderProgram(_lineShaderProgramName));
-    //_commandBuffer.addCommand(new CommandSetUniformMatrix4(_cameraTransformUniformName, _cameraMatrix));
-    //_commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
-    //_commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthEnabledLineVBOName]));
-    //_commandBuffer.addCommand(new CommandSetIndexBuffer(null));
-    //_commandBuffer.addCommand(new CommandSetInputLayout('$_depthEnabledLineVBOName Layout'));
-    //_commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
-    //_commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
-    //_commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthDisabledLineVBOName]));
-    //_commandBuffer.addCommand(new CommandSetInputLayout('$_depthDisabledLineVBOName Layout'));
-    //_commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
   }
   
   /// Render debug primitives for [Camera] [cam]
@@ -466,9 +477,15 @@ class DebugDrawManager {
       pm.selfMultiply(la);
       pm.copyIntoArray(_cameraMatrix);
     }
-    _depthEnabled.render(_cameraMatrix);
-    _depthDisabled.render(_cameraMatrix);
-    //_commandBuffer.apply(spectreRM, spectreDevice, spectreImmediateContext);
+    {
+      Interpreter interpreter = new Interpreter();
+      // Set registers
+      interpreter.setRegister(0, _depthEnabled.vertexCount);
+      interpreter.setRegister(1, 0);
+      interpreter.setRegister(2, _depthDisabled.vertexCount);
+      interpreter.setRegister(3, 0);
+      interpreter.run(_drawCommands, spectreDevice, spectreRM, spectreImmediateContext);
+    }
   }
   
   /// Update time [seconds], removing any dead debug primitives
