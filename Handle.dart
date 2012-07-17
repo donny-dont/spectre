@@ -37,7 +37,8 @@ class Handle {
   
   static final int StatusUsed = 0x1;
   static final int StatusFreeList = 0x2;
-
+  static final int StatusReg = 0x4;
+  
   static final int BadHandle = 0xFFFFFFFF;
   
   static int getStatus(int handle) {
@@ -120,6 +121,16 @@ class Handle {
   static bool isStaticHandle(int handle) {
     int serial = getSerial(handle);
     return serial == SerialMask;
+  }
+  
+  // A register handle is a special handle used by the interpreter
+  //
+  static int makeRegisterHandle(int register) {
+    return makeHandle(register, 0, 0, Handle.StatusReg);
+  }
+
+  static bool isRegisterHandle(int handle) {
+    return (getStatus(handle) & StatusReg) != 0;
   }
   
   // A next pointer has the status flag StatusFreeList
