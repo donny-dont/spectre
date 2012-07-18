@@ -186,6 +186,21 @@ class ResourceManager {
         unloadResource(h);
       }
     }
+  }
 
+  void addEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
+    ResourceBase rb = getResource(resourceHandle);
+    if (rb == null) {
+      return;
+    }
+    rb.on.getSetForType(eventType).add(callback);
+  }
+
+  void removeEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
+    ResourceBase rb = getResource(resourceHandle);
+    if (rb == null) {
+      return;
+    }
+    rb.on.getSetForType(eventType).remove(callback);
   }
 }

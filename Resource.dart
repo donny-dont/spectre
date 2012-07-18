@@ -20,19 +20,28 @@
 
 */
 
-typedef void ResourceEvent(int type, ResourceBase resource);
+typedef void ResourceEventCallback(int type, ResourceBase resource);
 
 class ResourceEvents {
   static final int TypeUpdate = 0x1;
   static final int TypeUnloaded = 0x2;
-  List<ResourceEvent> update;
-  List<ResourceEvent> unloaded;
+  Set<ResourceEventCallback> update;
+  Set<ResourceEventCallback> unloaded;
   ResourceEvents() {
-    update = new List();
-    unloaded = new List();
+    update = new HashSet();
+    unloaded = new HashSet();
+  }
+
+  Set<ResourceEventCallback> getSetForType(int type) {
+    if (type == TypeUpdate) {
+      return update;
+    }
+    if (type == TypeUnloaded) {
+      return unloaded;
+    }
+    return null;
   }
 }
-
 
 class ResourceBase {
   bool _isLoaded;
@@ -54,14 +63,14 @@ class ResourceBase {
 
   // Call after the data is updated
   void _fireUpdated() {
-    for (ResourceEvent reu in on.update) {
+    for (ResourceEventCallback reu in on.update) {
       reu(ResourceEvents.TypeUpdate, this);
     }
   }
 
   // Call before the data is gone
   void _fireUnloaded() {
-    for (ResourceEvent reu in on.unloaded) {
+    for (ResourceEventCallback reu in on.unloaded) {
       reu(ResourceEvents.TypeUnloaded, this);
     }
   }
@@ -168,33 +177,3 @@ class ImageResource extends ResourceBase {
     image = null;
   }
 }
-
-
-/// ----
-
-/*
-  void createDeviceObjects() {
-    String ibName = '${name}.IndexBuffer';
-    String vbName = '${name}.VertexBuffer';
-    int numIndices = meshData['meshes'][0]['indices'].length;
-    int indexWidth = meshData['meshes'][0]['indexWidth'];
-    int ibSize = numIndices*indexWidth;
-    indexBuffer = spectreDevice.createIndexBuffer(ibName,{'usage':'dynamic','size':ibSize});
-    spectreImmediateContext.updateBuffer(indexBuffer, new Uint16Array.fromList(meshData['meshes'][0]['indices']));
-    int numAttributeValues = meshData['meshes'][0]['vertices'].length;
-    int attributeValueWidth = 4;
-    int vbSize = numAttributeValues*attributeValueWidth;
-    vertexBuffer = spectreDevice.createVertexBuffer(vbName, {'usage':'dynamic','size':vbSize});
-    spectreImmediateContext.updateBuffer(vertexBuffer, new Float32Array.fromList(meshData['meshes'][0]['vertices']));
-    spectreLog.Info('Created ($ibName,$vbName) device objects for $name');
-  }
-
-  void deleteDeviceObjects() {
-    spectreLog.Info('Deleted (${spectreDevice.getDeviceChildName(indexBuffer)},${spectreDevice.getDeviceChildName(vertexBuffer)}) for $name');
-    spectreDevice.deleteDeviceChild(indexBuffer);
-    spectreDevice.deleteDeviceChild(vertexBuffer);
-    indexBuffer = null;
-    vertexBuffer = null;
-  }
-
-*/
