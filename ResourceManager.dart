@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -24,16 +24,16 @@ class ResourceManager {
   static final int MaxResources = 2048;
   static final int MaxStaticResources = 512;
   static final int ResourceType = 0x1;
-  
+
   ResourceLoaders _loaders;
-  
+
   HandleSystem _handleSystem;
   List<ResourceBase> _resources;
-  
+
   String _baseURL;
-  
+
   Map<String, int> _urlToHandle;
-  
+
   ResourceManager() {
     _handleSystem = new HandleSystem(MaxResources, MaxStaticResources);
     _resources = new List(MaxResources);
@@ -44,9 +44,9 @@ class ResourceManager {
   void setBaseURL(String baseURL) {
     _baseURL = baseURL;
   }
-  
-  Map<String, int> get children() => _urlToHandle; 
-  
+
+  Map<String, int> get children() => _urlToHandle;
+
   ResourceBase getResource(int handle) {
     if (handle == 0) {
       return null;
@@ -66,7 +66,7 @@ class ResourceManager {
     }
     return null;
   }
-  
+
   int getResourceHandle(String url) {
     int handle = _urlToHandle[url];
     if (handle == null) {
@@ -74,7 +74,7 @@ class ResourceManager {
     }
     return handle;
   }
-  
+
   int registerResource(String url, [int handle = Handle.BadHandle]) {
     {
       // Resource already exists
@@ -83,15 +83,15 @@ class ResourceManager {
         return existingHandle;
       }
     }
-    
+
     ResourceLoader rl = _loaders.findResourceLoader(url);
     if (rl == null) {
       spectreLog.Error('Resource Manager cannot load $url.');
       return Handle.BadHandle;
     }
-    
+
     ResourceBase rb = rl.createResource(url);
-    
+
     if (handle != Handle.BadHandle) {
       // Static handle
       int r = _handleSystem.setStaticHandle(handle);
@@ -108,19 +108,19 @@ class ResourceManager {
       }
     }
     assert(_handleSystem.validHandle(handle));
-     
+
     int index = Handle.getIndex(handle);
     if (_resources[index] != null) {
       spectreLog.Warning('Registering a resource t at $index but there is already something there.');
       _resources[index].unload();
       _resources[index] = null;
     }
-    
+
     _resources[index] = rb;
     _urlToHandle[url] = handle;
     return handle;
   }
-  
+
   bool deregisterResource(int handle) {
     if (handle == 0) {
       return true;
@@ -138,7 +138,7 @@ class ResourceManager {
     _resources[index] = null;
     _handleSystem.freeHandle(handle);
   }
-  
+
   /// Load the resource [handle]. Can be called again to reload.
   Future<int> loadResource(int handle) {
     ResourceBase rb = getResource(handle);
@@ -149,7 +149,7 @@ class ResourceManager {
     if (rl == null) {
       return null;
     }
-    // Start the load...    
+    // Start the load...
     Future<ResourceLoaderResult> futureResult = rl.load('$_baseURL${rb.url}');
     Completer<int> completer = new Completer<int>();
     if (futureResult != null) {
@@ -160,7 +160,7 @@ class ResourceManager {
     }
     return completer.future;
   }
-  
+
   /// Unload the resource [handle]. [handle] remains registered and can be reloaded.
   void unloadResource(int handle) {
     if (handle == 0) {
@@ -175,17 +175,17 @@ class ResourceManager {
       _resources[index].unload();
     }
   }
-  
+
   void batchUnload(List<int> handles, [bool deregister=false]) {
     if (deregister) {
       for (int h in handles) {
         deregisterResource(h);
-      }  
+      }
     } else {
       for (int h in handles) {
         unloadResource(h);
       }
     }
-    
+
   }
 }

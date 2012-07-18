@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -91,7 +91,7 @@ void checkWebGL() {
   if (webGL == null) {
     return;
   }
-  
+
   int error = webGL.getError();
   if (error != WebGLRenderingContext.NO_ERROR) {
     spectreLog.Error('WebGL Error: $error');

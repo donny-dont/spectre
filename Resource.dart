@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -33,31 +33,32 @@ class ResourceEvents {
   }
 }
 
+
 class ResourceBase {
   bool _isLoaded;
   bool get isLoaded() => _isLoaded;
-    
+
   String _url;
   String get url() => _url;
-  
+
   ResourceEvents on;
-  
+
   ResourceBase(this._url) {
     _isLoaded = false;
     on = new ResourceEvents();
   }
-  
+
   abstract void load(ResourceLoaderResult result);
-  
+
   abstract void unload();
-  
+
   // Call after the data is updated
   void _fireUpdated() {
     for (ResourceEvent reu in on.update) {
       reu(ResourceEvents.TypeUpdate, this);
     }
   }
-  
+
   // Call before the data is gone
   void _fireUnloaded() {
     for (ResourceEvent reu in on.unloaded) {
@@ -68,14 +69,14 @@ class ResourceBase {
 
 class Float32ArrayResource extends ResourceBase {
   Float32Array array;
-  
+
   Float32ArrayResource(String url) : super(url) {
   }
-  
+
   void load(ResourceLoaderResult result) {
     _fireUpdated();
   }
-  
+
   void unload() {
     _fireUnloaded();
   }
@@ -83,14 +84,14 @@ class Float32ArrayResource extends ResourceBase {
 
 class Uint16ArrayResource extends ResourceBase {
   Uint16Array array;
-  
+
   Uint16ArrayResource(String url) : super(url) {
   }
-  
+
   void load(ResourceLoaderResult result) {
     _fireUpdated();
   }
-  
+
   void unload() {
     _fireUnloaded();
   }
@@ -100,15 +101,15 @@ class MeshResource extends ResourceBase {
   Map meshData;
   Float32Array vertexArray;
   Uint16Array indexArray;
-  
+
   MeshResource(String url) : super(url) {
-    
+
   }
-  
+
   int get numIndices() {
     return meshData['meshes'][0]['indices'].length;
   }
-  
+
   void load(ResourceLoaderResult result) {
     if (result.success == false) {
       return;
@@ -118,7 +119,7 @@ class MeshResource extends ResourceBase {
     vertexArray = new Float32Array.fromList(meshData['meshes'][0]['vertices']);
     _fireUpdated();
   }
-  
+
   void unload() {
     _fireUnloaded();
     vertexArray = null;
@@ -129,10 +130,10 @@ class MeshResource extends ResourceBase {
 
 class ShaderResource extends ResourceBase {
   String source;
-  
+
   ShaderResource(String url) : super(url) {
   }
-  
+
   void load(ResourceLoaderResult result) {
     if (result.success == false) {
       return;
@@ -140,7 +141,7 @@ class ShaderResource extends ResourceBase {
     source = result.data;
     _fireUpdated();
   }
-  
+
   void unload() {
     _fireUnloaded();
     source = null;
@@ -149,11 +150,11 @@ class ShaderResource extends ResourceBase {
 
 class ImageResource extends ResourceBase {
   ImageElement image;
-  
+
   ImageResource(String url) : super(url) {
-    
+
   }
-  
+
   void load(ResourceLoaderResult result) {
     if (result.success == false) {
       return;
@@ -161,7 +162,7 @@ class ImageResource extends ResourceBase {
     image = result.data;
     _fireUpdated();
   }
-  
+
   void unload() {
     _fireUnloaded();
     image = null;
@@ -187,7 +188,7 @@ class ImageResource extends ResourceBase {
     spectreImmediateContext.updateBuffer(vertexBuffer, new Float32Array.fromList(meshData['meshes'][0]['vertices']));
     spectreLog.Info('Created ($ibName,$vbName) device objects for $name');
   }
-  
+
   void deleteDeviceObjects() {
     spectreLog.Info('Deleted (${spectreDevice.getDeviceChildName(indexBuffer)},${spectreDevice.getDeviceChildName(vertexBuffer)}) for $name');
     spectreDevice.deleteDeviceChild(indexBuffer);
@@ -195,5 +196,5 @@ class ImageResource extends ResourceBase {
     indexBuffer = null;
     vertexBuffer = null;
   }
-  
+
 */

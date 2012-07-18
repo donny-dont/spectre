@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -34,35 +34,35 @@ class Handle {
   // 4 bits for a status
   static final int StatusMask = 0xF;
   static final int StatusShift = 28;
-  
+
   static final int StatusUsed = 0x1;
   static final int StatusFreeList = 0x2;
   static final int StatusReg = 0x4;
-  
+
   static final int BadHandle = 0xFFFFFFFF;
-  
+
   static int getStatus(int handle) {
     return (handle >> StatusShift) & StatusMask;
   }
-  
+
   static int getType(int handle) {
     return (handle >> TypeShift) & TypeMask;
   }
-  
+
   static int getSerial(int handle) {
     return (handle >> SerialShift) & SerialMask;
   }
-  
+
   static int getIndex(int handle) {
     return (handle >> IndexShift) & IndexMask;
   }
-  
+
   static int nextSerial(int handle) {
     int index = getIndex(handle);
     int serial = getSerial(handle);
     int type = getType(handle);
     int status = getStatus(handle);
-    
+
     serial = (serial+1) & SerialMask;
     if (serial == SerialMask) {
       // We skip over SerialMask
@@ -71,36 +71,36 @@ class Handle {
     }
     return makeHandle(index, serial, type, status);
   }
-  
+
   static int setType(int handle, int type) {
     int index = getIndex(handle);
     int serial = getSerial(handle);
     int status = getStatus(handle);
     return makeHandle(index, serial, type, status);
   }
-  
+
   static int setIndex(int handle, int index) {
     int serial = getSerial(handle);
     int type = getType(handle);
     int status = getStatus(handle);
     return makeHandle(index, serial, type, status);
   }
-  
+
   static int setStatusFlag(int handle, int flag) {
     int bit = flag << StatusShift;
     return handle|bit;
   }
-  
+
   static int clearStatusFlag(int handle, int flag) {
     int bit = flag << StatusShift;
     handle &= ~bit;
     return handle;
   }
-  
+
   static bool checkStatusFlag(int handle, int flag) {
     return (Handle.getStatus(handle) & flag) != 0;
   }
-  
+
   static int makeHandle(int index, int serial, int type, int status) {
     index = index & IndexMask;
     index = index << IndexShift;
@@ -112,17 +112,17 @@ class Handle {
     status = status << StatusShift;
     return index|serial|type|status;
   }
-  
+
   // A static handle has a serial of SerialMask
   static int makeStaticHandle(int index, int type, int status) {
     return makeHandle(index, SerialMask, type, status);
   }
-  
+
   static bool isStaticHandle(int handle) {
     int serial = getSerial(handle);
     return serial == SerialMask;
   }
-  
+
   // A register handle is a special handle used by the interpreter
   //
   static int makeRegisterHandle(int register) {
@@ -132,12 +132,12 @@ class Handle {
   static bool isRegisterHandle(int handle) {
     return (getStatus(handle) & StatusReg) != 0;
   }
-  
+
   // A next pointer has the status flag StatusFreeList
   static int makeNextPointer(int serial, int nextIndex) {
     return makeHandle(nextIndex, serial, 0, StatusFreeList);
   }
-  
+
   static bool isNextPointer(int handle) {
     int status = getStatus(handle);
     return status == StatusFreeList;

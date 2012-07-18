@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -37,9 +37,9 @@ class _InputLayoutElement {
   int _attributeIndex;
   int _attributeStride;
   DeviceFormat _attributeFormat;
-  
+
   String toString() {
-    return 'Attribute $_attributeIndex bound to VBO: $_vboSlot VBO_OFFSET: $_vboOffset Attribute Stride: $_attributeStride Format: $_attributeFormat'; 
+    return 'Attribute $_attributeIndex bound to VBO: $_vboSlot VBO_OFFSET: $_vboOffset Attribute Stride: $_attributeStride Format: $_attributeFormat';
   }
 }
 
@@ -55,7 +55,7 @@ class InputElementDescription {
   int elementStride;
   int vertexBufferSlot;
   int vertexBufferOffset;
-  
+
   InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
 }
 
@@ -76,13 +76,13 @@ class DeviceChild implements Hashable {
 class InputLayout extends DeviceChild {
   int _maxAttributeIndex;
   List<_InputLayoutElement> _elements;
-  
+
   void _fillProps(Map props) {
-    
+
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -101,16 +101,16 @@ class Viewport extends DeviceChild {
     width = 640;
     height = 480;
   }
-  
+
   void _fillProps(Map props) {
     x = props['x'];
     y = props['y'];
     width = props['width'];
     height = props['height'];
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -217,9 +217,9 @@ class BlendState extends DeviceChild {
     o = props['writeRenderTargetAlpha'];
     writeRenderTargetAlpha = o != null ? o : true;
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -231,46 +231,46 @@ class DepthState extends DeviceChild {
   static final int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
   static final int DepthComparisonOpEqual = WebGLRenderingContext.EQUAL;
   static final int DepthComparisonOpNotEqual = WebGLRenderingContext.NOTEQUAL;
-  
+
   static final int DepthComparisonOpLess = WebGLRenderingContext.LESS;
   static final int DepthComparisonOpLessEqual = WebGLRenderingContext.LEQUAL;
   static final int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
   static final int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
-  
+
   bool depthTestEnabled;
   bool depthWriteEnabled;
   bool polygonOffsetEnabled;
-  
+
   num depthNearVal;
   num depthFarVal;
   num polygonOffsetFactor;
   num polygonOffsetUnits;
-  
+
   int depthComparisonOp;
-  
+
   DepthState() {
     depthTestEnabled = false;
     depthWriteEnabled = false;
     polygonOffsetEnabled = false;
-    
+
     depthNearVal = 0.0;
     depthFarVal = 1.0;
     polygonOffsetFactor = 0.0;
     polygonOffsetUnits = 0.0;
-    
+
     depthComparisonOp = DepthComparisonOpAlways;
   }
-  
+
   void _fillProps(Map props) {
     Dynamic o;
-    
+
     o = props['depthTestEnabled'];
     depthTestEnabled = o != null ? o : false;
     o = props['depthWriteEnabled'];
     depthWriteEnabled = o != null ? o : false;
     o = props['polygonOffsetEnabled'];
     polygonOffsetEnabled = o != null ? o : false;
-    
+
     o = props['depthNearVal'];
     depthNearVal = o != null ? o : 0.0;
     o = props['depthFarVal'];
@@ -282,19 +282,19 @@ class DepthState extends DeviceChild {
     o = props['depthComparisonOp'];
     depthComparisonOp = o != null ? o : DepthComparisonOpAlways;
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
 class StencilState extends DeviceChild {
   void _fillProps(Map props) {
-    
+
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -307,23 +307,23 @@ class RasterizerState extends DeviceChild {
   static final int CullFrontAndBack = WebGLRenderingContext.FRONT_AND_BACK;
   static final int FrontCW = WebGLRenderingContext.CW;
   static final int FrontCCW = WebGLRenderingContext.CCW;
-  
+
   bool cullEnabled;
   int cullMode;
   int cullFrontFace;
-  
+
   num lineWidth;
-  
+
   RasterizerState() {
     cullEnabled = false;
     cullMode = CullBack;
     cullFrontFace = FrontCCW;
     lineWidth = 1.0;
   }
-  
+
   void _fillProps(Map props) {
     Dynamic o;
-    
+
     o = props['cullEnabled'];
     cullEnabled = o != null ? o : false;
     o = props['cullMode'];
@@ -333,9 +333,9 @@ class RasterizerState extends DeviceChild {
     o = props['lineWidth'];
     lineWidth = o != null ? o : lineWidth;
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -373,7 +373,7 @@ class Shader extends DeviceChild {
   void _fillProps(Map props) {
 
   }
-  
+
   void _cleanup() {
     webGL.deleteShader(_shader);
   }
@@ -406,7 +406,7 @@ class ShaderProgram extends DeviceChild {
   WebGLProgram _program;
   int numAttributes;
   int numUniforms;
-  
+
   ShaderProgram() {
     vs = 0;
     fs = 0;
@@ -414,16 +414,16 @@ class ShaderProgram extends DeviceChild {
     numAttributes = 0;
     _program = null;
   }
-  
+
   void _fillProps(Map props) {
     Object o = null;
-    
-    o = props['VertexProgram']; 
+
+    o = props['VertexProgram'];
     vs = o != null ? o : 0;
     o = props['FragmentProgram'];
     fs = o != null ? o : 0;
   }
-  
+
   void _cleanup() {
     vs = null;
     fs = null;
@@ -517,7 +517,7 @@ class RenderBuffer extends DeviceChild {
     _width = props['width'];
     _height = props['height'];
   }
-  
+
   void _cleanup() {
     webGL.deleteRenderbuffer(_buffer);
   }
@@ -529,12 +529,12 @@ class Texture extends DeviceChild {
   static final int TextureFormatRGBA = WebGLRenderingContext.RGBA;
   static final int TextureFormatLuminance = WebGLRenderingContext.LUMINANCE;
   static final int TextureFormatLuminanceAlpha = WebGLRenderingContext.LUMINANCE_ALPHA;
-  
+
   static final int PixelFormatUnsignedByte = WebGLRenderingContext.UNSIGNED_BYTE;
   static final int PixelFormatUnsignedShort_4_4_4_4 = WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4;
   static final int PixelFormatUnsignedShort_5_5_5_1 = WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1;
   static final int PixelFormatUnsignedShort_5_6_5 = WebGLRenderingContext.UNSIGNED_SHORT_5_6_5;
-  
+
   int _target;
   int _target_param;
   int _width;
@@ -542,11 +542,11 @@ class Texture extends DeviceChild {
   int _textureFormat;
   int _pixelFormat;
   WebGLTexture _buffer;
-  
+
   void _fillProps(Map props) {
-    
+
   }
-  
+
   void _cleanup() {
     webGL.deleteTexture(_buffer);
   }
@@ -565,7 +565,7 @@ class Texture2D extends Texture {
     _textureFormat = Texture.TextureFormatRGBA;
     _pixelFormat = Texture.PixelFormatUnsignedByte;
   }
-  
+
   void _fillProps(Map props) {
     _width = props['width'] != null ? props['width'] : 1;
     _height = props['height'] != null ? props['height'] : 1;
@@ -581,38 +581,38 @@ class SamplerState extends DeviceChild {
   static final int TextureWrapClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE;
   static final int TextureWrapMirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT;
   static final int TextureWrapRepeat = WebGLRenderingContext.REPEAT;
-  
+
   static final int TextureMagFilterLinear = WebGLRenderingContext.LINEAR;
   static final int TextureMagFilterNearest = WebGLRenderingContext.NEAREST;
-  
+
   static final int TextureMinFilterLinear = WebGLRenderingContext.LINEAR;
   static final int TextureMinFilterNearest = WebGLRenderingContext.NEAREST;
   static final int TextureMinFilterNearestMipmapNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
   static final int TextureMinFilterNearestMipmapLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
   static final int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
   static final int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
-  
+
   int _wrap_s;
   int _wrap_t;
   int _mag_filter;
   int _min_filter;
-  
+
   SamplerState() {
     _wrap_s = TextureWrapRepeat;
     _wrap_t = TextureWrapRepeat;
     _min_filter = TextureMinFilterNearestMipmapLinear;
     _mag_filter = TextureMagFilterLinear;
   }
-  
+
   void _fillProps(Map props) {
     _wrap_s = props['wrapS'] != null ? props['wrapS'] : TextureWrapRepeat;
     _wrap_t = props['wrapT'] != null ? props['wrapT'] : TextureWrapRepeat;
     _min_filter = props['minFilter'] != null ? props['minFilter'] : TextureMinFilterNearestMipmapLinear;
     _mag_filter = props['magFilter'] != null ? props['magFilter'] : TextureMagFilterLinear;
   }
-  
+
   void _cleanup() {
-    
+
   }
 }
 
@@ -629,7 +629,7 @@ class RenderTarget extends DeviceChild {
     _depth = props['depth'];
     _stencil = props['stencil'];
   }
-  
+
   void _cleanup() {
     webGL.deleteFramebuffer(_buffer);
   }
@@ -641,11 +641,11 @@ class SpectreBuffer extends DeviceChild {
   int _param_target;
   int _usage;
   int _size;
-  
+
   void _fillProps(Map props) {
-    
+
   }
-  
+
   void _cleanup() {
     webGL.deleteBuffer(_buffer);
   }
@@ -715,7 +715,7 @@ class Device {
   static final DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
   static final DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
   static final DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
-  
+
   static final int BufferHandleType = 1;
   static final int RenderBufferHandleType = 2;
   static final int RenderTargetHandleType = 3;
@@ -728,7 +728,7 @@ class Device {
   static final int BlendStateHandleType = 10;
   static final int RasterizerStateHandleType = 11;
   static final int InputLayoutHandleType = 12;
-  
+
   String getHandleType(int handle) {
     int type = Handle.getType(handle);
     switch (type) {
@@ -760,24 +760,24 @@ class Device {
         return 'Unknown handle type';
     }
   }
-  
+
   // There is a 1:1 mapping between _childrenHandles and _childrenObjects
   HandleSystem _childrenHandles;
   List<DeviceChild> _childrenObjects;
-  
+
   // Maps from child object name to handle
   Map<String, int> _nameMapping;
 
   static final int MaxDeviceChildren = 2048;
   static final int MaxStaticDeviceChildren = 512;
-  
+
   /// Constructs a GPU device
   Device() {
     _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
     _childrenObjects = new List(MaxDeviceChildren);
     _nameMapping = new Map<String, int>();
   }
-  
+
   /// Returns the handle to the device child named [name]
   int findHandle(String name) {
     int h = _nameMapping[name];
@@ -787,9 +787,9 @@ class Device {
     }
     return h;
   }
-  
-  Map<String, int> get children() => _nameMapping; 
-  
+
+  Map<String, int> get children() => _nameMapping;
+
   /// Lookup the actual device child object given the [handle]
   Dynamic getDeviceChild(int handle) {
     if (handle == 0) {
@@ -802,7 +802,7 @@ class Device {
     int index = Handle.getIndex(handle);
     return _childrenObjects[index];
   }
-  
+
   String getDeviceChildName(int handle) {
     Dynamic dc = getDeviceChild(handle);
     if (dc != null) {
@@ -810,23 +810,23 @@ class Device {
     }
     return 'Unknown handle: $handle';
   }
-  
+
   int _checkName(String name, String type) {
-    int handle = _nameMapping[name]; 
+    int handle = _nameMapping[name];
     if (handle != null) {
       spectreLog.Error('Attempting to create a $type with a name that already exists: $name. Returning existing $name');
       return handle;
     }
     return Handle.BadHandle;
   }
-  
+
   void _setChildObject(int handle, Dynamic o) {
     int index = Handle.getIndex(handle);
     _childrenObjects[index] = o;
   }
 
   /// Registers a handle with the given [type] and [name]
-  /// [handle] is an optional argument that, if provided, must be a statically reserved handle 
+  /// [handle] is an optional argument that, if provided, must be a statically reserved handle
   int registerHandle(int type, [int handle=Handle.BadHandle]) {
     if (handle != Handle.BadHandle) {
       int handleType = Handle.getType(handle);
@@ -856,7 +856,7 @@ class Device {
     assert(_childrenHandles.validHandle(handle));
     return handle;
   }
-  
+
   /// Deletes the device child [handle]
   void deleteDeviceChild(int handle) {
     if (_childrenHandles.validHandle(handle) == false) {
@@ -872,7 +872,7 @@ class Device {
     _nameMapping.remove(dc.name);
     _childrenObjects[index] = null;
   }
-  
+
   /// Create a IndexBuffer named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
@@ -886,21 +886,21 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(BufferHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     IndexBuffer ib = new IndexBuffer();
     ib.name = name;
     ib._fillProps(props);
@@ -909,8 +909,8 @@ class Device {
     webGL.bindBuffer(ib._target, ib._buffer);
     webGL.bufferData(ib._target, ib._size, ib._usage);
     webGL.bindBuffer(ib._target, oldBind);
-    
-    
+
+
     _setChildObject(handle, ib);
     _nameMapping[name] = handle;
     return handle;
@@ -927,21 +927,21 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(BufferHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     VertexBuffer vb = new VertexBuffer();
     vb.name = name;
     vb._fillProps(props);
@@ -950,7 +950,7 @@ class Device {
     webGL.bindBuffer(vb._target, vb._buffer);
     webGL.bufferData(vb._target, vb._size, vb._usage);
     webGL.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, oldBind);
-    
+
     _setChildObject(handle, vb);
     _nameMapping[name] = handle;
     return handle;
@@ -967,14 +967,14 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(RenderBufferHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
@@ -990,7 +990,7 @@ class Device {
     webGL.bindRenderbuffer(rb._target, rb._buffer);
     webGL.renderbufferStorage(rb._target, rb._format, rb._width, rb._height);
     webGL.bindRenderbuffer(WebGLRenderingContext.RENDERBUFFER, oldBind);
-    
+
     _setChildObject(handle, rb);
     _nameMapping[name] = handle;
     return handle;
@@ -1007,21 +1007,21 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(RenderTargetHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     RenderTarget rt = new RenderTarget();
     rt.name = name;
     rt._fillProps(props);
@@ -1045,12 +1045,12 @@ class Device {
     }
     int status = webGL.checkFramebufferStatus(rt._target);
     if (status != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = $status');  
+      spectreLog.Error('RenderTarget $name incomplete status = $status');
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
     webGL.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
-    
+
     _setChildObject(handle, rt);
     _nameMapping[name] = handle;
     return handle;
@@ -1067,37 +1067,37 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(TextureHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     Texture2D tex = new Texture2D();
     tex.name = name;
     tex._fillProps(props);
     tex._buffer = webGL.createTexture();
-    
-    WebGLTexture oldBind = webGL.getParameter(tex._target_param); 
+
+    WebGLTexture oldBind = webGL.getParameter(tex._target_param);
     webGL.bindTexture(tex._target, tex._buffer);
     // Allocate memory for texture
     webGL.texImage2D(tex._target, 0, tex._textureFormat, tex._width, tex._height, 0, tex._textureFormat, tex._pixelFormat, null);
     webGL.bindTexture(tex._target, oldBind);
-    
+
     _setChildObject(handle, tex);
     _nameMapping[name] = handle;
     return handle;
   }
-  
+
   /// Create a [VertexShader] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
@@ -1109,21 +1109,21 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(ShaderHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     VertexShader vertexshader = new VertexShader();
     vertexshader.name = name;
     vertexshader._fillProps(props);
@@ -1145,26 +1145,26 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(ShaderHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     FragmentShader fragmentshader = new FragmentShader();
     fragmentshader.name = name;
     fragmentshader._fillProps(props);
     fragmentshader._shader = webGL.createShader(fragmentshader._type);
-    
+
     _setChildObject(handle, fragmentshader);
     _nameMapping[name] = handle;
     return handle;
@@ -1182,21 +1182,21 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(ShaderProgramHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     ShaderProgram shaderprogram = new ShaderProgram();
     shaderprogram.name = name;
     shaderprogram._fillProps(props);
@@ -1213,7 +1213,7 @@ class Device {
     _nameMapping[name] = handle;
     return handle;
   }
-  
+
   /// Create a [SamplerState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
@@ -1225,30 +1225,30 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(SamplerStateHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     SamplerState sampler = new SamplerState();
     sampler.name = name;
     sampler._fillProps(props);
-    
+
     _setChildObject(handle, sampler);
     _nameMapping[name] = handle;
     return handle;
   }
-  
+
   /// Create a [Viewport] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
@@ -1260,25 +1260,25 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(ViewportHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     Viewport viewport = new Viewport();
     viewport.name = name;
     viewport._fillProps(props);
-    
+
     _setChildObject(handle, viewport);
     _nameMapping[name] = handle;
     return handle;
@@ -1295,25 +1295,25 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(DepthStateHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     DepthState depthstate = new DepthState();
     depthstate.name = name;
     depthstate._fillProps(props);
-    
+
     _setChildObject(handle, depthstate);
     _nameMapping[name] = handle;
     return handle;
@@ -1330,25 +1330,25 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(BlendStateHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     BlendState blendstate = new BlendState();
     blendstate.name = name;
     blendstate._fillProps(props);
-    
+
     _setChildObject(handle, blendstate);
     _nameMapping[name] = handle;
     return handle;
@@ -1365,31 +1365,31 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(BlendStateHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    
+
     RasterizerState rasterizerstate = new RasterizerState();
     rasterizerstate.name = name;
     rasterizerstate._fillProps(props);
-    
+
     _setChildObject(handle, rasterizerstate);
     _nameMapping[name] = handle;
     return handle;
   }
 
-  /// Create an [InputLayout] named [name] for [elements] and [shaderProgramHandle] 
+  /// Create an [InputLayout] named [name] for [elements] and [shaderProgramHandle]
   int createInputLayout(String name, List<InputElementDescription> elements, int shaderProgramHandle, [int handle = Handle.BadHandle]) {
     {
       int checkHandle = _checkName(name, 'BlendState');
@@ -1397,16 +1397,16 @@ class Device {
         return checkHandle;
       }
     }
-    
+
     if (handle == Handle.BadHandle) {
       handle = registerHandle(BlendStateHandleType);
       if (handle == Handle.BadHandle) {
         return handle;
       }
     }
-    
+
     ShaderProgram sp = getDeviceChild(shaderProgramHandle);
-    
+
     InputLayout il = new InputLayout();
     il.name = name;
     il._maxAttributeIndex = -1;
@@ -1428,10 +1428,10 @@ class Device {
       el._attributeStride = e.elementStride;
       il._elements.add(el);
     }
-    
+
     _setChildObject(handle, il);
     _nameMapping[name] = handle;
     return handle;
   }
-  
+
 }

@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -24,12 +24,12 @@ class HandleSystem {
   List<int> _handles;
   int _totalCapacity;
   int _staticCapacity;
-  
+
   int _freeHead;
-  
+
   int _dynamicUsed;
   int _dynamicCapacity;
-  
+
   HandleSystem(this._totalCapacity, this._staticCapacity) {
     _handles = new List<int>(_totalCapacity);
     int i;
@@ -47,15 +47,15 @@ class HandleSystem {
     _dynamicUsed = 0;
     _dynamicCapacity = _totalCapacity - _staticCapacity;;
   }
-  
+
   int get maxStaticIndex() => _staticCapacity;
   int get dynamicSize() => _dynamicUsed;
   int get dynamicCapacity() => _dynamicCapacity;
   int get dynamicAvailable() => _dynamicCapacity - _dynamicUsed;
-  
+
   /// Returns true if index is in the static range
   bool isStaticIndex(int index) => index >= 0 && index < _staticCapacity;
-  
+
   /// Returns true if static index is free
   bool isStaticIndexFree(int index) {
     if (isStaticIndex(index) == false) {
@@ -63,9 +63,9 @@ class HandleSystem {
     }
     return Handle.checkStatusFlag(_handles[index], Handle.StatusUsed) == false;
   }
-  
+
   /// Allocates a static handle at [index] with [type].
-  /// Returns handle or [Handle.BadHandle] in case of error 
+  /// Returns handle or [Handle.BadHandle] in case of error
   int allocateStaticIndex(int index, int type) {
     if (isStaticIndex(index) == false) {
       return Handle.BadHandle;
@@ -76,7 +76,7 @@ class HandleSystem {
     _handles[index] = Handle.makeStaticHandle(index, type, Handle.StatusUsed);
     return _handles[index];
   }
-  
+
   /// Frees a static handle at [index]
   void freeStaticIndex(int index) {
     if (isStaticIndex(index) == false) {
@@ -84,7 +84,7 @@ class HandleSystem {
     }
     _handles[index] = Handle.makeStaticHandle(index, 0, 0);
   }
-  
+
   /// Allocates a static handle [handle]
   /// Returns [handle] or [Handle.BadHandle] in case of error
   int allocateStaticHandle(int handle) {
@@ -98,7 +98,7 @@ class HandleSystem {
     _handles[index] = handle;
     return handle;
   }
-  
+
   /// Frees a static handle [handle]
   void freeStaticHandle(int handle) {
     int index = Handle.getIndex(handle);
@@ -107,7 +107,7 @@ class HandleSystem {
     }
     _handles[index] = Handle.makeStaticHandle(index, 0, 0);
   }
-  
+
   /// Set a static handle slot, no error checking
   /// Returns [handle] or [Handle.BadHandle] in case handle points outside of static area
   int setStaticHandle(int handle) {
@@ -118,7 +118,7 @@ class HandleSystem {
     _handles[index] = handle;
     return _handles[index];
   }
-  
+
   /// Allocate a handle of [type] from the dynamic range
   /// Returns [handle] or [Handle.BadHandle]
   int allocateHandle(int type) {
@@ -146,20 +146,20 @@ class HandleSystem {
     // Return new handle
     return handle;
   }
-  
+
   /// Free [handle] from the dynamic range
   void freeHandle(int handle) {
     if (_dynamicUsed == 0) {
       return;
     }
     _dynamicUsed--;
-    
+
     int handleIndex = Handle.getIndex(handle);
     int handleSerial = Handle.getSerial(handle);
     _handles[handleIndex] = Handle.makeNextPointer(handleSerial, _freeHead);
     _freeHead = handleIndex;
   }
-  
+
   /// Returns true if [handle] is valid
   bool validHandle(int handle) {
     int index = Handle.getIndex(handle);
@@ -169,12 +169,12 @@ class HandleSystem {
     int indexHandle = _handles[index];
     return handle == indexHandle;
   }
-  
+
   bool _isStaticHandle(int handle) {
     int index = Handle.getIndex(handle);
     return Handle.isStaticHandle(handle) && isStaticIndex(index);
   }
-  
+
   void _dumpStaticTable() {
     print('Dumping static table');
     for (int i = 0; i < _staticCapacity; i++) {
@@ -187,7 +187,7 @@ class HandleSystem {
       }
     }
   }
-  
+
   void _dumpFreeList() {
     print('Dumping dynamic free list $dynamicAvailable');
     int i = _freeHead;

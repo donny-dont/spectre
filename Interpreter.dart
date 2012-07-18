@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -30,7 +30,7 @@ class Ops {
   static final int SetRegister = 1;
 
   /*
-  /// Create an index buffer 
+  /// Create an index buffer
   /// Arg0 - Handle
   /// Arg1 - Name of index buffer
   static final int CreateIndexBuffer = 6;
@@ -59,10 +59,10 @@ class Ops {
   /// Arg1 - Resource Handle
   static final int UpdateBufferOnResourceChange = 21;
   */
-  
+
   static final int Call = 30;
   static final int Return = 31;
-  
+
   /// Set the blend state
   /// Arg0 - Blend State handle
   static final int SetBlendState = 0xA0;
@@ -88,17 +88,17 @@ class Ops {
   /// Set the input layout
   /// Arg0 - Input Layout handle
   static final int SetInputLayout = 0xA7;
-  
+
   /// Set a uniform variable
   /// Arg0 - Uniform name
   /// Arg1 - Float32Array
   static final int SetUniformMatrix4 = 0xB0;
-  
+
   /// Draw vertices
   /// Arg0 - Vertex Count
   /// Arg1 - Vertex Buffer Offset
   static final int Draw = 0xC0;
-  
+
   /// Draw vertices with values from registers
   /// Arg0 - Vertex Count register
   /// Arg1 - Vertex Buffer Offset register
@@ -107,71 +107,71 @@ class Ops {
 
 class ProgramBuilder {
   List ops;
-  
+
   ProgramBuilder() {
     ops = new List();
   }
   ProgramBuilder.append(this.ops);
-  
+
   void setRegister(int register, Dynamic value) {
     ops.add(Ops.SetRegister);
     ops.add(register);
     ops.add(value);
   }
-  
+
   void setPrimitiveTopology(int topology) {
     ops.add(Ops.SetPrimitiveTopology);
     ops.add(topology);
   }
-  
+
   void setIndexBuffer(int handle) {
     ops.add(Ops.SetIndexBuffer);
     ops.add(handle);
   }
-  
+
   void setBlendState(int handle) {
     ops.add(Ops.SetBlendState);
     ops.add(handle);
   }
-  
+
   void setRasterizerState(int handle) {
     ops.add(Ops.SetRasterizerState);
     ops.add(handle);
   }
-  
+
   void setDepthState(int handle) {
     ops.add(Ops.SetDepthState);
     ops.add(handle);
   }
-  
+
   void setShaderProgram(int handle) {
     ops.add(Ops.SetShaderProgram);
     ops.add(handle);
   }
-  
+
   void setVertexBuffers(int offset, List handles) {
     ops.add(Ops.SetVertexBuffers);
     ops.add(offset);
     ops.add(handles);
   }
-  
+
   void setInputLayout(int handle) {
     ops.add(Ops.SetInputLayout);
     ops.add(handle);
   }
-  
+
   void setUniformMatrix4(String name, Float32Array buf) {
     ops.add(Ops.SetUniformMatrix4);
     ops.add(name);
     ops.add(buf);
   }
-  
+
   void draw(int vertexCount, int vertexOffset) {
     ops.add(Ops.Draw);
     ops.add(vertexCount);
     ops.add(vertexOffset);
   }
-  
+
   void drawIndirect(int vertexCountHandle, int vertexOffsetHandle) {
     ops.add(Ops.DrawIndirect);
     ops.add(vertexCountHandle);
@@ -182,31 +182,31 @@ class ProgramBuilder {
 class Interpreter {
   static final int NumRegisters = 32;
   List registers;
-  
+
   Interpreter() {
     registers = new List(NumRegisters);
   }
-  
+
   void clearRegisters() {
     for (int i = 0; i < NumRegisters; i++) {
       registers[i] = null;
     }
   }
-  
+
   void setRegister(int register, Dynamic value) {
     registers[register] = value;
   }
-  
+
   int getHandle(int handle) {
     if (Handle.isRegisterHandle(handle) == false ) {
       // Not a register handle, return it
-      return handle;  
+      return handle;
     }
     // handle is a register handle
     // dereference and return contents of register
     return registers[Handle.getIndex(handle)];
   }
-  
+
   int getRegisterIndex(int handle) {
     if (Handle.isRegisterHandle(handle) == false ) {
       // Not a register handle
@@ -214,7 +214,7 @@ class Interpreter {
     }
     return Handle.getIndex(handle);
   }
-  
+
   void run(List program, Device device, ResourceManager rm, ImmediateContext im) {
     final int last = program.length;
     int i = 0;
