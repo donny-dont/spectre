@@ -23,11 +23,11 @@
 class Ops {
   /// NO-OP
   /// No arguments
-  static final int Null = 0;
+  static final int Null = 0x00;
   /// Set the value of a register
   /// Arg0 - Register index (0...NumRegisters)
   /// Arg1 - Value to set
-  static final int SetRegister = 1;
+  static final int SetRegister = 0x01;
 
   /*
   /// Create an index buffer
@@ -60,8 +60,8 @@ class Ops {
   static final int UpdateBufferOnResourceChange = 21;
   */
 
-  static final int Call = 30;
-  static final int Return = 31;
+  static final int Call = 0x10;
+  static final int Return = 0x11;
 
   /// Set the blend state
   /// Arg0 - Blend State handle
@@ -88,6 +88,14 @@ class Ops {
   /// Set the input layout
   /// Arg0 - Input Layout handle
   static final int SetInputLayout = 0xA7;
+  /// Set the texture units
+  /// Arg0 - texture unit offset
+  /// Arg1 - List of texture handles
+  static final int SetTextures = 0xA8;
+  /// Set the sampler state on texture units
+  /// Arg0 - texture unit offset
+  /// Arg1 - List of sampler handles
+  static final int SetSamplers = 0xA9;
 
   /// Set a uniform variable
   /// Arg0 - Uniform name
@@ -103,6 +111,19 @@ class Ops {
   /// Arg0 - Vertex Count register
   /// Arg1 - Vertex Buffer Offset register
   static final int DrawIndirect = 0xC1;
+
+  /// Draw an indexed primitive stream
+  /// Arg0 - Index count
+  /// Arg1 - Index buffer offset
+  static final int DrawIndexed = 0xC2;
+
+  /// Dergister and unload resources
+  /// Arg0 - List of resource handles
+  static final int DeregisterAndUnloadResources = 0xD0;
+
+  /// Delete device children
+  /// Arg0 - List of device handles
+  static final int DeleteDeviceChildren = 0xD1;
 }
 
 class ProgramBuilder {
@@ -160,6 +181,18 @@ class ProgramBuilder {
     ops.add(handle);
   }
 
+  void setTextures(int textureUnitOffset, List<int> handles) {
+    ops.add(Ops.SetTextures);
+    ops.add(textureUnitOffset);
+    ops.add(handles);
+  }
+
+  void setSamplers(int textureUnitOffset, List<int> handles) {
+    ops.add(Ops.SetSamplers);
+    ops.add(textureUnitOffset);
+    ops.add(handles);
+  }
+
   void setUniformMatrix4(String name, Float32Array buf) {
     ops.add(Ops.SetUniformMatrix4);
     ops.add(name);
@@ -176,6 +209,22 @@ class ProgramBuilder {
     ops.add(Ops.DrawIndirect);
     ops.add(vertexCountHandle);
     ops.add(vertexOffsetHandle);
+  }
+
+  void drawIndexed(int numIndices, int indexOffset) {
+    ops.add(Ops.DrawIndexed);
+    ops.add(numIndices);
+    ops.add(indexOffset);
+  }
+
+  void deregisterAndUnloadResources(List<int> handles) {
+    ops.add(Ops.DeregisterAndUnloadResources);
+    ops.add(handles);
+  }
+
+  void deleteDeviceChildren(List<int> handles) {
+    ops.add(Ops.DeleteDeviceChildren);
+    ops.add(handles);
   }
 }
 
@@ -293,6 +342,22 @@ class Interpreter {
             im.setInputLayout(handle);
           }
           break;
+        case Ops.SetTextures:
+          skip = 3;
+        {
+          final int textureUnitOffset = program[i+1];
+          final List<int> handles = program[i+2];
+          im.setTextures(textureUnitOffset, handles);
+        }
+        break;
+        case Ops.SetSamplers:
+          skip = 3;
+        {
+          final int textureUnitOffset = program[i+1];
+          final List<int> handles = program[i+2];
+          im.setSamplers(textureUnitOffset, handles);
+        }
+        break;
         case Ops.SetUniformMatrix4:
           skip = 3;
           {
@@ -317,6 +382,28 @@ class Interpreter {
             im.draw(vertexCount, vertexOffset);
           }
           break;
+        case Ops.DrawIndexed:
+          skip = 3;
+          {
+            final int indexCount = program[i+1];
+            final int indexOffset = program[i+2];
+            im.drawIndexed(indexCount, indexOffset);
+          }
+          break;
+        case Ops.DeregisterAndUnloadResources:
+          skip = 2;
+        {
+          final List<int> handles = program[i+1];
+          spectreRM.batchUnload(handles, true);
+        }
+        break;
+        case Ops.DeleteDeviceChildren:
+          skip = 2;
+        {
+          final List<int> handles = program[i+1];
+          spectreDevice.batchDeleteDeviceChildren(handles);
+        }
+        break;
         case Ops.Call:
           skip = 2;
         {
