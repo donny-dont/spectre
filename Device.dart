@@ -873,6 +873,12 @@ class Device {
     _childrenObjects[index] = null;
   }
 
+  void batchDeleteDeviceChildren(List<int> handles) {
+    for (int h in handles) {
+      deleteDeviceChild(h);
+    }
+  }
+
   /// Create a IndexBuffer named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
