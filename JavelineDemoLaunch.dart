@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -33,7 +33,7 @@ class JavelineDemoDescription {
 class JavelineDemoLaunch {
   JavelineDemoInterface _demo;
   List<JavelineDemoDescription> demos;
-  
+
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -41,17 +41,17 @@ class JavelineDemoLaunch {
     demos.add(jdd);
     refreshDemoList('#DemoPicker');
   }
-  
-  JavelineDemoLaunch() { 
+
+  JavelineDemoLaunch() {
     _demo = null;
     demos = new List<JavelineDemoDescription>();
   }
-  
+
   void updateStatus(String message) {
     // the HTML library defines a global "document" variable
     document.query('#DartStatus').innerHTML = message;
   }
-  
+
   void refreshDemoList(String listDiv) {
     DivElement d = document.query(listDiv);
     if (d == null) {
@@ -68,7 +68,7 @@ class JavelineDemoLaunch {
       d.nodes.add(demod);
     }
   }
-  
+
   void refreshResourceManagerTable() {
     final String divName = '#ResourceManagerTable';
     DivElement d = document.query(divName);
@@ -85,7 +85,7 @@ class JavelineDemoLaunch {
       d.nodes.add(resourceDiv);
     });
   }
-  
+
   void refreshDeviceManagerTable() {
     final String divName = '#DeviceChildTable';
     DivElement d = document.query(divName);
@@ -103,7 +103,7 @@ class JavelineDemoLaunch {
       d.nodes.add(resourceDiv);
     });
   }
-  
+
   void run() {
     updateStatus("Pick a demo: ");
     // Start spectre
@@ -120,7 +120,7 @@ class JavelineDemoLaunch {
       window.setInterval(refreshDeviceManagerTable, 1000);
     });
   }
-  
+
   void switchToDemo(String name) {
     Future shut;
     if (_demo != null) {
@@ -150,6 +150,7 @@ class JavelineDemoLaunch {
 
 void main() {
   JavelineConfigStorage.init();
+  // Comment out the following line to keep defaults
   JavelineConfigStorage.load();
   spectreLog = new HtmlLogger('#SpectreLog');
   new JavelineDemoLaunch().run();
