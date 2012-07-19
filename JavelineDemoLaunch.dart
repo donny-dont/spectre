@@ -104,10 +104,34 @@ class JavelineDemoLaunch {
     });
   }
 
+  void resizeHandler(Event event) {
+    updateSize();
+  }
+
+  void updateSize() {
+    String webGLCanvasParentName = '#MainView';
+    String webGLCanvasName = '#webGLFrontBuffer';
+    {
+      DivElement canvasParent = document.query(webGLCanvasParentName);
+      final num width = canvasParent.$dom_clientWidth;
+      final num height = canvasParent.$dom_clientHeight;
+      CanvasElement canvas = document.query(webGLCanvasName);
+      canvas.width = width;
+      canvas.height = height;
+      if (_demo != null) {
+        _demo.resize(width, height);
+      }
+    }
+  }
+
   void run() {
+    String webGLCanvasParentName = '#MainView';
+    String webGLCanvasName = '#webGLFrontBuffer';
     updateStatus("Pick a demo: ");
+    window.on.resize.add(resizeHandler);
+    updateSize();
     // Start spectre
-    Future<bool> spectreStarted = initSpectre("#webGLFrontBuffer");
+    Future<bool> spectreStarted = initSpectre(webGLCanvasName);
     spectreStarted.then((value) {
       print('Spectre Launched');
       webGL.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -141,6 +165,7 @@ class JavelineDemoLaunch {
         Future<JavelineDemoStatus> started = _demo.startup();
         started.then((sv) {
           print('Running demo $name');
+          updateSize();
           _demo.run();
         });
       }

@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -30,14 +30,14 @@ class JavelineDemoStatus {
 
 interface JavelineDemoInterface {
   bool get shouldQuit();
-  
+
   Future<JavelineDemoStatus> startup();
   Future<JavelineDemoStatus> shutdown();
-  
+
   void run();
-  
+  void resize(num width, num height);
   void update(num time, num dt);
-  
+
   void keyboardEventHandler(KeyboardEvent event, bool down);
   void mouseMoveEventHandler(MouseEvent event);
   void mouseButtonEventHandler(MouseEvent event, bool down);
