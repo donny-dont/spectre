@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -28,17 +28,17 @@ class JavelineBaseDemo implements JavelineDemoInterface {
   num _accumTime;
   num _lastYaw;
   num _lastPitch;
-  Viewport _viewPort;
-  BlendState _blendState;
-  DepthState _depthState;
-  RasterizerState _rasterizerState;
-  
+  int _viewPort;
+  int _blendState;
+  int _depthState;
+  int _rasterizerState;
+
   bool _quit;
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
-  
-  final int width = 640;
-  final int height = 360;
+
+  int width;
+  int height;
 
   JavelineBaseDemo() {
     _keyboard = new JavelineKeyboard();
@@ -54,7 +54,19 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     _lastYaw = 0;
     _lastPitch = 0;
   }
-  
+
+  void resize(num elementWidth, num elementHeight) {
+    this.width = elementWidth;
+    this.height = elementHeight;
+    Viewport vp = spectreDevice.getDeviceChild(_viewPort);
+    if (vp == null) {
+      return;
+    }
+    vp.width = elementWidth;
+    vp.height = elementHeight;
+    print('Resized to $elementWidth $elementHeight');
+  }
+
   Future<JavelineDemoStatus> startup() {
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
@@ -73,17 +85,17 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     spectreImmediateContext.reset();
     return completer.future;
   }
-  
+
   Future<JavelineDemoStatus> shutdown() {
     document.on.keyDown.remove(_keyDownHandler);
     document.on.keyUp.remove(_keyUpHandler);
     document.on.mouseMove.remove(_mouseMoveHandler);
     document.on.mouseDown.remove(_mouseDownHandler);
     document.on.mouseUp.remove(_mouseUpHandler);
-    spectreDevice.deleteRasterizerState(_rasterizerState);
-    spectreDevice.deleteDepthState(_depthState);
-    spectreDevice.deleteBlendState(_blendState);
-    spectreDevice.deleteViewport(_viewPort);
+    spectreDevice.deleteDeviceChild(_rasterizerState);
+    spectreDevice.deleteDeviceChild(_depthState);
+    spectreDevice.deleteDeviceChild(_blendState);
+    spectreDevice.deleteDeviceChild(_viewPort);
     _quit = true;
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
@@ -92,18 +104,18 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     completer.complete(status);
     return completer.future;
   }
-  
+
   void run() {
     window.requestAnimationFrame(_animationFrame);
   }
-  
+
   bool get shouldQuit() => _quit;
- 
+
   bool _animationFrame(num highResTime) {
     if (shouldQuit) {
       return false;
     }
-    
+
     if (_time == 0 && _oldTime == 0) {
       // First time through
       _time = highResTime;
@@ -111,38 +123,38 @@ class JavelineBaseDemo implements JavelineDemoInterface {
       window.requestAnimationFrame(_animationFrame);
       return true;
     }
-    
+
     _oldTime = _time;
     _time = highResTime;
     num dt = _time - _oldTime;
     _accumTime += dt;
-    
+
     update(_accumTime/1000.0, dt/1000.0);
-    
+
     window.requestAnimationFrame(_animationFrame);
     return true;
   }
-  
+
   void drawGrid(int gridLines) {
     final int midLine = gridLines~/2;
     vec3 o = new vec3.zero();
     vec3 x = new vec3.raw(1.0, 0.0, 0.0);
     vec3 z = new vec3.raw(0.0, 0.0, 1.0);
     vec4 color = new vec4.raw(0.0, 1.0, 0.0, 1.0);
-    
+
     for (int i = 0; i < gridLines; i++) {
       vec3 start = o + (z * (i-midLine)) + (x * -midLine);
       vec3 end = o + (z * (i-midLine)) + (x * midLine);
       spectreDDM.addLine(start, end, color);
     }
-    
+
     for (int i = 0; i < gridLines; i++) {
       vec3 start = o + (x * (i-midLine)) + (z * -midLine);
       vec3 end = o + (x * (i-midLine)) + (z * midLine);
       spectreDDM.addLine(start, end, color);
     }
   }
-  
+
   void update(num time, num dt) {
     _cameraController.forward = _keyboard.pressed(JavelineKeyCodes.KeyW);
     _cameraController.backward = _keyboard.pressed(JavelineKeyCodes.KeyS);
@@ -159,7 +171,7 @@ class JavelineBaseDemo implements JavelineDemoInterface {
       _lastYaw = yaw;
       _lastPitch = pitch;
       if (abs(deltaYaw) > 0.00001) {
-        //spectreLog.Info('Camera Yaw: $deltaYaw');  
+        //spectreLog.Info('Camera Yaw: $deltaYaw');
       }
       if (abs(deltaPitch) > 0.00001) {
         //spectreLog.Info('Camera Pitch: $deltaPitch');
@@ -175,11 +187,11 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     spectreImmediateContext.setViewport(_viewPort);
     spectreDDM.update(dt);
   }
-  
+
   void keyboardEventHandler(KeyboardEvent event, bool down) {
     _keyboard.keyboardEvent(event, down);
   }
-  
+
   void mouseMoveEventHandler(MouseEvent event) {
     _mouse.mouseMoveEvent(event);
     if (_mouse.pressed(JavelineMouseButtonCodes.MouseButtonLeft)) {
@@ -187,27 +199,27 @@ class JavelineBaseDemo implements JavelineDemoInterface {
       _cameraController.accumDY += event.webkitMovementY;
     }
   }
-  
+
   void mouseButtonEventHandler(MouseEvent event, bool down) {
     _mouse.mouseButtonEvent(event, down);
   }
-  
+
   void _keyDownHandler(KeyboardEvent event) {
     keyboardEventHandler(event, true);
   }
-  
+
   void _keyUpHandler(KeyboardEvent event) {
     keyboardEventHandler(event, false);
   }
-  
+
   void _mouseDownHandler(MouseEvent event) {
     mouseButtonEventHandler(event, true);
   }
-  
+
   void _mouseUpHandler(MouseEvent event) {
     mouseButtonEventHandler(event, false);
   }
-  
+
   void _mouseMoveHandler(MouseEvent event) {
     mouseMoveEventHandler(event);
   }

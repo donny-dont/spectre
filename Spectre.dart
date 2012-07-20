@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -27,20 +27,20 @@
 #import('dart:json');
 #import('VectorMath/VectorMath.dart');
 #source('Logger.dart');
+#source('Handle.dart');
+#source('HandleSystem.dart');
 #source('Device.dart');
 #source('ImmediateContext.dart');
+#source('ResourceLoader.dart');
 #source('Resource.dart');
 #source('ResourceManager.dart');
-#source('StaticResources.dart');
-#source('BoundCommands.dart');
-#source('Commands.dart');
-#source('CommandBuffer.dart');
+#source('Interpreter.dart');
+
 #source('Camera.dart');
 #source('CameraController.dart');
 #source('MouseKeyboardCameraController.dart');
 #source('InputLayoutHelper.dart');
 #source('DebugDrawManager.dart');
-
 
 // We have a single WebGL context
 WebGLRenderingContext webGL;
@@ -72,14 +72,16 @@ Future<bool> initSpectre(String canvasName) {
   spectreRM.setBaseURL(baseUrl);
   print('Started Spectre');
   List loadedResources = [];
-  loadedResources.add(spectreRM.load('/shaders/debug_line.vs'));
-  loadedResources.add(spectreRM.load('/shaders/debug_line.fs'));
+  {
+    int debugLineVSResource = spectreRM.registerResource('/shaders/debug_line.vs');
+    int debugLineFSResource = spectreRM.registerResource('/shaders/debug_line.fs');
+    loadedResources.add(spectreRM.loadResource(debugLineVSResource));
+    loadedResources.add(spectreRM.loadResource(debugLineFSResource));
+  }
   Future allLoaded = Futures.wait(loadedResources);
   Completer<bool> inited = new Completer<bool>();
   allLoaded.then((resourceList) {
-    VertexShaderResource lineVShader = resourceList[0];
-    FragmentShaderResource linePShader = resourceList[1];
-    spectreDDM.Init(lineVShader, linePShader, null, null, null);
+    spectreDDM.init(resourceList[0], resourceList[1], null, null, null);
     inited.complete(true);
   });
   return inited.future;
@@ -89,7 +91,7 @@ void checkWebGL() {
   if (webGL == null) {
     return;
   }
-  
+
   int error = webGL.getError();
   if (error != WebGLRenderingContext.NO_ERROR) {
     spectreLog.Error('WebGL Error: $error');

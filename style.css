@@ -1,41 +1,36 @@
 #RootDiv {
 	background: #fff;
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-justify-content: space-around;
+	
 }
 
 #DartStatus {
 	background: #fff;
 	text-align: center;
-    vertical-align: middle;
 }
 
 #MainView {
-	width:640px;
-	height:360px;
-	overflow:hidden;
-	margin-left: auto;
-	margin-right: auto;
+	background: #ccc;
+	display: -webkit-flex;
+	min-width: 853px;
+	width: 853px;
+	height: 480px;
+	min-height: 480px;
+	-webkit-flex: none;
+	-webkit-flex-direction: row;
+	-webkit-justify-content: space-around;
+	-webkit-align-self: center;
 }
 
-#webGLFrontBuffer {
-	width: 100%;
-	height: 100%;
-}
 
 #SpectreLog {
-	width:100%;
-	height:360px;
-	overflow:auto;
-	position:absolute;
-	bottom:0;
 	background:#aaa
 }
 
 #ResourceTable {
  	min-height: 100%;
-    height: auto !important;
-    width: auto;
-	overflow: auto;
-	position: relative;
 }
 
 #DemoPicker {
@@ -44,7 +39,6 @@
 
 #StatusBar {
 	display: -webkit-flex;
-	
 }
 
 .DemoButton {
@@ -57,11 +51,13 @@
 #ResourceManagerTable {
 	display: -webkit-flex;
 	-webkit-flex-direction: column;
-	-webkit-justify-content: center;
+	-webkit-flex: auto;
+	overflow:scroll;
 }
 
 #DeviceChildTable {
 	display: -webkit-flex;
 	-webkit-flex-direction: column;
-	-webkit-justify-content: center;
+	-webkit-flex: auto;
+	overflow:scroll;
 }

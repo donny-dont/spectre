@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -33,7 +33,7 @@ class JavelineDemoDescription {
 class JavelineDemoLaunch {
   JavelineDemoInterface _demo;
   List<JavelineDemoDescription> demos;
-  
+
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -41,17 +41,17 @@ class JavelineDemoLaunch {
     demos.add(jdd);
     refreshDemoList('#DemoPicker');
   }
-  
-  JavelineDemoLaunch() { 
+
+  JavelineDemoLaunch() {
     _demo = null;
     demos = new List<JavelineDemoDescription>();
   }
-  
+
   void updateStatus(String message) {
     // the HTML library defines a global "document" variable
     document.query('#DartStatus').innerHTML = message;
   }
-  
+
   void refreshDemoList(String listDiv) {
     DivElement d = document.query(listDiv);
     if (d == null) {
@@ -68,7 +68,7 @@ class JavelineDemoLaunch {
       d.nodes.add(demod);
     }
   }
-  
+
   void refreshResourceManagerTable() {
     final String divName = '#ResourceManagerTable';
     DivElement d = document.query(divName);
@@ -79,41 +79,72 @@ class JavelineDemoLaunch {
     ParagraphElement pe = new ParagraphElement();
     pe.innerHTML = 'Loaded Resources:';
     d.nodes.add(pe);
-    spectreRM.forEach((name, resource) {
+    spectreRM.children.forEach((name, resource) {
       DivElement resourceDiv = new DivElement();
-      resourceDiv.innerHTML = '${name} (${resource.type})';
+      resourceDiv.innerHTML = '${name}';
       d.nodes.add(resourceDiv);
     });
   }
-  
+
   void refreshDeviceManagerTable() {
     final String divName = '#DeviceChildTable';
     DivElement d = document.query(divName);
     d.nodes.clear();
     ParagraphElement pe = new ParagraphElement();
-    pe.innerHTML = 'Device Objects: Not implemented';
+    pe.innerHTML = 'Device Objects:';
     d.nodes.add(pe);
     if (d == null) {
       return;
     }
+    spectreDevice.children.forEach((name, handle) {
+      DivElement resourceDiv = new DivElement();
+      String type = spectreDevice.getHandleType(handle);
+      resourceDiv.innerHTML = '${name} ($type)';
+      d.nodes.add(resourceDiv);
+    });
   }
-  
+
+  void resizeHandler(Event event) {
+    updateSize();
+  }
+
+  void updateSize() {
+    String webGLCanvasParentName = '#MainView';
+    String webGLCanvasName = '#webGLFrontBuffer';
+    {
+      DivElement canvasParent = document.query(webGLCanvasParentName);
+      final num width = canvasParent.$dom_clientWidth;
+      final num height = canvasParent.$dom_clientHeight;
+      CanvasElement canvas = document.query(webGLCanvasName);
+      canvas.width = width;
+      canvas.height = height;
+      if (_demo != null) {
+        _demo.resize(width, height);
+      }
+    }
+  }
+
   void run() {
+    String webGLCanvasParentName = '#MainView';
+    String webGLCanvasName = '#webGLFrontBuffer';
     updateStatus("Pick a demo: ");
+    window.on.resize.add(resizeHandler);
+    updateSize();
     // Start spectre
-    Future<bool> spectreStarted = initSpectre("#webGLFrontBuffer");
+    Future<bool> spectreStarted = initSpectre(webGLCanvasName);
     spectreStarted.then((value) {
       print('Spectre Launched');
       webGL.clearColor(0.0, 0.0, 0.0, 1.0);
       webGL.clearDepth(1.0);
       webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(); });
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
     });
   }
-  
+
   void switchToDemo(String name) {
     Future shut;
     if (_demo != null) {
@@ -134,6 +165,7 @@ class JavelineDemoLaunch {
         Future<JavelineDemoStatus> started = _demo.startup();
         started.then((sv) {
           print('Running demo $name');
+          updateSize();
           _demo.run();
         });
       }
@@ -143,6 +175,7 @@ class JavelineDemoLaunch {
 
 void main() {
   JavelineConfigStorage.init();
+  // Comment out the following line to keep defaults
   JavelineConfigStorage.load();
   spectreLog = new HtmlLogger('#SpectreLog');
   new JavelineDemoLaunch().run();

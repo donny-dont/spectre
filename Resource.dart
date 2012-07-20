@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -20,209 +20,160 @@
 
 */
 
-/// A resource
-class Resource implements Hashable {
-  String name;
-  
-  int hashCode() {
-    return name.hashCode();
+typedef void ResourceEventCallback(int type, ResourceBase resource);
+
+class ResourceEvents {
+  static final int TypeUpdate = 0x1;
+  static final int TypeUnloaded = 0x2;
+  Set<ResourceEventCallback> update;
+  Set<ResourceEventCallback> unloaded;
+  ResourceEvents() {
+    update = new HashSet();
+    unloaded = new HashSet();
   }
-  
-  abstract String get type();
-  
-  abstract void createDeviceObjects();
-  abstract bool hasDeviceObjects();
-  abstract void deleteDeviceObjects();
-  abstract bool hasData();
-  abstract void releaseData();
-  
-  void refreshDeviceObjects() {
-    deleteDeviceObjects();
-    createDeviceObjects();
+
+  Set<ResourceEventCallback> getSetForType(int type) {
+    if (type == TypeUpdate) {
+      return update;
+    }
+    if (type == TypeUnloaded) {
+      return unloaded;
+    }
+    return null;
   }
 }
 
-/// A Mesh resource
-///
-/// Mesh data is loaded into [IndexBuffer] and [VertexBuffer]
-class MeshResource extends Resource {
+class ResourceBase {
+  bool _isLoaded;
+  bool get isLoaded() => _isLoaded;
+
+  String _url;
+  String get url() => _url;
+
+  ResourceEvents on;
+
+  ResourceBase(this._url) {
+    _isLoaded = false;
+    on = new ResourceEvents();
+  }
+
+  abstract void load(ResourceLoaderResult result);
+
+  abstract void unload();
+
+  // Call after the data is updated
+  void _fireUpdated() {
+    for (ResourceEventCallback reu in on.update) {
+      reu(ResourceEvents.TypeUpdate, this);
+    }
+  }
+
+  // Call before the data is gone
+  void _fireUnloaded() {
+    for (ResourceEventCallback reu in on.unloaded) {
+      reu(ResourceEvents.TypeUnloaded, this);
+    }
+  }
+}
+
+class Float32ArrayResource extends ResourceBase {
+  Float32Array array;
+
+  Float32ArrayResource(String url) : super(url) {
+  }
+
+  void load(ResourceLoaderResult result) {
+    _fireUpdated();
+  }
+
+  void unload() {
+    _fireUnloaded();
+  }
+}
+
+class Uint16ArrayResource extends ResourceBase {
+  Uint16Array array;
+
+  Uint16ArrayResource(String url) : super(url) {
+  }
+
+  void load(ResourceLoaderResult result) {
+    _fireUpdated();
+  }
+
+  void unload() {
+    _fireUnloaded();
+  }
+}
+
+class MeshResource extends ResourceBase {
   Map meshData;
-  IndexBuffer indexBuffer;
-  VertexBuffer vertexBuffer;
-  
-  String get type() {
-    return 'Mesh';
+  Float32Array vertexArray;
+  Uint16Array indexArray;
+
+  MeshResource(String url) : super(url) {
+
   }
-  
-  MeshResource(String name, Dynamic mesh) {
-    this.name = name;
-    
-    meshData = null;
-    indexBuffer = null;
-    vertexBuffer = null;
-    
-    if (mesh is String) {
-      mesh = JSON.parse(mesh);
-    }
-    
-    if (mesh is Map) {
-      meshData = mesh;
-    }
-  }
-  
+
   int get numIndices() {
     return meshData['meshes'][0]['indices'].length;
   }
-  
-  void createDeviceObjects() {
-    String ibName = '${name}.IndexBuffer';
-    String vbName = '${name}.VertexBuffer';
-    int numIndices = meshData['meshes'][0]['indices'].length;
-    int indexWidth = meshData['meshes'][0]['indexWidth'];
-    int ibSize = numIndices*indexWidth;
-    indexBuffer = spectreDevice.createIndexBuffer(ibName,{'usage':'dynamic','size':ibSize});
-    spectreImmediateContext.updateBuffer(indexBuffer, new Uint16Array.fromList(meshData['meshes'][0]['indices']));
-    int numAttributeValues = meshData['meshes'][0]['vertices'].length;
-    int attributeValueWidth = 4;
-    int vbSize = numAttributeValues*attributeValueWidth;
-    vertexBuffer = spectreDevice.createVertexBuffer(vbName, {'usage':'dynamic','size':vbSize});
-    spectreImmediateContext.updateBuffer(vertexBuffer, new Float32Array.fromList(meshData['meshes'][0]['vertices']));
-    spectreLog.Info('Created ($ibName,$vbName) device objects for $name');
+
+  void load(ResourceLoaderResult result) {
+    if (result.success == false) {
+      return;
+    }
+    meshData = JSON.parse(result.data);
+    indexArray = new Uint16Array.fromList(meshData['meshes'][0]['indices']);
+    vertexArray = new Float32Array.fromList(meshData['meshes'][0]['vertices']);
+    _fireUpdated();
   }
-  
-  bool hasDeviceObjects() {
-    return indexBuffer != null && vertexBuffer != null;
-  }
-  
-  void deleteDeviceObjects() {
-    spectreDevice.deleteIndexBuffer(indexBuffer);
-    spectreDevice.deleteVertexBuffer(vertexBuffer);
-    spectreLog.Info('Deleted (${indexBuffer.name},${vertexBuffer.name}) for $name');
-    indexBuffer = null;
-    vertexBuffer = null;
-  }
-  
-  bool hasData() {
-    return meshData != null;
-  }
-  
-  void releaseData() {
+
+  void unload() {
+    _fireUnloaded();
+    vertexArray = null;
+    indexArray = null;
     meshData = null;
   }
 }
 
-/// A Vertex Shader resource
-///
-/// Vertex program is compiled into a [VertexShader]
-class VertexShaderResource extends Resource {
-  String shaderSource;
-  VertexShader shader;
-  
-  String get type() {
-    return 'VertexShader';
+class ShaderResource extends ResourceBase {
+  String source;
+
+  ShaderResource(String url) : super(url) {
   }
-  
-  VertexShaderResource(String name, String source) {
-    this.name = name;
-    shaderSource = source;
+
+  void load(ResourceLoaderResult result) {
+    if (result.success == false) {
+      return;
+    }
+    source = result.data;
+    _fireUpdated();
   }
-  
-  void createDeviceObjects() {
-    shader = spectreDevice.createVertexShader(name, {});
-    shader.source = shaderSource;
-    shader.compile();
-  }
-  
-  bool hasDeviceObjects() {
-    return shader != null;
-  }
-  
-  void deleteDeviceObjects() {
-    spectreDevice.deleteVertexShader(shader);
-    shader = null;
-  }
-  
-  bool hasData() {
-    return shaderSource != null;
-  }
-  
-  void releaseData() {
-    shaderSource = null;
+
+  void unload() {
+    _fireUnloaded();
+    source = null;
   }
 }
 
-/// A Fragment Shader resource
-///
-/// Fragment program is compiled into a [Fragment]
-class FragmentShaderResource extends Resource {
-  String shaderSource;
-  FragmentShader shader;
-  
-  String get type() {
-    return 'FragmentShader';
-  }
-  
-  FragmentShaderResource(String name, String source) {
-    this.name = name;
-    shaderSource = source;
-  }
-  
-  void createDeviceObjects() {
-    shader = spectreDevice.createFragmentShader(name, {});
-    shader.source = shaderSource;
-    shader.compile();
-  }
-  
-  bool hasDeviceObjects() {
-    return shader != null;
-  }
-  
-  void deleteDeviceObjects() {
-    spectreDevice.deleteFragmentShader(shader);
-    shader = null;
-  }
-
-  bool hasData() {
-    return shaderSource != null;
-  }
-  
-  void releaseData() {
-    shaderSource = null;
-  }
-}
-
-/// An Image resource
-///
-/// No device resources are created
-class ImageResource extends Resource {
-  String url;
+class ImageResource extends ResourceBase {
   ImageElement image;
-  
-  String get type() {
-    return 'Image';
+
+  ImageResource(String url) : super(url) {
+
   }
-  
-  ImageResource(String name, this.url) {
-    this.name = name;
-    image = new ImageElement();
+
+  void load(ResourceLoaderResult result) {
+    if (result.success == false) {
+      return;
+    }
+    image = result.data;
+    _fireUpdated();
   }
-  
-  void createDeviceObjects() {
-    
-  }
-  
-  bool hasDeviceObjects() {
-    return false;
-  }
-  
-  void deleteDeviceObjects() {
-  }
-  
-  bool hasData() {
-    image != null;
-  }
-  
-  void releaseData() {
+
+  void unload() {
+    _fireUnloaded();
     image = null;
   }
 }

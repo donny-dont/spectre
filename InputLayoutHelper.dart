@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -38,7 +38,7 @@ class InputLayoutHelper {
       // mesh doesn't have this attribute
       return null;
     }
-    
+
     String type = attribute['type'];
     num numElements = attribute['numElements'];
     bool normalized = attribute['normalized'];

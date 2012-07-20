@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -32,10 +32,10 @@ class _DebugDrawVertexManager {
   List<_DebugDrawVertex> _vertices;
   Float32Array _vboStorage;
   int _vboUsed;
-  VertexBuffer _vbo;
-  InputLayout _vboLayout;
-  ShaderProgram _lineShader;
-  
+  int _vbo;
+  int _vboLayout;
+  int _lineShader;
+
   _DebugDrawVertexManager(String name, int vboSize, this._lineShader) {
     _maxVertices = vboSize;
     _vertices = new List<_DebugDrawVertex>();
@@ -46,16 +46,16 @@ class _DebugDrawVertexManager {
                           new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
     _vboLayout = spectreDevice.createInputLayout('$name Layout', inputElements, _lineShader);
   }
-  
+
   bool hasRoomFor(int vertexCount) {
     int current = _vertices.length;
     return current+vertexCount < _maxVertices;
   }
-  
+
   void add(_DebugDrawVertex v) {
     _vertices.add(v);
   }
-  
+
   void _prepareForRender() {
     _vboUsed = 0;
     for (int i = 0; i < _vertices.length; i++) {
@@ -66,7 +66,7 @@ class _DebugDrawVertexManager {
       _vboUsed++;
       _vboStorage[_vboUsed] = v.position.z;
       _vboUsed++;
-      
+
       _vboStorage[_vboUsed] = v.color.x;
       _vboUsed++;
       _vboStorage[_vboUsed] = v.color.y;
@@ -79,7 +79,7 @@ class _DebugDrawVertexManager {
 
     spectreImmediateContext.updateBuffer(_vbo, _vboStorage);
   }
-  
+
   int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
 
   void update(num dt) {
@@ -93,7 +93,7 @@ class _DebugDrawVertexManager {
       i++;
     }
   }
-  
+
   void render(Float32Array cameraMatrix) {
     if (_vertices.length == 0) {
       return;
@@ -103,7 +103,7 @@ class _DebugDrawVertexManager {
     spectreImmediateContext.setUniformMatrix4('cameraTransform', cameraMatrix);
     spectreImmediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
     spectreImmediateContext.setVertexBuffers(0, [_vbo]);
-    spectreImmediateContext.setIndexBuffer(null);
+    spectreImmediateContext.setIndexBuffer(0);
     spectreImmediateContext.setInputLayout(_vboLayout);
     spectreImmediateContext.draw(verts, 0);
   }
@@ -119,22 +119,22 @@ class _DebugDrawSphere {
 class _DebugDrawSphereManager {
   int _maxSpheres;
   List<_DebugDrawSphere> _spheres;
-  MeshResource _unitSphere;
-  InputLayout _vboLayout;
-  ShaderProgram _sphereShader;
+  int _unitSphere;
+  int _vboLayout;
+  int _sphereShader;
   Float32Array _sphereColor;
-  
-  _DebugDrawSphereManager(MeshResource unitSphere, int maxSpheres) {
+
+  _DebugDrawSphereManager(int unitSphere, int maxSpheres) {
     _unitSphere = unitSphere;
     _maxSpheres = maxSpheres;
     _spheres = new List<_DebugDrawSphere>();
   }
-  
+
   bool hasRoomFor(int sphereCount) {
     int current = _spheres.length;
     return current+sphereCount < _maxSpheres;
   }
-  
+
   void _prepareForRender() {
   }
 
@@ -142,7 +142,7 @@ class _DebugDrawSphereManager {
     return;
     _spheres.add(sphere);
   }
-  
+
   void update(num dt) {
     return;
     for (int i = 0; i < _spheres.length;) {
@@ -155,7 +155,7 @@ class _DebugDrawSphereManager {
       i++;
     }
   }
-  
+
   void render(Float32Array cameraMatrix) {
     if (_spheres.length == 0) {
       return;
@@ -180,49 +180,83 @@ class _DebugDrawSphereManager {
   *
   * Most of the above primitives can be configured with size and / or color
   *
-  * You will have to call update, prepareForRender, and render once per frame 
+  * You will have to call update, prepareForRender, and render once per frame
   */
 class DebugDrawManager {
-  DepthState _depthEnabledState;
-  DepthState _depthDisabledState;
-  BlendState _blendState;
-  RasterizerState _rasterState;
-  CommandBuffer _commandBuffer;
-  
+  int _depthEnabledState;
+  int _depthDisabledState;
+  int _blendState;
+  int _rasterState;
+
+  List _drawCommands;
+
   _DebugDrawVertexManager _depthEnabled;
   _DebugDrawVertexManager _depthDisabled;
   _DebugDrawSphereManager _depthEnabledSpheres;
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
-  
+
+
   final String _depthStateEnabledName = 'Debug Depth Enabled State';
   final String _depthStateDisabledName = 'Debug Depth Disabled State';
   final String _blendStateName = 'Debug Blend State';
   final String _rasterStateName = 'Debug Rasterizer State';
+  final String _lineVertexShader = 'Debug Line Vertex Shader';
+  final String _lineFragmentShader = 'Debug Line Fragment Shader';
   final String _lineShaderProgramName = 'Debug Line Program';
   final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
   final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
   final String _cameraTransformUniformName = 'cameraTransform';
-  
+
   DebugDrawManager() {
     _depthEnabledState = spectreDevice.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
     _depthDisabledState = spectreDevice.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
     _blendState = spectreDevice.createBlendState(_blendStateName, {});
     _rasterState = spectreDevice.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
     _cameraMatrix = new Float32Array(16);
-    _commandBuffer = new CommandBuffer();
   }
-  
-  void Init(VertexShaderResource lineVShader, FragmentShaderResource linePShader, VertexShaderResource sphereVShader, FragmentShaderResource spherePShader, MeshResource unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
-    ShaderProgram lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {'VertexProgram':lineVShader.shader, 'FragmentProgram':linePShader.shader});
+
+  void init(int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
+    int lineVS = spectreDevice.createVertexShader(_lineVertexShader, {});
+    int lineFS = spectreDevice.createFragmentShader(_lineFragmentShader, {});
+    spectreImmediateContext.compileShaderFromResource(lineVS, lineVSResourceHandle);
+    spectreImmediateContext.compileShaderFromResource(lineFS, lineFSResourceHandle);
+    int lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {});
+    spectreImmediateContext.linkShaderProgram(lineProgram, lineVS, lineFS);
     _depthEnabled = new _DebugDrawVertexManager(_depthEnabledLineVBOName, vboSize, lineProgram);
     _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
+
+    // Build the program
+    ProgramBuilder pb = new ProgramBuilder();
+    // General
+    pb.setBlendState(_blendState);
+    pb.setRasterizerState(_rasterState);
+    pb.setShaderProgram(lineProgram);
+    pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
+    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    pb.setIndexBuffer(0);
+    // Depth enabled lines
+    pb.setDepthState(_depthEnabledState);
+    pb.setVertexBuffers(0, [_depthEnabled._vbo]);
+    pb.setInputLayout(_depthEnabled._vboLayout);
+    // draw Indirect takes vertexCount from register 0
+    // draw Indirect takes vertexOffset from register 1
+    pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    // Depth disabled lines
+    pb.setDepthState(_depthDisabledState);
+    pb.setVertexBuffers(0, [_depthDisabled._vbo]);
+    pb.setInputLayout(_depthDisabled._vboLayout);
+    // draw Indirect takes vertexCount from register 2
+    // draw Indirect takes vertexOffset from register 3
+    pb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
+    // Save built program
+    _drawCommands = pb.ops;
   }
-  
+
   /// Add a line segment from [start] to [finish] with [color]
-  ///  
+  ///
   /// Options: [duration] and [depthEnabled]
   void addLine(vec3 start, vec3 finish, vec4 color, [num duration = 0.0, bool depthEnabled=true]) {
     _DebugDrawVertex v1 = new _DebugDrawVertex();
@@ -241,7 +275,7 @@ class DebugDrawManager {
       _depthDisabled.add(v2);
     }
   }
-  
+
   /// Add a cross at [point] with [color]
   ///
   /// Options: [size], [duration], and [depthEnabled]
@@ -254,7 +288,7 @@ class DebugDrawManager {
     addLine(point, point + new vec3(0.0, 0.0, half_size), color, duration, depthEnabled);
     addLine(point, point + new vec3(0.0, 0.0, -half_size), color, duration, depthEnabled);
   }
-  
+
   /// Add a sphere located at [center] with [radius] and [color]
   ///
   /// Options: [duration] and [depthEnabled]
@@ -270,7 +304,7 @@ class DebugDrawManager {
       _depthDisabledSpheres.add(sphere);
     }
   }
-  
+
   /// Add a circle located at [center] perpindicular to [planeNormal] with [radius] and [color]
   ///
   /// Options: [duration] and [depthEnabled]
@@ -291,8 +325,8 @@ class DebugDrawManager {
     }
     addLine(last, center + u * radius, color, duration);
   }
-  
-  /// Add a transformation (rotation & translation) from [xform]. Size is controlled with [size] 
+
+  /// Add a transformation (rotation & translation) from [xform]. Size is controlled with [size]
   ///
   /// X,Y, and Z axes are colored Red,Green, and Blue
   ///
@@ -364,23 +398,23 @@ class DebugDrawManager {
     addLine(Z.xyz, Z_head_2.xyz, color, duration, depthEnabled);
     addLine(Z.xyz, Z_head_3.xyz, color, duration, depthEnabled);
   }
-  
+
   /// Add a triangle with vertices [vertex0], [vertex1], and [vertex2]. Color [color]
   ///
-  /// Options: [duration] and [depthEnabled] 
+  /// Options: [duration] and [depthEnabled]
   void addTriangle(vec3 vertex0, vec3 vertex1, vec3 vertex2, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
     addLine(vertex0, vertex1, color, duration, depthEnabled);
     addLine(vertex1, vertex2, color, duration, depthEnabled);
     addLine(vertex2, vertex0, color, duration, depthEnabled);
   }
-  
+
   /// Add an AABB from [boxMin] to [boxMax] with [color].
   ///
   /// Options: [duration] and [depthEnabled]
   void addAABB(vec3 boxMin, vec3 boxMax, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
     vec3 vertex_a;
     vec3 vertex_b;
-    
+
     vertex_a = new vec3.copy(boxMin);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[0] = boxMax[0];
@@ -426,30 +460,15 @@ class DebugDrawManager {
     vertex_b[1] = boxMax[1];
     addLine(vertex_a, vertex_b, color, duration, depthEnabled);
   }
-  
+
   /// Prepare to render debug primitives
   void prepareForRender() {
     _depthEnabled._prepareForRender();
     _depthDisabled._prepareForRender();
     _depthEnabledSpheres._prepareForRender();
     _depthDisabledSpheres._prepareForRender();
-    _commandBuffer.clear();
-    _commandBuffer.addCommand(new CommandSetBlendState(_blendStateName));
-    _commandBuffer.addCommand(new CommandSetRasterizerState(_rasterStateName));
-    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateEnabledName));
-    _commandBuffer.addCommand(new CommandSetShaderProgram(_lineShaderProgramName));
-    _commandBuffer.addCommand(new CommandSetUniformMatrix4(_cameraTransformUniformName, _cameraMatrix));
-    _commandBuffer.addCommand(new CommandSetPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthEnabledLineVBOName]));
-    _commandBuffer.addCommand(new CommandSetIndexBuffer(null));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthEnabledLineVBOName Layout'));
-    _commandBuffer.addCommand(new CommandDraw(_depthEnabled.vertexCount, 0));
-    _commandBuffer.addCommand(new CommandSetDepthState(_depthStateDisabledName));
-    _commandBuffer.addCommand(new CommandSetVertexBuffers(0, [_depthDisabledLineVBOName]));
-    _commandBuffer.addCommand(new CommandSetInputLayout('$_depthDisabledLineVBOName Layout'));
-    _commandBuffer.addCommand(new CommandDraw(_depthDisabled.vertexCount, 0));
   }
-  
+
   /// Render debug primitives for [Camera] [cam]
   void render(Camera cam) {
     {
@@ -458,9 +477,17 @@ class DebugDrawManager {
       pm.selfMultiply(la);
       pm.copyIntoArray(_cameraMatrix);
     }
-    _commandBuffer.apply(spectreRM, spectreDevice, spectreImmediateContext);
+    {
+      Interpreter interpreter = new Interpreter();
+      // Set registers
+      interpreter.setRegister(0, _depthEnabled.vertexCount);
+      interpreter.setRegister(1, 0);
+      interpreter.setRegister(2, _depthDisabled.vertexCount);
+      interpreter.setRegister(3, 0);
+      interpreter.run(_drawCommands, spectreDevice, spectreRM, spectreImmediateContext);
+    }
   }
-  
+
   /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
     _depthEnabled.update(seconds);

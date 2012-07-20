@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -20,15 +20,6 @@
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
-class DeviceChild implements Hashable {
-  String name;
-  int hashCode() {
-    return name.hashCode();
-  }
-}
-
 /// Format describing a vertex buffer element
 class DeviceFormat {
   final int type;
@@ -46,9 +37,9 @@ class _InputLayoutElement {
   int _attributeIndex;
   int _attributeStride;
   DeviceFormat _attributeFormat;
-  
+
   String toString() {
-    return 'Attribute $_attributeIndex bound to VBO: $_vboSlot VBO_OFFSET: $_vboOffset Attribute Stride: $_attributeStride Format: $_attributeFormat'; 
+    return 'Attribute $_attributeIndex bound to VBO: $_vboSlot VBO_OFFSET: $_vboOffset Attribute Stride: $_attributeStride Format: $_attributeFormat';
   }
 }
 
@@ -64,8 +55,19 @@ class InputElementDescription {
   int elementStride;
   int vertexBufferSlot;
   int vertexBufferOffset;
-  
+
   InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
+}
+
+/// A resource created by a device
+/// All resources have a [name]
+class DeviceChild implements Hashable {
+  String name;
+  int hashCode() {
+    return name.hashCode();
+  }
+  abstract void _fillProps(Map props);
+  abstract void _cleanup();
 }
 
 /// A mapping of vertex buffers to shader program input attributes
@@ -74,6 +76,14 @@ class InputElementDescription {
 class InputLayout extends DeviceChild {
   int _maxAttributeIndex;
   List<_InputLayoutElement> _elements;
+
+  void _fillProps(Map props) {
+
+  }
+
+  void _cleanup() {
+
+  }
 }
 
 /// Rendering viewport
@@ -91,12 +101,16 @@ class Viewport extends DeviceChild {
     width = 640;
     height = 480;
   }
-  
-  void fillProps(Map props) {
+
+  void _fillProps(Map props) {
     x = props['x'];
     y = props['y'];
     width = props['width'];
     height = props['height'];
+  }
+
+  void _cleanup() {
+
   }
 }
 
@@ -167,7 +181,7 @@ class BlendState extends DeviceChild {
     writeRenderTargetAlpha = true;
   }
 
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     Dynamic o;
     o = props['blendColorRed'];
     blendColorRed = o != null ? o : 1.0;
@@ -203,6 +217,10 @@ class BlendState extends DeviceChild {
     o = props['writeRenderTargetAlpha'];
     writeRenderTargetAlpha = o != null ? o : true;
   }
+
+  void _cleanup() {
+
+  }
 }
 
 /// DepthState controls depth testing and writing to a depth buffer
@@ -213,46 +231,46 @@ class DepthState extends DeviceChild {
   static final int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
   static final int DepthComparisonOpEqual = WebGLRenderingContext.EQUAL;
   static final int DepthComparisonOpNotEqual = WebGLRenderingContext.NOTEQUAL;
-  
+
   static final int DepthComparisonOpLess = WebGLRenderingContext.LESS;
   static final int DepthComparisonOpLessEqual = WebGLRenderingContext.LEQUAL;
   static final int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
   static final int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
-  
+
   bool depthTestEnabled;
   bool depthWriteEnabled;
   bool polygonOffsetEnabled;
-  
+
   num depthNearVal;
   num depthFarVal;
   num polygonOffsetFactor;
   num polygonOffsetUnits;
-  
+
   int depthComparisonOp;
-  
+
   DepthState() {
     depthTestEnabled = false;
     depthWriteEnabled = false;
     polygonOffsetEnabled = false;
-    
+
     depthNearVal = 0.0;
     depthFarVal = 1.0;
     polygonOffsetFactor = 0.0;
     polygonOffsetUnits = 0.0;
-    
+
     depthComparisonOp = DepthComparisonOpAlways;
   }
-  
-  void fillProps(Map props) {
+
+  void _fillProps(Map props) {
     Dynamic o;
-    
+
     o = props['depthTestEnabled'];
     depthTestEnabled = o != null ? o : false;
     o = props['depthWriteEnabled'];
     depthWriteEnabled = o != null ? o : false;
     o = props['polygonOffsetEnabled'];
     polygonOffsetEnabled = o != null ? o : false;
-    
+
     o = props['depthNearVal'];
     depthNearVal = o != null ? o : 0.0;
     o = props['depthFarVal'];
@@ -264,11 +282,19 @@ class DepthState extends DeviceChild {
     o = props['depthComparisonOp'];
     depthComparisonOp = o != null ? o : DepthComparisonOpAlways;
   }
+
+  void _cleanup() {
+
+  }
 }
 
 class StencilState extends DeviceChild {
-  void fillProps(Map props) {
-    
+  void _fillProps(Map props) {
+
+  }
+
+  void _cleanup() {
+
   }
 }
 
@@ -281,23 +307,23 @@ class RasterizerState extends DeviceChild {
   static final int CullFrontAndBack = WebGLRenderingContext.FRONT_AND_BACK;
   static final int FrontCW = WebGLRenderingContext.CW;
   static final int FrontCCW = WebGLRenderingContext.CCW;
-  
+
   bool cullEnabled;
   int cullMode;
   int cullFrontFace;
-  
+
   num lineWidth;
-  
+
   RasterizerState() {
     cullEnabled = false;
     cullMode = CullBack;
     cullFrontFace = FrontCCW;
     lineWidth = 1.0;
   }
-  
-  void fillProps(Map props) {
+
+  void _fillProps(Map props) {
     Dynamic o;
-    
+
     o = props['cullEnabled'];
     cullEnabled = o != null ? o : false;
     o = props['cullMode'];
@@ -306,6 +332,10 @@ class RasterizerState extends DeviceChild {
     cullFrontFace = o != null ? o : FrontCCW;
     o = props['lineWidth'];
     lineWidth = o != null ? o : lineWidth;
+  }
+
+  void _cleanup() {
+
   }
 }
 
@@ -340,8 +370,12 @@ class Shader extends DeviceChild {
     spectreLog.Info('Compiled $name - $log');
   }
 
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
 
+  }
+
+  void _cleanup() {
+    webGL.deleteShader(_shader);
   }
 }
 
@@ -349,7 +383,7 @@ class Shader extends DeviceChild {
 /// Create using [Device.createVertexShader]
 /// Must be linked into a ShaderProgram before use
 class VertexShader extends Shader {
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
 }
@@ -358,7 +392,7 @@ class VertexShader extends Shader {
 /// Create using [Device.createFragmentShader]
 /// Must be linked into a ShaderProgram before use
 class FragmentShader extends Shader {
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
 }
@@ -367,15 +401,33 @@ class FragmentShader extends Shader {
 /// Create using [Device.createShaderProgram]
 /// Set using [ImmediateContext.setShaderProgram]
 class ShaderProgram extends DeviceChild {
-  VertexShader vs;
-  FragmentShader fs;
+  int vs;
+  int fs;
   WebGLProgram _program;
   int numAttributes;
   int numUniforms;
-  
-  void fillProps(Map props) {
-    vs = props['VertexProgram'];
-    fs = props['FragmentProgram'];
+
+  ShaderProgram() {
+    vs = 0;
+    fs = 0;
+    numUniforms = 0;
+    numAttributes = 0;
+    _program = null;
+  }
+
+  void _fillProps(Map props) {
+    Object o = null;
+
+    o = props['VertexProgram'];
+    vs = o != null ? o : 0;
+    o = props['FragmentProgram'];
+    fs = o != null ? o : 0;
+  }
+
+  void _cleanup() {
+    vs = null;
+    fs = null;
+    webGL.deleteProgram(_program);
   }
 
   void link() {
@@ -419,7 +471,7 @@ class ShaderProgram extends DeviceChild {
       case WebGLRenderingContext.INT_VEC4:
         return 'ivec4';
       default:
-        return 'unknown';
+        return 'unknown code: $type';
     }
   }
 
@@ -448,7 +500,7 @@ class RenderBuffer extends DeviceChild {
   int _height;
   int _format;
   WebGLRenderbuffer _buffer;
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _target = WebGLRenderingContext.RENDERBUFFER;
     String format = props['format'];
     switch (format) {
@@ -465,6 +517,10 @@ class RenderBuffer extends DeviceChild {
     _width = props['width'];
     _height = props['height'];
   }
+
+  void _cleanup() {
+    webGL.deleteRenderbuffer(_buffer);
+  }
 }
 
 class Texture extends DeviceChild {
@@ -473,12 +529,12 @@ class Texture extends DeviceChild {
   static final int TextureFormatRGBA = WebGLRenderingContext.RGBA;
   static final int TextureFormatLuminance = WebGLRenderingContext.LUMINANCE;
   static final int TextureFormatLuminanceAlpha = WebGLRenderingContext.LUMINANCE_ALPHA;
-  
+
   static final int PixelFormatUnsignedByte = WebGLRenderingContext.UNSIGNED_BYTE;
   static final int PixelFormatUnsignedShort_4_4_4_4 = WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4;
   static final int PixelFormatUnsignedShort_5_5_5_1 = WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1;
   static final int PixelFormatUnsignedShort_5_6_5 = WebGLRenderingContext.UNSIGNED_SHORT_5_6_5;
-  
+
   int _target;
   int _target_param;
   int _width;
@@ -486,6 +542,14 @@ class Texture extends DeviceChild {
   int _textureFormat;
   int _pixelFormat;
   WebGLTexture _buffer;
+
+  void _fillProps(Map props) {
+
+  }
+
+  void _cleanup() {
+    webGL.deleteTexture(_buffer);
+  }
 }
 
 /// Texture2D defines the storage for a 2D texture including Mipmaps
@@ -501,8 +565,8 @@ class Texture2D extends Texture {
     _textureFormat = Texture.TextureFormatRGBA;
     _pixelFormat = Texture.PixelFormatUnsignedByte;
   }
-  
-  void fillProps(Map props) {
+
+  void _fillProps(Map props) {
     _width = props['width'] != null ? props['width'] : 1;
     _height = props['height'] != null ? props['height'] : 1;
     _textureFormat = props['textureFormat'] != null ? props['textureFormat'] : Texture.TextureFormatRGBA;
@@ -517,34 +581,38 @@ class SamplerState extends DeviceChild {
   static final int TextureWrapClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE;
   static final int TextureWrapMirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT;
   static final int TextureWrapRepeat = WebGLRenderingContext.REPEAT;
-  
+
   static final int TextureMagFilterLinear = WebGLRenderingContext.LINEAR;
   static final int TextureMagFilterNearest = WebGLRenderingContext.NEAREST;
-  
+
   static final int TextureMinFilterLinear = WebGLRenderingContext.LINEAR;
   static final int TextureMinFilterNearest = WebGLRenderingContext.NEAREST;
   static final int TextureMinFilterNearestMipmapNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
   static final int TextureMinFilterNearestMipmapLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
   static final int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
   static final int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
-  
+
   int _wrap_s;
   int _wrap_t;
   int _mag_filter;
   int _min_filter;
-  
+
   SamplerState() {
     _wrap_s = TextureWrapRepeat;
     _wrap_t = TextureWrapRepeat;
     _min_filter = TextureMinFilterNearestMipmapLinear;
     _mag_filter = TextureMagFilterLinear;
   }
-  
-  void fillProps(Map props) {
+
+  void _fillProps(Map props) {
     _wrap_s = props['wrapS'] != null ? props['wrapS'] : TextureWrapRepeat;
     _wrap_t = props['wrapT'] != null ? props['wrapT'] : TextureWrapRepeat;
     _min_filter = props['minFilter'] != null ? props['minFilter'] : TextureMinFilterNearestMipmapLinear;
     _mag_filter = props['magFilter'] != null ? props['magFilter'] : TextureMagFilterLinear;
+  }
+
+  void _cleanup() {
+
   }
 }
 
@@ -555,27 +623,41 @@ class RenderTarget extends DeviceChild {
   WebGLFramebuffer _buffer;
   int _target;
 
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _target = WebGLRenderingContext.FRAMEBUFFER;
     _color0 = props['color0'];
     _depth = props['depth'];
     _stencil = props['stencil'];
+  }
+
+  void _cleanup() {
+    webGL.deleteFramebuffer(_buffer);
   }
 }
 
 class SpectreBuffer extends DeviceChild {
   WebGLBuffer _buffer;
   int _target;
+  int _param_target;
   int _usage;
   int _size;
+
+  void _fillProps(Map props) {
+
+  }
+
+  void _cleanup() {
+    webGL.deleteBuffer(_buffer);
+  }
 }
 
 /// IndexBuffer defines the storage for indexes used to construct primitives
 /// Create using [Device.createIndexBuffer]
 /// Set using [Device.setIndexBuffer]
 class IndexBuffer extends SpectreBuffer {
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+    _param_target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
     String usage = props['usage'];
     switch (usage) {
       case 'stream':
@@ -599,8 +681,9 @@ class IndexBuffer extends SpectreBuffer {
 /// Create using [Device.createVertexBuffer]
 /// Set using [Device.setVertexBuffers]
 class VertexBuffer extends SpectreBuffer {
-  void fillProps(Map props) {
+  void _fillProps(Map props) {
     _target = WebGLRenderingContext.ARRAY_BUFFER;
+    _param_target = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
     String usage = props['usage'];
     switch (usage) {
       case 'stream':
@@ -632,154 +715,272 @@ class Device {
   static final DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
   static final DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
   static final DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
-  
-  Map<String, IndexBuffer> _indexBuffers;
-  Map<String, VertexBuffer> _vertexBuffers;
-  Map<String, RenderBuffer> _renderBuffers;
-  Map<String, RenderTarget> _renderTargets;
-  Map<String, Texture2D> _texture2Ds;
-  Map<String, SamplerState> _samplerStates;
-  Map<String, VertexShader> _vertexShaders;
-  Map<String, FragmentShader> _fragmentShaders;
-  Map<String, ShaderProgram> _shaderPrograms;
-  Map<String, Viewport> _viewports;
-  Map<String, DepthState> _depthStates;
-  Map<String, BlendState> _blendStates;
-  Map<String, RasterizerState> _rasterizerStates;
-  Map<String, InputLayout> _inputLayouts;
-  
+
+  static final int BufferHandleType = 1;
+  static final int RenderBufferHandleType = 2;
+  static final int RenderTargetHandleType = 3;
+  static final int TextureHandleType = 4;
+  static final int SamplerStateHandleType = 5;
+  static final int ShaderHandleType = 6;
+  static final int ShaderProgramHandleType = 7;
+  static final int ViewportHandleType = 8;
+  static final int DepthStateHandleType = 9;
+  static final int BlendStateHandleType = 10;
+  static final int RasterizerStateHandleType = 11;
+  static final int InputLayoutHandleType = 12;
+
+  String getHandleType(int handle) {
+    int type = Handle.getType(handle);
+    switch (type) {
+      case BufferHandleType:
+        return 'Buffer';
+      case RenderBufferHandleType:
+        return 'RenderBuffer';
+      case RenderTargetHandleType:
+        return 'RenderTarget';
+      case TextureHandleType:
+        return 'Texture';
+      case SamplerStateHandleType:
+        return 'SamplerState';
+      case ShaderHandleType:
+        return 'Shader';
+      case ShaderProgramHandleType:
+        return 'ShaderProgram';
+      case ViewportHandleType:
+        return 'Viewport';
+      case DepthStateHandleType:
+        return 'DepthState';
+      case BlendStateHandleType:
+        return 'BlendState';
+      case RasterizerStateHandleType:
+        return 'RasterizerState';
+      case InputLayoutHandleType:
+        return 'Input Layout';
+      default:
+        return 'Unknown handle type';
+    }
+  }
+
+  // There is a 1:1 mapping between _childrenHandles and _childrenObjects
+  HandleSystem _childrenHandles;
+  List<DeviceChild> _childrenObjects;
+
+  // Maps from child object name to handle
+  Map<String, int> _nameMapping;
+
+  static final int MaxDeviceChildren = 2048;
+  static final int MaxStaticDeviceChildren = 512;
+
   /// Constructs a GPU device
   Device() {
-    _indexBuffers = new Map<String, IndexBuffer>();
-    _vertexBuffers = new Map<String, VertexBuffer>();
-    _renderBuffers = new Map<String, RenderBuffer>();
-    _renderTargets = new Map<String, RenderTarget>();
-    _texture2Ds = new Map<String, Texture2D>();
-    _samplerStates = new Map<String, SamplerState>();
-    _vertexShaders = new Map<String, VertexShader>();
-    _fragmentShaders = new Map<String, FragmentShader>();
-    _shaderPrograms = new Map<String, ShaderProgram>();
-    _viewports = new Map<String, Viewport>();
-    _depthStates = new Map<String, DepthState>();
-    _blendStates = new Map<String, BlendState>();
-    _rasterizerStates = new Map<String, RasterizerState>();
-    _inputLayouts = new Map<String, InputLayout>();
+    _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
+    _childrenObjects = new List(MaxDeviceChildren);
+    _nameMapping = new Map<String, int>();
   }
 
-  /// Returns the [IndexBuffer] named [name]
-  IndexBuffer findIndexBuffer(String name) {
-    IndexBuffer ib = _indexBuffers[name];
-    if (ib == null) {
-      spectreLog.Warning('IndexBuffer $name not found.');
+  /// Returns the handle to the device child named [name]
+  int findHandle(String name) {
+    int h = _nameMapping[name];
+    if (h == null) {
+      spectreLog.Warning('Could not find handle for device child $name');
+      return Handle.BadHandle;
     }
-    return ib;
+    return h;
   }
 
-  /// Create a [IndexBuffer] named [name]
+  Map<String, int> get children() => _nameMapping;
+
+  /// Lookup the actual device child object given the [handle]
+  Dynamic getDeviceChild(int handle) {
+    if (handle == 0) {
+      return null;
+    }
+    if (_childrenHandles.validHandle(handle) == false) {
+      spectreLog.Warning('$handle is not a valid handle');
+      return null;
+    }
+    int index = Handle.getIndex(handle);
+    return _childrenObjects[index];
+  }
+
+  String getDeviceChildName(int handle) {
+    Dynamic dc = getDeviceChild(handle);
+    if (dc != null) {
+      return dc.name;
+    }
+    return 'Unknown handle: $handle';
+  }
+
+  int _checkName(String name, String type) {
+    int handle = _nameMapping[name];
+    if (handle != null) {
+      spectreLog.Error('Attempting to create a $type with a name that already exists: $name. Returning existing $name');
+      return handle;
+    }
+    return Handle.BadHandle;
+  }
+
+  void _setChildObject(int handle, Dynamic o) {
+    int index = Handle.getIndex(handle);
+    _childrenObjects[index] = o;
+  }
+
+  /// Registers a handle with the given [type] and [name]
+  /// [handle] is an optional argument that, if provided, must be a statically reserved handle
+  int registerHandle(int type, [int handle=Handle.BadHandle]) {
+    if (handle != Handle.BadHandle) {
+      int handleType = Handle.getType(handle);
+      if (type != handleType) {
+        spectreLog.Error('$type and static handle type do not match.');
+        return Handle.BadHandle;
+      }
+      int r = _childrenHandles.setStaticHandle(handle);
+      if (r != handle) {
+        spectreLog.Error('Registering a static handle $handle failed.');
+        return Handle.BadHandle;
+      }
+    } else {
+      handle = _childrenHandles.allocateHandle(type);
+      if (handle == Handle.BadHandle) {
+        spectreLog.Error('Registering dynamic handle failed.');
+        return Handle.BadHandle;
+      }
+    }
+    int index = Handle.getIndex(handle);
+    if (_childrenObjects[index] != null) {
+      spectreLog.Warning('Registering an object at $index but there is already something there.');
+      _childrenObjects[index]._cleanup();
+      // Nuke it
+      _childrenObjects[index] = null;
+    }
+    assert(_childrenHandles.validHandle(handle));
+    return handle;
+  }
+
+  /// Deletes the device child [handle]
+  void deleteDeviceChild(int handle) {
+    if (_childrenHandles.validHandle(handle) == false) {
+      spectreLog.Warning('Deleting device child handle [$handle] is invalid.');
+      return;
+    }
+    int index = Handle.getIndex(handle);
+    DeviceChild dc = _childrenObjects[index];
+    if (dc == null) {
+      return;
+    }
+    dc._cleanup();
+    _nameMapping.remove(dc.name);
+    _childrenObjects[index] = null;
+  }
+
+  void batchDeleteDeviceChildren(List<int> handles) {
+    for (int h in handles) {
+      deleteDeviceChild(h);
+    }
+  }
+
+  /// Create a IndexBuffer named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [IndexBuffer] being created
-  IndexBuffer createIndexBuffer(String name, Object props) {
-    if (_indexBuffers.containsKey(name)){
-      spectreLog.Error('Attempting to create index buffer with same name $name');
-      return _indexBuffers[name];
+  /// describing the IndexBuffer being created. If [handle] is specified it must be a registered handle.
+  ///
+  /// Returns the handle to the IndexBuffer.
+  int createIndexBuffer(String name, Object props, [int handle=Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'IndexBuffer');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(BufferHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
+
     IndexBuffer ib = new IndexBuffer();
     ib.name = name;
-    ib.fillProps(props);
-
-    WebGLBuffer oldBind = webGL.getParameter(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING);
-    
+    ib._fillProps(props);
+    WebGLBuffer oldBind = webGL.getParameter(ib._param_target);
     ib._buffer = webGL.createBuffer();
     webGL.bindBuffer(ib._target, ib._buffer);
     webGL.bufferData(ib._target, ib._size, ib._usage);
-    _indexBuffers[ib.name] = ib;
-    
-    webGL.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, oldBind);
-    
-    return ib;
-  }
+    webGL.bindBuffer(ib._target, oldBind);
 
-  /// Deletes [IndexBuffer] [ib]
-  void deleteIndexBuffer(IndexBuffer ib) {
-    if (ib == null) {
-      spectreLog.Warning('Attempting to delete null index buffer');
-      return;
-    }
-    _indexBuffers.remove(ib.name);
-    webGL.deleteBuffer(ib._buffer);
-  }
 
-  /// Returns the [VertexBuffer] named [name]
-  VertexBuffer findVertexBuffer(String name) {
-    VertexBuffer vb = _vertexBuffers[name];
-    if (vb == null) {
-      spectreLog.Warning('VertexBuffer $name not found.');
-    }
-    return vb;
+    _setChildObject(handle, ib);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [VertexBuffer] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexBuffer] being created
-  VertexBuffer createVertexBuffer(String name, Object props) {
-    if (_vertexBuffers.containsKey(name)){
-      spectreLog.Error('Attempting to create vertex buffer with same name $name');
-      return _vertexBuffers[name];
+  int createVertexBuffer(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'VertexBuffer');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(BufferHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
+
     VertexBuffer vb = new VertexBuffer();
     vb.name = name;
-    vb.fillProps(props);
+    vb._fillProps(props);
     WebGLBuffer oldBind = webGL.getParameter(WebGLRenderingContext.ARRAY_BUFFER_BINDING);
     vb._buffer = webGL.createBuffer();
     webGL.bindBuffer(vb._target, vb._buffer);
     webGL.bufferData(vb._target, vb._size, vb._usage);
     webGL.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, oldBind);
-    _vertexBuffers[vb.name] = vb;
-    return vb;
-  }
 
-  /// Deletes [VertexBuffer] [vb]
-  void deleteVertexBuffer(VertexBuffer vb) {
-    if (vb == null) {
-      spectreLog.Warning('Attempting to delete null vertex buffer');
-      return;
-    }
-    _vertexBuffers.remove(vb.name);
-    webGL.deleteBuffer(vb._buffer);
-  }
-
-  /// Returns the [RenderBuffer] named [name]
-  RenderBuffer findRenderBuffer(String name) {
-    RenderBuffer b = _renderBuffers[name];
-    if (b == null) {
-      spectreLog.Warning('RenderBuffer $name not found.');
-    }
-    return b;
+    _setChildObject(handle, vb);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [RenderBuffer] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderBuffer] being created
-  RenderBuffer createRenderBuffer(String name, Object props) {
-    if (_renderBuffers.containsKey(name)){
-      spectreLog.Error('Attempting to create render buffer with same name $name');
-      return _renderBuffers[name];
+  int createRenderBuffer(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'RenderBuffer');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(RenderBufferHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
@@ -788,50 +989,48 @@ class Device {
     }
     RenderBuffer rb = new RenderBuffer();
     rb.name = name;
-    rb.fillProps(props);
+    rb._fillProps(props);
 
     rb._buffer = webGL.createRenderbuffer();
     WebGLRenderbuffer oldBind = webGL.getParameter(WebGLRenderingContext.RENDERBUFFER_BINDING);
     webGL.bindRenderbuffer(rb._target, rb._buffer);
     webGL.renderbufferStorage(rb._target, rb._format, rb._width, rb._height);
     webGL.bindRenderbuffer(WebGLRenderingContext.RENDERBUFFER, oldBind);
-    _renderBuffers[rb.name] = rb;
-    return rb;
+
+    _setChildObject(handle, rb);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
-  /// Deletes [RenderBuffer] [rb]
-  void deleteRenderBuffer(RenderBuffer rb) {
-    _renderBuffers.remove(rb.name);
-    webGL.deleteRenderbuffer(rb._buffer);
-  }
-
-  /// Returns the [RenderTarget] named [name]
-  RenderTarget findRenderTarget(String name) {
-    RenderTarget t = _renderTargets[name];
-    if (t == null) {
-      spectreLog.Warning('RenderTarget $name not found');
-    }
-    return t;
-  }
-  
   /// Create a [RenderTarget] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderTarget] being created
-  RenderTarget createRenderTarget(String name, Object props) {
-    if (_renderTargets.containsKey(name)){
-      spectreLog.Error('Attempting to create render target with same name $name');
-      return _renderTargets[name];
+  int createRenderTarget(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'RenderTarget');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(RenderTargetHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
+
     RenderTarget rt = new RenderTarget();
     rt.name = name;
-    rt.fillProps(props);
+    rt._fillProps(props);
     rt._buffer = webGL.createFramebuffer();
     WebGLFramebuffer oldBind = webGL.getParameter(WebGLRenderingContext.FRAMEBUFFER_BINDING);
     webGL.bindFramebuffer(rt._target, rt._buffer);
@@ -852,382 +1051,368 @@ class Device {
     }
     int status = webGL.checkFramebufferStatus(rt._target);
     if (status != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = $status');  
+      spectreLog.Error('RenderTarget $name incomplete status = $status');
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
     webGL.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
-    _renderTargets[rt.name] = rt;
-    return rt;
-  }
-  
-  /// Deletes [RenderTarget] [rt]
-  void deleteRenderTarget(RenderTarget rt) {
-    _renderTargets.remove(rt.name);
-    webGL.deleteFramebuffer(rt._buffer);
-  }
 
-  /// Returns the [Texture2D] named [name]
-  Texture2D findTexture2D(String name) {
-    Texture t = _texture2Ds[name];
-    if (t == null) {
-      spectreLog.Warning('Texture $name not found');
-    }
-    return t;
+    _setChildObject(handle, rt);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [Texture2D] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Texture2D] being created
-  Texture2D createTexture2D(String name, Object props) {
-    if (_texture2Ds.containsKey(name)){
-      spectreLog.Error('Attempting to create Texture2D with same name $name');
-      return _texture2Ds[name];
+  int createTexture2D(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'Texture2D');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(TextureHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    Texture2D rt = new Texture2D();
-    rt.name = name;
-    rt.fillProps(props);
-    rt._buffer = webGL.createTexture();
-    
-    WebGLTexture oldBind = webGL.getParameter(rt._target_param); 
-    webGL.bindTexture(rt._target, rt._buffer);
+
+    Texture2D tex = new Texture2D();
+    tex.name = name;
+    tex._fillProps(props);
+    tex._buffer = webGL.createTexture();
+
+    WebGLTexture oldBind = webGL.getParameter(tex._target_param);
+    webGL.bindTexture(tex._target, tex._buffer);
     // Allocate memory for texture
-    webGL.texImage2D(rt._target, 0, rt._textureFormat, rt._width, rt._height, 0, rt._textureFormat, rt._pixelFormat, null);
-    webGL.bindTexture(rt._target, oldBind);
-    _texture2Ds[rt.name] = rt;
-    return rt;
-  }
+    webGL.texImage2D(tex._target, 0, tex._textureFormat, tex._width, tex._height, 0, tex._textureFormat, tex._pixelFormat, null);
+    webGL.bindTexture(tex._target, oldBind);
 
-  /// Deletes [Texture2D] [t]
-  void deleteTexture2D(Texture2D t) {
-    _texture2Ds.remove(t.name);
-    webGL.deleteTexture(t._buffer);
-  }
-
-  /// Returns the [SamplerState] named [name]
-  SamplerState findSamplerState(String name) {
-    SamplerState s = _samplerStates[name];
-    if (s == null) {
-      spectreLog.Warning('Sampler $name not found');
-    }
-    return s;
-  }
-
-  /// Create a [SamplerState] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [SamplerState] being created
-  SamplerState createSamplerState(String name, Object props) {
-    if (_samplerStates.containsKey(name)){
-      spectreLog.Error('Attempting to create sampler with same name $name');
-      return _samplerStates[name];
-    }
-    if (props is String) {
-      props = JSON.parse(props);
-    }
-    if ((props is Map) == false) {
-      return null;
-    }
-    SamplerState sampler = new SamplerState();
-    sampler.name = name;
-    sampler.fillProps(props);
-    _samplerStates[sampler.name] = sampler;
-    return sampler;
-  }
-
-  /// Deletes [SamplerState] [sampler]
-  void deleteSamplerState(SamplerState sampler) {
-    _samplerStates.remove(sampler.name);
-  }
-  
-  /// Returns the [VertexShader] named [name]
-  VertexShader findVertexShader(String name) {
-    VertexShader vs = _vertexShaders[name];
-    if (vs == null) {
-      spectreLog.Warning('VertexShader $name not found');
-    }
-    return vs;
+    _setChildObject(handle, tex);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [VertexShader] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
-  VertexShader createVertexShader(String name, Object props) {
-    if (_vertexShaders.containsKey(name)){
-      spectreLog.Error('Attempting to create render target with same name $name');
-      return _vertexShaders[name];
+  int createVertexShader(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'VertexShader');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(ShaderHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    VertexShader rt = new VertexShader();
-    rt.name = name;
-    rt.fillProps(props);
-    rt._shader = webGL.createShader(rt._type);
 
-    _vertexShaders[rt.name] = rt;
-    return rt;
-  }
+    VertexShader vertexshader = new VertexShader();
+    vertexshader.name = name;
+    vertexshader._fillProps(props);
+    vertexshader._shader = webGL.createShader(vertexshader._type);
 
-  /// Deletes [VertexShader] [shader]
-  void deleteVertexShader(VertexShader shader) {
-    _vertexShaders.remove(shader.name);
-    webGL.deleteShader(shader._shader);
-  }
-  
-  /// Returns the [FragmentShader] named [name]
-  FragmentShader findFragmentShader(String name) {
-    FragmentShader vs = _fragmentShaders[name];
-    if (vs == null) {
-      spectreLog.Warning('FragmentShader $name not found');
-    }
-    return vs;
+    _setChildObject(handle, vertexshader);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [FragmentShader] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
-  FragmentShader createFragmentShader(String name, Object props) {
-    if (_fragmentShaders.containsKey(name)) {
-      spectreLog.Error('Attempting to create fragment shader with same name $name');
-      return _fragmentShaders[name];
+  int createFragmentShader(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'FragmentShader');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(ShaderHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    FragmentShader rt = new FragmentShader();
-    rt.name = name;
-    rt.fillProps(props);
-    rt._shader = webGL.createShader(rt._type);
-    _fragmentShaders[rt.name] = rt;
-    return rt;
-  }
 
-  /// Deletes [FragmentShader] [fs]
-  void deleteFragmentShader(FragmentShader fs) {
-    if (fs == null) {
-      spectreLog.Warning('Attempting to delete null fragment shader');
-      return;
-    }
-    _fragmentShaders.remove(fs.name);
-    webGL.deleteShader(fs._shader);
-  }
+    FragmentShader fragmentshader = new FragmentShader();
+    fragmentshader.name = name;
+    fragmentshader._fillProps(props);
+    fragmentshader._shader = webGL.createShader(fragmentshader._type);
 
-  /// Returns the [ShaderProgram] named [name]
-  ShaderProgram findShaderProgram(String name) {
-    ShaderProgram vs = _shaderPrograms[name];
-    if (vs == null) {
-      spectreLog.Warning('ShaderProgram $name not found');
-    }
-    return vs;
+    _setChildObject(handle, fragmentshader);
+    _nameMapping[name] = handle;
+    return handle;
+
   }
 
   /// Create a [ShaderProgram] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
-  ShaderProgram createShaderProgram(String name, Object props) {
-    if (_shaderPrograms.containsKey(name)) {
-      spectreLog.Error('Attempting to create shader program with same name $name');
-      return _shaderPrograms[name];
+  int createShaderProgram(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'ShaderProgram');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(ShaderProgramHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    ShaderProgram rt = new ShaderProgram();
-    rt.name = name;
-    rt.fillProps(props);
-    rt._program = webGL.createProgram();
-    webGL.attachShader(rt._program, rt.vs._shader);
-    webGL.attachShader(rt._program, rt.fs._shader);
-    rt.link();
-    _shaderPrograms[rt.name] = rt;
-    return rt;
-  }
-  
-  /// Deletes [ShaderProgram] [sp]
-  void deleteShaderProgram(ShaderProgram sp) {
-    _shaderPrograms.remove(sp.name);
-    webGL.deleteProgram(sp._program);
+
+    ShaderProgram shaderprogram = new ShaderProgram();
+    shaderprogram.name = name;
+    shaderprogram._fillProps(props);
+    shaderprogram._program = webGL.createProgram();
+    VertexShader vs = getDeviceChild(shaderprogram.vs);
+    FragmentShader fs = getDeviceChild(shaderprogram.fs);
+    if (vs != null && fs != null) {
+      webGL.attachShader(shaderprogram._program, vs._shader);
+      webGL.attachShader(shaderprogram._program, fs._shader);
+      shaderprogram.link();
+    }
+
+    _setChildObject(handle, shaderprogram);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
-  /// Returns the [Viewport] named [name]
-  Viewport findViewport(String name) {
-    Dynamic o = _viewports[name];
-    if (o == null) {
-      spectreLog.Warning('Viewport $name not found');
+  /// Create a [SamplerState] named [name]
+  ///
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// describing the [SamplerState] being created
+  int createSamplerState(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'SamplerState');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
-    return o;
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(SamplerStateHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
+    if (props is String) {
+      props = JSON.parse(props);
+    }
+    if ((props is Map) == false) {
+      return null;
+    }
+
+    SamplerState sampler = new SamplerState();
+    sampler.name = name;
+    sampler._fillProps(props);
+
+    _setChildObject(handle, sampler);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [Viewport] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
-  Viewport createViewport(String name, Object props) {
-    if (_viewports.containsKey(name)) {
-      spectreLog.Error('Attempting to create viewport with same name $name');
-      return _viewports[name];
+  int createViewport(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'Viewport');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(ViewportHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    Viewport rt = new Viewport();
-    rt.name = name;
-    rt.fillProps(props);
-    _viewports[rt.name] = rt;
-    return rt;
-  }
 
-  /// Deletes [Viewport] [vp]
-  void deleteViewport(Viewport vp) {
-    _viewports.remove(vp.name);
-  }
+    Viewport viewport = new Viewport();
+    viewport.name = name;
+    viewport._fillProps(props);
 
-  /// Returns the [DepthState] named [name]
-  DepthState findDepthState(String name) {
-    Dynamic o = _depthStates[name];
-    if (o == null) {
-      spectreLog.Warning('DepthState $name not found');
-    }
-    return o;
+    _setChildObject(handle, viewport);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [DepthState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
-  DepthState createDepthState(String name, Object props) {
-    if (_depthStates.containsKey(name)) {
-      spectreLog.Error('Attempting to create Depth Stencil State with same name $name');
-      return _depthStates[name];
+  int createDepthState(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'DepthState');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(DepthStateHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    DepthState rt = new DepthState();
-    rt.name = name;
-    rt.fillProps(props);
-    _depthStates[rt.name] = rt;
-    return rt;
-  }
 
-  /// Deletes [DepthState] [ds]
-  void deleteDepthState(DepthState ds) {
-    _depthStates.remove(ds.name);
-  }
+    DepthState depthstate = new DepthState();
+    depthstate.name = name;
+    depthstate._fillProps(props);
 
-  /// Returns the [BlendState] named [name]
-  BlendState findBlendState(String name) {
-    Dynamic o = _blendStates[name];
-    if (o == null) {
-      spectreLog.Warning('BlendState $name not found');
-    }
-    return o;
+    _setChildObject(handle, depthstate);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [BlendState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [BlendState] being created
-  BlendState createBlendState(String name, Object props) {
-    if (_blendStates.containsKey(name)) {
-      spectreLog.Error('Attempting to create Blend State with same name $name');
-      return _blendStates[name];
+  int createBlendState(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'BlendState');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(BlendStateHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    BlendState rt = new BlendState();
-    rt.name = name;
-    rt.fillProps(props);
-    _blendStates[rt.name] = rt;
-    return rt;
-  }
 
-  /// Deletes [BlendState] [bs]
-  void deleteBlendState(BlendState bs) {
-    _blendStates.remove(bs.name);
-  }
+    BlendState blendstate = new BlendState();
+    blendstate.name = name;
+    blendstate._fillProps(props);
 
-  /// Returns the [RasterizerState] named [name]
-  RasterizerState findRasterizerState(String name) {
-    Dynamic o = _rasterizerStates[name];
-    if (o == null) {
-      spectreLog.Warning('RasterizerState $name not found');
-    }
-    return o;
+    _setChildObject(handle, blendstate);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
   /// Create a [RasterizerState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RasterizerState] being created
-  RasterizerState createRasterizerState(String name, Object props) {
-    if (_rasterizerStates.containsKey(name)) {
-      spectreLog.Error('Attempting to create Rasterizer State with same name $name');
-      return _rasterizerStates[name];
+  int createRasterizerState(String name, Object props, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'BlendState');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
     }
+
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(BlendStateHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
+    }
+
     if (props is String) {
       props = JSON.parse(props);
     }
     if ((props is Map) == false) {
       return null;
     }
-    RasterizerState rt = new RasterizerState();
-    rt.name = name;
-    rt.fillProps(props);
-    _rasterizerStates[rt.name] = rt;
-    return rt;
+
+    RasterizerState rasterizerstate = new RasterizerState();
+    rasterizerstate.name = name;
+    rasterizerstate._fillProps(props);
+
+    _setChildObject(handle, rasterizerstate);
+    _nameMapping[name] = handle;
+    return handle;
   }
 
-  /// Deletes [RasterizerState] [rs]
-  void deleteRasterizerState(RasterizerState rs) {
-    _rasterizerStates.remove(rs.name);
-  }
+  /// Create an [InputLayout] named [name] for [elements] and [shaderProgramHandle]
+  int createInputLayout(String name, List<InputElementDescription> elements, int shaderProgramHandle, [int handle = Handle.BadHandle]) {
+    {
+      int checkHandle = _checkName(name, 'BlendState');
+      if (checkHandle != Handle.BadHandle) {
+        return checkHandle;
+      }
+    }
 
-  /// Returns the [InputLayout] named [name]
-  InputLayout findInputLayout(String name) {
-    Dynamic o = _inputLayouts[name];
-    if (o == null) {
-      spectreLog.Warning('InputLayout $name not found');
+    if (handle == Handle.BadHandle) {
+      handle = registerHandle(BlendStateHandleType);
+      if (handle == Handle.BadHandle) {
+        return handle;
+      }
     }
-    return o;
-  }
-  
-  /// Create an [InputLayout] named [name] for [elements] and [sp] 
-  InputLayout createInputLayout(String name, List<InputElementDescription> elements, ShaderProgram sp) {
-    if (_inputLayouts.containsKey(name)) {
-      spectreLog.Error('Attempting to create input layout with same name $name');
-      return _inputLayouts[name];
-    }
+
+    ShaderProgram sp = getDeviceChild(shaderProgramHandle);
+
     InputLayout il = new InputLayout();
     il.name = name;
     il._maxAttributeIndex = -1;
@@ -1249,13 +1434,10 @@ class Device {
       el._attributeStride = e.elementStride;
       il._elements.add(el);
     }
-    _inputLayouts[name] = il;
-    spectreLog.Info('Created InputLayout $name with ${il._elements.length} attributes');
-    return il;
+
+    _setChildObject(handle, il);
+    _nameMapping[name] = handle;
+    return handle;
   }
-  
-  /// Deletes [InputLayout] [il]
-  void deleteInputLayout(InputLayout il) {
-    _inputLayouts.remove(il.name);
-  }
+
 }
