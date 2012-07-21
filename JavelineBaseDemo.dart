@@ -57,6 +57,8 @@ class JavelineBaseDemo {
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
 
+  Camera get camera() => _camera;
+  
   int width;
   int height;
 

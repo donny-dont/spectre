@@ -38,6 +38,6 @@ class JavelineEmptyDemo extends JavelineBaseDemo {
     super.update(time, dt);
     
     debugDrawManager.prepareForRender();
-    debugDrawManager.render(_camera);
+    debugDrawManager.render(camera);
   }
 }

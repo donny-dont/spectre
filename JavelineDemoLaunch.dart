@@ -25,6 +25,11 @@
 #import('VectorMath/VectorMath.dart');
 #import('Javeline.dart');
 
+// Actual demos
+#source('JavelineEmptyDemo.dart');
+#source('JavelineDebugDrawTest.dart');
+#source('JavelineSpinningCube.dart');
+
 class JavelineDemoDescription {
   String name;
   Function constructDemo;

@@ -31,7 +31,3 @@
 #source('JavelineMouse.dart');
 #source('JavelineBaseDemo.dart');
 
-// Actual demos
-#source('JavelineEmptyDemo.dart');
-#source('JavelineDebugDrawTest.dart');
-#source('JavelineSpinningCube.dart');

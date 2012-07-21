@@ -101,6 +101,6 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
     }
     
     debugDrawManager.prepareForRender();
-    debugDrawManager.render(_camera);
+    debugDrawManager.render(camera);
   }
 }

@@ -78,11 +78,11 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
     allLoaded.then((list) {
       // After our resources are loaded, we build the scene
-      _immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
-      _immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
+      immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
+      immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
       cubeProgram = device.createShaderProgram('Cube Program', { 'VertexProgram': cubeVertexShader, 'FragmentProgram': cubeFragmentShader});
-      _immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
-      _immediateContext.generateMipmap(texture);
+      immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
+      immediateContext.generateMipmap(texture);
 
       {
         MeshResource cube = resourceManager.getResource(cubeMeshResource);
@@ -134,8 +134,8 @@ class JavelineSpinningCube extends JavelineBaseDemo {
 
   void drawCube(mat4x4 T) {
     {
-      mat4x4 pm = _camera.projectionMatrix;
-      mat4x4 la = _camera.lookAtMatrix;
+      mat4x4 pm = camera.projectionMatrix;
+      mat4x4 la = camera.lookAtMatrix;
       pm.selfMultiply(la);
       pm.copyIntoArray(cameraTransform);
       T.copyIntoArray(objectTransform);
@@ -149,7 +149,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     _angle += dt * 3.14159;
     drawGrid(20);
     debugDrawManager.prepareForRender();
-    debugDrawManager.render(_camera);
+    debugDrawManager.render(camera);
     mat4x4 I = new mat4x4.rotationY(_angle);
     drawCube(I);
   }
