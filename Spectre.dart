@@ -43,42 +43,14 @@
 #source('InputLayoutHelper.dart');
 #source('DebugDrawManager.dart');
 
-/// [spectreDevice] is the global Spectre GPU device instance
-Device spectreDevice;
-/// [spectreDDM] is the global Spectre debug draw manager instance
-DebugDrawManager spectreDDM;
 // We have a single logger
 Logger spectreLog;
-/// [spectreRM] is the global Sprectre resource manager instance
-ResourceManager spectreRM;
 
 /// Initializes the Spectre graphis engine. [canvasName] is the CSS id of the canvas to render to
 /// Returns a Future that will complete when all required resources are loaded and the engine is running
-Future<bool> initSpectre(String canvasName) {
+Future<bool> initSpectre() {
   if (spectreLog == null) {
     spectreLog = new PrintLogger();
   }
-  spectreLog.Info('Started Spectre');
-  CanvasElement canvas = document.query(canvasName);
-  WebGLRenderingContext webGL2 = canvas.getContext("experimental-webgl");
-  spectreDevice = new Device(webGL2);
-  spectreDDM = new DebugDrawManager();
-  spectreRM = new ResourceManager();
-  var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
-  spectreRM.setBaseURL(baseUrl);
-  print('Started Spectre');
-  List loadedResources = [];
-  {
-    int debugLineVSResource = spectreRM.registerResource('/shaders/debug_line.vs');
-    int debugLineFSResource = spectreRM.registerResource('/shaders/debug_line.fs');
-    loadedResources.add(spectreRM.loadResource(debugLineVSResource));
-    loadedResources.add(spectreRM.loadResource(debugLineFSResource));
-  }
-  Future allLoaded = Futures.wait(loadedResources);
-  Completer<bool> inited = new Completer<bool>();
-  allLoaded.then((resourceList) {
-    spectreDDM.init(spectreDevice, resourceList[0], resourceList[1], null, null, null);
-    inited.complete(true);
-  });
-  return inited.future;
+  return new Future.immediate(true);
 }

@@ -32,7 +32,7 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
   mat4x4 _rotateZ;
   num _angle;
   
-  JavelineDebugDrawTest(Device device) : super(device) {
+  JavelineDebugDrawTest(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
     _colors = new Map<String, vec4>();
     _colors['Red'] = new vec4(1.0, 0.0, 0.0, 1.0);
     _colors['Green'] = new vec4(0.0, 1.0, 0.0, 1.0);
@@ -70,37 +70,37 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
     _rotateZ.setRotationAroundZ(_angle);
     
     // Global Axis
-    spectreDDM.addLine(_origin, _unitX * 20.0, _colors['Red']);
-    spectreDDM.addLine(_origin, _unitY * 20.0, _colors['Green']);
-    spectreDDM.addLine(_origin, _unitZ * 20.0, _colors['Blue']);
+    debugDrawManager.addLine(_origin, _unitX * 20.0, _colors['Red']);
+    debugDrawManager.addLine(_origin, _unitY * 20.0, _colors['Green']);
+    debugDrawManager.addLine(_origin, _unitZ * 20.0, _colors['Blue']);
     
     // Rotating transformations
     {
       mat4x4 T = null;
       T = new mat4x4.translateRaw(5.0, 0.0, 0.0) * _rotateX;
-      spectreDDM.addAxes(T, 4.0);
+      debugDrawManager.addAxes(T, 4.0);
       T = new mat4x4.translateRaw(0.0, 5.0, 0.0) * _rotateY;
-      spectreDDM.addAxes(T, 4.0);
+      debugDrawManager.addAxes(T, 4.0);
       T = new mat4x4.translateRaw(0.0, 0.0, 5.0) * _rotateZ;
-      spectreDDM.addAxes(T, 4.0);
+      debugDrawManager.addAxes(T, 4.0);
     }
     
     // Rotating circles
     {
-      spectreDDM.addCircle(new vec3(0.0, 10.0, 0.0), _rotateY.transform3(_unitX), 3.14, _colors['Red']);
-      spectreDDM.addCircle(new vec3(0.0, 0.0, 10.0), _rotateZ.transform3(_unitY), 3.14, _colors['Green']);
-      spectreDDM.addCircle(new vec3(10.0, 0.0, 0.0), _rotateX.transform3(_unitZ), 3.14, _colors['Blue']);
+      debugDrawManager.addCircle(new vec3(0.0, 10.0, 0.0), _rotateY.transform3(_unitX), 3.14, _colors['Red']);
+      debugDrawManager.addCircle(new vec3(0.0, 0.0, 10.0), _rotateZ.transform3(_unitY), 3.14, _colors['Green']);
+      debugDrawManager.addCircle(new vec3(10.0, 0.0, 0.0), _rotateX.transform3(_unitZ), 3.14, _colors['Blue']);
     }
     
     // AABB and a line from min to max
     {
-      spectreDDM.addAABB(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Gray']);
-      spectreDDM.addCross(new vec3(5.0, 5.0, 5.0), _colors['White']);
-      spectreDDM.addCross(new vec3(10.0, 10.0, 10.0), _colors['White']);
-      spectreDDM.addLine(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Orange']);
+      debugDrawManager.addAABB(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Gray']);
+      debugDrawManager.addCross(new vec3(5.0, 5.0, 5.0), _colors['White']);
+      debugDrawManager.addCross(new vec3(10.0, 10.0, 10.0), _colors['White']);
+      debugDrawManager.addLine(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Orange']);
     }
     
-    spectreDDM.prepareForRender();
-    spectreDDM.render(_camera);
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(_camera);
   }
 }

@@ -33,7 +33,11 @@ class JavelineDemoDescription {
 class JavelineDemoLaunch {
   JavelineBaseDemo _demo;
   List<JavelineDemoDescription> demos;
-
+  
+  Device device;
+  ResourceManager resourceManager;
+  DebugDrawManager debugDrawManager;
+  
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -79,7 +83,7 @@ class JavelineDemoLaunch {
     ParagraphElement pe = new ParagraphElement();
     pe.innerHTML = 'Loaded Resources:';
     d.nodes.add(pe);
-    spectreRM.children.forEach((name, resource) {
+    resourceManager.children.forEach((name, resource) {
       DivElement resourceDiv = new DivElement();
       resourceDiv.innerHTML = '${name}';
       d.nodes.add(resourceDiv);
@@ -127,22 +131,48 @@ class JavelineDemoLaunch {
     }
   }
 
+  Future<bool> startup() {
+    final String webGLCanvasParentName = '#MainView';
+    final String webGLCanvasName = '#webGLFrontBuffer';
+    spectreLog.Info('Started Javeline');
+    CanvasElement canvas = document.query(webGLCanvasName);
+    WebGLRenderingContext webGL = canvas.getContext("experimental-webgl");
+    device = new Device(webGL);
+    debugDrawManager = new DebugDrawManager();
+    resourceManager = new ResourceManager();
+    var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
+    resourceManager.setBaseURL(baseUrl);
+    print('Started Spectre');
+    List loadedResources = [];
+    {
+      int debugLineVSResource = resourceManager.registerResource('/shaders/debug_line.vs');
+      int debugLineFSResource = resourceManager.registerResource('/shaders/debug_line.fs');
+      loadedResources.add(resourceManager.loadResource(debugLineVSResource));
+      loadedResources.add(resourceManager.loadResource(debugLineFSResource));
+    }
+    Future allLoaded = Futures.wait(loadedResources);
+    Completer<bool> inited = new Completer<bool>();
+    allLoaded.then((resourceList) {
+      debugDrawManager.init(device, resourceManager, resourceList[0], resourceList[1], null, null, null);
+      inited.complete(true);
+    });
+    return inited.future;
+  }
+  
   void run() {
-    String webGLCanvasParentName = '#MainView';
-    String webGLCanvasName = '#webGLFrontBuffer';
     updateStatus("Pick a demo: ");
     window.on.resize.add(resizeHandler);
     updateSize();
     // Start spectre
-    Future<bool> spectreStarted = initSpectre(webGLCanvasName);
-    spectreStarted.then((value) {
-      print('Spectre Launched');
-      spectreDevice.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-      spectreDevice.gl.clearDepth(1.0);
-      spectreDevice.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
-      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(spectreDevice); });
-      registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(spectreDevice); });
-      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(spectreDevice); });
+    Future<bool> started = startup();
+    started.then((value) {
+      spectreLog.Info('Javeline Running');
+      device.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      device.gl.clearDepth(1.0);
+      device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
+      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
     });

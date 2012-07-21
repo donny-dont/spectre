@@ -45,9 +45,13 @@ class JavelineBaseDemo {
 
   Device _device;
   ImmediateContext _immediateContext;
+  ResourceManager _resourceManager;
+  DebugDrawManager _debugDrawManager;
   
   Device get device() => _device;
   ImmediateContext get immediateContext() => _immediateContext;
+  DebugDrawManager get debugDrawManager() => _debugDrawManager;
+  ResourceManager get resourceManager() => _resourceManager;
   
   bool _quit;
   Camera _camera;
@@ -56,9 +60,12 @@ class JavelineBaseDemo {
   int width;
   int height;
 
-  JavelineBaseDemo(Device device) {
+  JavelineBaseDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) {
     _device = device;
     _immediateContext = device.immediateContext;
+    _resourceManager = resourceManager;
+    _debugDrawManager = debugDrawManager;
+    
     _keyboard = new JavelineKeyboard();
     _mouse = new JavelineMouse();
     _camera = new Camera();
@@ -163,13 +170,13 @@ class JavelineBaseDemo {
     for (int i = 0; i < gridLines; i++) {
       vec3 start = o + (z * (i-midLine)) + (x * -midLine);
       vec3 end = o + (z * (i-midLine)) + (x * midLine);
-      spectreDDM.addLine(start, end, color);
+      debugDrawManager.addLine(start, end, color);
     }
 
     for (int i = 0; i < gridLines; i++) {
       vec3 start = o + (x * (i-midLine)) + (z * -midLine);
       vec3 end = o + (x * (i-midLine)) + (z * midLine);
-      spectreDDM.addLine(start, end, color);
+      debugDrawManager.addLine(start, end, color);
     }
   }
 
@@ -195,15 +202,15 @@ class JavelineBaseDemo {
         //spectreLog.Info('Camera Pitch: $deltaPitch');
       }
     }
-    spectreDevice.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    spectreDevice.gl.clearDepth(1.0);
-    spectreDevice.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
-    _immediateContext.reset();
-    _immediateContext.setBlendState(_blendState);
-    _immediateContext.setRasterizerState(_rasterizerState);
-    _immediateContext.setDepthState(_depthState);
-    _immediateContext.setViewport(_viewPort);
-    spectreDDM.update(dt);
+    device.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    device.gl.clearDepth(1.0);
+    device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    immediateContext.reset();
+    immediateContext.setBlendState(_blendState);
+    immediateContext.setRasterizerState(_rasterizerState);
+    immediateContext.setDepthState(_depthState);
+    immediateContext.setViewport(_viewPort);
+    debugDrawManager.update(dt);
   }
 
   void keyboardEventHandler(KeyboardEvent event, bool down) {

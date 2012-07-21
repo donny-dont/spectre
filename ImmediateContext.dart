@@ -365,8 +365,8 @@ class ImmediateContext {
   /// Update the pixels of [textureHandle] from the [imageResourceHandle]
   ///
   /// Only updates the top level mip map
-  void updateTexture2DFromResource(int textureHandle, int imageResourceHandle) {
-    ImageResource ir = spectreRM.getResource(imageResourceHandle);
+  void updateTexture2DFromResource(int textureHandle, int imageResourceHandle, ResourceManager rm) {
+    ImageResource ir = rm.getResource(imageResourceHandle);
     if (ir == null) {
       return;
     }
@@ -396,8 +396,8 @@ class ImmediateContext {
     spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
   }
 
-  void compileShaderFromResource(int shaderHandle, int shaderSourceHandle) {
-    ShaderResource sr = spectreRM.getResource(shaderSourceHandle);
+  void compileShaderFromResource(int shaderHandle, int shaderSourceHandle, ResourceManager rm) {
+    ShaderResource sr = rm.getResource(shaderSourceHandle);
     if (sr == null) {
       return;
     }

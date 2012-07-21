@@ -21,7 +21,7 @@
 */
 
 class JavelineEmptyDemo extends JavelineBaseDemo {
-  JavelineEmptyDemo(Device device) : super(device) {
+  JavelineEmptyDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
   }
   
   Future<JavelineDemoStatus> startup() {
@@ -37,7 +37,7 @@ class JavelineEmptyDemo extends JavelineBaseDemo {
   void update(num time, num dt) {
     super.update(time, dt);
     
-    spectreDDM.prepareForRender();
-    spectreDDM.render(_camera);
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(_camera);
   }
 }

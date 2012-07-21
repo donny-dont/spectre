@@ -25,13 +25,13 @@
 #import('dart:json');
 #import('VectorMath/VectorMath.dart');
 #import('Spectre.dart');
+
 #source('JavelineConfig.dart');
-#source('JavelineDemoInterface.dart');
 #source('JavelineKeyboard.dart');
 #source('JavelineMouse.dart');
-
 #source('JavelineBaseDemo.dart');
+
+// Actual demos
 #source('JavelineEmptyDemo.dart');
-#source('JavelineImmediateTest.dart');
 #source('JavelineDebugDrawTest.dart');
 #source('JavelineSpinningCube.dart');

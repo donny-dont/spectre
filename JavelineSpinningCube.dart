@@ -41,7 +41,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   List _frameProgram;
   List _shutdownProgram;
 
-  JavelineSpinningCube(Device device) : super(device) {
+  JavelineSpinningCube(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
     cubeMeshResource = 0;
     cubeVertexShaderResource = 0;
     cubeFragmentShaderResource = 0;
@@ -54,10 +54,10 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
 
-    cubeMeshResource = spectreRM.registerResource('/meshes/TexturedCube.mesh');
-    cubeVertexShaderResource = spectreRM.registerResource('/shaders/simple_texture.vs');
-    cubeFragmentShaderResource = spectreRM.registerResource('/shaders/simple_texture.fs');
-    cubeTextureResource = spectreRM.registerResource('/textures/WoodPlank.jpg');
+    cubeMeshResource = resourceManager.registerResource('/meshes/TexturedCube.mesh');
+    cubeVertexShaderResource = resourceManager.registerResource('/shaders/simple_texture.vs');
+    cubeFragmentShaderResource = resourceManager.registerResource('/shaders/simple_texture.fs');
+    cubeTextureResource = resourceManager.registerResource('/textures/WoodPlank.jpg');
     cubeVertexShader = device.createVertexShader('Cube Vertex Shader',{});
     cubeFragmentShader = device.createFragmentShader('Cube Fragment Shader', {});
     sampler = device.createSamplerState('Cube Texture Sampler', {});
@@ -68,24 +68,24 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     List loadedResources = [];
     base.then((value) {
       // Once the base is done, we load our resources
-      loadedResources.add(spectreRM.loadResource(cubeMeshResource));
-      loadedResources.add(spectreRM.loadResource(cubeVertexShaderResource));
-      loadedResources.add(spectreRM.loadResource(cubeFragmentShaderResource));
-      loadedResources.add(spectreRM.loadResource(cubeTextureResource));
+      loadedResources.add(resourceManager.loadResource(cubeMeshResource));
+      loadedResources.add(resourceManager.loadResource(cubeVertexShaderResource));
+      loadedResources.add(resourceManager.loadResource(cubeFragmentShaderResource));
+      loadedResources.add(resourceManager.loadResource(cubeTextureResource));
     });
 
     Future allLoaded = Futures.wait(loadedResources);
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
     allLoaded.then((list) {
       // After our resources are loaded, we build the scene
-      _immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource);
-      _immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource);
+      _immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
+      _immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
       cubeProgram = device.createShaderProgram('Cube Program', { 'VertexProgram': cubeVertexShader, 'FragmentProgram': cubeFragmentShader});
-      _immediateContext.updateTexture2DFromResource(texture, cubeTextureResource);
+      _immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
       _immediateContext.generateMipmap(texture);
 
       {
-        MeshResource cube = spectreRM.getResource(cubeMeshResource);
+        MeshResource cube = resourceManager.getResource(cubeMeshResource);
         var elements = [InputLayoutHelper.inputElementDescriptionFromMesh('vPosition', 0, 'POSITION', cube),
                         InputLayoutHelper.inputElementDescriptionFromMesh('vTexCoord', 0, 'TEXCOORD0', cube)];
         il = device.createInputLayout('Cube Input Layout', elements, cubeProgram);
@@ -127,7 +127,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
 
   Future<JavelineDemoStatus> shutdown() {
     Interpreter interpreter = new Interpreter();
-    interpreter.run(_shutdownProgram, _device, spectreRM, _immediateContext);
+    interpreter.run(_shutdownProgram, device, resourceManager, immediateContext);
     Future<JavelineDemoStatus> base = super.shutdown();
     return base;
   }
@@ -141,15 +141,15 @@ class JavelineSpinningCube extends JavelineBaseDemo {
       T.copyIntoArray(objectTransform);
     }
     Interpreter interpreter = new Interpreter();
-    interpreter.run(_frameProgram, device, spectreRM, immediateContext);
+    interpreter.run(_frameProgram, device, resourceManager, immediateContext);
   }
 
   void update(num time, num dt) {
     super.update(time, dt);
     _angle += dt * 3.14159;
     drawGrid(20);
-    spectreDDM.prepareForRender();
-    spectreDDM.render(_camera);
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(_camera);
     mat4x4 I = new mat4x4.rotationY(_angle);
     drawCube(I);
   }

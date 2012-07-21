@@ -214,7 +214,7 @@ class DebugDrawManager {
    
   }
 
-  void init(Device device, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
+  void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
     _context = device.immediateContext;
     _depthEnabledState = _device.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
@@ -224,8 +224,8 @@ class DebugDrawManager {
     _cameraMatrix = new Float32Array(16);
     int lineVS = _device.createVertexShader(_lineVertexShader, {});
     int lineFS = _device.createFragmentShader(_lineFragmentShader, {});
-    _context.compileShaderFromResource(lineVS, lineVSResourceHandle);
-    _context.compileShaderFromResource(lineFS, lineFSResourceHandle);
+    _context.compileShaderFromResource(lineVS, lineVSResourceHandle, rm);
+    _context.compileShaderFromResource(lineFS, lineFSResourceHandle, rm);
     int lineProgram = _device.createShaderProgram(_lineShaderProgramName, {});
     _context.linkShaderProgram(lineProgram, lineVS, lineFS);
     _depthEnabled = new _DebugDrawVertexManager(device, _depthEnabledLineVBOName, vboSize, lineProgram);
@@ -489,7 +489,7 @@ class DebugDrawManager {
       interpreter.setRegister(1, 0);
       interpreter.setRegister(2, _depthDisabled.vertexCount);
       interpreter.setRegister(3, 0);
-      interpreter.run(_drawCommands, _device, spectreRM, _context);
+      interpreter.run(_drawCommands, _device, null, _context);
     }
   }
 
