@@ -32,7 +32,7 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
   mat4x4 _rotateZ;
   num _angle;
   
-  JavelineDebugDrawTest() {
+  JavelineDebugDrawTest(Device device) : super(device) {
     _colors = new Map<String, vec4>();
     _colors['Red'] = new vec4(1.0, 0.0, 0.0, 1.0);
     _colors['Green'] = new vec4(0.0, 1.0, 0.0, 1.0);

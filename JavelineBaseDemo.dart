@@ -20,7 +20,17 @@
 
 */
 
-class JavelineBaseDemo implements JavelineDemoInterface {
+
+class JavelineDemoStatus {
+  static final int DemoStatusOKAY = 0;
+  static final int DemoStatusError = 1;
+  JavelineDemoStatus(this.code, this.text);
+  int code;
+  String text;
+}
+
+
+class JavelineBaseDemo {
   JavelineKeyboard _keyboard;
   JavelineMouse _mouse;
   num _time;
@@ -33,6 +43,12 @@ class JavelineBaseDemo implements JavelineDemoInterface {
   int _depthState;
   int _rasterizerState;
 
+  Device _device;
+  ImmediateContext _immediateContext;
+  
+  Device get device() => _device;
+  ImmediateContext get immediateContext() => _immediateContext;
+  
   bool _quit;
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
@@ -40,7 +56,9 @@ class JavelineBaseDemo implements JavelineDemoInterface {
   int width;
   int height;
 
-  JavelineBaseDemo() {
+  JavelineBaseDemo(Device device) {
+    _device = device;
+    _immediateContext = device.immediateContext;
     _keyboard = new JavelineKeyboard();
     _mouse = new JavelineMouse();
     _camera = new Camera();
@@ -58,7 +76,7 @@ class JavelineBaseDemo implements JavelineDemoInterface {
   void resize(num elementWidth, num elementHeight) {
     this.width = elementWidth;
     this.height = elementHeight;
-    Viewport vp = spectreDevice.getDeviceChild(_viewPort);
+    Viewport vp = _device.getDeviceChild(_viewPort);
     if (vp == null) {
       return;
     }
@@ -72,17 +90,17 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
     completer.complete(status);
     {
-      _viewPort = spectreDevice.createViewport('Default VP', {'x':0, 'y':0, 'width':width, 'height':height});
-      _blendState = spectreDevice.createBlendState('Default BS', {});
-      _depthState = spectreDevice.createDepthState('Default DS', {});
-      _rasterizerState = spectreDevice.createRasterizerState('Default RS', {});
+      _viewPort = _device.createViewport('Default VP', {'x':0, 'y':0, 'width':width, 'height':height});
+      _blendState = _device.createBlendState('Default BS', {});
+      _depthState = _device.createDepthState('Default DS', {});
+      _rasterizerState = _device.createRasterizerState('Default RS', {});
     }
     document.on.keyDown.add(_keyDownHandler);
     document.on.keyUp.add(_keyUpHandler);
     document.on.mouseMove.add(_mouseMoveHandler);
     document.on.mouseDown.add(_mouseDownHandler);
     document.on.mouseUp.add(_mouseUpHandler);
-    spectreImmediateContext.reset();
+    _immediateContext.reset();
     return completer.future;
   }
 
@@ -92,10 +110,10 @@ class JavelineBaseDemo implements JavelineDemoInterface {
     document.on.mouseMove.remove(_mouseMoveHandler);
     document.on.mouseDown.remove(_mouseDownHandler);
     document.on.mouseUp.remove(_mouseUpHandler);
-    spectreDevice.deleteDeviceChild(_rasterizerState);
-    spectreDevice.deleteDeviceChild(_depthState);
-    spectreDevice.deleteDeviceChild(_blendState);
-    spectreDevice.deleteDeviceChild(_viewPort);
+    _device.deleteDeviceChild(_rasterizerState);
+    _device.deleteDeviceChild(_depthState);
+    _device.deleteDeviceChild(_blendState);
+    _device.deleteDeviceChild(_viewPort);
     _quit = true;
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
@@ -177,14 +195,14 @@ class JavelineBaseDemo implements JavelineDemoInterface {
         //spectreLog.Info('Camera Pitch: $deltaPitch');
       }
     }
-    webGL.clearColor(0.0, 0.0, 0.0, 1.0);
-    webGL.clearDepth(1.0);
-    webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
-    spectreImmediateContext.reset();
-    spectreImmediateContext.setBlendState(_blendState);
-    spectreImmediateContext.setRasterizerState(_rasterizerState);
-    spectreImmediateContext.setDepthState(_depthState);
-    spectreImmediateContext.setViewport(_viewPort);
+    spectreDevice.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    spectreDevice.gl.clearDepth(1.0);
+    spectreDevice.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    _immediateContext.reset();
+    _immediateContext.setBlendState(_blendState);
+    _immediateContext.setRasterizerState(_rasterizerState);
+    _immediateContext.setDepthState(_depthState);
+    _immediateContext.setViewport(_viewPort);
     spectreDDM.update(dt);
   }
 

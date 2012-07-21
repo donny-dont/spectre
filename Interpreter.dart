@@ -394,14 +394,14 @@ class Interpreter {
           skip = 2;
         {
           final List<int> handles = program[i+1];
-          spectreRM.batchUnload(handles, true);
+          rm.batchUnload(handles, true);
         }
         break;
         case Ops.DeleteDeviceChildren:
           skip = 2;
         {
           final List<int> handles = program[i+1];
-          spectreDevice.batchDeleteDeviceChildren(handles);
+          device.batchDeleteDeviceChildren(handles);
         }
         break;
         case Ops.Call:

@@ -19,26 +19,3 @@
   3. This notice may not be removed or altered from any source distribution.
 
 */
-
-class JavelineDemoStatus {
-  static final int DemoStatusOKAY = 0;
-  static final int DemoStatusError = 1;
-  JavelineDemoStatus(this.code, this.text);
-  int code;
-  String text;
-}
-
-interface JavelineDemoInterface {
-  bool get shouldQuit();
-
-  Future<JavelineDemoStatus> startup();
-  Future<JavelineDemoStatus> shutdown();
-
-  void run();
-  void resize(num width, num height);
-  void update(num time, num dt);
-
-  void keyboardEventHandler(KeyboardEvent event, bool down);
-  void mouseMoveEventHandler(MouseEvent event);
-  void mouseButtonEventHandler(MouseEvent event, bool down);
-}

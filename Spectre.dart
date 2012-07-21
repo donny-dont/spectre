@@ -29,6 +29,7 @@
 #source('Logger.dart');
 #source('Handle.dart');
 #source('HandleSystem.dart');
+#source('DeviceChildren.dart');
 #source('Device.dart');
 #source('ImmediateContext.dart');
 #source('ResourceLoader.dart');
@@ -42,12 +43,8 @@
 #source('InputLayoutHelper.dart');
 #source('DebugDrawManager.dart');
 
-// We have a single WebGL context
-WebGLRenderingContext webGL;
 /// [spectreDevice] is the global Spectre GPU device instance
 Device spectreDevice;
-/// [spectreImmediateContext] is the global Spectre GPU Immediate context instance
-ImmediateContext spectreImmediateContext;
 /// [spectreDDM] is the global Spectre debug draw manager instance
 DebugDrawManager spectreDDM;
 // We have a single logger
@@ -63,9 +60,8 @@ Future<bool> initSpectre(String canvasName) {
   }
   spectreLog.Info('Started Spectre');
   CanvasElement canvas = document.query(canvasName);
-  webGL = canvas.getContext("experimental-webgl");
-  spectreDevice = new Device();
-  spectreImmediateContext = new ImmediateContext();
+  WebGLRenderingContext webGL2 = canvas.getContext("experimental-webgl");
+  spectreDevice = new Device(webGL2);
   spectreDDM = new DebugDrawManager();
   spectreRM = new ResourceManager();
   var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
@@ -81,19 +77,8 @@ Future<bool> initSpectre(String canvasName) {
   Future allLoaded = Futures.wait(loadedResources);
   Completer<bool> inited = new Completer<bool>();
   allLoaded.then((resourceList) {
-    spectreDDM.init(resourceList[0], resourceList[1], null, null, null);
+    spectreDDM.init(spectreDevice, resourceList[0], resourceList[1], null, null, null);
     inited.complete(true);
   });
   return inited.future;
-}
-
-void checkWebGL() {
-  if (webGL == null) {
-    return;
-  }
-
-  int error = webGL.getError();
-  if (error != WebGLRenderingContext.NO_ERROR) {
-    spectreLog.Error('WebGL Error: $error');
-  }
 }

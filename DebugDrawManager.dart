@@ -36,15 +36,15 @@ class _DebugDrawVertexManager {
   int _vboLayout;
   int _lineShader;
 
-  _DebugDrawVertexManager(String name, int vboSize, this._lineShader) {
+  _DebugDrawVertexManager(Device device, String name, int vboSize, this._lineShader) {
     _maxVertices = vboSize;
     _vertices = new List<_DebugDrawVertex>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
-    _vbo = spectreDevice.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
+    _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
     List inputElements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 7*4, 0, 0),
                           new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
-    _vboLayout = spectreDevice.createInputLayout('$name Layout', inputElements, _lineShader);
+    _vboLayout = device.createInputLayout('$name Layout', inputElements, _lineShader);
   }
 
   bool hasRoomFor(int vertexCount) {
@@ -56,7 +56,7 @@ class _DebugDrawVertexManager {
     _vertices.add(v);
   }
 
-  void _prepareForRender() {
+  void _prepareForRender(ImmediateContext context) {
     _vboUsed = 0;
     for (int i = 0; i < _vertices.length; i++) {
       _DebugDrawVertex v = _vertices[i];
@@ -77,7 +77,7 @@ class _DebugDrawVertexManager {
       _vboUsed++;
     }
 
-    spectreImmediateContext.updateBuffer(_vbo, _vboStorage);
+    context.updateBuffer(_vbo, _vboStorage);
   }
 
   int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
@@ -94,18 +94,18 @@ class _DebugDrawVertexManager {
     }
   }
 
-  void render(Float32Array cameraMatrix) {
+  void render(ImmediateContext context, Float32Array cameraMatrix) {
     if (_vertices.length == 0) {
       return;
     }
     int verts = _vboUsed~/DebugDrawVertexSize;
-    spectreImmediateContext.setShaderProgram(_lineShader);
-    spectreImmediateContext.setUniformMatrix4('cameraTransform', cameraMatrix);
-    spectreImmediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
-    spectreImmediateContext.setVertexBuffers(0, [_vbo]);
-    spectreImmediateContext.setIndexBuffer(0);
-    spectreImmediateContext.setInputLayout(_vboLayout);
-    spectreImmediateContext.draw(verts, 0);
+    context.setShaderProgram(_lineShader);
+    context.setUniformMatrix4('cameraTransform', cameraMatrix);
+    context.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    context.setVertexBuffers(0, [_vbo]);
+    context.setIndexBuffer(0);
+    context.setInputLayout(_vboLayout);
+    context.draw(verts, 0);
   }
 }
 
@@ -135,7 +135,7 @@ class _DebugDrawSphereManager {
     return current+sphereCount < _maxSpheres;
   }
 
-  void _prepareForRender() {
+  void _prepareForRender(ImmediateContext context) {
   }
 
   void add(_DebugDrawSphere sphere) {
@@ -156,7 +156,7 @@ class _DebugDrawSphereManager {
     }
   }
 
-  void render(Float32Array cameraMatrix) {
+  void render(ImmediateContext context, Float32Array cameraMatrix) {
     if (_spheres.length == 0) {
       return;
     }
@@ -196,7 +196,9 @@ class DebugDrawManager {
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
 
-
+  Device _device;
+  ImmediateContext _context;
+  
   final String _depthStateEnabledName = 'Debug Depth Enabled State';
   final String _depthStateDisabledName = 'Debug Depth Disabled State';
   final String _blendStateName = 'Debug Blend State';
@@ -209,22 +211,25 @@ class DebugDrawManager {
   final String _cameraTransformUniformName = 'cameraTransform';
 
   DebugDrawManager() {
-    _depthEnabledState = spectreDevice.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
-    _depthDisabledState = spectreDevice.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
-    _blendState = spectreDevice.createBlendState(_blendStateName, {});
-    _rasterState = spectreDevice.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
-    _cameraMatrix = new Float32Array(16);
+   
   }
 
-  void init(int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
-    int lineVS = spectreDevice.createVertexShader(_lineVertexShader, {});
-    int lineFS = spectreDevice.createFragmentShader(_lineFragmentShader, {});
-    spectreImmediateContext.compileShaderFromResource(lineVS, lineVSResourceHandle);
-    spectreImmediateContext.compileShaderFromResource(lineFS, lineFSResourceHandle);
-    int lineProgram = spectreDevice.createShaderProgram(_lineShaderProgramName, {});
-    spectreImmediateContext.linkShaderProgram(lineProgram, lineVS, lineFS);
-    _depthEnabled = new _DebugDrawVertexManager(_depthEnabledLineVBOName, vboSize, lineProgram);
-    _depthDisabled = new _DebugDrawVertexManager(_depthDisabledLineVBOName, vboSize, lineProgram);
+  void init(Device device, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
+    _device = device;
+    _context = device.immediateContext;
+    _depthEnabledState = _device.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
+    _depthDisabledState = _device.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
+    _blendState = _device.createBlendState(_blendStateName, {});
+    _rasterState = _device.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
+    _cameraMatrix = new Float32Array(16);
+    int lineVS = _device.createVertexShader(_lineVertexShader, {});
+    int lineFS = _device.createFragmentShader(_lineFragmentShader, {});
+    _context.compileShaderFromResource(lineVS, lineVSResourceHandle);
+    _context.compileShaderFromResource(lineFS, lineFSResourceHandle);
+    int lineProgram = _device.createShaderProgram(_lineShaderProgramName, {});
+    _context.linkShaderProgram(lineProgram, lineVS, lineFS);
+    _depthEnabled = new _DebugDrawVertexManager(device, _depthEnabledLineVBOName, vboSize, lineProgram);
+    _depthDisabled = new _DebugDrawVertexManager(device, _depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
 
@@ -463,10 +468,10 @@ class DebugDrawManager {
 
   /// Prepare to render debug primitives
   void prepareForRender() {
-    _depthEnabled._prepareForRender();
-    _depthDisabled._prepareForRender();
-    _depthEnabledSpheres._prepareForRender();
-    _depthDisabledSpheres._prepareForRender();
+    _depthEnabled._prepareForRender(_context);
+    _depthDisabled._prepareForRender(_context);
+    _depthEnabledSpheres._prepareForRender(_context);
+    _depthDisabledSpheres._prepareForRender(_context);
   }
 
   /// Render debug primitives for [Camera] [cam]
@@ -484,7 +489,7 @@ class DebugDrawManager {
       interpreter.setRegister(1, 0);
       interpreter.setRegister(2, _depthDisabled.vertexCount);
       interpreter.setRegister(3, 0);
-      interpreter.run(_drawCommands, spectreDevice, spectreRM, spectreImmediateContext);
+      interpreter.run(_drawCommands, _device, spectreRM, _context);
     }
   }
 

@@ -27,6 +27,7 @@ class ImmediateContext {
   final int numVertexBuffers = 1;
   final int numTextures = 1;
 
+  Device _device;
   // Input Assembler
   int _primitiveTopology;
   int _indexBufferHandle;
@@ -50,12 +51,12 @@ class ImmediateContext {
   }
 
   void _logVertexAttributes(int index) {
-    var enabled = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_ENABLED);
-    var size = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_SIZE);
-    var stride = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_STRIDE);
-    var type = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_TYPE);
-    var normalized = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_NORMALIZED);
-    var binding = webGL.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING);
+    var enabled = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_ENABLED);
+    var size = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_SIZE);
+    var stride = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_STRIDE);
+    var type = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_TYPE);
+    var normalized = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_NORMALIZED);
+    var binding = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING);
     spectreLog.Info('Vertex Attribute $index $enabled $size $stride $type $normalized $binding');
   }
 
@@ -65,18 +66,18 @@ class ImmediateContext {
       return;
     }
 
-    InputLayout inputLayout = spectreDevice.getDeviceChild(_inputLayoutHandle);
+    InputLayout inputLayout = _device.getDeviceChild(_inputLayoutHandle);
     // TODO: Need to disable unneeded vertex attribute arrays.
 
     for (var element in inputLayout._elements) {
-      VertexBuffer vb = spectreDevice.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
+      VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
         continue;
       }
-      webGL.enableVertexAttribArray(element._attributeIndex);
-      webGL.bindBuffer(vb._target, vb._buffer);
-      webGL.vertexAttribPointer(element._attributeIndex,
+      _device.gl.enableVertexAttribArray(element._attributeIndex);
+      _device.gl.bindBuffer(vb._target, vb._buffer);
+      _device.gl.vertexAttribPointer(element._attributeIndex,
         element._attributeFormat.count,
         element._attributeFormat.type,
         element._attributeFormat.normalized,
@@ -84,17 +85,17 @@ class ImmediateContext {
         element._vboOffset);
       if (debug)
         _logVertexAttributes(element._attributeIndex);
-      //webGL.bindBuffer(vb._target, null);
+      //_device.gl.bindBuffer(vb._target, null);
 
     }
     if (_indexBufferHandle != 0) {
-      IndexBuffer indexBuffer = spectreDevice.getDeviceChild(_indexBufferHandle);
-      webGL.bindBuffer(indexBuffer._target, indexBuffer._buffer);
+      IndexBuffer indexBuffer = _device.getDeviceChild(_indexBufferHandle);
+      _device.gl.bindBuffer(indexBuffer._target, indexBuffer._buffer);
       if (debug) {
         print('Binding index buffer');
       }
     } else {
-      webGL.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
+      _device.gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
       if (debug) {
         print('No index buffer');
       }
@@ -104,21 +105,22 @@ class ImmediateContext {
   void _prepareTextures() {
     // TODO: Need to unbind unused texture channels
     for (int i = 0; i < numTextures; i++) {
-      SamplerState s = spectreDevice.getDeviceChild(_samplerStateHandles[i]);
-      Texture t = spectreDevice.getDeviceChild(_textureHandles[i]);
+      SamplerState s = _device.getDeviceChild(_samplerStateHandles[i]);
+      Texture t = _device.getDeviceChild(_textureHandles[i]);
       if (s == null || t == null) {
         continue;
       }
-      webGL.activeTexture(WebGLRenderingContext.TEXTURE0 + i);
-      webGL.bindTexture(t._target, t._buffer);
-      webGL.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s._wrap_s);
-      webGL.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s._wrap_t);
-      webGL.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s._min_filter);
-      webGL.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s._mag_filter);
+      _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + i);
+      _device.gl.bindTexture(t._target, t._buffer);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s._wrapS);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s._wrapT);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s._minFilter);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s._magFilter);
     }
   }
 
-  ImmediateContext() {
+  ImmediateContext(Device device) {
+    _device = device;
     _vertexBufferHandles = new List<int>(numVertexBuffers);
     _samplerStateHandles = new List<int>(numTextures);
     _textureHandles = new List<int>(numTextures);
@@ -177,8 +179,8 @@ class ImmediateContext {
       return;
     }
     _shaderProgramHandle = shaderProgramHandle;
-    ShaderProgram sp = spectreDevice.getDeviceChild(shaderProgramHandle);
-    webGL.useProgram(sp._program);
+    ShaderProgram sp = _device.getDeviceChild(shaderProgramHandle);
+    _device.gl.useProgram(sp._program);
   }
 
   /// Set RasterizerState to [rasterizerStateHandle]
@@ -187,17 +189,17 @@ class ImmediateContext {
       return;
     }
     _rasterizerStateHandle = rasterizerStateHandle;
-    RasterizerState rs = spectreDevice.getDeviceChild(rasterizerStateHandle);
+    RasterizerState rs = _device.getDeviceChild(rasterizerStateHandle);
     if (rs == null) {
       return;
     }
-    webGL.lineWidth(rs.lineWidth);
+    _device.gl.lineWidth(rs.lineWidth);
     if (rs.cullEnabled) {
-      webGL.enable(WebGLRenderingContext.CULL_FACE);
-      webGL.cullFace(rs.cullMode);
-      webGL.frontFace(rs.cullFrontFace);
+      _device.gl.enable(WebGLRenderingContext.CULL_FACE);
+      _device.gl.cullFace(rs.cullMode);
+      _device.gl.frontFace(rs.cullFrontFace);
     } else {
-      webGL.disable(WebGLRenderingContext.CULL_FACE);
+      _device.gl.disable(WebGLRenderingContext.CULL_FACE);
     }
   }
 
@@ -206,11 +208,11 @@ class ImmediateContext {
     if (_viewportHandle == viewportHandle) {
       return;
     }
-    Viewport vp = spectreDevice.getDeviceChild(viewportHandle);
+    Viewport vp = _device.getDeviceChild(viewportHandle);
     if (vp == null) {
       return;
     }
-    webGL.viewport(vp.x, vp.y, vp.width, vp.height);
+    _device.gl.viewport(vp.x, vp.y, vp.width, vp.height);
   }
 
   /// Set BlendState to [blendStateHandle]
@@ -218,19 +220,19 @@ class ImmediateContext {
     if (_blendStateHandle == blendStateHandle) {
       return;
     }
-    BlendState bs = spectreDevice.getDeviceChild(blendStateHandle);
+    BlendState bs = _device.getDeviceChild(blendStateHandle);
     if (bs == null) {
       return;
     }
-    webGL.colorMask(bs.writeRenderTargetRed, bs.writeRenderTargetGreen, bs.writeRenderTargetBlue, bs.writeRenderTargetAlpha);
+    _device.gl.colorMask(bs.writeRenderTargetRed, bs.writeRenderTargetGreen, bs.writeRenderTargetBlue, bs.writeRenderTargetAlpha);
     if (bs.blendEnable == false) {
-      webGL.disable(WebGLRenderingContext.BLEND);
+      _device.gl.disable(WebGLRenderingContext.BLEND);
       return;
     }
-    webGL.enable(WebGLRenderingContext.BLEND);
-    webGL.blendFuncSeparate(bs.blendSourceColorFunc, bs.blendDestColorFunc, bs.blendSourceAlphaFunc, bs.blendDestAlphaFunc);
-    webGL.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
-    webGL.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
+    _device.gl.enable(WebGLRenderingContext.BLEND);
+    _device.gl.blendFuncSeparate(bs.blendSourceColorFunc, bs.blendDestColorFunc, bs.blendSourceAlphaFunc, bs.blendDestAlphaFunc);
+    _device.gl.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
+    _device.gl.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
   }
 
   /// Set DepthState to [depthStateHandle]
@@ -238,25 +240,25 @@ class ImmediateContext {
     if (_depthStateHandle == depthStateHandle) {
       return;
     }
-    DepthState ds = spectreDevice.getDeviceChild(depthStateHandle);
+    DepthState ds = _device.getDeviceChild(depthStateHandle);
     if (ds == null) {
       return;
     }
-    webGL.depthRange(ds.depthNearVal, ds.depthFarVal);
+    _device.gl.depthRange(ds.depthNearVal, ds.depthFarVal);
     if (ds.depthTestEnabled == false) {
-      webGL.disable(WebGLRenderingContext.DEPTH_TEST);
+      _device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
     } else {
-      webGL.enable(WebGLRenderingContext.DEPTH_TEST);
-      webGL.depthFunc(ds.depthComparisonOp);
+      _device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+      _device.gl.depthFunc(ds.depthComparisonOp);
     }
 
-    webGL.depthMask(ds.depthWriteEnabled);
+    _device.gl.depthMask(ds.depthWriteEnabled);
 
     if (ds.polygonOffsetEnabled == false) {
-      webGL.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      _device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
     } else {
-      webGL.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-      webGL.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
+      _device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      _device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
     }
   }
 
@@ -265,109 +267,99 @@ class ImmediateContext {
     if (_renderTargetHandle == renderTargetHandle) {
       return;
     }
-    RenderTarget rt = spectreDevice.getDeviceChild(renderTargetHandle);
-    webGL.bindFramebuffer(rt._target, rt._buffer);
+    RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
+    _device.gl.bindFramebuffer(rt._target, rt._buffer);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
-    ShaderProgram sp = spectreDevice.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
     }
-    var index = webGL.getUniformLocation(sp._program, name);
+    var index = _device.gl.getUniformLocation(sp._program, name);
     if (index == -1) {
       spectreLog.Error('Could not find uniform $name in ${sp.name}');
       return;
     }
-    webGL.uniform3f(index,v0, v1, v2);
+    _device.gl.uniform3f(index,v0, v1, v2);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform4f(String name, num v0, num v1, num v2, num v3) {
-    ShaderProgram sp = spectreDevice.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
     }
-    var index = webGL.getUniformLocation(sp._program, name);
+    var index = _device.gl.getUniformLocation(sp._program, name);
     if (index == -1) {
       spectreLog.Error('Could not find uniform $name in ${sp.name}');
       return;
     }
-    webGL.uniform4f(index,v0, v1, v2, v3);
+    _device.gl.uniform4f(index,v0, v1, v2, v3);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = spectreDevice.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
     }
-    var index = webGL.getUniformLocation(sp._program, name);
+    var index = _device.gl.getUniformLocation(sp._program, name);
     if (index == -1) {
       spectreLog.Error('Could not find uniform $name in ${sp.name}');
       return;
     }
-    webGL.uniformMatrix3fv(index, transpose, matrix);
+    _device.gl.uniformMatrix3fv(index, transpose, matrix);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = spectreDevice.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
     }
-    var index = webGL.getUniformLocation(sp._program, name);
+    var index = _device.gl.getUniformLocation(sp._program, name);
     if (index == -1) {
       spectreLog.Error('Could not find uniform $name in ${sp.name}');
       return;
     }
-    webGL.uniformMatrix4fv(index, transpose, matrix);
+    _device.gl.uniformMatrix4fv(index, transpose, matrix);
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data]
   void updateBuffer(int bufferHandle, ArrayBufferView data) {
-    SpectreBuffer buffer = spectreDevice.getDeviceChild(bufferHandle);
+    SpectreBuffer buffer = _device.getDeviceChild(bufferHandle);
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
       return;
     }
     var target = buffer._target;
-    var oldBind;
-    if (buffer is VertexBuffer) {
-      oldBind = webGL.getParameter(WebGLRenderingContext.ARRAY_BUFFER_BINDING);
-    } else if (buffer is IndexBuffer) {
-      oldBind = webGL.getParameter(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING);
-    }
-    webGL.bindBuffer(buffer._target, buffer._buffer);
-    webGL.bufferData(buffer._target, data, buffer._usage);
-    //int size = webGL.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_SIZE);
-    //int usage = webGL.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_USAGE);
+    var oldBind = _device.gl.getParameter(buffer._param_target);
+    _device.gl.bindBuffer(buffer._target, buffer._buffer);
+    _device.gl.bufferData(buffer._target, data, buffer._usage);
+    //int size = _device.gl.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_SIZE);
+    //int usage = _device.gl.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_USAGE);
     //spectreLog.Info('updated buffer (${buffer._target}, $size, $usage) with ${data.byteLength}');
-    webGL.bindBuffer(buffer._target,  oldBind);
+    _device.gl.bindBuffer(buffer._target,  oldBind);
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
   void updateSubBuffer(int bufferHandle, ArrayBufferView data, num offset) {
-    SpectreBuffer buffer = spectreDevice.getDeviceChild(bufferHandle);
+    SpectreBuffer buffer = _device.getDeviceChild(bufferHandle);
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
       return;
     }
     var target = buffer._target;
-    var oldBind;
-    if (buffer is VertexBuffer) {
-      oldBind = webGL.getParameter(WebGLRenderingContext.ARRAY_BUFFER_BINDING);
-    } else if (buffer is IndexBuffer) {
-      oldBind = webGL.getParameter(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING);
-    }
-    webGL.bindBuffer(buffer._target, buffer._buffer);
-    webGL.bufferSubData(buffer._target, offset, data);
-    webGL.bindBuffer(buffer._target, oldBind);
+    var oldBind = _device.gl.getParameter(buffer._param_target);
+    _device.gl.bindBuffer(buffer._target, buffer._buffer);
+    _device.gl.bufferSubData(buffer._target, offset, data);
+    _device.gl.bindBuffer(buffer._target, oldBind);
   }
 
   /// Update the pixels of [textureHandle] from the [imageResourceHandle]
@@ -378,29 +370,29 @@ class ImmediateContext {
     if (ir == null) {
       return;
     }
-    Texture2D tex = spectreDevice.getDeviceChild(textureHandle);
-    webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
-    var oldBind = webGL.getParameter(tex._target_param);
-    webGL.bindTexture(tex._target, tex._buffer);
-    webGL.texImage2D(tex._target, 0, tex._textureFormat, tex._textureFormat, tex._pixelFormat, ir.image);
-    webGL.bindTexture(tex._target, oldBind);
+    Texture2D tex = _device.getDeviceChild(textureHandle);
+    _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
+    var oldBind = _device.gl.getParameter(tex._target_param);
+    _device.gl.bindTexture(tex._target, tex._buffer);
+    _device.gl.texImage2D(tex._target, 0, tex._textureFormat, tex._textureFormat, tex._pixelFormat, ir.image);
+    _device.gl.bindTexture(tex._target, oldBind);
   }
 
   /// Generate the full mipmap pyramid for [textureHandle]
   void generateMipmap(int textureHandle) {
-    Texture2D tex = spectreDevice.getDeviceChild(textureHandle);
-    webGL.activeTexture(WebGLRenderingContext.TEXTURE0);
-    var oldBind = webGL.getParameter(tex._target_param);
-    webGL.bindTexture(tex._target, tex._buffer);
-    webGL.generateMipmap(tex._target);
-    webGL.bindTexture(tex._target, oldBind);
+    Texture2D tex = _device.getDeviceChild(textureHandle);
+    _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
+    var oldBind = _device.gl.getParameter(tex._target_param);
+    _device.gl.bindTexture(tex._target, tex._buffer);
+    _device.gl.generateMipmap(tex._target);
+    _device.gl.bindTexture(tex._target, oldBind);
   }
 
   void compileShader(int shaderHandle, String source) {
-    Shader shader = spectreDevice.getDeviceChild(shaderHandle);
+    Shader shader = _device.getDeviceChild(shaderHandle);
     shader.source = source;
     shader.compile();
-    String shaderCompileLog = webGL.getShaderInfoLog(shader._shader);
+    String shaderCompileLog = _device.gl.getShaderInfoLog(shader._shader);
     spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
   }
 
@@ -413,11 +405,11 @@ class ImmediateContext {
   }
 
   void linkShaderProgram(int shaderProgramHandle, int vertexShaderHandle, int fragmentShaderHandle) {
-    ShaderProgram sp = spectreDevice.getDeviceChild(shaderProgramHandle);
-    VertexShader vs = spectreDevice.getDeviceChild(vertexShaderHandle);
-    FragmentShader fs = spectreDevice.getDeviceChild(fragmentShaderHandle);
-    webGL.attachShader(sp._program, vs._shader);
-    webGL.attachShader(sp._program, fs._shader);
+    ShaderProgram sp = _device.getDeviceChild(shaderProgramHandle);
+    VertexShader vs = _device.getDeviceChild(vertexShaderHandle);
+    FragmentShader fs = _device.getDeviceChild(fragmentShaderHandle);
+    _device.gl.attachShader(sp._program, vs._shader);
+    _device.gl.attachShader(sp._program, fs._shader);
     sp.link();
   }
 
@@ -442,7 +434,7 @@ class ImmediateContext {
     }
     _prepareInputs();
     _prepareTextures();
-    webGL.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
+    _device.gl.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
   }
 
   /// Draw a mesh with [numVertices] starting at [vertexOffset]
@@ -452,6 +444,6 @@ class ImmediateContext {
     }
     _prepareInputs();
     _prepareTextures();
-    webGL.drawArrays(_primitiveTopology, vertexOffset, numVertices);
+    _device.gl.drawArrays(_primitiveTopology, vertexOffset, numVertices);
   }
 }

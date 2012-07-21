@@ -21,6 +21,9 @@
 */
 
 class JavelineImmediateTest extends JavelineBaseDemo {
+  JavelineImmediateTest(Device device) : super(device) {
+    
+  }
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
     print('Startup');

@@ -110,12 +110,9 @@ class ResourceManager {
     assert(_handleSystem.validHandle(handle));
 
     int index = Handle.getIndex(handle);
-    if (_resources[index] != null) {
-      spectreLog.Warning('Registering a resource t at $index but there is already something there.');
-      _resources[index].unload();
-      _resources[index] = null;
-    }
-
+    // Nothing is at this index
+    assert(_resources[index] == null);
+    
     _resources[index] = rb;
     _urlToHandle[url] = handle;
     return handle;

@@ -31,7 +31,7 @@ class JavelineDemoDescription {
 }
 
 class JavelineDemoLaunch {
-  JavelineDemoInterface _demo;
+  JavelineBaseDemo _demo;
   List<JavelineDemoDescription> demos;
 
   void registerDemo(String name, Function constructDemo) {
@@ -96,9 +96,12 @@ class JavelineDemoLaunch {
     if (d == null) {
       return;
     }
-    spectreDevice.children.forEach((name, handle) {
+    if (_demo == null) {
+      return;
+    }
+    _demo.device.children.forEach((name, handle) {
       DivElement resourceDiv = new DivElement();
-      String type = spectreDevice.getHandleType(handle);
+      String type = _demo.device.getHandleType(handle);
       resourceDiv.innerHTML = '${name} ($type)';
       d.nodes.add(resourceDiv);
     });
@@ -134,12 +137,12 @@ class JavelineDemoLaunch {
     Future<bool> spectreStarted = initSpectre(webGLCanvasName);
     spectreStarted.then((value) {
       print('Spectre Launched');
-      webGL.clearColor(0.0, 0.0, 0.0, 1.0);
-      webGL.clearDepth(1.0);
-      webGL.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
-      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(); });
-      registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(); });
-      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(); });
+      spectreDevice.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      spectreDevice.gl.clearDepth(1.0);
+      spectreDevice.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(spectreDevice); });
+      registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(spectreDevice); });
+      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(spectreDevice); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
     });

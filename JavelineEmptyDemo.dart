@@ -21,7 +21,7 @@
 */
 
 class JavelineEmptyDemo extends JavelineBaseDemo {
-  JavelineEmptyDemo() {
+  JavelineEmptyDemo(Device device) : super(device) {
   }
   
   Future<JavelineDemoStatus> startup() {
