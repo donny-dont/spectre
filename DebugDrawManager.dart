@@ -116,10 +116,29 @@ class _DebugDrawLineManager {
 }
 
 class _DebugDrawSphere {
-  vec3 center;
-  vec4 color;
-  num radius;
+  // Probably want to pool these Float32Arrays
+  Float32Array centerUniform;
+  Float32Array colorUniform;
+  num radiusUniform;
   num duration;
+  _DebugDrawSphere(vec3 center, vec4 color, num radius) {
+    centerUniform = new Float32Array(3);
+    centerUniform[0] = center.x;
+    centerUniform[1] = center.y;
+    centerUniform[2] = center.z;
+    colorUniform = new Float32Array(4);
+    colorUniform[0] = color.x;
+    colorUniform[1] = color.y;
+    colorUniform[2] = color.z;
+    colorUniform[3] = color.w;
+    radiusUniform = radius;
+  }
+
+  void destroy() {
+    centerUniform = null;
+    colorUniform = null;
+    radiusUniform = null;
+  }
 }
 
 class _DebugDrawSphereManager {
@@ -155,18 +174,12 @@ class _DebugDrawSphereManager {
       _DebugDrawSphere s = _spheres[i];
       s.duration -= dt;
       if (s.duration < 0.0) {
+        s.destroy();
         _spheres.removeRange(i, 1);
         continue;
       }
       i++;
     }
-  }
-
-  void render(ImmediateContext context, Float32Array cameraMatrix) {
-    if (_spheres.length == 0) {
-      return;
-    }
-    // DRAW HERE
   }
 }
 
@@ -189,11 +202,28 @@ class _DebugDrawSphereManager {
   * You will have to call update, prepareForRender, and render once per frame
   */
 class DebugDrawManager {
-  int _depthEnabledState;
-  int _depthDisabledState;
-  int _blendState;
-  int _rasterState;
+  static final int _depthEnabledStateHandleIndex = 0;
+  static final int _depthDisabledStateHandleIndex = 1;
+  static final int _blendStateHandleIndex = 2;
+  static final int _rasterizerStateHandleIndex = 3;
+  static final int _lineVertexShaderHandleIndex = 4;
+  static final int _lineFragmentShaderHandleIndex = 5;
+  static final int _lineShaderProgramHandleIndex = 6;
 
+  static final String _depthStateEnabledName = 'Debug Depth Enabled State';
+  static final String _depthStateDisabledName = 'Debug Depth Disabled State';
+  static final String _blendStateName = 'Debug Blend State';
+  static final String _rasterizerStateName = 'Debug Rasterizer State';
+  static final String _lineVertexShaderName = 'Debug Line Vertex Shader';
+  static final String _lineFragmentShaderName = 'Debug Line Fragment Shader';
+  static final String _lineShaderProgramName = 'Debug Line Program';
+  static final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
+  static final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
+  static final String _cameraTransformUniformName = 'cameraTransform';
+
+  List<int> _handles;
+
+  List _startupCommands;
   List _drawCommands;
 
   _DebugDrawLineManager _depthEnabledLines;
@@ -205,58 +235,61 @@ class DebugDrawManager {
   Device _device;
   ImmediateContext _context;
 
-  final String _depthStateEnabledName = 'Debug Depth Enabled State';
-  final String _depthStateDisabledName = 'Debug Depth Disabled State';
-  final String _blendStateName = 'Debug Blend State';
-  final String _rasterStateName = 'Debug Rasterizer State';
-  final String _lineVertexShader = 'Debug Line Vertex Shader';
-  final String _lineFragmentShader = 'Debug Line Fragment Shader';
-  final String _lineShaderProgramName = 'Debug Line Program';
-  final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
-  final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
-  final String _cameraTransformUniformName = 'cameraTransform';
-
   DebugDrawManager() {
+    _handles = new List<int>();
+    _cameraMatrix = new Float32Array(16);
 
+    ProgramBuilder pb = new ProgramBuilder();
+    pb.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess}, _handles);
+    pb.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false}, _handles);
+    pb.createBlendState(_blendStateName, {}, _handles);
+    pb.createRasterizerState(_rasterizerStateName, {'cullEnabled': false, 'lineWidth': 1.0}, _handles);
+    pb.createVertexShader(_lineVertexShaderName, {}, _handles);
+    pb.createFragmentShader(_lineFragmentShaderName, {}, _handles);
+    pb.createShaderProgram(_lineShaderProgramName, {}, _handles);
+    pb.setRegisterFromList(0, _handles, _lineVertexShaderHandleIndex);
+    pb.setRegisterFromList(1, _handles, _lineFragmentShaderHandleIndex);
+    pb.setRegisterFromList(2, _handles, _lineShaderProgramHandleIndex);
+    // register 3 must have resource handle for the vertex shader
+    // register 4 must have resource handle for the fragment shader
+    pb.compileShaderFromResource(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(3));
+    pb.compileShaderFromResource(Handle.makeRegisterHandle(1), Handle.makeRegisterHandle(4));
+    pb.linkShaderProgram(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    _startupCommands = pb.ops;
   }
 
   void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
     _context = device.immediateContext;
-    _depthEnabledState = _device.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
-    _depthDisabledState = _device.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
-    _blendState = _device.createBlendState(_blendStateName, {});
-    _rasterState = _device.createRasterizerState(_rasterStateName, {'cullEnabled': false, 'lineWidth': 2.0});
-    _cameraMatrix = new Float32Array(16);
-    int lineVS = _device.createVertexShader(_lineVertexShader, {});
-    int lineFS = _device.createFragmentShader(_lineFragmentShader, {});
-    _context.compileShaderFromResource(lineVS, lineVSResourceHandle, rm);
-    _context.compileShaderFromResource(lineFS, lineFSResourceHandle, rm);
-    int lineProgram = _device.createShaderProgram(_lineShaderProgramName, {});
-    _context.linkShaderProgram(lineProgram, lineVS, lineFS);
-    _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, lineProgram);
-    _depthDisabledLines = new _DebugDrawLineManager(device, _depthDisabledLineVBOName, vboSize, lineProgram);
+
+    Interpreter interpreter = new Interpreter();
+    interpreter.setRegister(3, lineVSResourceHandle);
+    interpreter.setRegister(4, lineFSResourceHandle);
+    interpreter.run(_startupCommands, _device, rm, _context);
+
+    _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
+    _depthDisabledLines = new _DebugDrawLineManager(device, _depthDisabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
 
     // Build the program
     ProgramBuilder pb = new ProgramBuilder();
     // General
-    pb.setBlendState(_blendState);
-    pb.setRasterizerState(_rasterState);
-    pb.setShaderProgram(lineProgram);
+    pb.setBlendState(_handles[_blendStateHandleIndex]);
+    pb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
+    pb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
     pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
     pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
     pb.setIndexBuffer(0);
     // Depth enabled lines
-    pb.setDepthState(_depthEnabledState);
+    pb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
     pb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
     pb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
     pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
     // Depth disabled lines
-    pb.setDepthState(_depthDisabledState);
+    pb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
     pb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
     pb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
@@ -300,10 +333,7 @@ class DebugDrawManager {
   ///
   /// Options: [duration] and [depthEnabled]
   void addSphere(vec3 center, num radius, vec4 color, [num duration = 0.0, bool depthEnabled = true]) {
-    _DebugDrawSphere sphere = new _DebugDrawSphere();
-    sphere.color = new vec4.copy(color);
-    sphere.radius = radius;
-    sphere.center = new vec3.copy(center);
+    _DebugDrawSphere sphere = new _DebugDrawSphere(center, color, radius);
     sphere.duration = duration;
     if (depthEnabled) {
       _depthEnabledSpheres.add(sphere);
