@@ -20,60 +20,80 @@
 
 */
 
-class _DebugDrawVertex {
-  vec3 position;
-  vec4 color;
+class _DebugLine {
+  vec3 positionStart;
+  vec3 positionEnd;
+  vec4 colorStart;
+  vec4 colorEnd;
   num duration;
 }
 
-class _DebugDrawVertexManager {
+class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
+  List<_DebugLine> _lines;
+
   int _maxVertices;
-  List<_DebugDrawVertex> _vertices;
   Float32Array _vboStorage;
+
   int _vboUsed;
   int _vbo;
   int _vboLayout;
-  int _lineShader;
 
-  _DebugDrawVertexManager(Device device, String name, int vboSize, this._lineShader) {
+  _DebugDrawLineManager(Device device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
-    _vertices = new List<_DebugDrawVertex>();
+    _lines = new List<_DebugLine>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
     List inputElements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 7*4, 0, 0),
                           new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
-    _vboLayout = device.createInputLayout('$name Layout', inputElements, _lineShader);
+    _vboLayout = device.createInputLayout('$name Layout', inputElements, lineShaderHandle);
   }
 
-  bool hasRoomFor(int vertexCount) {
-    int current = _vertices.length;
-    return current+vertexCount < _maxVertices;
+  bool hasRoomFor(int lineCount) {
+    int current = _lines.length;
+    return current+(lineCount*2) < _maxVertices;
   }
 
-  void add(_DebugDrawVertex v) {
-    _vertices.add(v);
+  void add(_DebugLine line) {
+    _lines.add(line);
   }
 
   void _prepareForRender(ImmediateContext context) {
     _vboUsed = 0;
-    for (int i = 0; i < _vertices.length; i++) {
-      _DebugDrawVertex v = _vertices[i];
-      _vboStorage[_vboUsed] = v.position.x;
+    for (int i = 0; i < _lines.length; i++) {
+      _DebugLine line = _lines[i];
+
+      _vboStorage[_vboUsed] = line.positionStart.x;
       _vboUsed++;
-      _vboStorage[_vboUsed] = v.position.y;
+      _vboStorage[_vboUsed] = line.positionStart.y;
       _vboUsed++;
-      _vboStorage[_vboUsed] = v.position.z;
+      _vboStorage[_vboUsed] = line.positionStart.z;
       _vboUsed++;
 
-      _vboStorage[_vboUsed] = v.color.x;
+      _vboStorage[_vboUsed] = line.colorStart.x;
       _vboUsed++;
-      _vboStorage[_vboUsed] = v.color.y;
+      _vboStorage[_vboUsed] = line.colorStart.y;
       _vboUsed++;
-      _vboStorage[_vboUsed] = v.color.z;
+      _vboStorage[_vboUsed] = line.colorStart.z;
       _vboUsed++;
-      _vboStorage[_vboUsed] = v.color.w;
+      _vboStorage[_vboUsed] = line.colorStart.w;
+      _vboUsed++;
+
+      _vboStorage[_vboUsed] = line.positionEnd.x;
+      _vboUsed++;
+      _vboStorage[_vboUsed] = line.positionEnd.y;
+      _vboUsed++;
+      _vboStorage[_vboUsed] = line.positionEnd.z;
+      _vboUsed++;
+
+      _vboStorage[_vboUsed] = line.colorEnd.x;
+      _vboUsed++;
+      _vboStorage[_vboUsed] = line.colorEnd.y;
+      _vboUsed++;
+      _vboStorage[_vboUsed] = line.colorEnd.z;
+      _vboUsed++;
+      _vboStorage[_vboUsed] = line.colorEnd.w;
       _vboUsed++;
     }
 
@@ -83,29 +103,15 @@ class _DebugDrawVertexManager {
   int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
 
   void update(num dt) {
-    for (int i = 0; i < _vertices.length;) {
-      _DebugDrawVertex v = _vertices[i];
-      v.duration -= dt;
-      if (v.duration < 0.0) {
-        _vertices.removeRange(i, 1);
+    for (int i = 0; i < _lines.length;) {
+      _DebugLine line = _lines[i];
+      line.duration -= dt;
+      if (line.duration < 0.0) {
+        _lines.removeRange(i, 1);
         continue;
       }
       i++;
     }
-  }
-
-  void render(ImmediateContext context, Float32Array cameraMatrix) {
-    if (_vertices.length == 0) {
-      return;
-    }
-    int verts = _vboUsed~/DebugDrawVertexSize;
-    context.setShaderProgram(_lineShader);
-    context.setUniformMatrix4('cameraTransform', cameraMatrix);
-    context.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
-    context.setVertexBuffers(0, [_vbo]);
-    context.setIndexBuffer(0);
-    context.setInputLayout(_vboLayout);
-    context.draw(verts, 0);
   }
 }
 
@@ -190,15 +196,15 @@ class DebugDrawManager {
 
   List _drawCommands;
 
-  _DebugDrawVertexManager _depthEnabled;
-  _DebugDrawVertexManager _depthDisabled;
+  _DebugDrawLineManager _depthEnabledLines;
+  _DebugDrawLineManager _depthDisabledLines;
   _DebugDrawSphereManager _depthEnabledSpheres;
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
 
   Device _device;
   ImmediateContext _context;
-  
+
   final String _depthStateEnabledName = 'Debug Depth Enabled State';
   final String _depthStateDisabledName = 'Debug Depth Disabled State';
   final String _blendStateName = 'Debug Blend State';
@@ -211,7 +217,7 @@ class DebugDrawManager {
   final String _cameraTransformUniformName = 'cameraTransform';
 
   DebugDrawManager() {
-   
+
   }
 
   void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
@@ -228,8 +234,8 @@ class DebugDrawManager {
     _context.compileShaderFromResource(lineFS, lineFSResourceHandle, rm);
     int lineProgram = _device.createShaderProgram(_lineShaderProgramName, {});
     _context.linkShaderProgram(lineProgram, lineVS, lineFS);
-    _depthEnabled = new _DebugDrawVertexManager(device, _depthEnabledLineVBOName, vboSize, lineProgram);
-    _depthDisabled = new _DebugDrawVertexManager(device, _depthDisabledLineVBOName, vboSize, lineProgram);
+    _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, lineProgram);
+    _depthDisabledLines = new _DebugDrawLineManager(device, _depthDisabledLineVBOName, vboSize, lineProgram);
     _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
     _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
 
@@ -244,15 +250,15 @@ class DebugDrawManager {
     pb.setIndexBuffer(0);
     // Depth enabled lines
     pb.setDepthState(_depthEnabledState);
-    pb.setVertexBuffers(0, [_depthEnabled._vbo]);
-    pb.setInputLayout(_depthEnabled._vboLayout);
+    pb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
+    pb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
     pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
     // Depth disabled lines
     pb.setDepthState(_depthDisabledState);
-    pb.setVertexBuffers(0, [_depthDisabled._vbo]);
-    pb.setInputLayout(_depthDisabled._vboLayout);
+    pb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
+    pb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
     // draw Indirect takes vertexOffset from register 3
     pb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
@@ -264,20 +270,16 @@ class DebugDrawManager {
   ///
   /// Options: [duration] and [depthEnabled]
   void addLine(vec3 start, vec3 finish, vec4 color, [num duration = 0.0, bool depthEnabled=true]) {
-    _DebugDrawVertex v1 = new _DebugDrawVertex();
-    v1.color = new vec4.copy(color);
-    v1.position = new vec3.copy(start);
-    v1.duration = duration;
-    _DebugDrawVertex v2 = new _DebugDrawVertex();
-    v2.color = new vec4.copy(color);
-    v2.position = new vec3.copy(finish);
-    v2.duration = duration;
-    if (depthEnabled && _depthEnabled.hasRoomFor(2)) {
-      _depthEnabled.add(v1);
-      _depthEnabled.add(v2);
-    } else if (_depthDisabled.hasRoomFor(2)){
-      _depthDisabled.add(v1);
-      _depthDisabled.add(v2);
+    _DebugLine line = new _DebugLine();
+    line.colorStart = new vec4.copy(color);
+    line.colorEnd = line.colorStart;
+    line.positionStart = new vec3.copy(start);
+    line.positionEnd = new vec3.copy(finish);
+    line.duration = duration;
+    if (depthEnabled && _depthEnabledLines.hasRoomFor(1)) {
+      _depthEnabledLines.add(line);
+    } else if (_depthDisabledLines.hasRoomFor(1)){
+      _depthDisabledLines.add(line);
     }
   }
 
@@ -468,8 +470,8 @@ class DebugDrawManager {
 
   /// Prepare to render debug primitives
   void prepareForRender() {
-    _depthEnabled._prepareForRender(_context);
-    _depthDisabled._prepareForRender(_context);
+    _depthEnabledLines._prepareForRender(_context);
+    _depthDisabledLines._prepareForRender(_context);
     _depthEnabledSpheres._prepareForRender(_context);
     _depthDisabledSpheres._prepareForRender(_context);
   }
@@ -485,9 +487,9 @@ class DebugDrawManager {
     {
       Interpreter interpreter = new Interpreter();
       // Set registers
-      interpreter.setRegister(0, _depthEnabled.vertexCount);
+      interpreter.setRegister(0, _depthEnabledLines.vertexCount);
       interpreter.setRegister(1, 0);
-      interpreter.setRegister(2, _depthDisabled.vertexCount);
+      interpreter.setRegister(2, _depthDisabledLines.vertexCount);
       interpreter.setRegister(3, 0);
       interpreter.run(_drawCommands, _device, null, _context);
     }
@@ -495,8 +497,8 @@ class DebugDrawManager {
 
   /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
-    _depthEnabled.update(seconds);
-    _depthDisabled.update(seconds);
+    _depthEnabledLines.update(seconds);
+    _depthDisabledLines.update(seconds);
     _depthEnabledSpheres.update(seconds);
     _depthDisabledSpheres.update(seconds);
   }
