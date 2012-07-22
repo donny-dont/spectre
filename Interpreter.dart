@@ -77,6 +77,104 @@ class Interpreter {
             registers[regId] = val;
           }
           break;
+        case Ops.SetRegisterFromList:
+          skip = 4;
+          {
+            final int regId = program[i+1];
+            final List table = program[i+2];
+            final int tableIndex = program[i+3];
+            registers[regId] = table[tableIndex];
+          }
+          break;
+        case Ops.CreateBlendState:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createBlendState(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CreateRasterizerState:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createRasterizerState(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CreateDepthState:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createDepthState(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CreateVertexShader:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createVertexShader(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CreateFragmentShader:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createFragmentShader(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CreateShaderProgram:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createShaderProgram(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
+        case Ops.CompileShaderFromResource:
+          skip = 3;
+        {
+          final int shaderHandle = getHandle(program[i+1]);
+          final int resourceHandle = getHandle(program[i+2]);
+          im.compileShaderFromResource(shaderHandle, resourceHandle, rm);
+        }
+        break;
+        case Ops.LinkShaderProgram:
+          skip = 4;
+        {
+          final int shaderProgramHandle = getHandle(program[i+1]);
+          final int vertexShaderHandle = getHandle(program[i+2]);
+          final int fragmentShaderHandle = getHandle(program[i+3]);
+          im.linkShaderProgram(shaderProgramHandle, vertexShaderHandle, fragmentShaderHandle);
+        }
+        break;
         case Ops.SetBlendState:
           skip = 2;
           {

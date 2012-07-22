@@ -34,6 +34,68 @@ class ProgramBuilder {
     ops.add(value);
   }
 
+  void setRegisterFromList(int register, List table, int index) {
+    ops.add(Ops.SetRegisterFromList);
+    ops.add(register);
+    ops.add(table);
+    ops.add(index);
+  }
+
+  void createBlendState(String name, Map options, List output) {
+    ops.add(Ops.CreateBlendState);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void createDepthState(String name, Map options, List output) {
+    ops.add(Ops.CreateDepthState);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void createRasterizerState(String name, Map options, List output) {
+    ops.add(Ops.CreateRasterizerState);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void createVertexShader(String name, Map options, List output) {
+    ops.add(Ops.CreateVertexShader);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void createFragmentShader(String name, Map options, List output) {
+    ops.add(Ops.CreateFragmentShader);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void createShaderProgram(String name, Map options, List output) {
+    ops.add(Ops.CreateShaderProgram);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
+  void compileShaderFromResource(int shaderHandle, int resourceHandle) {
+    ops.add(Ops.CompileShaderFromResource);
+    ops.add(shaderHandle);
+    ops.add(resourceHandle);
+  }
+
+  void linkShaderProgram(int shaderProgramHandle, int vertexShaderHandle, int fragmentShaderHandle) {
+    ops.add(Ops.LinkShaderProgram);
+    ops.add(shaderProgramHandle);
+    ops.add(vertexShaderHandle);
+    ops.add(fragmentShaderHandle);
+  }
+
   void setPrimitiveTopology(int topology) {
     ops.add(Ops.SetPrimitiveTopology);
     ops.add(topology);

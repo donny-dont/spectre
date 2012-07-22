@@ -28,40 +28,58 @@ class Ops {
   /// Arg0 - Register index (0...NumRegisters)
   /// Arg1 - Value to set
   static final int SetRegister = 0x01;
+  /// Set the value of a register
+  /// Arg0 - Register index (0...NumRegisters)
+  /// Arg1 - List
+  /// Arg2 - List index
+  static final int SetRegisterFromList = 0x02;
 
-  /*
-  /// Create an index buffer
-  /// Arg0 - Handle
-  /// Arg1 - Name of index buffer
-  static final int CreateIndexBuffer = 6;
-  /// Delete an index buffer
-  /// Arg0 - Handle
-  static final int DeleteIndexBuffer = 7;
-  /// Update a buffer with the contents of an array
-  /// Arg0 - Buffer handle
-  /// Arg1 - Array handle
-  static final int UpdateBuffer = 8;
-  /// Create a resource
-  /// Arg0 - Handle
-  /// Arg1 - Name
-  static final int CreateResource = 9;
-  /// Load a URL into a resource
-  /// Arg0 - Handle
-  /// Arg1 - URL
-  static final int LoadResource = 10;
-  static final int DeleteResource = 11;
-  /// Update texture on resource change
-  /// Arg0 - Texture Handle
-  /// Arg1 - Resource Handle
-  static final int UpdateTextureOnResourceChange = 20;
-  /// Update a buffer on resource change
-  /// Arg0 - Buffer Handle
-  /// Arg1 - Resource Handle
-  static final int UpdateBufferOnResourceChange = 21;
-  */
 
   static final int Call = 0x10;
   static final int Return = 0x11;
+
+
+  /// Create a new blend state
+  /// Arg0 - Name of blend state
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateBlendState = 0x20;
+  /// Create a new depth state
+  /// Arg0 - Name of depth state
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateDepthState = 0x21;
+  /// Create a new rasterizer state
+  /// Arg0 - Name of rasterizer state
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateRasterizerState = 0x22;
+  /// Create a new vertex shader
+  /// Arg0 - Name of vertex shader
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateVertexShader = 0x23;
+  /// Create a new fragment shader
+  /// Arg0 - Name of fragment shader
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateFragmentShader = 0x24;
+  /// Create a new shader program
+  /// Arg0 - Name of shader program state
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateShaderProgram = 0x25;
+
+
+  /// Compile a shader from a shader resource
+  /// Arg0 - Handle to shader
+  /// Arg1 - Handle to resource
+  static final int CompileShaderFromResource = 0x30;
+  /// Link a shader program
+  /// Arg0 - Handle to shader program
+  /// Arg1 - Handle to vertex shader
+  /// Arg2 - Handle to fragment shader
+  static final int LinkShaderProgram = 0x31;
 
   /// Set the blend state
   /// Arg0 - Blend State handle
