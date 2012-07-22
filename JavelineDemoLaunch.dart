@@ -25,7 +25,7 @@
 #import('VectorMath/VectorMath.dart');
 #import('Javeline.dart');
 
-// Actual demos
+// Demos
 #source('JavelineEmptyDemo.dart');
 #source('JavelineDebugDrawTest.dart');
 #source('JavelineSpinningCube.dart');
@@ -38,11 +38,11 @@ class JavelineDemoDescription {
 class JavelineDemoLaunch {
   JavelineBaseDemo _demo;
   List<JavelineDemoDescription> demos;
-  
+
   Device device;
   ResourceManager resourceManager;
   DebugDrawManager debugDrawManager;
-  
+
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -147,7 +147,7 @@ class JavelineDemoLaunch {
     resourceManager = new ResourceManager();
     var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
     resourceManager.setBaseURL(baseUrl);
-    print('Started Spectre');
+
     List loadedResources = [];
     {
       int debugLineVSResource = resourceManager.registerResource('/shaders/debug_line.vs');
@@ -163,7 +163,7 @@ class JavelineDemoLaunch {
     });
     return inited.future;
   }
-  
+
   void run() {
     updateStatus("Pick a demo: ");
     window.on.resize.add(resizeHandler);
@@ -172,9 +172,8 @@ class JavelineDemoLaunch {
     Future<bool> started = startup();
     started.then((value) {
       spectreLog.Info('Javeline Running');
-      device.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-      device.gl.clearDepth(1.0);
-      device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+      device.immediateContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
+      device.immediateContext.clearDepthBuffer(1.0);
       registerDemo('Empty Demo', () { return new JavelineEmptyDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });

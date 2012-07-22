@@ -47,18 +47,18 @@ class JavelineBaseDemo {
   ImmediateContext _immediateContext;
   ResourceManager _resourceManager;
   DebugDrawManager _debugDrawManager;
-  
+
   Device get device() => _device;
   ImmediateContext get immediateContext() => _immediateContext;
   DebugDrawManager get debugDrawManager() => _debugDrawManager;
   ResourceManager get resourceManager() => _resourceManager;
-  
+
   bool _quit;
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
 
   Camera get camera() => _camera;
-  
+
   int width;
   int height;
 
@@ -67,7 +67,7 @@ class JavelineBaseDemo {
     _immediateContext = device.immediateContext;
     _resourceManager = resourceManager;
     _debugDrawManager = debugDrawManager;
-    
+
     _keyboard = new JavelineKeyboard();
     _mouse = new JavelineMouse();
     _camera = new Camera();
@@ -204,9 +204,8 @@ class JavelineBaseDemo {
         //spectreLog.Info('Camera Pitch: $deltaPitch');
       }
     }
-    device.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    device.gl.clearDepth(1.0);
-    device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT|WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    immediateContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
+    immediateContext.clearDepthBuffer(1.0);
     immediateContext.reset();
     immediateContext.setBlendState(_blendState);
     immediateContext.setRasterizerState(_rasterizerState);

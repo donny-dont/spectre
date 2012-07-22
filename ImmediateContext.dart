@@ -396,6 +396,21 @@ class ImmediateContext {
     spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
   }
 
+  void clearColorBuffer(num r, num g, num b, num a) {
+    _device.gl.clearColor(r, g, b, a);
+    _device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+  }
+
+  void clearDepthBuffer(num depth) {
+    _device.gl.clearDepth(depth);
+    _device.gl.clear(WebGLRenderingContext.DEPTH_BUFFER_BIT);
+  }
+
+  void clearStencilBuffer(int stencil) {
+    _device.gl.clearStencil(stencil);
+    _device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
+  }
+
   void compileShaderFromResource(int shaderHandle, int shaderSourceHandle, ResourceManager rm) {
     ShaderResource sr = rm.getResource(shaderSourceHandle);
     if (sr == null) {
