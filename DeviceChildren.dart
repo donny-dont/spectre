@@ -4,13 +4,13 @@ class DeviceChild implements Hashable {
   String name;
   Device device;
   bool dirty;
-  
+
   DeviceChild(this.name, this.device);
-  
+
   int hashCode() {
     return name.hashCode();
   }
-  
+
   void _createDeviceState() {
   }
   void _configDeviceState(Dynamic props) {
@@ -42,7 +42,7 @@ class InputLayout extends DeviceChild {
     _maxAttributeIndex = 0;
     _elements = null;
   }
-  
+
   void _createDeviceState() {
   }
   void _configDeviceState(Dynamic props) {
@@ -67,9 +67,9 @@ class Viewport extends DeviceChild {
     height = 480;
   }
 
-  void _createDeviceState() { 
+  void _createDeviceState() {
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -80,13 +80,13 @@ class Viewport extends DeviceChild {
       o = props['width'];
       width = o != null ? o : width;
       o = props['height'];
-      height = o != null ? o : height;  
+      height = o != null ? o : height;
     }
   }
 
   void _destroyDeviceState() {
   }
-  
+
 }
 
 /// BlendState controls how output from your fragment shader is blended onto the framebuffer
@@ -155,9 +155,9 @@ class BlendState extends DeviceChild {
     writeRenderTargetBlue = true;
     writeRenderTargetAlpha = true;
   }
-  void _createDeviceState() { 
+  void _createDeviceState() {
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -193,7 +193,7 @@ class BlendState extends DeviceChild {
       o = props['writeRenderTargetBlue'];
       writeRenderTargetBlue = o != null ? o : writeRenderTargetBlue;
       o = props['writeRenderTargetAlpha'];
-      writeRenderTargetAlpha = o != null ? o : writeRenderTargetAlpha; 
+      writeRenderTargetAlpha = o != null ? o : writeRenderTargetAlpha;
     }
   }
 
@@ -240,10 +240,10 @@ class DepthState extends DeviceChild {
     depthComparisonOp = DepthComparisonOpAlways;
   }
 
-  void _createDeviceState() { 
+  void _createDeviceState() {
   }
-  
-  
+
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -266,7 +266,7 @@ class DepthState extends DeviceChild {
       o = props['depthComparisonOp'];
       depthComparisonOp = o != null ? o : depthComparisonOp;
     }
-    
+
   }
 
   void _destroyDeviceState() {
@@ -275,15 +275,15 @@ class DepthState extends DeviceChild {
 }
 
 class StencilState extends DeviceChild {
-  
+
   StencilState(String name, Device device) : super(name, device) {
-    
+
   }
-  
+
   void _createDeviceState() {
-    
+
   }
-  
+
   void _configDeviceState(Map props) {
 
   }
@@ -317,9 +317,9 @@ class RasterizerState extends DeviceChild {
   }
 
   void _createDeviceState() {
-    
+
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -367,16 +367,14 @@ class Shader extends DeviceChild {
 
   void compile() {
     device.gl.compileShader(_shader);
-    String log = device.gl.getShaderInfoLog(_shader);
-    spectreLog.Info('Compiled $name - $log');
   }
 
-  
+
   void _createDeviceState() {
     _shader = device.gl.createShader(_type);
   }
-  
-  
+
+
   void _configDeviceState(Dynamic props) {
   }
 
@@ -392,17 +390,17 @@ class VertexShader extends Shader {
   VertexShader(String name, Device device) : super(name, device) {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
-  
-  
+
+
   void _createDeviceState() {
     super._createDeviceState();
   }
-  
-  
+
+
   void _configDeviceState(Dynamic props) {
-   super._configDeviceState(props); 
+   super._configDeviceState(props);
   }
-  
+
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
@@ -415,16 +413,16 @@ class FragmentShader extends Shader {
   FragmentShader(String name, Device device) : super(name, device) {
     _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
   }
-  
-  
+
+
   void _configDeviceState(Dynamic props) {
-   super._configDeviceState(props); 
+   super._configDeviceState(props);
   }
-  
+
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
@@ -451,7 +449,7 @@ class ShaderProgram extends DeviceChild {
   void _createDeviceState() {
     _program = device.gl.createProgram();
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -545,19 +543,19 @@ class RenderBuffer extends DeviceChild {
   int _height;
   int _format;
   WebGLRenderbuffer _buffer;
-  
+
   RenderBuffer(String name, Device device) : super(name, device) {
-    
+
   }
-  
+
   void _createDeviceState() {
     _buffer = device.gl.createRenderbuffer();
   }
-  
+
   void _destroyDeviceState() {
     device.gl.deleteRenderbuffer(_buffer);
   }
-  
+
   void _configDeviceState(Dynamic props) {
     _target = WebGLRenderingContext.RENDERBUFFER;
     String format = props['format'];
@@ -574,7 +572,7 @@ class RenderBuffer extends DeviceChild {
     }
     _width = props['width'];
     _height = props['height'];
-    
+
     WebGLRenderbuffer oldBind = device.gl.getParameter(WebGLRenderingContext.RENDERBUFFER_BINDING);
     device.gl.bindRenderbuffer(_target, _buffer);
     device.gl.renderbufferStorage(_target, _format, _width, _height);
@@ -603,7 +601,7 @@ class Texture extends DeviceChild {
   WebGLTexture _buffer;
 
   Texture(String name, Device device) : super(name, device);
-  
+
   void _createDeviceState() {
     _buffer = device.gl.createTexture();
   }
@@ -630,28 +628,28 @@ class Texture2D extends Texture {
     _textureFormat = Texture.TextureFormatRGBA;
     _pixelFormat = Texture.PixelFormatUnsignedByte;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
   }
 
   void _configDeviceState(Dynamic props) {
     super._configDeviceState(props);
-    
+
     if (props != null) {
       _width = props['width'] != null ? props['width'] : _width;
       _height = props['height'] != null ? props['height'] : _height;
       _textureFormat = props['textureFormat'] != null ? props['textureFormat'] : _textureFormat;
       _pixelFormat = props['pixelFormat'] != null ? props['pixelFormat'] : _pixelFormat;
     }
-    
+
     WebGLTexture oldBind = device.gl.getParameter(_target_param);
     device.gl.bindTexture(_target, _buffer);
     // Allocate memory for texture
     device.gl.texImage2D(_target, 0, _textureFormat, _width, _height, 0, _textureFormat, _pixelFormat, null);
     device.gl.bindTexture(_target, oldBind);
   }
-  
+
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
@@ -691,15 +689,15 @@ class SamplerState extends DeviceChild {
     super._createDeviceState();
   }
 
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       _wrapS = props['wrapS'] != null ? props['wrapS'] : _wrapS;
       _wrapT = props['wrapT'] != null ? props['wrapT'] : _wrapT;
       _minFilter = props['minFilter'] != null ? props['minFilter'] : _minFilter;
-      _magFilter = props['magFilter'] != null ? props['magFilter'] : _magFilter;  
+      _magFilter = props['magFilter'] != null ? props['magFilter'] : _magFilter;
     }
-    
+
   }
 
   void _destroyDeviceState() {
@@ -716,18 +714,18 @@ class RenderTarget extends DeviceChild {
   RenderTarget(String name, Device device) : super(name, device) {
     _target = WebGLRenderingContext.FRAMEBUFFER;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
     _buffer = device.gl.createFramebuffer();
   }
-  
+
   void _configDeviceState(Dynamic props) {
 
     _color0 = props['color0'];
     _depth = props['depth'];
     _stencil = props['stencil'];
-    
+
     WebGLFramebuffer oldBind = device.gl.getParameter(WebGLRenderingContext.FRAMEBUFFER_BINDING);
     device.gl.bindFramebuffer(_target, _buffer);
     if (_color0 != null) {
@@ -770,21 +768,21 @@ class SpectreBuffer extends DeviceChild {
   SpectreBuffer(String name, Device device) : super(name, device) {
     _buffer = null;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
     _buffer = device.gl.createBuffer();
     _usage = WebGLRenderingContext.DYNAMIC_DRAW;
     _size = 1;
   }
-  
+
   void _configDeviceState(Dynamic props) {
     super._configDeviceState(props);
 
     if (props != null) {
       Dynamic o;
       o = props['usage'];
-      if (o != null && o is String) {      
+      if (o != null && o is String) {
         switch (o) {
           case 'stream':
             _usage = WebGLRenderingContext.STREAM_DRAW;
@@ -805,7 +803,7 @@ class SpectreBuffer extends DeviceChild {
         _size = o;
       }
     }
-    
+
     WebGLBuffer oldBind = device.gl.getParameter(_param_target);
     device.gl.bindBuffer(_target, _buffer);
     device.gl.bufferData(_target, _size, _usage);
@@ -815,27 +813,27 @@ class SpectreBuffer extends DeviceChild {
   void _destroyDeviceState() {
     device.gl.deleteBuffer(_buffer);
     super._destroyDeviceState();
-  }  
+  }
 }
 
 /// IndexBuffer defines the storage for indexes used to construct primitives
 /// Create using [Device.createIndexBuffer]
 /// Set using [Device.setIndexBuffer]
 class IndexBuffer extends SpectreBuffer {
-  
+
   IndexBuffer(String name, Device device) : super(name, device) {
     _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
     _param_target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
   }
-  
+
   void _configDeviceState(Dynamic props) {
     super._configDeviceState(props);
   }
-  
+
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
@@ -849,16 +847,16 @@ class VertexBuffer extends SpectreBuffer {
     _target = WebGLRenderingContext.ARRAY_BUFFER;
     _param_target = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
   }
-  
+
   void _createDeviceState() {
     super._createDeviceState();
   }
-  
+
   void _configDeviceState(Dynamic props) {
     super._configDeviceState(props);
 
   }
-  
+
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
