@@ -35,6 +35,8 @@
 #source('ResourceLoader.dart');
 #source('Resource.dart');
 #source('ResourceManager.dart');
+#source('Program.dart');
+#source('ProgramBuilder.dart');
 #source('Interpreter.dart');
 
 #source('Camera.dart');
@@ -46,8 +48,6 @@
 // We have a single logger
 Logger spectreLog;
 
-/// Initializes the Spectre graphis engine. [canvasName] is the CSS id of the canvas to render to
-/// Returns a Future that will complete when all required resources are loaded and the engine is running
 Future<bool> initSpectre() {
   if (spectreLog == null) {
     spectreLog = new PrintLogger();
