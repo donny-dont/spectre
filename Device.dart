@@ -74,7 +74,8 @@ class Device {
   static final int BlendStateHandleType = 10;
   static final int RasterizerStateHandleType = 11;
   static final int InputLayoutHandleType = 12;
-  
+  static final int MeshHandleType = 13;
+
   Map _getPropertyMap(Dynamic props) {
     if (props is String) {
       props = JSON.parse(props);
@@ -84,7 +85,7 @@ class Device {
     }
     return props;
   }
-  
+
   String getHandleType(int handle) {
     int type = Handle.getType(handle);
     switch (type) {
@@ -119,10 +120,10 @@ class Device {
 
   ImmediateContext _immediateContext;
   ImmediateContext get immediateContext() => _immediateContext;
-  
+
   WebGLRenderingContext _gl;
   WebGLRenderingContext get gl() => _gl;
-  
+
   // There is a 1:1 mapping between _childrenHandles and _childrenObjects
   HandleSystem _childrenHandles;
   List<DeviceChild> _childrenObjects;
@@ -141,7 +142,7 @@ class Device {
     _nameMapping = new Map<String, int>();
     _immediateContext = new ImmediateContext(this);
   }
-  
+
   /// Returns the handle to the device child named [name]
   int getDeviceChildHandle(String name) {
     int h = _nameMapping[name];
@@ -216,10 +217,10 @@ class Device {
     int index = Handle.getIndex(handle);
     // Nothing is at this index
     assert(_childrenObjects[index] == null);
-    
+
     // Register name
     _nameMapping[name] = handle;
-    
+
     return handle;
   }
 
@@ -249,13 +250,22 @@ class Device {
     }
   }
 
+  void configureDeviceChild(int handle, Dynamic props) {
+    Dynamic deviceChild = getDeviceChild(handle);
+    if (deviceChild == null) {
+      return;
+    }
+    props = _getPropertyMap(props);
+    deviceChild._configDeviceState(props);
+  }
+
   /// Create a IndexBuffer named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the IndexBuffer being created. If [handle] is specified it must be a registered handle.
   ///
   /// Returns the handle to the IndexBuffer.
-  int createIndexBuffer(String name, Object props, [int handle=Handle.BadHandle]) {
+  int createIndexBuffer(String name, Dynamic props, [int handle=Handle.BadHandle]) {
     handle = _registerHandle(name, BufferHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -272,7 +282,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexBuffer] being created
-  int createVertexBuffer(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createVertexBuffer(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, BufferHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -306,7 +316,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderTarget] being created
-  int createRenderTarget(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createRenderTarget(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, RenderTargetHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -323,7 +333,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Texture2D] being created
-  int createTexture2D(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createTexture2D(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, TextureHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -340,7 +350,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
-  int createVertexShader(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createVertexShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, ShaderHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -357,7 +367,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
-  int createFragmentShader(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createFragmentShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, ShaderHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -374,7 +384,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
-  int createShaderProgram(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createShaderProgram(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, ShaderProgramHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -384,7 +394,7 @@ class Device {
     _setChildObject(handle, shaderProgram);
     shaderProgram._createDeviceState();
     shaderProgram._configDeviceState(props);
-   
+
     return handle;
   }
 
@@ -392,7 +402,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [SamplerState] being created
-  int createSamplerState(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createSamplerState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, SamplerStateHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -409,7 +419,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
-  int createViewport(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createViewport(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, ViewportHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -426,7 +436,7 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
-  int createDepthState(String name, Object props, [int handle = Handle.BadHandle]) {
+  int createDepthState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, DepthStateHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
@@ -468,7 +478,6 @@ class Device {
     }
     props = _getPropertyMap(props);
 
-
     RasterizerState rasterizerState = new RasterizerState(name, this);
     _setChildObject(handle, rasterizerState);
     rasterizerState._createDeviceState();
@@ -484,16 +493,16 @@ class Device {
     }
 
 
-    
+
     InputLayout il = new InputLayout(name, this);
     _setChildObject(handle, il);
     il._createDeviceState();
-    
+
     ShaderProgram sp = getDeviceChild(shaderProgramHandle);
     if (sp == null) {
       return handle;
     }
-    
+
     il._maxAttributeIndex = -1;
     il._elements = new List<_InputLayoutElement>();
     for (var e in elements) {
@@ -516,4 +525,34 @@ class Device {
     return handle;
   }
 
+  /// Create an [IndexedMesh] named [name]
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  int createIndexedMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
+    handle = _registerHandle(name, MeshHandleType, handle);
+    if (handle == Handle.BadHandle) {
+      return handle;
+    }
+    props = _getPropertyMap(props);
+
+    IndexedMesh indexedMesh = new IndexedMesh(name, this);
+    _setChildObject(handle, indexedMesh);
+    indexedMesh._createDeviceState();
+    indexedMesh._configDeviceState(props);
+    return handle;
+  }
+
+  /// Create an [ArrayMesh] name [name]
+  /// [props] is a JSON String or a [Map] containing a set of properties
+  int createArrayMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
+    handle = _registerHandle(name, MeshHandleType, handle);
+    if (handle == Handle.BadHandle) {
+      return handle;
+    }
+    props = _getPropertyMap(props);
+    ArrayMesh arrayMesh = new ArrayMesh(name, this);
+    _setChildObject(handle, arrayMesh);
+    arrayMesh._createDeviceState();
+    arrayMesh._configDeviceState(props);
+    return handle;
+  }
 }

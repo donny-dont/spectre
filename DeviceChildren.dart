@@ -861,3 +861,117 @@ class VertexBuffer extends SpectreBuffer {
     super._destroyDeviceState();
   }
 }
+
+class IndexedMesh extends DeviceChild {
+  int vertexArrayHandle;
+  int indexArrayHandle;
+  int numIndices;
+  int indexOffset;
+
+  IndexedMesh(String name, Device device) : super(name, device) {
+    vertexArrayHandle = 0;
+    indexArrayHandle = 0;
+    numIndices = 0;
+    indexOffset = 0;
+  }
+
+  void _createDeviceState() {
+    super._createDeviceState();
+    vertexArrayHandle = device.createVertexBuffer('${name}.array', {});
+    indexArrayHandle = device.createIndexBuffer('${name}.index', {});
+  }
+
+  void _configDeviceState(Dynamic props) {
+    super._configDeviceState(props);
+    if (props != null) {
+      Dynamic o;
+
+      o = props['UpdateFromMeshResource'];
+      if (o != null && o is Map) {
+        ResourceManager rm = o['resourceManager'];
+        int meshResourceHandle = o['meshResourceHandle'];
+        /*
+         * MeshResource just loads the first index for now
+        int meshResourceIndex = o['meshResourceIndex'];
+        if (meshResourceIndex == null) {
+          meshResourceIndex = 0;
+        }*/
+        if (rm != null && rm is ResourceManager && meshResourceHandle != null) {
+          MeshResource mesh = rm.getResource(meshResourceHandle);
+          device.immediateContext.updateBuffer(vertexArrayHandle, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
+          device.immediateContext.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
+          indexOffset = 0;
+          numIndices = mesh.numIndices;
+        }
+      }
+
+      /* TODO
+      o = props['UpdateFromArray'];
+      if (o != null && o is int) {
+
+      }
+      */
+
+      o = props['indexOffset'];
+      if (o != null && o is int) {
+        indexOffset = o;
+      }
+
+      o = props['numIndices'];
+      if (o != null && o is int) {
+        numIndices = o;
+      }
+    }
+  }
+
+  void _destroyDeviceState() {
+    device.deleteDeviceChild(indexArrayHandle);
+    device.deleteDeviceChild(vertexArrayHandle);
+    super._destroyDeviceState();
+  }
+}
+
+class ArrayMesh extends DeviceChild {
+  int vertexArrayHandle;
+  int numVertices;
+  int vertexOffset;
+
+  ArrayMesh(String name, Device device) : super(name, device) {
+    vertexArrayHandle = 0;
+    numVertices = 0;
+    vertexOffset = 0;
+  }
+
+  void _createDeviceState() {
+    super._createDeviceState();
+    vertexArrayHandle = device.createVertexBuffer('${name}.array', {});
+  }
+
+  void _configDeviceState(Dynamic props) {
+    super._configDeviceState(props);
+    if (props != null) {
+      Dynamic o;
+
+      /* TODO
+      o = props['UpdateFromArray'];
+      if (o != null && o is int) {
+
+      }
+
+      o = props['vertexOffset'];
+      if (o != null && o is int) {
+        vertexOffset = o;
+      }
+
+      o = props['numVertices'];
+      if (o != null && o is int) {
+        numVertices = o;
+      }*/
+    }
+  }
+
+  void _destroyDeviceState() {
+    device.deleteDeviceChild(vertexArrayHandle);
+    super._destroyDeviceState();
+  }
+}
