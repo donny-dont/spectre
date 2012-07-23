@@ -173,6 +173,15 @@ class ImmediateContext {
     _inputLayoutHandle = inputLayoutHandle;
   }
 
+  void setIndexedMesh(int indexedMeshHandle) {
+    IndexedMesh im = _device.getDeviceChild(indexedMeshHandle);
+    if (im == null) {
+      return;
+    }
+    setIndexBuffer(im.indexArrayHandle);
+    setVertexBuffers(0, [im.vertexArrayHandle]);
+  }
+
   /// Set ShaderProgram to [shaderProgramHandle]
   void setShaderProgram(int shaderProgramHandle) {
     if (_shaderProgramHandle == shaderProgramHandle) {
@@ -331,8 +340,37 @@ class ImmediateContext {
     _device.gl.uniformMatrix4fv(index, transpose, matrix);
   }
 
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector4(String name, Float32Array vector) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform4fv(index, vector);
+  }
+
+  void setUniformFloat4Array(String name, Float32Array array) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform4fv(index, array);
+  }
+
   /// Update the contents of [bufferHandle] with the contents of [data]
-  void updateBuffer(int bufferHandle, ArrayBufferView data) {
+  void updateBuffer(int bufferHandle, ArrayBufferView data, [int usage = null]) {
     SpectreBuffer buffer = _device.getDeviceChild(bufferHandle);
     var correctType = buffer is SpectreBuffer;
     if (correctType == false) {
@@ -341,11 +379,8 @@ class ImmediateContext {
     var target = buffer._target;
     var oldBind = _device.gl.getParameter(buffer._param_target);
     _device.gl.bindBuffer(buffer._target, buffer._buffer);
-    _device.gl.bufferData(buffer._target, data, buffer._usage);
-    //int size = _device.gl.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_SIZE);
-    //int usage = _device.gl.getBufferParameter(buffer._target, WebGLRenderingContext.BUFFER_USAGE);
-    //spectreLog.Info('updated buffer (${buffer._target}, $size, $usage) with ${data.byteLength}');
-    _device.gl.bindBuffer(buffer._target,  oldBind);
+    _device.gl.bufferData(buffer._target, data, usage != null ? usage : buffer._usage);
+    _device.gl.bindBuffer(buffer._target, oldBind);
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
@@ -450,6 +485,14 @@ class ImmediateContext {
     _prepareInputs();
     _prepareTextures();
     _device.gl.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
+  }
+
+  void drawIndexedMesh(int indexedMeshHandle) {
+    IndexedMesh im = _device.getDeviceChild(indexedMeshHandle);
+    if (im == null) {
+      return;
+    }
+    drawIndexed(im.numIndices, im.indexOffset);
   }
 
   /// Draw a mesh with [numVertices] starting at [vertexOffset]
