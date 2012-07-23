@@ -152,13 +152,19 @@ class JavelineDemoLaunch {
     {
       int debugLineVSResource = resourceManager.registerResource('/shaders/debug_line.vs');
       int debugLineFSResource = resourceManager.registerResource('/shaders/debug_line.fs');
+      int debugSphereVSResource = resourceManager.registerResource('/shaders/debug_sphere.vs');
+      int debugSphereFSResource = resourceManager.registerResource('/shaders/debug_sphere.fs');
+      int sphereMeshResource = resourceManager.registerResource('/meshes/unitSphere.mesh');
       loadedResources.add(resourceManager.loadResource(debugLineVSResource));
       loadedResources.add(resourceManager.loadResource(debugLineFSResource));
+      loadedResources.add(resourceManager.loadResource(debugSphereVSResource));
+      loadedResources.add(resourceManager.loadResource(debugSphereFSResource));
+      loadedResources.add(resourceManager.loadResource(sphereMeshResource));
     }
     Future allLoaded = Futures.wait(loadedResources);
     Completer<bool> inited = new Completer<bool>();
     allLoaded.then((resourceList) {
-      debugDrawManager.init(device, resourceManager, resourceList[0], resourceList[1], null, null, null);
+      debugDrawManager.init(device, resourceManager, resourceList[0], resourceList[1], resourceList[2], resourceList[3], resourceList[4]);
       inited.complete(true);
     });
     return inited.future;

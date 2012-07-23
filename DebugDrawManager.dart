@@ -116,43 +116,51 @@ class _DebugDrawLineManager {
 }
 
 class _DebugDrawSphere {
-  // Probably want to pool these Float32Arrays
-  Float32Array centerUniform;
-  Float32Array colorUniform;
-  num radiusUniform;
+  Float32Array sphereCenterAndRadius;
+  Float32Array sphereColor;
   num duration;
   _DebugDrawSphere(vec3 center, vec4 color, num radius) {
-    centerUniform = new Float32Array(3);
-    centerUniform[0] = center.x;
-    centerUniform[1] = center.y;
-    centerUniform[2] = center.z;
-    colorUniform = new Float32Array(4);
-    colorUniform[0] = color.x;
-    colorUniform[1] = color.y;
-    colorUniform[2] = color.z;
-    colorUniform[3] = color.w;
-    radiusUniform = radius;
+    sphereCenterAndRadius = new Float32Array(4);
+    sphereColor = new Float32Array(4);
+    sphereCenterAndRadius[0] = center.x;
+    sphereCenterAndRadius[1] = center.y;
+    sphereCenterAndRadius[2] = center.z;
+    sphereCenterAndRadius[3] = radius;
+    sphereColor[0] = color.x;
+    sphereColor[1] = color.y;
+    sphereColor[2] = color.z;
+    sphereColor[3] = color.w;
   }
 
   void destroy() {
-    centerUniform = null;
-    colorUniform = null;
-    radiusUniform = null;
+    sphereCenterAndRadius = null;
+    sphereColor = null;
   }
 }
 
 class _DebugDrawSphereManager {
   int _maxSpheres;
   List<_DebugDrawSphere> _spheres;
-  int _unitSphere;
-  int _vboLayout;
-  int _sphereShader;
-  Float32Array _sphereColor;
 
-  _DebugDrawSphereManager(int unitSphere, int maxSpheres) {
-    _unitSphere = unitSphere;
+  int _unitSphereMeshHandle;
+  int _unitSphereMeshInputLayoutHandle;
+  int _unitSphereShaderProgram;
+
+  List _drawProgram;
+
+  int _sphereProgramHandle;
+  int _sphereIndexedMeshHandle;
+  int _sphereVertexBuffer;
+  int _sphereIndexBuffer;
+  int _sphereNumIndices;
+  int _sphereInputLayout;
+  _DebugDrawSphereManager(int sphereProgramHandle, int sphereIndexedMeshHandle, int sphereInputLayout, int maxSpheres) {
+    _sphereInputLayout = sphereInputLayout;
+    _sphereProgramHandle = sphereProgramHandle;
+    _sphereIndexedMeshHandle = sphereIndexedMeshHandle;
     _maxSpheres = maxSpheres;
     _spheres = new List<_DebugDrawSphere>();
+    _drawProgram = new List();
   }
 
   bool hasRoomFor(int sphereCount) {
@@ -160,16 +168,33 @@ class _DebugDrawSphereManager {
     return current+sphereCount < _maxSpheres;
   }
 
-  void _prepareForRender(ImmediateContext context) {
+  void _prepareForRender(ImmediateContext context, Float32Array cameraMatrix) {
+    // Reset draw program
+    _drawProgram.clear();
+    for (final _DebugDrawSphere sphere in _spheres) {
+
+    }
+  }
+
+  void _render(Device device, Float32Array cameraMatrix) {
+    for (final _DebugDrawSphere sphere in _spheres) {
+      device.immediateContext.setIndexBuffer(_sphereIndexBuffer);
+      device.immediateContext.setShaderProgram(_sphereProgramHandle);
+      device.immediateContext.setUniformMatrix4('cameraTransform', cameraMatrix);
+      device.immediateContext.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
+      device.immediateContext.setUniformVector4('debugSphereColor', sphere.sphereColor);
+      device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+      device.immediateContext.setIndexedMesh(_sphereIndexedMeshHandle);
+      device.immediateContext.setInputLayout(_sphereInputLayout);
+      device.immediateContext.drawIndexedMesh(_sphereIndexedMeshHandle);
+    }
   }
 
   void add(_DebugDrawSphere sphere) {
-    return;
     _spheres.add(sphere);
   }
 
   void update(num dt) {
-    return;
     for (int i = 0; i < _spheres.length;) {
       _DebugDrawSphere s = _spheres[i];
       s.duration -= dt;
@@ -209,6 +234,10 @@ class DebugDrawManager {
   static final int _lineVertexShaderHandleIndex = 4;
   static final int _lineFragmentShaderHandleIndex = 5;
   static final int _lineShaderProgramHandleIndex = 6;
+  static final int _sphereVertexShaderHandleIndex = 7;
+  static final int _sphereFragmentShaderHandleIndex = 8;
+  static final int _sphereShaderProgramHandleIndex = 9;
+  static final int _sphereIndexedMeshHandleIndex = 10;
 
   static final String _depthStateEnabledName = 'Debug Depth Enabled State';
   static final String _depthStateDisabledName = 'Debug Depth Disabled State';
@@ -220,6 +249,10 @@ class DebugDrawManager {
   static final String _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
   static final String _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
   static final String _cameraTransformUniformName = 'cameraTransform';
+  static final String _sphereVertexShaderName = 'Debug Sphere Vertex Shader';
+  static final String _sphereFragmentShaderName = 'Debug Sphere Fragment Shader';
+  static final String _sphereShaderProgramName = 'Debug Sphere Shader Program';
+  static final String _sphereIndexedMeshName = 'Debug Sphere Indexed Mesh';
 
   List<int> _handles;
 
@@ -243,37 +276,64 @@ class DebugDrawManager {
     pb.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess}, _handles);
     pb.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false}, _handles);
     pb.createBlendState(_blendStateName, {}, _handles);
-    pb.createRasterizerState(_rasterizerStateName, {'cullEnabled': false, 'lineWidth': 1.0}, _handles);
+    pb.createRasterizerState(_rasterizerStateName, {'cullEnabled': true, 'lineWidth': 1.0}, _handles);
     pb.createVertexShader(_lineVertexShaderName, {}, _handles);
     pb.createFragmentShader(_lineFragmentShaderName, {}, _handles);
     pb.createShaderProgram(_lineShaderProgramName, {}, _handles);
     pb.setRegisterFromList(0, _handles, _lineVertexShaderHandleIndex);
     pb.setRegisterFromList(1, _handles, _lineFragmentShaderHandleIndex);
     pb.setRegisterFromList(2, _handles, _lineShaderProgramHandleIndex);
-    // register 3 must have resource handle for the vertex shader
-    // register 4 must have resource handle for the fragment shader
+    // register 3 must have resource handle for line vertex shader
+    // register 4 must have resource handle for line fragment shader
     pb.compileShaderFromResource(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(3));
     pb.compileShaderFromResource(Handle.makeRegisterHandle(1), Handle.makeRegisterHandle(4));
+    pb.linkShaderProgram(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    pb.createVertexShader(_sphereVertexShaderName, {}, _handles);
+    pb.createFragmentShader(_sphereFragmentShaderName, {}, _handles);
+    pb.createShaderProgram(_sphereShaderProgramName, {}, _handles);
+    pb.setRegisterFromList(0, _handles, _sphereVertexShaderHandleIndex);
+    pb.setRegisterFromList(1, _handles, _sphereFragmentShaderHandleIndex);
+    pb.setRegisterFromList(2, _handles, _sphereShaderProgramHandleIndex);
+    // register 5 must have resource handle for sphere vertex shader
+    // register 6 must have resource handle for sphere fragment shader
+    pb.compileShaderFromResource(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(5));
+    pb.compileShaderFromResource(Handle.makeRegisterHandle(1), Handle.makeRegisterHandle(6));
     pb.linkShaderProgram(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
     _startupCommands = pb.ops;
   }
 
-  void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResource, int sphereFSResource, int unitSphere, [int vboSize=4096, int maxSpheres=1024]) {
+  void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResourceHandle, int sphereFSResourceHandle, int sphereMeshResourceHandle, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
     _context = device.immediateContext;
+
+    // Finish building startup command
+    ProgramBuilder pb;
+
+    pb = new ProgramBuilder.append(_startupCommands);
+    pb.createIndexedMesh(_sphereIndexedMeshName, {'UpdateFromMeshResource':{'resourceManager': rm, 'meshResourceHandle': sphereMeshResourceHandle}}, _handles);
 
     Interpreter interpreter = new Interpreter();
     interpreter.setRegister(3, lineVSResourceHandle);
     interpreter.setRegister(4, lineFSResourceHandle);
+    interpreter.setRegister(5, sphereVSResourceHandle);
+    interpreter.setRegister(6, sphereFSResourceHandle);
     interpreter.run(_startupCommands, _device, rm, _context);
+
+    // Sphere startup
+    int sphereInputLayout;
+    {
+      MeshResource sphere = rm.getResource(sphereMeshResourceHandle);
+      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh('vPosition', 0, 'POSITION', sphere)];
+      sphereInputLayout = device.createInputLayout('Debug Sphere Input', elements, _handles[_sphereShaderProgramHandleIndex]);
+    }
 
     _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
     _depthDisabledLines = new _DebugDrawLineManager(device, _depthDisabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
-    _depthEnabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
-    _depthDisabledSpheres = new _DebugDrawSphereManager(unitSphere, maxSpheres);
+    _depthEnabledSpheres = new _DebugDrawSphereManager(_handles[_sphereShaderProgramHandleIndex], _handles[_sphereIndexedMeshHandleIndex], sphereInputLayout, maxSpheres);
+    _depthDisabledSpheres = new _DebugDrawSphereManager(_handles[_sphereShaderProgramHandleIndex], _handles[_sphereIndexedMeshHandleIndex], sphereInputLayout, maxSpheres);
 
     // Build the program
-    ProgramBuilder pb = new ProgramBuilder();
+    pb = new ProgramBuilder();
     // General
     pb.setBlendState(_handles[_blendStateHandleIndex]);
     pb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
@@ -502,8 +562,8 @@ class DebugDrawManager {
   void prepareForRender() {
     _depthEnabledLines._prepareForRender(_context);
     _depthDisabledLines._prepareForRender(_context);
-    _depthEnabledSpheres._prepareForRender(_context);
-    _depthDisabledSpheres._prepareForRender(_context);
+    _depthEnabledSpheres._prepareForRender(_context, _cameraMatrix);
+    _depthDisabledSpheres._prepareForRender(_context, _cameraMatrix);
   }
 
   /// Render debug primitives for [Camera] [cam]
@@ -523,6 +583,9 @@ class DebugDrawManager {
       interpreter.setRegister(3, 0);
       interpreter.run(_drawCommands, _device, null, _context);
     }
+    _device.immediateContext.setDepthState(_handles[_depthEnabledStateHandleIndex]);
+    _depthEnabledSpheres._render(_device, _cameraMatrix);
+    _depthDisabledSpheres._render(_device, _cameraMatrix);
   }
 
   /// Update time [seconds], removing any dead debug primitives
