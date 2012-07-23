@@ -83,6 +83,13 @@ class ProgramBuilder {
     ops.add(output);
   }
 
+  void createIndexedMesh(String name, Map options, List output) {
+    ops.add(Ops.CreateIndexedMesh);
+    ops.add(name);
+    ops.add(options);
+    ops.add(output);
+  }
+
   void compileShaderFromResource(int shaderHandle, int resourceHandle) {
     ops.add(Ops.CompileShaderFromResource);
     ops.add(shaderHandle);

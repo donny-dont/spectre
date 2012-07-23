@@ -69,7 +69,11 @@ class Ops {
   /// Arg1 - Map of options
   /// Arg2 - List to store handle in (can be null)
   static final int CreateShaderProgram = 0x25;
-
+  /// Create a new indexed mesh
+  /// Arg0 - Name of indexed mesh
+  /// Arg1 - Map of options
+  /// Arg2 - List to store handle in (can be null)
+  static final int CreateIndexedMesh = 0x26;
 
   /// Compile a shader from a shader resource
   /// Arg0 - Handle to shader
@@ -134,6 +138,10 @@ class Ops {
   /// Arg0 - Index count
   /// Arg1 - Index buffer offset
   static final int DrawIndexed = 0xC2;
+
+  /// Draw an IndexedMesh
+  /// Arg0 - handle to IndexedMesh
+  static final int DrawIndexedMesh = 0xC3;
 
   /// Dergister and unload resources
   /// Arg0 - List of resource handles

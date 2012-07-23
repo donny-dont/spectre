@@ -158,6 +158,18 @@ class Interpreter {
           }
         }
         break;
+        case Ops.CreateIndexedMesh:
+          skip = 4;
+        {
+          final String name = program[i+1];
+          final Map options = program[i+2];
+          final List output = program[i+3];
+          int handle = device.createIndexedMesh(name, options);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
         case Ops.CompileShaderFromResource:
           skip = 3;
         {
