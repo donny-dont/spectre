@@ -51,15 +51,18 @@ class ResourceBase {
   String get url() => _url;
 
   ResourceEvents on;
+  ResourceManager _rm;
 
-  ResourceBase(this._url) {
+  ResourceBase(this._url, this._rm) {
     _isLoaded = false;
     on = new ResourceEvents();
   }
 
   abstract void load(ResourceLoaderResult result);
-
   abstract void unload();
+  void deregister() {
+    
+  }
 
   // Call after the data is updated
   void _fireUpdated() {
@@ -79,11 +82,12 @@ class ResourceBase {
 class Float32ArrayResource extends ResourceBase {
   Float32Array array;
 
-  Float32ArrayResource(String url) : super(url) {
+  Float32ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
   void load(ResourceLoaderResult result) {
     _fireUpdated();
+    result.completer.complete(result.handle);
   }
 
   void unload() {
@@ -94,11 +98,12 @@ class Float32ArrayResource extends ResourceBase {
 class Uint16ArrayResource extends ResourceBase {
   Uint16Array array;
 
-  Uint16ArrayResource(String url) : super(url) {
+  Uint16ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
   void load(ResourceLoaderResult result) {
     _fireUpdated();
+    result.completer.complete(result.handle);
   }
 
   void unload() {
@@ -111,7 +116,7 @@ class MeshResource extends ResourceBase {
   Float32Array vertexArray;
   Uint16Array indexArray;
 
-  MeshResource(String url) : super(url) {
+  MeshResource(String url, ResourceManager rm) : super(url, rm) {
 
   }
 
@@ -127,6 +132,7 @@ class MeshResource extends ResourceBase {
     indexArray = new Uint16Array.fromList(meshData['meshes'][0]['indices']);
     vertexArray = new Float32Array.fromList(meshData['meshes'][0]['vertices']);
     _fireUpdated();
+    result.completer.complete(result.handle);
   }
 
   void unload() {
@@ -140,7 +146,8 @@ class MeshResource extends ResourceBase {
 class ShaderResource extends ResourceBase {
   String source;
 
-  ShaderResource(String url) : super(url) {
+  ShaderResource(String url, ResourceManager rm) : super(url, rm) {
+    source = '';
   }
 
   void load(ResourceLoaderResult result) {
@@ -148,7 +155,9 @@ class ShaderResource extends ResourceBase {
       return;
     }
     source = result.data;
+    print('$_url $source');
     _fireUpdated();
+    result.completer.complete(result.handle);
   }
 
   void unload() {
@@ -157,10 +166,32 @@ class ShaderResource extends ResourceBase {
   }
 }
 
+class ShaderProgramResource extends ResourceBase {
+  String vertexShaderSource;
+  String fragmentShaderSource;
+  
+  ShaderProgramResource(String url, ResourceManager rm) : super(url, rm) {
+    vertexShaderSource = '';
+    fragmentShaderSource = '';
+  }
+
+  void load(ResourceLoaderResult result) {
+    if (result.success == false) {
+      return;
+    }
+    _fireUpdated();
+    result.completer.complete(result.handle);
+  }
+
+  void unload() {
+    _fireUnloaded();
+  }
+}
+
 class ImageResource extends ResourceBase {
   ImageElement image;
 
-  ImageResource(String url) : super(url) {
+  ImageResource(String url, ResourceManager rm) : super(url, rm) {
 
   }
 
@@ -170,10 +201,53 @@ class ImageResource extends ResourceBase {
     }
     image = result.data;
     _fireUpdated();
+    result.completer.complete(result.handle);
   }
 
   void unload() {
     _fireUnloaded();
     image = null;
+  }
+}
+
+class PackResource extends ResourceBase {
+  List<int> childResources;
+  PackResource(String url, ResourceManager rm) : super(url, rm) {
+    childResources = new List<int>();
+  }
+  
+  void load(ResourceLoaderResult result) {
+    if (childResources.length > 0) {
+      _rm.batchUnload(childResources);
+      childResources.clear();
+    }
+    if (result.success) {
+      List<Future<int>> futures = new List<Future<int>>();
+      if (result.data is String) {
+        Map pack = JSON.parse(result.data);
+        if (pack != null) {
+          for (String url in pack['packContents']) {
+            int handle = _rm.registerResource(url);
+            childResources.add(handle);
+            if (handle != Handle.BadHandle) {
+              futures.add(_rm.loadResource(handle));
+            }
+          }
+        }
+      }
+      _fireUpdated();
+      Future allLoaded = Futures.wait(futures);
+      allLoaded.then((_unused) {
+        result.completer.complete(result.handle);  
+      });
+    }
+  }
+  
+  void unload() {
+    _rm.batchUnload(childResources);
+  }
+  
+  void deregister() {
+    _rm.batchDeregister(childResources);
   }
 }

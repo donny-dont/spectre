@@ -23,7 +23,11 @@
 class ResourceLoaderResult {
   bool success;
   Dynamic data;
-  ResourceLoaderResult(this.success, this.data);
+  int handle;
+  Completer<int> completer;
+  ResourceLoaderResult(this.success, this.data) {
+    handle = 0;
+  }
 }
 
 class ResourceLoader {
@@ -33,7 +37,7 @@ class ResourceLoader {
 
   abstract Future<ResourceLoaderResult> load(String url);
 
-  Dynamic createResource(String URL) {
+  Dynamic createResource(String URL, ResourceManager rm) {
     return null;
   }
 }
@@ -57,9 +61,7 @@ class ImageResourceLoader extends ResourceLoader {
     return completer.future;
   }
 
-  ImageResource createResource(String url) {
-    return new ImageResource(url);
-  }
+  ImageResource createResource(String url, ResourceManager rm) => new ImageResource(url, rm);
 }
 
 class HttpResourceLoader extends ResourceLoader {
@@ -83,9 +85,7 @@ class MeshResourceLoader extends HttpResourceLoader {
     return extension == 'mesh';
   }
 
-  MeshResource createResource(String url) {
-    return new MeshResource(url);
-  }
+  MeshResource createResource(String url, ResourceManager rm) => new MeshResource(url, rm);
 }
 
 class ShaderResourceLoader extends HttpResourceLoader {
@@ -93,9 +93,15 @@ class ShaderResourceLoader extends HttpResourceLoader {
     return extension == 'vs' || extension == 'fs';
   }
 
-  ShaderResource createResource(String url) {
-    return new ShaderResource(url);
+  ShaderResource createResource(String url, ResourceManager rm) => new ShaderResource(url, rm);
+}
+
+class PackResourceLoader extends HttpResourceLoader {
+  bool canLoad(String URL, String extension) {
+    return extension == 'pack';
   }
+  
+  PackResource createResource(String url, ResourceManager rm) => new PackResource(url, rm);
 }
 
 class ResourceLoaders {
@@ -114,6 +120,7 @@ class ResourceLoaders {
     _resourceLoaders.add(new ImageResourceLoader());
     _resourceLoaders.add(new ShaderResourceLoader());
     _resourceLoaders.add(new MeshResourceLoader());
+    _resourceLoaders.add(new PackResourceLoader());
   }
 
   ResourceLoader findResourceLoader(String URL) {

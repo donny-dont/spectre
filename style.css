@@ -55,6 +55,12 @@
 	overflow:scroll;
 }
 
+.ResourceRow {
+display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-flex: auto;
+}
+
 #DeviceChildTable {
 	display: -webkit-flex;
 	-webkit-flex-direction: column;

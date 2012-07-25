@@ -90,7 +90,7 @@ class ResourceManager {
       return Handle.BadHandle;
     }
 
-    ResourceBase rb = rl.createResource(url);
+    ResourceBase rb = rl.createResource(url, this);
 
     if (handle != Handle.BadHandle) {
       // Static handle
@@ -130,6 +130,7 @@ class ResourceManager {
     ResourceBase rb = _resources[index];
     if (rb != null) {
       rb.unload();
+      rb.deregister();
       _urlToHandle.remove(rb.url);
     }
     _resources[index] = null;
@@ -151,8 +152,9 @@ class ResourceManager {
     Completer<int> completer = new Completer<int>();
     if (futureResult != null) {
       futureResult.then((result) {
+        result.handle = handle;
+        result.completer = completer;
         rb.load(result);
-        completer.complete(handle);
       });
     }
     return completer.future;
@@ -173,15 +175,15 @@ class ResourceManager {
     }
   }
 
-  void batchUnload(List<int> handles, [bool deregister=false]) {
-    if (deregister) {
-      for (int h in handles) {
-        deregisterResource(h);
-      }
-    } else {
-      for (int h in handles) {
-        unloadResource(h);
-      }
+  void batchUnload(List<int> handles) {
+    for (int h in handles) {
+      unloadResource(h);
+    }
+  }
+  
+  void batchDeregister(List<int> handles) {
+    for (int h in handles) {
+      deregisterResource(h);
     }
   }
 
