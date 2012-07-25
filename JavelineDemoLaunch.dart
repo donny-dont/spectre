@@ -90,7 +90,24 @@ class JavelineDemoLaunch {
     d.nodes.add(pe);
     resourceManager.children.forEach((name, resource) {
       DivElement resourceDiv = new DivElement();
-      resourceDiv.innerHTML = '${name}';
+      DivElement resourceNameDiv = new DivElement();
+      DivElement resourceUnloadDiv = new DivElement();
+      DivElement resourceLoadDiv = new DivElement();
+      resourceNameDiv.innerHTML = '${name}';
+      resourceLoadDiv.innerHTML = 'Load';
+      resourceLoadDiv.on.click.add((Event event) {
+        resourceManager.loadResource(resource);
+      });
+      resourceUnloadDiv.innerHTML = 'Unload';
+      resourceUnloadDiv.on.click.add((Event event) {
+        resourceManager.unloadResource(resource);
+      });
+      resourceLoadDiv.classes.add('DemoButton');
+      resourceUnloadDiv.classes.add('DemoButton');
+      resourceDiv.nodes.add(resourceNameDiv);
+      resourceDiv.nodes.add(resourceLoadDiv);
+      resourceDiv.nodes.add(resourceUnloadDiv);
+      resourceDiv.classes.add('ResourceRow');
       d.nodes.add(resourceDiv);
     });
   }
@@ -148,23 +165,20 @@ class JavelineDemoLaunch {
     var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
     resourceManager.setBaseURL(baseUrl);
 
-    List loadedResources = [];
+    Future<int> debugPackLoaded = null;
     {
-      int debugLineVSResource = resourceManager.registerResource('/shaders/debug_line.vs');
-      int debugLineFSResource = resourceManager.registerResource('/shaders/debug_line.fs');
-      int debugSphereVSResource = resourceManager.registerResource('/shaders/debug_sphere.vs');
-      int debugSphereFSResource = resourceManager.registerResource('/shaders/debug_sphere.fs');
-      int sphereMeshResource = resourceManager.registerResource('/meshes/unitSphere.mesh');
-      loadedResources.add(resourceManager.loadResource(debugLineVSResource));
-      loadedResources.add(resourceManager.loadResource(debugLineFSResource));
-      loadedResources.add(resourceManager.loadResource(debugSphereVSResource));
-      loadedResources.add(resourceManager.loadResource(debugSphereFSResource));
-      loadedResources.add(resourceManager.loadResource(sphereMeshResource));
+      int debugPackResourceHandle = resourceManager.registerResource('/packs/debug.pack');
+      debugPackLoaded = resourceManager.loadResource(debugPackResourceHandle);
     }
-    Future allLoaded = Futures.wait(loadedResources);
     Completer<bool> inited = new Completer<bool>();
-    allLoaded.then((resourceList) {
-      debugDrawManager.init(device, resourceManager, resourceList[0], resourceList[1], resourceList[2], resourceList[3], resourceList[4]);
+    debugPackLoaded.then((resourceList) {
+      debugDrawManager.init(device,
+        resourceManager,
+        resourceManager.getResourceHandle('/shaders/debug_line.vs'),
+        resourceManager.getResourceHandle('/shaders/debug_line.fs'),
+        resourceManager.getResourceHandle('/shaders/debug_sphere.vs'),
+        resourceManager.getResourceHandle('/shaders/debug_sphere.fs'),
+        resourceManager.getResourceHandle('/meshes/unitSphere.mesh'));
       inited.complete(true);
     });
     return inited.future;
