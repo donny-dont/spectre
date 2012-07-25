@@ -96,6 +96,14 @@ class ShaderResourceLoader extends HttpResourceLoader {
   ShaderResource createResource(String url, ResourceManager rm) => new ShaderResource(url, rm);
 }
 
+class ShaderProgramResourceLoader extends HttpResourceLoader {
+  bool canLoad(String URL, String extension) {
+    return extension == 'sp';
+  }
+  
+  ShaderProgramResource createResource(String url, ResourceManager rm) => new ShaderProgramResource(url, rm);
+}
+
 class PackResourceLoader extends HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'pack';
@@ -121,6 +129,7 @@ class ResourceLoaders {
     _resourceLoaders.add(new ShaderResourceLoader());
     _resourceLoaders.add(new MeshResourceLoader());
     _resourceLoaders.add(new PackResourceLoader());
+    _resourceLoaders.add(new ShaderProgramResourceLoader());
   }
 
   ResourceLoader findResourceLoader(String URL) {

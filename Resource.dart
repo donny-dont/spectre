@@ -155,7 +155,6 @@ class ShaderResource extends ResourceBase {
       return;
     }
     source = result.data;
-    print('$_url $source');
     _fireUpdated();
     result.completer.complete(result.handle);
   }
@@ -179,11 +178,59 @@ class ShaderProgramResource extends ResourceBase {
     if (result.success == false) {
       return;
     }
-    _fireUpdated();
-    result.completer.complete(result.handle);
+    List<Future> futures = new List();
+    bool fetchedVertex = false;
+    bool fetchedFragment = false;
+    if (result.data is String) {
+      Map spdata = JSON.parse(result.data);
+      String inlineVertexShader = spdata['inlineVertexShader'];
+      String inlineFragmentShader = spdata['inlineFragmentShader'];
+      String fetchVertexShader = spdata['fetchVertexShader'];
+      String fetchFragmentShader = spdata['fetchFragmentShader'];
+      if (inlineVertexShader != null) {
+        vertexShaderSource = inlineVertexShader;
+      }
+      if (fetchVertexShader != null) {
+        fetchedVertex = true;
+        futures.add(new ShaderResourceLoader().load('${_rm._baseURL}${fetchVertexShader}'));
+      }
+      if (inlineFragmentShader != null) {
+        fragmentShaderSource = inlineFragmentShader;
+      }
+      if (fetchFragmentShader != null) {
+        fetchedFragment = true;
+        futures.add(new ShaderResourceLoader().load('${_rm._baseURL}${fetchFragmentShader}'));        
+      }
+    }
+    if (futures.length > 0) {
+      Future all = Futures.wait(futures);
+      all.then((results) {
+        int index = 0;
+        if (fetchedVertex) {
+          ResourceLoaderResult vsResult = results[index];
+          index++;
+          if (vsResult.success) {
+            vertexShaderSource = vsResult.data;
+          }
+        }
+        if (fetchedFragment) {
+          ResourceLoaderResult fsResult = results[index];
+          if (fsResult.success) {
+            fragmentShaderSource = fsResult.data;
+          }
+        }
+        _fireUpdated();
+        result.completer.complete(result.handle);
+      });  
+    } else {
+      _fireUpdated();
+      result.completer.complete(result.handle);
+    }
   }
 
   void unload() {
+    vertexShaderSource = null;
+    fragmentShaderSource = null;
     _fireUnloaded();
   }
 }
