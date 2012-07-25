@@ -292,11 +292,11 @@ class Interpreter {
             im.drawIndexed(indexCount, indexOffset);
           }
           break;
-        case Ops.DeregisterAndUnloadResources:
+        case Ops.DeregisterResources:
           skip = 2;
         {
           final List<int> handles = program[i+1];
-          rm.batchUnload(handles, true);
+          rm.batchDeregister(handles);
         }
         break;
         case Ops.DeleteDeviceChildren:

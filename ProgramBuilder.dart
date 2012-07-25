@@ -180,8 +180,8 @@ class ProgramBuilder {
     ops.add(indexOffset);
   }
 
-  void deregisterAndUnloadResources(List<int> handles) {
-    ops.add(Ops.DeregisterAndUnloadResources);
+  void deregisterResources(List<int> handles) {
+    ops.add(Ops.DeregisterResources);
     ops.add(handles);
   }
 

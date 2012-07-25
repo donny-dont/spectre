@@ -100,7 +100,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
 
       // Build shutdown program
       pb = new ProgramBuilder();
-      pb.deregisterAndUnloadResources([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource]);
+      pb.deregisterResources([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource]);
       pb.deleteDeviceChildren([il, rs, sampler, texture, cubeProgram, cubeVertexBuffer, cubeIndexBuffer, cubeVertexShader, cubeFragmentShader]);
       _shutdownProgram = pb.ops;
 

@@ -145,7 +145,7 @@ class Ops {
 
   /// Dergister and unload resources
   /// Arg0 - List of resource handles
-  static final int DeregisterAndUnloadResources = 0xD0;
+  static final int DeregisterResources = 0xD0;
 
   /// Delete device children
   /// Arg0 - List of device handles
