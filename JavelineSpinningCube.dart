@@ -86,8 +86,8 @@ class JavelineSpinningCube extends JavelineBaseDemo {
 
       {
         MeshResource cube = resourceManager.getResource(cubeMeshResource);
-        var elements = [InputLayoutHelper.inputElementDescriptionFromMesh('vPosition', 0, 'POSITION', cube),
-                        InputLayoutHelper.inputElementDescriptionFromMesh('vTexCoord', 0, 'TEXCOORD0', cube)];
+        var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
+                        InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vTexCoord', 0, 'TEXCOORD0'), cube)];
         il = device.createInputLayout('Cube Input Layout', elements, cubeProgram);
         cubeVertexBuffer = device.createVertexBuffer('Cube Vertex Buffer', {'usage': 'static', 'size': cube.vertexArray.byteLength});
         cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static', 'size': cube.indexArray.byteLength});
