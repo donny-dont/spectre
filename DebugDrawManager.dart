@@ -171,23 +171,22 @@ class _DebugDrawSphereManager {
   void _prepareForRender(ImmediateContext context, Float32Array cameraMatrix) {
     // Reset draw program
     _drawProgram.clear();
+    ProgramBuilder pb = new ProgramBuilder.append(_drawProgram);
+    pb.setShaderProgram(_sphereProgramHandle);
+    pb.setUniformMatrix4('cameraTransform', cameraMatrix);
+    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    pb.setIndexedMesh(_sphereIndexedMeshHandle);
+    pb.setInputLayout(_sphereInputLayout);
     for (final _DebugDrawSphere sphere in _spheres) {
-
+      pb.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
+      pb.setUniformVector4('debugSphereColor', sphere.sphereColor);
+      pb.drawIndexedMesh(_sphereIndexedMeshHandle);
     }
   }
 
   void _render(Device device, Float32Array cameraMatrix) {
-    for (final _DebugDrawSphere sphere in _spheres) {
-      device.immediateContext.setIndexBuffer(_sphereIndexBuffer);
-      device.immediateContext.setShaderProgram(_sphereProgramHandle);
-      device.immediateContext.setUniformMatrix4('cameraTransform', cameraMatrix);
-      device.immediateContext.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
-      device.immediateContext.setUniformVector4('debugSphereColor', sphere.sphereColor);
-      device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
-      device.immediateContext.setIndexedMesh(_sphereIndexedMeshHandle);
-      device.immediateContext.setInputLayout(_sphereInputLayout);
-      device.immediateContext.drawIndexedMesh(_sphereIndexedMeshHandle);
-    }
+    Interpreter interpreter = new Interpreter();
+    interpreter.run(_drawProgram, device, null, device.immediateContext);
   }
 
   void add(_DebugDrawSphere sphere) {
@@ -323,7 +322,7 @@ class DebugDrawManager {
     int sphereInputLayout;
     {
       MeshResource sphere = rm.getResource(sphereMeshResourceHandle);
-      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh('vPosition', 0, 'POSITION', sphere)];
+      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), sphere)];
       sphereInputLayout = device.createInputLayout('Debug Sphere Input', elements, _handles[_sphereShaderProgramHandleIndex]);
     }
 
