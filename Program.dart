@@ -74,7 +74,14 @@ class Ops {
   /// Arg1 - Map of options
   /// Arg2 - List to store handle in (can be null)
   static final int CreateIndexedMesh = 0x26;
-
+  /// Create a new input layout for a given indexed mesh resource and shader
+  /// Arg0 - Name of input layout
+  /// Arg1 - Handle of mesh resource
+  /// Arg2 - Handle of shader program resource
+  /// Arg3 - List of inputs descriptions (InputLayoutDescription)
+  /// Arg4 - List to store handle in (can be null)
+  static final int CreateInputLayoutForMeshResource = 0x27;
+  
   /// Compile a shader from a shader resource
   /// Arg0 - Handle to shader
   /// Arg1 - Handle to resource
@@ -118,11 +125,20 @@ class Ops {
   /// Arg0 - texture unit offset
   /// Arg1 - List of sampler handles
   static final int SetSamplers = 0xA9;
-
+  
+  /// Set the index buffer and vertex buffer units
+  /// Arg0 - Handle to indexed mesh
+  static final int SetIndexedMesh = 0xA10;
+  
   /// Set a uniform variable
   /// Arg0 - Uniform name
   /// Arg1 - Float32Array
   static final int SetUniformMatrix4 = 0xB0;
+  
+  /// Set a uniform variable
+  /// Arg0 - Uniform name
+  /// Arg1 - Float32Array
+  static final int SetUniformVector4 = 0xB1;
 
   /// Draw vertices
   /// Arg0 - Vertex Count

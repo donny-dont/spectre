@@ -89,6 +89,15 @@ class ProgramBuilder {
     ops.add(options);
     ops.add(output);
   }
+  
+  void createInputLayoutForMesh(String name, int meshResourceHandle, int shaderProgramHandle, List<InputLayoutDescription> inputs, List output) {
+    ops.add(Ops.CreateInputLayoutForMeshResource);
+    ops.add(name);
+    ops.add(meshResourceHandle);
+    ops.add(shaderProgramHandle);
+    ops.add(inputs);
+    ops.add(output);
+  }
 
   void compileShaderFromResource(int shaderHandle, int resourceHandle) {
     ops.add(Ops.CompileShaderFromResource);
@@ -161,7 +170,18 @@ class ProgramBuilder {
     ops.add(name);
     ops.add(buf);
   }
+  
+  void setUniformVector4(String name, Float32Array buf) {
+    ops.add(Ops.SetUniformVector4);
+    ops.add(name);
+    ops.add(buf);
+  }
 
+  void setIndexedMesh(int indexedMeshHandle) {
+    ops.add(Ops.SetIndexedMesh);
+    ops.add(indexedMeshHandle);
+  }
+  
   void draw(int vertexCount, int vertexOffset) {
     ops.add(Ops.Draw);
     ops.add(vertexCount);
@@ -178,6 +198,11 @@ class ProgramBuilder {
     ops.add(Ops.DrawIndexed);
     ops.add(numIndices);
     ops.add(indexOffset);
+  }
+  
+  void drawIndexedMesh(int indexedMeshHandle) {
+    ops.add(Ops.DrawIndexedMesh);
+    ops.add(indexedMeshHandle);
   }
 
   void deregisterResources(List<int> handles) {

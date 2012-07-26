@@ -20,8 +20,16 @@
 
 */
 
+class InputLayoutDescription {
+  String meshAttributeName;
+  int vertexBufferIndex;
+  String shaderAttributeName;
+  
+  InputLayoutDescription(this.shaderAttributeName, this.vertexBufferIndex, this.meshAttributeName);
+}
+
 class InputLayoutHelper {
-  static InputElementDescription inputElementDescriptionFromMesh(String vertexAttributeName, int vertexBufferSlot, String meshAttributeName, MeshResource mesh, [num meshIndex=0]) {
+  static InputElementDescription inputElementDescriptionFromMesh(InputLayoutDescription description, MeshResource mesh, [num meshIndex=0]) {
     if (mesh == null) {
       spectreLog.Info('mesh is null');
       return null;
@@ -32,9 +40,9 @@ class InputLayoutHelper {
     }
     Map innerMesh = mesh.meshData['meshes'][meshIndex];
     Map attributes = innerMesh['attributes'];
-    Map attribute = attributes[meshAttributeName];
+    Map attribute = attributes[description.meshAttributeName];
     if (attribute == null) {
-      spectreLog.Info('mesh is does not have $meshAttributeName');
+      spectreLog.Info('mesh is does not have ${description.meshAttributeName}');
       // mesh doesn't have this attribute
       return null;
     }
@@ -63,6 +71,6 @@ class InputLayoutHelper {
       spectreLog.Info('cant find format for $type $numElements');
       return null;
     }
-    return new InputElementDescription(vertexAttributeName, format, stride, vertexBufferSlot, offset);
+    return new InputElementDescription(description.shaderAttributeName, format, stride, description.vertexBufferIndex, offset);
   }
 }

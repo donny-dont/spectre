@@ -178,6 +178,25 @@ class Interpreter {
           im.compileShaderFromResource(shaderHandle, resourceHandle, rm);
         }
         break;
+        case Ops.CreateInputLayoutForMeshResource:
+          skip = 5;
+        {
+          final String name = program[i+1];
+          final int meshResourceHandle = getHandle(program[i+2]);
+          final int shaderProgramHandle = getHandle(program[i+3]);
+          final List<InputLayoutDescription> inputs = program[i+4];
+          final List output = program[i+5];
+          MeshResource mr = rm.getResource(meshResourceHandle);
+          List<InputElementDescription> elements = new List<InputElementDescription>(inputs.length);
+          for (int j = 0; j < inputs.length; j++) {
+            elements[j] = InputLayoutHelper.inputElementDescriptionFromMesh(inputs[j], mr);
+          }
+          int handle = device.createInputLayout(name, elements, shaderProgramHandle);
+          if (output != null) {
+            output.add(handle);
+          }
+        }
+        break;
         case Ops.LinkShaderProgram:
           skip = 4;
         {
@@ -260,12 +279,27 @@ class Interpreter {
           im.setSamplers(textureUnitOffset, handles);
         }
         break;
+        case Ops.SetIndexedMesh:
+          skip = 2;
+        {
+          final int indexedMeshHandle = program[i+1];
+          im.setIndexedMesh(indexedMeshHandle);
+        }
+        break;
         case Ops.SetUniformMatrix4:
           skip = 3;
           {
             final String name = program[i+1];
             final Float32Array buf = program[i+2];
             im.setUniformMatrix4(name, buf);
+          }
+          break;
+        case Ops.SetUniformVector4:
+          skip = 3;
+          {
+            final String name = program[i+1];
+            final Float32Array buf = program[i+2];
+            im.setUniformVector4(name, buf);
           }
           break;
         case Ops.Draw:
@@ -290,6 +324,13 @@ class Interpreter {
             final int indexCount = program[i+1];
             final int indexOffset = program[i+2];
             im.drawIndexed(indexCount, indexOffset);
+          }
+          break;
+        case Ops.DrawIndexedMesh:
+          skip = 2;
+          {
+            final int indexedMeshHandle = program[i+1];
+            im.drawIndexedMesh(indexedMeshHandle);
           }
           break;
         case Ops.DeregisterResources:
