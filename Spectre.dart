@@ -25,7 +25,7 @@
 #library('Spectre');
 #import('dart:html');
 #import('dart:json');
-#import('VectorMath/VectorMath.dart');
+#import('VectorMath/vector_math_html.dart');
 #source('Logger.dart');
 #source('Handle.dart');
 #source('HandleSystem.dart');

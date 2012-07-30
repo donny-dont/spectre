@@ -22,7 +22,7 @@
 
 #import('dart:html');
 #import('Spectre.dart');
-#import('VectorMath/VectorMath.dart');
+#import('VectorMath/vector_math_html.dart');
 #import('Javeline.dart');
 
 // Demos

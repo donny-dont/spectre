@@ -86,39 +86,3 @@ void buildPlaneVectors(final vec3 planeNormal, vec3 u, vec3 v) {
     v.z = a*k;
   }
 }
-
-vec4 unprojectSelf(vec4 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  return v;
-}
-
-vec4 unproject(vec4 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  vec4 o = v.copy();
-  return unprojectSelf(v, projection, view, x, y, w, h);
-}
-
-vec3 unprojectSelf3(vec3 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  return v;
-}
-
-vec3 unproject3(vec3 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  vec3 o = v.copy();
-  return unprojectSelf3(o, projection, view, x, y, w, h);
-}
-
-vec4 projectSelf(vec4 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  return v;
-}
-
-vec4 project(vec4 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  vec4 o = v.copy();
-  return unprojectSelf(v, projection, view, x, y, w, h);
-}
-
-vec3 projectSelf3(vec3 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  return v;
-}
-
-vec3 project3(vec3 v, mat4x4 projection, mat4x4 view, double x, double y, double w, double h) {
-  vec3 o = v.copy();
-  return unprojectSelf3(o, projection, view, x, y, w, h);
-}
