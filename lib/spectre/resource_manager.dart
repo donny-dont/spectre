@@ -75,6 +75,41 @@ class ResourceManager {
     return handle;
   }
 
+  int registerDynamicResource(ResourceBase resource, [int handle = Handle.BadHandle]) {
+    {
+      // Resource already exists
+      int existingHandle = getResourceHandle(resource.url);
+      if (existingHandle == Handle.BadHandle) {
+        return existingHandle;
+      }
+    }
+    
+    if (handle != Handle.BadHandle) {
+      // Static handle
+      int r = _handleSystem.setStaticHandle(handle);
+      if (r != handle) {
+        spectreLog.Error('Registering a static handle $handle failed.');
+        return Handle.BadHandle;
+      }
+    } else {
+      // Dynamic handle
+      handle = _handleSystem.allocateHandle(ResourceType);
+      if (handle == Handle.BadHandle) {
+        spectreLog.Error('Registering dynamic handle failed.');
+        return Handle.BadHandle;
+      }
+    }
+    assert(_handleSystem.validHandle(handle));
+
+    int index = Handle.getIndex(handle);
+    // Nothing is at this index
+    assert(_resources[index] == null);
+    
+    _resources[index] = resource;
+    _urlToHandle[resource.url] = handle;
+    return handle;
+  }
+  
   int registerResource(String url, [int handle = Handle.BadHandle]) {
     {
       // Resource already exists

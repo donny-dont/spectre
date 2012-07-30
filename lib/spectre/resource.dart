@@ -58,10 +58,17 @@ class ResourceBase {
     on = new ResourceEvents();
   }
 
-  abstract void load(ResourceLoaderResult result);
-  abstract void unload();
+  void load(ResourceLoaderResult result) {
+    _fireUpdated();
+  }
+  void unload() {
+    _fireUnloaded();
+  }
   void deregister() {
-    
+  }
+  
+  void notifyUpdate() {
+    _fireUpdated();
   }
 
   // Call after the data is updated
@@ -80,27 +87,40 @@ class ResourceBase {
 }
 
 class Float32ArrayResource extends ResourceBase {
-  Float32Array array;
+  Float32Array _array;
 
   Float32ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
+  Float32Array get array() => _array;
+  set array(Float32Array array) {
+    _array = array;
+    _fireUpdated();
+  }
+  
   void load(ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
 
   void unload() {
+    _array = null;
     _fireUnloaded();
   }
 }
 
 class Uint16ArrayResource extends ResourceBase {
-  Uint16Array array;
+  Uint16Array _array;
 
   Uint16ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
+  Uint16Array get array() => _array;
+  set array(Uint16Array array) {
+    _array = array;
+    _fireUpdated();
+  }
+  
   void load(ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
@@ -236,24 +256,26 @@ class ShaderProgramResource extends ResourceBase {
 }
 
 class ImageResource extends ResourceBase {
-  ImageElement image;
+  ImageElement _image;
 
   ImageResource(String url, ResourceManager rm) : super(url, rm) {
 
   }
+  
+  ImageElement get image() => _image;
 
   void load(ResourceLoaderResult result) {
     if (result.success == false) {
       return;
     }
-    image = result.data;
+    _image = result.data;
     _fireUpdated();
     result.completer.complete(result.handle);
   }
 
   void unload() {
     _fireUnloaded();
-    image = null;
+    _image = null;
   }
 }
 
@@ -296,5 +318,25 @@ class PackResource extends ResourceBase {
   
   void deregister() {
     _rm.batchDeregister(childResources);
+  }
+}
+
+class ProgramResource extends ResourceBase {
+  List _program;
+  ProgramResource(String url, ResourceManager rm) : super(url, rm) {
+    _program = null;
+  }
+  
+  set program(List program) {
+    _program = program;
+    _fireUpdated();
+  }
+  
+  void unload() {
+    _program = null;
+    _fireUnloaded();
+  }
+  
+  void deregister() {
   }
 }
