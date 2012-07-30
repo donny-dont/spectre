@@ -24,16 +24,17 @@
 class ImmediateContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
-  final int numVertexBuffers = 1;
-  final int numTextures = 1;
-
+  static final int numVertexBuffers = 1;
+  static final int numTextures = 1;
+  
   Device _device;
   // Input Assembler
   int _primitiveTopology;
   int _indexBufferHandle;
   List<int> _vertexBufferHandles;
-  int _vertexAttributeArrayEnabledIndex;
+  List<int> _enabledVertexAttributeArrays;
   int _inputLayoutHandle;
+  int _preparedInputLayoutHandle;
   // VS and PS stages
   int _shaderProgramHandle;
   List<int> _samplerStateHandles;
@@ -65,9 +66,26 @@ class ImmediateContext {
       spectreLog.Error('Prepare for draw no input layout');
       return;
     }
-
+    
     InputLayout inputLayout = _device.getDeviceChild(_inputLayoutHandle);
-    // TODO: Need to disable unneeded vertex attribute arrays.
+    if (inputLayout == null) {
+      spectreLog.Error('Prepare for draw no input layout.');
+      return;
+    }
+    
+    if (_preparedInputLayoutHandle == _inputLayoutHandle) {
+      // Early out
+      return;
+    }
+    
+    _preparedInputLayoutHandle = _inputLayoutHandle;
+    
+    // Disable old arrays
+    for (int index in _enabledVertexAttributeArrays) {
+      _device.gl.disableVertexAttribArray(index);
+    }
+    _enabledVertexAttributeArrays.clear();
+    
 
     for (var element in inputLayout._elements) {
       VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
@@ -83,6 +101,8 @@ class ImmediateContext {
         element._attributeFormat.normalized,
         element._attributeStride,
         element._vboOffset);
+      // Remember that this was enabled.
+      _enabledVertexAttributeArrays.add(element._attributeIndex);
       if (debug)
         _logVertexAttributes(element._attributeIndex);
       //_device.gl.bindBuffer(vb._target, null);
@@ -124,14 +144,14 @@ class ImmediateContext {
     _vertexBufferHandles = new List<int>(numVertexBuffers);
     _samplerStateHandles = new List<int>(numTextures);
     _textureHandles = new List<int>(numTextures);
-    _vertexAttributeArrayEnabledIndex = 0;
+    _enabledVertexAttributeArrays = new List<int>();
   }
 
   /// Resets the cached GPU pipeline state
   void reset() {
-    // TODO: Update state
+    // TODO: Update GPU state
     _primitiveTopology = 0;
-    _vertexAttributeArrayEnabledIndex = 0;
+    _enabledVertexAttributeArrays.clear();
     _indexBufferHandle = 0;
     for (int i = 0; i < numVertexBuffers; i++) {
       _vertexBufferHandles[i] = 0;

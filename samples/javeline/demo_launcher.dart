@@ -21,14 +21,14 @@
 */
 
 #import('dart:html');
-#import('Spectre.dart');
-#import('VectorMath/vector_math_html.dart');
-#import('Javeline.dart');
+#import('../../external/DartVectorMath/lib/vector_math_html.dart');
+#import('../../lib/spectre.dart');
+#import('../../lib/javeline.dart');
 
 // Demos
-#source('JavelineEmptyDemo.dart');
-#source('JavelineDebugDrawTest.dart');
-#source('JavelineSpinningCube.dart');
+#source('demo_empty.dart');
+#source('demo_debug_draw.dart');
+#source('demo_spinning_cube.dart');
 
 class JavelineDemoDescription {
   String name;

@@ -20,34 +20,14 @@
 
 */
 
-class Uniform {
-  int _programIndex;
-  int _type;
-  String _name;
+#library('Javeline');
+#import('dart:html');
+#import('dart:json');
+#import('../external/DartVectorMath/lib/vector_math_html.dart');
+#import('spectre.dart');
 
-  /* Can't override operator= ?
-  Uniform operator=(Dynamic val) {
+#source('javeline/config.dart');
+#source('javeline/keyboard.dart');
+#source('javeline/mouse.dart');
+#source('javeline/base_demo.dart');
 
-  }
-  */
-
-  void set(Dynamic val) {
-    /*
-    if (val is mat2x2) {
-      ...
-    } else if (val is mat2x3) {
-      ...
-    } else if (val is Float32Array) {
-
-    }
-    */
-  }
-}
-
-class Material {
-  initialize(ShaderProgram, List<String> uniforms) {
-    // Gets new copies of uniform variables from shader program
-    // When shader program gets enabled, full state is set
-    // Each material applies the required subset to the shader program before rendering
-  }
-}

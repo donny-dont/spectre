@@ -25,25 +25,25 @@
 #library('Spectre');
 #import('dart:html');
 #import('dart:json');
-#import('VectorMath/vector_math_html.dart');
-#source('Logger.dart');
-#source('Handle.dart');
-#source('HandleSystem.dart');
-#source('DeviceChildren.dart');
-#source('Device.dart');
-#source('ImmediateContext.dart');
-#source('ResourceLoader.dart');
-#source('Resource.dart');
-#source('ResourceManager.dart');
-#source('Program.dart');
-#source('ProgramBuilder.dart');
-#source('Interpreter.dart');
+#import('../external/DartVectorMath/lib/vector_math_html.dart');
+#import('handle.dart');
 
-#source('Camera.dart');
-#source('CameraController.dart');
-#source('MouseKeyboardCameraController.dart');
-#source('InputLayoutHelper.dart');
-#source('DebugDrawManager.dart');
+#source('spectre/logger.dart');
+#source('spectre/device_children.dart');
+#source('spectre/device.dart');
+#source('spectre/immediate_context.dart');
+#source('spectre/resource_loader.dart');
+#source('spectre/resource.dart');
+#source('spectre/resource_manager.dart');
+#source('spectre/program.dart');
+#source('spectre/program_builder.dart');
+#source('spectre/interpreter.dart');
+#source('spectre/input_layout_helper.dart');
+#source('spectre/debug_draw_manager.dart');
+
+#source('spectre/camera.dart');
+#source('spectre/camera_controller.dart');
+#source('spectre/mouse_keyboard_camera_controller.dart');
 
 // We have a single logger
 Logger spectreLog;
