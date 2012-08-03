@@ -374,6 +374,21 @@ class ImmediateContext {
     }
     _device.gl.uniform4fv(index, vector);
   }
+  
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector3(String name, Float32Array vector) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform3fv(index, vector);
+  }
 
   void setUniformFloat4Array(String name, Float32Array array) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
