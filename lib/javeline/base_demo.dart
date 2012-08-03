@@ -31,8 +31,8 @@ class JavelineDemoStatus {
 
 
 class JavelineBaseDemo {
-  JavelineKeyboard _keyboard;
-  JavelineMouse _mouse;
+  JavelineKeyboard keyboard;
+  JavelineMouse mouse;
   num _time;
   num _oldTime;
   num _accumTime;
@@ -48,6 +48,16 @@ class JavelineBaseDemo {
   ResourceManager _resourceManager;
   DebugDrawManager _debugDrawManager;
 
+  mat4x4 projectionMatrix;
+  mat4x4 viewMatrix;
+  mat4x4 projectionViewMatrix;
+  mat4x4 normalMatrix;
+  
+  Float32Array projectionTransform;
+  Float32Array viewTransform;
+  Float32Array projectionViewTransform;
+  Float32Array normalTransform;
+  
   Device get device() => _device;
   ImmediateContext get immediateContext() => _immediateContext;
   DebugDrawManager get debugDrawManager() => _debugDrawManager;
@@ -59,8 +69,8 @@ class JavelineBaseDemo {
 
   Camera get camera() => _camera;
 
-  int width;
-  int height;
+  int viewportWidth;
+  int viewportHeight;
 
   JavelineBaseDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) {
     _device = device;
@@ -68,8 +78,8 @@ class JavelineBaseDemo {
     _resourceManager = resourceManager;
     _debugDrawManager = debugDrawManager;
 
-    _keyboard = new JavelineKeyboard();
-    _mouse = new JavelineMouse();
+    keyboard = new JavelineKeyboard();
+    mouse = new JavelineMouse();
     _camera = new Camera();
     _camera.eyePosition = JavelineConfigStorage.get('camera.eyePosition');
     _camera.lookAtPosition = JavelineConfigStorage.get('camera.lookAtPosition');
@@ -80,11 +90,19 @@ class JavelineBaseDemo {
     _accumTime = 0;
     _lastYaw = 0;
     _lastPitch = 0;
+    projectionMatrix = new mat4x4.zero();
+    viewMatrix = new mat4x4.zero();
+    projectionViewMatrix = new mat4x4.zero();
+    normalMatrix = new mat4x4.zero();
+    projectionTransform = new Float32Array(16);
+    viewTransform = new Float32Array(16);
+    projectionViewTransform = new Float32Array(16);
+    normalTransform = new Float32Array(16);
   }
 
   void resize(num elementWidth, num elementHeight) {
-    this.width = elementWidth;
-    this.height = elementHeight;
+    this.viewportWidth = elementWidth;
+    this.viewportHeight = elementHeight;
     Viewport vp = _device.getDeviceChild(_viewPort);
     if (vp == null) {
       return;
@@ -99,7 +117,7 @@ class JavelineBaseDemo {
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
     completer.complete(status);
     {
-      _viewPort = _device.createViewport('Default VP', {'x':0, 'y':0, 'width':width, 'height':height});
+      _viewPort = _device.createViewport('Default VP', {'x':0, 'y':0, 'width':viewportWidth, 'height':viewportHeight});
       _blendState = _device.createBlendState('Default BS', {});
       _depthState = _device.createDepthState('Default DS', {});
       _rasterizerState = _device.createRasterizerState('Default RS', {});
@@ -183,11 +201,23 @@ class JavelineBaseDemo {
   }
 
   void update(num time, num dt) {
-    _cameraController.forward = _keyboard.pressed(JavelineKeyCodes.KeyW);
-    _cameraController.backward = _keyboard.pressed(JavelineKeyCodes.KeyS);
-    _cameraController.strafeLeft = _keyboard.pressed(JavelineKeyCodes.KeyA);
-    _cameraController.strafeRight = _keyboard.pressed(JavelineKeyCodes.KeyD);
+    _cameraController.forward = keyboard.pressed(JavelineKeyCodes.KeyW);
+    _cameraController.backward = keyboard.pressed(JavelineKeyCodes.KeyS);
+    _cameraController.strafeLeft = keyboard.pressed(JavelineKeyCodes.KeyA);
+    _cameraController.strafeRight = keyboard.pressed(JavelineKeyCodes.KeyD);
     _cameraController.UpdateCamera(dt, _camera);
+    {
+      _camera.copyViewMatrix(viewMatrix);
+      _camera.copyProjectionMatrix(projectionMatrix);
+      _camera.copyProjectionMatrix(projectionViewMatrix);
+      projectionViewMatrix.selfMultiply(viewMatrix);
+      _camera.copyNormalMatrix(normalMatrix);
+      normalMatrix.setTranslation(new vec3(0.0, 0.0, 0.0));
+      projectionMatrix.copyIntoArray(projectionTransform);
+      viewMatrix.copyIntoArray(viewTransform);
+      projectionViewMatrix.copyIntoArray(projectionViewTransform);
+      normalMatrix.copyIntoArray(normalTransform);
+    }
     JavelineConfigStorage.set('camera.lookAtPosition', _camera.lookAtPosition);
     JavelineConfigStorage.set('camera.eyePosition', _camera.eyePosition);
     {
@@ -215,19 +245,19 @@ class JavelineBaseDemo {
   }
 
   void keyboardEventHandler(KeyboardEvent event, bool down) {
-    _keyboard.keyboardEvent(event, down);
+    keyboard.keyboardEvent(event, down);
   }
 
   void mouseMoveEventHandler(MouseEvent event) {
-    _mouse.mouseMoveEvent(event);
-    if (_mouse.pressed(JavelineMouseButtonCodes.MouseButtonLeft)) {
+    mouse.mouseMoveEvent(event);
+    if (mouse.pressed(JavelineMouseButtonCodes.MouseButtonLeft)) {
       _cameraController.accumDX += event.webkitMovementX;
       _cameraController.accumDY += event.webkitMovementY;
     }
   }
 
   void mouseButtonEventHandler(MouseEvent event, bool down) {
-    _mouse.mouseButtonEvent(event, down);
+    mouse.mouseButtonEvent(event, down);
   }
 
   void _keyDownHandler(KeyboardEvent event) {
