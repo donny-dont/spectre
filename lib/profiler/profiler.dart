@@ -1,0 +1,46 @@
+class ProfilerEvent {
+  static final int Enter = 0x1;
+  static final int Exit = 0x2;
+  static final int FrameStart = 0x3;
+  static final int FrameEnd = 0x4;
+  int event;
+  String name;
+  int now;
+  
+  ProfilerEvent(this.event, this.name, this.now);
+}
+
+class Profiler {
+  static init() {
+    events = new Queue<ProfilerEvent>();
+    frameCounter = 0;
+  }
+  
+  static int frameCounter;
+  static Queue<ProfilerEvent> events;
+  
+  static enter(String name) {
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Enter, name, Clock.now());
+    events.add(event);
+  }
+  
+  static exit() {
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Exit, null, Clock.now());
+    events.add(event);
+  }
+  
+  static frameStart() {
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameStart, 'Frame $frameCounter', Clock.now());
+    events.add(event);
+  }
+  
+  static frameEnd() {
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameEnd, 'Frame $frameCounter', Clock.now());
+    events.add(event);
+    frameCounter++;
+  }
+  
+  static clear() {
+    events.clear();
+  }
+}
