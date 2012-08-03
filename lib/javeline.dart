@@ -25,6 +25,7 @@
 #import('dart:json');
 #import('../external/DartVectorMath/lib/vector_math_html.dart');
 #import('spectre.dart');
+#import('profiler.dart');
 
 #source('javeline/config.dart');
 #source('javeline/keyboard.dart');

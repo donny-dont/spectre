@@ -24,11 +24,15 @@
 #import('../../external/DartVectorMath/lib/vector_math_html.dart');
 #import('../../lib/spectre.dart');
 #import('../../lib/javeline.dart');
+#import('../../lib/profiler.dart');
+#import('../../lib/profiler_gui.dart');
+#import('hfluid.dart');
 
 // Demos
 #source('demo_empty.dart');
 #source('demo_debug_draw.dart');
 #source('demo_spinning_cube.dart');
+#source('demo_hfluid.dart');
 
 class JavelineDemoDescription {
   String name;
@@ -42,6 +46,7 @@ class JavelineDemoLaunch {
   Device device;
   ResourceManager resourceManager;
   DebugDrawManager debugDrawManager;
+  ProfilerTree tree;
 
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
@@ -54,6 +59,7 @@ class JavelineDemoLaunch {
   JavelineDemoLaunch() {
     _demo = null;
     demos = new List<JavelineDemoDescription>();
+    tree = new ProfilerTree();
   }
 
   void updateStatus(String message) {
@@ -184,6 +190,18 @@ class JavelineDemoLaunch {
     return inited.future;
   }
 
+  void refreshProfiler() {
+    final String divName = '#ProfilerRoot';
+    DivElement d = document.query(divName);
+    d.nodes.clear();
+    tree.resetStatistics();
+    tree.processEvents(Profiler.events);
+    Element gui = ProfilerTreeListGUI.buildTree(tree);
+    if (gui != null) {
+      d.nodes.add(gui);
+    }
+  }
+  
   void run() {
     updateStatus("Pick a demo: ");
     window.on.resize.add(resizeHandler);
@@ -194,11 +212,13 @@ class JavelineDemoLaunch {
       spectreLog.Info('Javeline Running');
       device.immediateContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
       device.immediateContext.clearDepthBuffer(1.0);
-      registerDemo('Empty Demo', () { return new JavelineEmptyDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Empty', () { return new JavelineEmptyDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
+      registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
+      window.setInterval(refreshProfiler, 1000);
     });
   }
 
@@ -231,6 +251,7 @@ class JavelineDemoLaunch {
 }
 
 void main() {
+  Profiler.init();
   JavelineConfigStorage.init();
   // Comment out the following line to keep defaults
   JavelineConfigStorage.load();
