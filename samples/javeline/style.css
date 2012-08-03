@@ -55,6 +55,14 @@
 	overflow:scroll;
 }
 
+#ProfilerRoot {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex: auto;
+	overflow:scroll;
+	background: #f0f;
+}
+
 .ResourceRow {
 display: -webkit-flex;
 	-webkit-flex-direction: row;
