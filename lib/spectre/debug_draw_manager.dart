@@ -20,17 +20,20 @@
 
 */
 
-class _DebugLine {
+class _DebugLine implements Hashable {
   vec3 positionStart;
   vec3 positionEnd;
   vec4 colorStart;
   vec4 colorEnd;
   num duration;
+  int hashCode() {
+    return positionStart.x.hashCode() ^ positionEnd.y.hashCode() ^ colorStart.z.hashCode();
+  }
 }
 
 class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
-  List<_DebugLine> _lines;
+  Set<_DebugLine> _lines;
 
   int _maxVertices;
   Float32Array _vboStorage;
@@ -41,7 +44,7 @@ class _DebugDrawLineManager {
 
   _DebugDrawLineManager(Device device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
-    _lines = new List<_DebugLine>();
+    _lines = new Set<_DebugLine>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
@@ -61,9 +64,7 @@ class _DebugDrawLineManager {
 
   void _prepareForRender(ImmediateContext context) {
     _vboUsed = 0;
-    for (int i = 0; i < _lines.length; i++) {
-      _DebugLine line = _lines[i];
-
+    for (_DebugLine line in _lines) {
       _vboStorage[_vboUsed] = line.positionStart.x;
       _vboUsed++;
       _vboStorage[_vboUsed] = line.positionStart.y;
@@ -103,15 +104,14 @@ class _DebugDrawLineManager {
   int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
 
   void update(num dt) {
-    for (int i = 0; i < _lines.length;) {
-      _DebugLine line = _lines[i];
+    Profiler.enter('update');
+    for (_DebugLine line in _lines) {
       line.duration -= dt;
       if (line.duration < 0.0) {
-        _lines.removeRange(i, 1);
-        continue;
+        _lines.remove(line);
       }
-      i++;
     }
+    Profiler.exit();
   }
 }
 
@@ -559,14 +559,17 @@ class DebugDrawManager {
 
   /// Prepare to render debug primitives
   void prepareForRender() {
+    Profiler.enter('DebugDrawManager.prepareForRender');
     _depthEnabledLines._prepareForRender(_context);
     _depthDisabledLines._prepareForRender(_context);
     _depthEnabledSpheres._prepareForRender(_context, _cameraMatrix);
     _depthDisabledSpheres._prepareForRender(_context, _cameraMatrix);
+    Profiler.exit();
   }
 
   /// Render debug primitives for [Camera] [cam]
   void render(Camera cam) {
+    Profiler.enter('DebugDrawManager.render');
     {
       mat4x4 pm = cam.projectionMatrix;
       mat4x4 la = cam.lookAtMatrix;
@@ -585,13 +588,26 @@ class DebugDrawManager {
     _device.immediateContext.setDepthState(_handles[_depthEnabledStateHandleIndex]);
     _depthEnabledSpheres._render(_device, _cameraMatrix);
     _depthDisabledSpheres._render(_device, _cameraMatrix);
+    Profiler.exit();
   }
 
   /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
-    _depthEnabledLines.update(seconds);
-    _depthDisabledLines.update(seconds);
+    Profiler.enter('DebugDrawManager.update');
+    
+    {
+      Profiler.enter('lines');
+      Profiler.enter('depth enabled');
+      _depthEnabledLines.update(seconds);
+      Profiler.exit();
+      Profiler.enter('depth disabled');
+      _depthDisabledLines.update(seconds);
+      Profiler.exit();
+      Profiler.exit();  
+    }
+    
     _depthEnabledSpheres.update(seconds);
     _depthDisabledSpheres.update(seconds);
+    Profiler.exit();
   }
 }

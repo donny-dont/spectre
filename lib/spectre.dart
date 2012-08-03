@@ -27,7 +27,7 @@
 #import('dart:json');
 #import('../external/DartVectorMath/lib/vector_math_html.dart');
 #import('handle.dart');
-
+#import('profiler.dart');
 #source('spectre/logger.dart');
 #source('spectre/device_children.dart');
 #source('spectre/device.dart');
