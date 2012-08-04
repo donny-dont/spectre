@@ -47,7 +47,29 @@ class InputElementDescription {
   InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
 }
 
+class _InputElementCheckerItem {
+  String name;
+  int vertexBufferSlot;
+  int vertexBufferOffset;
+  _InputElementCheckerItem(this.name, this.vertexBufferSlot, this.vertexBufferOffset);
+}
 
+class _InputElementChecker {
+  List<_InputElementCheckerItem> items;
+  _InputElementChecker() {
+    items = new List<_InputElementCheckerItem>();
+  }
+  
+  void add(InputElementDescription d) {
+    _InputElementCheckerItem item = new _InputElementCheckerItem(d.name, d.vertexBufferSlot, d.vertexBufferOffset);
+    for(_InputElementCheckerItem check in items) {
+      if (check.vertexBufferOffset == item.vertexBufferOffset && check.vertexBufferSlot == item.vertexBufferSlot) {
+        spectreLog.Warning('Input elements -  ${check.name} and ${item.name} - share same offset. This is likely an error.');
+      }
+    }
+    items.add(item);
+  }
+}
 
 /// Spectre GPU Device
 
@@ -492,8 +514,8 @@ class Device {
       return handle;
     }
 
-
-
+    _InputElementChecker checker = new _InputElementChecker();
+    
     InputLayout il = new InputLayout(name, this);
     _setChildObject(handle, il);
     il._createDeviceState();
@@ -505,7 +527,8 @@ class Device {
 
     il._maxAttributeIndex = -1;
     il._elements = new List<_InputLayoutElement>();
-    for (var e in elements) {
+    for (InputElementDescription e in elements) {
+      checker.add(e);
       var index = gl.getAttribLocation(sp._program, e.name);
       if (index == -1) {
         spectreLog.Warning('Can\'t find ${e.name} in ${sp.name}');
