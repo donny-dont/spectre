@@ -133,7 +133,7 @@ class HandleSystem {
     int handle = _handles[index];
     // Index points to next element, point it at ourselves
     handle = Handle.setIndex(handle, index);
-    print('Allocating index ${index}');
+    //print('Allocating index ${index}');
     // Update serial number
     handle = Handle.nextSerial(handle);
     // Update flags
