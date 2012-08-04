@@ -220,12 +220,20 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
       
     }
     if (keyboard.pressed(JavelineKeyCodes.KeyO)) {
-      _makeDrop(10, 0.2);
+      _makeDrop(10, 0.5);
     }
     
     Profiler.enter('fluid update');
     _fluid.update();
     _fluid.setReflectiveBoundaryAll();
+    _fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, 0.1);
+    //_fluid.setFlowBoundary(HeightFieldFluid.BoundarySouth, -0.05);
+    //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryNorth);
+    //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryWest);
+    //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundarySouth);
+    //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryEast);
+    //_fluid.setOpenBoundary(HeightFieldFluid.BoundaryEast);
+    //_fluid.setOpenBoundaryAll();
     Profiler.exit();
     
     Profiler.enter('fluid prepare to draw');

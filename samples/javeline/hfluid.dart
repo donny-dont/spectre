@@ -45,22 +45,39 @@ class HeightFieldFluid {
   num _dx;
   num _invDx;
   num _gravity;
-  num _velocityScale;
+  
+  
+  num _c;
+  num _c2;
+  num _h;
+  num _h2;
+  num _invH2;
+  num _maxSlope;
+  num _maxOffset;
+  num _velocityDampen;
+ 
   
   List<HeightFieldFluidColumn> columns;
   List<HeightFieldFluidColumn> _tempColumns;
   
   int columnIndex(int i, int j) => i + (columnsWide * j);
   
+  
   HeightFieldFluid(this.columnsWide, this.columnWidth) {
     final int numColumns = columnsWide * columnsWide;
-    _velocityScale = 0.90;
+    _velocityDampen = 0.99;
     _gravity = -10.0;
-    _dt = 1.0 / columnsWide;
+    _dt = 0.10;
     num domainSize = (numColumns)/2.0;
     _dx = domainSize / numColumns;
     _invDx = 1.0 / _dx;
-    
+    _h = columnWidth;
+    _h2 = _h * _h;
+    _invH2 = 1.0 / _h2;
+    _c = 3.0;
+    _c2 = _c * _c;
+    _maxSlope = 4.0;
+    _maxOffset = _maxSlope * _h;
     
     columns = new List<HeightFieldFluidColumn>(numColumns);
     _tempColumns = new List<HeightFieldFluidColumn>(numColumns);
@@ -246,7 +263,7 @@ class HeightFieldFluid {
         num dVelocityX = columns[index].height - columns[indexWest].height; 
         dVelocityX *= _gravity * _dt * _invDx;
         columns[index].velocityX += dVelocityX;
-        columns[index].velocityX *= _velocityScale;
+        columns[index].velocityX *= _velocityDampen;
       }
     }
     
@@ -258,19 +275,12 @@ class HeightFieldFluid {
         num dVelocityY = columns[index].height - columns[indexSouth].height;
         dVelocityY *= _gravity * _dt * _invDx;
         columns[index].velocityY += dVelocityY;
-        columns[index].velocityY *= _velocityScale;
+        columns[index].velocityY *= _velocityDampen;
       }
     }
   }
   
   void _simpleUpdate() {
-    num c = 3.0;
-    num c2 = c * c;
-    num h = columnWidth;
-    num h2 = h*h;
-    num invH2 = 1.0/h2;
-    num maxSlope = 4.0;
-    num maxOffset = maxSlope * h;
     for (int i = 1; i < columnsWide-1; i++) {
       for (int j = 1; j < columnsWide-1; j++) {
         final int index = columnIndex(i, j);
@@ -281,12 +291,15 @@ class HeightFieldFluid {
         num heightSum = columns[indexEast].height+columns[indexWest].height+columns[indexNorth].height+columns[indexSouth].height;
         heightSum = heightSum - 4 * columns[index].height;
         num offset = heightSum;
-        num f = c2 * heightSum * invH2;
+        num f = _c2 * heightSum * _invH2;
+        // v'
         columns[index].velocityX += f * _dt;
+        // scale
+        columns[index].velocityX *= _velocityDampen;
+        // u'
         _tempColumns[index].height = columns[index].height + columns[index].velocityX * _dt;
         
-        // scale
-        columns[index].velocityX *= 0.99;
+        
         
         // clamp
         /*
@@ -355,6 +368,87 @@ class HeightFieldFluid {
     _setReflectiveBoundaryEast();
     _setReflectiveBoundaryWest();
   }
+  
+  void _setFlowBoundaryNorth(num dh) {
+    for (int i = 0; i < columnsWide; i++) {
+      final int indexGhost = i + (columnsWide-1)*columnsWide;
+      final int indexVisible = indexGhost-columnsWide;
+      columns[indexGhost].height += dh;
+    }
+  }
+  
+  void _setFlowBoundaryEast(num dh) {
+    for (int j = 0; j < columnsWide; j++) {
+      int indexGhost = columnsWide-1 + j*columnsWide;
+      int indexVisible = indexGhost-1;
+      columns[indexGhost].height += dh;
+    }
+  }
+
+  void _setFlowBoundarySouth(num dh) {
+    for (int i = 0; i < columnsWide; i++) {
+      final int indexGhost = i;
+      final int indexVisible = indexGhost+columnsWide;
+      columns[indexGhost].height += dh;
+    }
+  }
+
+  void _setFlowBoundaryWest(num dh) {
+    for (int j = 0; j < columnsWide; j++) {
+      int indexGhost = j*columnsWide;
+      int indexVisible = indexGhost+1;
+      columns[indexGhost].height += dh;
+    }
+  }
+  
+  void setFlowBoundary(int boundaryLabel, num dh) {
+    if (boundaryLabel == BoundaryNorth) {
+      _setFlowBoundaryNorth(dh);
+    } else if (boundaryLabel == BoundaryEast) {
+      _setFlowBoundaryEast(dh);
+    } else if (boundaryLabel == BoundarySouth) {
+      _setFlowBoundarySouth(dh);
+    } else if (boundaryLabel == BoundaryWest) {
+      _setFlowBoundaryWest(dh);
+    }
+  }
+  
+  void _setOpenBoundaryNorth() {
+    num denom = 1.0 / (_h + _c * _dt);
+    for (int i = 0; i < columnsWide; i++) {
+      final int indexGhost = i + (columnsWide-1)*columnsWide;
+      final int indexVisible = indexGhost-columnsWide;
+      columns[indexGhost].height = (_c * _dt * columns[indexVisible].height + columns[indexGhost].height * _h) * denom;
+    }
+  }
+  
+  void _setOpenBoundaryEast() {
+    num denom = 1.0 / (_h + _c * _dt);
+    for (int j = 0; j < columnsWide; j++) {
+      int indexGhost = columnsWide-1 + j*columnsWide;
+      int indexVisible = indexGhost-1;
+      columns[indexGhost].height = (_c * _dt * columns[indexVisible].height + columns[indexGhost].height * _h) * denom;
+    }
+  }
+
+  void _setOpenBoundarySouth() {
+    num denom = 1.0 / (_h + _c * _dt);
+    for (int i = 0; i < columnsWide; i++) {
+      final int indexGhost = i;
+      final int indexVisible = indexGhost+columnsWide;
+      columns[indexGhost].height = (_c * _dt * columns[indexVisible].height + columns[indexGhost].height * _h) * denom;
+    }
+  }
+
+  void _setOpenBoundaryWest() {
+    num denom = 1.0 / (_h + _c * _dt);
+    for (int j = 0; j < columnsWide; j++) {
+      int indexGhost = j*columnsWide;
+      int indexVisible = indexGhost+1;
+      columns[indexGhost].height = (_c * _dt * columns[indexVisible].height + columns[indexGhost].height * _h) * denom;
+    }
+  }
+  
   void setReflectiveBoundary(int boundaryLabel) {
     if (boundaryLabel == BoundaryNorth) {
       _setReflectiveBoundaryNorth();
@@ -364,6 +458,24 @@ class HeightFieldFluid {
       _setReflectiveBoundarySouth();
     } else if (boundaryLabel == BoundaryWest) {
       _setReflectiveBoundaryWest();
+    }
+  }
+  
+  void setOpenBoundaryAll() {
+    _setOpenBoundaryNorth();
+    _setOpenBoundaryEast();
+    _setOpenBoundarySouth();
+    _setOpenBoundaryWest();
+  }
+  void setOpenBoundary(int boundaryLabel) {
+    if (boundaryLabel == BoundaryNorth) {
+      _setOpenBoundaryNorth();
+    } else if (boundaryLabel == BoundaryEast) {
+      _setOpenBoundaryEast();
+    } else if (boundaryLabel == BoundarySouth) {
+      _setOpenBoundarySouth();
+    } else if (boundaryLabel == BoundaryWest) {
+      _setOpenBoundaryWest();
     }
   }
 }
