@@ -36,8 +36,8 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
   Float32Array _lightDirection;
   
   JavelineHFluidDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
-    _fluid = new HeightFieldFluid(20, 1.0);
-    _centerColumnIndex = _fluid.columnIndex(10, 10);
+    _fluid = new HeightFieldFluid(25, 1.0);
+    _centerColumnIndex = 12;
   }
   
   Future<JavelineDemoStatus> startup() {
@@ -216,17 +216,17 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
         
     if (keyboard.pressed(JavelineKeyCodes.KeyP)) {
-      _makeWave(2, 0.3);
+      _makeWave(1, 0.3);
       
     }
     if (keyboard.pressed(JavelineKeyCodes.KeyO)) {
-      _makeDrop(10, 0.5);
+      _makeDrop(_centerColumnIndex, 0.8);
     }
     
     Profiler.enter('fluid update');
     _fluid.update();
     _fluid.setReflectiveBoundaryAll();
-    _fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, 0.1);
+    //_fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, 0.1);
     //_fluid.setFlowBoundary(HeightFieldFluid.BoundarySouth, -0.05);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryNorth);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryWest);
@@ -237,8 +237,10 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
     
     Profiler.enter('fluid prepare to draw');
-    _buildFluidVertexData();
-    _updateFluidVertexData();
+    if (frameCounter % 20 == 0) {
+      _buildFluidVertexData();
+      _updateFluidVertexData();  
+    }
     Profiler.exit();
     
     { 
