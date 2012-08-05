@@ -25,21 +25,39 @@ typedef void ResourceEventCallback(int type, ResourceBase resource);
 class ResourceEvents {
   static final int TypeUpdate = 0x1;
   static final int TypeUnloaded = 0x2;
-  Set<ResourceEventCallback> update;
-  Set<ResourceEventCallback> unloaded;
+  Map<int, ResourceEventCallback> update;
+  Map<int, ResourceEventCallback> unloaded;
+  int _idCounter;
   ResourceEvents() {
-    update = new HashSet();
-    unloaded = new HashSet();
+    update = new HashMap();
+    unloaded = new HashMap();
+    _idCounter = 0;
   }
 
-  Set<ResourceEventCallback> getSetForType(int type) {
-    if (type == TypeUpdate) {
-      return update;
+  int addUpdate(ResourceEventCallback cb) {
+    _idCounter++;
+    if (_idCounter == 0) {
+      _idCounter++;
     }
-    if (type == TypeUnloaded) {
-      return unloaded;
+    update[_idCounter] = cb;
+    return _idCounter;
+  }
+  
+  void removeUpdate(int id) {
+    update.remove(id);
+  }
+  
+  int addUnloaded(ResourceEventCallback cb) {
+    _idCounter++;
+    if (_idCounter == 0) {
+      _idCounter++;
     }
-    return null;
+    unloaded[_idCounter] = cb;
+    return _idCounter;
+  }
+  
+  void removeUnloaded(int id) {
+    unloaded.remove(id);
   }
 }
 
@@ -61,6 +79,11 @@ class ResourceBase {
   void load(ResourceLoaderResult result) {
     _fireUpdated();
   }
+  
+  void update(Map state) {
+    _fireUpdated();
+  }
+  
   void unload() {
     _fireUnloaded();
   }
@@ -73,16 +96,16 @@ class ResourceBase {
 
   // Call after the data is updated
   void _fireUpdated() {
-    for (ResourceEventCallback reu in on.update) {
-      reu(ResourceEvents.TypeUpdate, this);
-    }
+    on.update.forEach((key, value) {
+      value(ResourceEvents.TypeUpdate, this);
+    });
   }
 
   // Call before the data is gone
   void _fireUnloaded() {
-    for (ResourceEventCallback reu in on.unloaded) {
-      reu(ResourceEvents.TypeUnloaded, this);
-    }
+    on.unloaded.forEach((key, value) {
+      value(ResourceEvents.TypeUpdate, this);
+    });
   }
 }
 
@@ -102,10 +125,24 @@ class Float32ArrayResource extends ResourceBase {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
+  
+  void update(Map state) {
+    Dynamic o;
+    o = state['array'];
+    if (o != null && o is Float32Array) {
+      _array = o;
+      _fireUpdated();
+    }
+    o = state['list'];
+    if (o != null && o is List<num>) {
+      _array = new Float32Array.fromList(o);
+      _fireUpdated();
+    }
+  }
 
   void unload() {
-    _array = null;
     _fireUnloaded();
+    _array = null;
   }
 }
 
@@ -178,6 +215,14 @@ class ShaderResource extends ResourceBase {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
+  
+  void update(Map state) {
+    Dynamic o = state['source'];
+    if (o != null && o is String) {
+      source = o;
+      _fireUpdated();
+    }
+  }
 
   void unload() {
     _fireUnloaded();
@@ -247,11 +292,23 @@ class ShaderProgramResource extends ResourceBase {
       result.completer.complete(result.handle);
     }
   }
+  
+  void update(Map state) {
+    Dynamic o = state['vertexShaderSource'];
+    if (o != null && o is String) {
+      vertexShaderSource = o;
+    }
+    o = state['fragmentShaderSource'];
+    if (o != null && o is String) {
+      fragmentShaderSource = o;
+    }
+    _fireUpdated();
+  }
 
   void unload() {
+    _fireUnloaded();
     vertexShaderSource = null;
     fragmentShaderSource = null;
-    _fireUnloaded();
   }
 }
 
@@ -271,6 +328,14 @@ class ImageResource extends ResourceBase {
     _image = result.data;
     _fireUpdated();
     result.completer.complete(result.handle);
+  }
+  
+  void update(Map state) {
+    Dynamic o = state['image'];
+    if (o != null && o is ImageElement) {
+      _image = o;
+      _fireUpdated();
+    }
   }
 
   void unload() {
@@ -332,9 +397,17 @@ class ProgramResource extends ResourceBase {
     _fireUpdated();
   }
   
+  void update(Map state) {
+    Dynamic o = state['program'];
+    if (o != null && o is List) {
+      _program = o;
+      _fireUpdated();  
+    }
+  }
+  
   void unload() {
-    _program = null;
     _fireUnloaded();
+    _program = null;
   }
   
   void deregister() {

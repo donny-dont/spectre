@@ -158,7 +158,7 @@ class ResourceManager {
       return true;
     }
     if (_handleSystem.validHandle(handle) == false) {
-      spectreLog.Warning('deregisterHandle - $handle is not a valid handle');
+      spectreLog.Warning('deregisterResource - $handle is not a valid handle');
       return false;
     }
     int index = Handle.getIndex(handle);
@@ -170,6 +170,28 @@ class ResourceManager {
     }
     _resources[index] = null;
     _handleSystem.freeHandle(handle);
+  }
+  
+  void updateResource(int handle, Dynamic state) {
+    if (handle == 0) {
+      return;
+    }
+    if (_handleSystem.validHandle(handle) == false) {
+      spectreLog.Warning('updateResource - $handle is not a valid handle');
+      return;
+    }
+    int index = Handle.getIndex(handle);
+    ResourceBase rb = _resources[index];
+    if (state is String) {
+      state = JSON.parse(state);
+    }
+    if (state is Map == false) {
+      spectreLog.Warning('updateResource - state is not a Map or a JSON string.');
+      return;
+    }
+    if (rb != null) {
+      rb.update(state);
+    }
   }
 
   /// Load the resource [handle]. Can be called again to reload.
@@ -222,19 +244,28 @@ class ResourceManager {
     }
   }
 
-  void addEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
+  int addEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
     ResourceBase rb = getResource(resourceHandle);
     if (rb == null) {
-      return;
+      return 0;
     }
-    rb.on.getSetForType(eventType).add(callback);
+    if (eventType == ResourceEvents.TypeUpdate) {
+      return rb.on.addUpdate(callback);
+    } else if (eventType == ResourceEvents.TypeUnloaded) {
+      return rb.on.addUnloaded(callback);
+    }
+    return 0;
   }
 
-  void removeEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
+  void removeEventCallback(int resourceHandle, int eventType, int id) {
     ResourceBase rb = getResource(resourceHandle);
     if (rb == null) {
       return;
     }
-    rb.on.getSetForType(eventType).remove(callback);
+    if (eventType == ResourceEvents.TypeUpdate) {
+      rb.on.removeUpdate(id);
+    } else if (eventType == ResourceEvents.TypeUnloaded) {
+      rb.on.removeUnloaded(id);
+    }
   }
 }
