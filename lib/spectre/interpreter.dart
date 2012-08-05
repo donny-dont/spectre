@@ -57,6 +57,9 @@ class Interpreter {
   }
 
   void run(List program, Device device, ResourceManager rm, ImmediateContext im) {
+    if (program == null) {
+      return;
+    }
     final int last = program.length;
     int i = 0;
     int skip = 0;
