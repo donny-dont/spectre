@@ -450,18 +450,41 @@ class ShaderProgram extends DeviceChild {
     _program = device.gl.createProgram();
   }
 
+  void _detach(int shaderHandle) {
+    Shader shader = device.getDeviceChild(shaderHandle);
+    if (shader != null) {
+      device.gl.detachShader(_program, shader._shader);
+    }
+  }
+  
+  void _attach(int shaderHandle) {
+    Shader shader = device.getDeviceChild(shaderHandle);
+    if (shader != null) {
+      device.gl.attachShader(_program, shader._shader);
+    }
+  }
+  
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
       o = props['VertexProgram'];
-      vertexShaderHandle = o != null ? o : vertexShaderHandle;
+      if (o != null && o is int) {
+        _detach(vertexShaderHandle);
+        vertexShaderHandle = o;
+        _attach(vertexShaderHandle);
+      }
+      
       o = props['FragmentProgram'];
-      fragmentShaderHandle = o != null ? o : fragmentShaderHandle;
+      if (o != null && o is int) {
+        _detach(fragmentShaderHandle);
+        fragmentShaderHandle = o;
+        _attach(fragmentShaderHandle);
+      }
+      
       VertexShader vertexShader = device.getDeviceChild(vertexShaderHandle);
       FragmentShader fragmentShader = device.getDeviceChild(fragmentShaderHandle);
       if (vertexShader != null && fragmentShader != null) {
-        device.gl.attachShader(_program, vertexShader._shader);
-        device.gl.attachShader(_program, fragmentShader._shader);
+        // relink
         link();
       }
     }
@@ -763,7 +786,6 @@ class SpectreBuffer extends DeviceChild {
   int _target;
   int _param_target;
   int _usage;
-  int _size;
 
   SpectreBuffer(String name, Device device) : super(name, device) {
     _buffer = null;
@@ -773,7 +795,6 @@ class SpectreBuffer extends DeviceChild {
     super._createDeviceState();
     _buffer = device.gl.createBuffer();
     _usage = WebGLRenderingContext.DYNAMIC_DRAW;
-    _size = 1;
   }
 
   void _configDeviceState(Dynamic props) {
@@ -798,16 +819,14 @@ class SpectreBuffer extends DeviceChild {
           break;
         }
       }
-      o = props['size'];
-      if (o != null && (o is int)) {
-        _size = o;
-      }
     }
 
+    /*
     WebGLBuffer oldBind = device.gl.getParameter(_param_target);
     device.gl.bindBuffer(_target, _buffer);
     device.gl.bufferData(_target, _size, _usage);
     device.gl.bindBuffer(_target, oldBind);
+    */
   }
 
   void _destroyDeviceState() {
