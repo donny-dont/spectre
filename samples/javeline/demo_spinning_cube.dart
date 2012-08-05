@@ -51,6 +51,9 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     _angle = 0.0;
   }
 
+  /*
+   * fix loading of input layout
+   */
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
 
@@ -63,49 +66,22 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     sampler = device.createSamplerState('Cube Texture Sampler', {});
     rs = device.createRasterizerState('Cube Rasterizer State', {'cullEnabled': true, 'cullMode': RasterizerState.CullBack, 'cullFrontFace': RasterizerState.FrontCCW});
     texture = device.createTexture2D('Cube Texture', { 'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGB, 'pixelFormat': Texture.PixelFormatUnsignedByte});
-
-
-    List loadedResources = [];
-    base.then((value) {
-      // Once the base is done, we load our resources
-      loadedResources.add(resourceManager.loadResource(cubeMeshResource));
-      loadedResources.add(resourceManager.loadResource(cubeVertexShaderResource));
-      loadedResources.add(resourceManager.loadResource(cubeFragmentShaderResource));
-      loadedResources.add(resourceManager.loadResource(cubeTextureResource));
-    });
-
-    Future allLoaded = Futures.wait(loadedResources);
-    Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
-    allLoaded.then((list) {
-      // After our resources are loaded, we build the scene
-      immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
-      immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
-      cubeProgram = device.createShaderProgram('Cube Program', { 'VertexProgram': cubeVertexShader, 'FragmentProgram': cubeFragmentShader});
-      immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
-      immediateContext.generateMipmap(texture);
-
-      {
-        MeshResource cube = resourceManager.getResource(cubeMeshResource);
-        var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
-                        InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vTexCoord', 0, 'TEXCOORD0'), cube)];
-        il = device.createInputLayout('Cube Input Layout', elements, cubeProgram);
-        cubeVertexBuffer = device.createVertexBuffer('Cube Vertex Buffer', {'usage': 'static', 'size': cube.vertexArray.byteLength});
-        cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static', 'size': cube.indexArray.byteLength});
-        cubeNumIndices = cube.numIndices;
-        immediateContext.updateBuffer(cubeVertexBuffer, cube.vertexArray);
-        immediateContext.updateBuffer(cubeIndexBuffer, cube.indexArray);
-      }
-
-      ProgramBuilder pb;
-
-      // Build shutdown program
-      pb = new ProgramBuilder();
-      pb.deregisterResources([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource]);
-      pb.deleteDeviceChildren([il, rs, sampler, texture, cubeProgram, cubeVertexBuffer, cubeIndexBuffer, cubeVertexShader, cubeFragmentShader]);
-      _shutdownProgram = pb.ops;
-
+    cubeVertexBuffer = device.createVertexBuffer('Cube Vertex Buffer', {'usage':'static'});
+    cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static'});
+    cubeProgram = device.createShaderProgram('Cube Program', {});
+    
+    resourceManager.addEventCallback(cubeMeshResource, ResourceEvents.TypeUpdate, (type, resource) {
+      MeshResource cube = resourceManager.getResource(cubeMeshResource);
+      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
+                      InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vTexCoord', 0, 'TEXCOORD0'), cube)];
+      il = device.createInputLayout('Cube Input Layout', elements, cubeProgram);
+      cubeNumIndices = cube.numIndices;
+      immediateContext.updateBuffer(cubeVertexBuffer, cube.vertexArray);
+      immediateContext.updateBuffer(cubeIndexBuffer, cube.indexArray);
+      resourceManager.loadResource(cubeTextureResource);
+      
       // Build frame program
-      pb = new ProgramBuilder();
+      ProgramBuilder pb = new ProgramBuilder();
       pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
       pb.setRasterizerState(rs);
       pb.setShaderProgram(cubeProgram);
@@ -118,15 +94,50 @@ class JavelineSpinningCube extends JavelineBaseDemo {
       pb.setVertexBuffers(0, [cubeVertexBuffer]);
       pb.drawIndexed(cubeNumIndices, 0);
       _frameProgram = pb.ops;
-
-      complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
     });
-
+    
+    resourceManager.addEventCallback(cubeTextureResource, ResourceEvents.TypeUpdate, (type, resource) {
+      immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
+      immediateContext.generateMipmap(texture);
+    });
+    
+    resourceManager.addEventCallback(cubeVertexShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
+      immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
+      device.configureDeviceChild(cubeProgram, { 'VertexProgram': cubeVertexShader });
+    });
+    
+    resourceManager.addEventCallback(cubeFragmentShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
+      immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
+      device.configureDeviceChild(cubeProgram, { 'FragmentProgram': cubeFragmentShader });
+    });
+    
+    resourceManager.loadResource(cubeVertexShaderResource);
+    resourceManager.loadResource(cubeFragmentShaderResource);
+    resourceManager.loadResource(cubeMeshResource);
+    
+    List loadedResources = [];
+    Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
+    base.then((value) {
+      // Once the base is done, we load our resources
+      
+      Future allLoaded = Futures.wait(loadedResources);
+      allLoaded.then((list) {
+        // After our resources are loaded, we build the scene
+        
+        complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
+      });
+    });
     return complete.future;
   }
 
   Future<JavelineDemoStatus> shutdown() {
     Interpreter interpreter = new Interpreter();
+    // Build shutdown program
+    ProgramBuilder pb = new ProgramBuilder();
+    pb.deregisterResources([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource]);
+    pb.deleteDeviceChildren([il, rs, sampler, texture, cubeProgram, cubeVertexBuffer, cubeIndexBuffer, cubeVertexShader, cubeFragmentShader]);
+    _shutdownProgram = pb.ops;
+
     interpreter.run(_shutdownProgram, device, resourceManager, immediateContext);
     Future<JavelineDemoStatus> base = super.shutdown();
     return base;
