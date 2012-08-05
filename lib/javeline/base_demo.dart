@@ -63,6 +63,8 @@ class JavelineBaseDemo {
   DebugDrawManager get debugDrawManager() => _debugDrawManager;
   ResourceManager get resourceManager() => _resourceManager;
 
+  int frameCounter;
+  
   bool _quit;
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
@@ -98,6 +100,7 @@ class JavelineBaseDemo {
     viewTransform = new Float32Array(16);
     projectionViewTransform = new Float32Array(16);
     normalTransform = new Float32Array(16);
+    frameCounter = 0;
   }
 
   void resize(num elementWidth, num elementHeight) {
@@ -201,6 +204,7 @@ class JavelineBaseDemo {
   }
 
   void update(num time, num dt) {
+
     _cameraController.forward = keyboard.pressed(JavelineKeyCodes.KeyW);
     _cameraController.backward = keyboard.pressed(JavelineKeyCodes.KeyS);
     _cameraController.strafeLeft = keyboard.pressed(JavelineKeyCodes.KeyA);
@@ -242,6 +246,8 @@ class JavelineBaseDemo {
     immediateContext.setDepthState(_depthState);
     immediateContext.setViewport(_viewPort);
     debugDrawManager.update(dt);
+    
+    frameCounter++;
   }
 
   void keyboardEventHandler(KeyboardEvent event, bool down) {
