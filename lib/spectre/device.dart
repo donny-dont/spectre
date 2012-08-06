@@ -507,44 +507,21 @@ class Device {
     return handle;
   }
 
-  /// Create an [InputLayout] named [name] for [elements] and [shaderProgramHandle]
-  int createInputLayout(String name, List<InputElementDescription> elements, int shaderProgramHandle, [int handle = Handle.BadHandle]) {
+  /// Create an [InputLayout] named [name]
+  ///
+  /// [props] is a JSONS tring or a [Map] containing a set of properties
+  /// describing the [InputLayout] being created. 
+  int createInputLayout(String name, Object props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, InputLayoutHandleType, handle);
     if (handle == Handle.BadHandle) {
       return handle;
     }
 
-    _InputElementChecker checker = new _InputElementChecker();
-    
+    props = _getPropertyMap(props);
     InputLayout il = new InputLayout(name, this);
     _setChildObject(handle, il);
     il._createDeviceState();
-
-    ShaderProgram sp = getDeviceChild(shaderProgramHandle);
-    if (sp == null) {
-      return handle;
-    }
-
-    il._maxAttributeIndex = -1;
-    il._elements = new List<_InputLayoutElement>();
-    for (InputElementDescription e in elements) {
-      checker.add(e);
-      var index = gl.getAttribLocation(sp._program, e.name);
-      if (index == -1) {
-        spectreLog.Warning('Can\'t find ${e.name} in ${sp.name}');
-        continue;
-      }
-      _InputLayoutElement el = new _InputLayoutElement();
-      el._attributeIndex = index;
-      if (index > il._maxAttributeIndex) {
-        il._maxAttributeIndex = index;
-      }
-      el._attributeFormat = e.format;
-      el._vboOffset = e.vertexBufferOffset;
-      el._vboSlot = e.vertexBufferSlot;
-      el._attributeStride = e.elementStride;
-      il._elements.add(el);
-    }
+    il._configDeviceState(props);
     return handle;
   }
 

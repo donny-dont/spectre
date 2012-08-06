@@ -194,7 +194,7 @@ class Interpreter {
           for (int j = 0; j < inputs.length; j++) {
             elements[j] = InputLayoutHelper.inputElementDescriptionFromMesh(inputs[j], mr);
           }
-          int handle = device.createInputLayout(name, elements, shaderProgramHandle);
+          int handle = device.createInputLayout(name, {'elements':elements, 'shaderProgram':shaderProgramHandle});
           if (output != null) {
             output.add(handle);
           }

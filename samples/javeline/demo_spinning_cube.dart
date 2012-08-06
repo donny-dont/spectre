@@ -57,75 +57,72 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
 
-    cubeMeshResource = resourceManager.registerResource('/meshes/TexturedCube.mesh');
-    cubeVertexShaderResource = resourceManager.registerResource('/shaders/simple_texture.vs');
-    cubeFragmentShaderResource = resourceManager.registerResource('/shaders/simple_texture.fs');
-    cubeTextureResource = resourceManager.registerResource('/textures/WoodPlank.jpg');
-    cubeVertexShader = device.createVertexShader('Cube Vertex Shader',{});
-    cubeFragmentShader = device.createFragmentShader('Cube Fragment Shader', {});
-    sampler = device.createSamplerState('Cube Texture Sampler', {});
-    rs = device.createRasterizerState('Cube Rasterizer State', {'cullEnabled': true, 'cullMode': RasterizerState.CullBack, 'cullFrontFace': RasterizerState.FrontCCW});
-    texture = device.createTexture2D('Cube Texture', { 'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGB, 'pixelFormat': Texture.PixelFormatUnsignedByte});
-    cubeVertexBuffer = device.createVertexBuffer('Cube Vertex Buffer', {'usage':'static'});
-    cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static'});
-    cubeProgram = device.createShaderProgram('Cube Program', {});
-    
-    resourceManager.addEventCallback(cubeMeshResource, ResourceEvents.TypeUpdate, (type, resource) {
-      MeshResource cube = resourceManager.getResource(cubeMeshResource);
-      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
-                      InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vTexCoord', 0, 'TEXCOORD0'), cube)];
-      il = device.createInputLayout('Cube Input Layout', elements, cubeProgram);
-      cubeNumIndices = cube.numIndices;
-      immediateContext.updateBuffer(cubeVertexBuffer, cube.vertexArray);
-      immediateContext.updateBuffer(cubeIndexBuffer, cube.indexArray);
-      resourceManager.loadResource(cubeTextureResource);
-      
-      // Build frame program
-      ProgramBuilder pb = new ProgramBuilder();
-      pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
-      pb.setRasterizerState(rs);
-      pb.setShaderProgram(cubeProgram);
-      pb.setUniformMatrix4('objectTransform', objectTransform);
-      pb.setUniformMatrix4('cameraTransform', cameraTransform);
-      pb.setTextures(0, [texture]);
-      pb.setSamplers(0, [sampler]);
-      pb.setInputLayout(il);
-      pb.setIndexBuffer(cubeIndexBuffer);
-      pb.setVertexBuffers(0, [cubeVertexBuffer]);
-      pb.drawIndexed(cubeNumIndices, 0);
-      _frameProgram = pb.ops;
-    });
-    
-    resourceManager.addEventCallback(cubeTextureResource, ResourceEvents.TypeUpdate, (type, resource) {
-      immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
-      immediateContext.generateMipmap(texture);
-    });
-    
-    resourceManager.addEventCallback(cubeVertexShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
-      immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
-      device.configureDeviceChild(cubeProgram, { 'VertexProgram': cubeVertexShader });
-    });
-    
-    resourceManager.addEventCallback(cubeFragmentShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
-      immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
-      device.configureDeviceChild(cubeProgram, { 'FragmentProgram': cubeFragmentShader });
-    });
-    
-    resourceManager.loadResource(cubeVertexShaderResource);
-    resourceManager.loadResource(cubeFragmentShaderResource);
-    resourceManager.loadResource(cubeMeshResource);
-    
-    List loadedResources = [];
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
     base.then((value) {
       // Once the base is done, we load our resources
-      
-      Future allLoaded = Futures.wait(loadedResources);
-      allLoaded.then((list) {
-        // After our resources are loaded, we build the scene
+      cubeMeshResource = resourceManager.registerResource('/meshes/TexturedCube.mesh');
+      cubeVertexShaderResource = resourceManager.registerResource('/shaders/simple_texture.vs');
+      cubeFragmentShaderResource = resourceManager.registerResource('/shaders/simple_texture.fs');
+      cubeTextureResource = resourceManager.registerResource('/textures/WoodPlank.jpg');
+      cubeVertexShader = device.createVertexShader('Cube Vertex Shader',{});
+      cubeFragmentShader = device.createFragmentShader('Cube Fragment Shader', {});
+      sampler = device.createSamplerState('Cube Texture Sampler', {});
+      rs = device.createRasterizerState('Cube Rasterizer State', {'cullEnabled': true, 'cullMode': RasterizerState.CullBack, 'cullFrontFace': RasterizerState.FrontCCW});
+      texture = device.createTexture2D('Cube Texture', { 'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGB, 'pixelFormat': Texture.PixelFormatUnsignedByte});
+      cubeVertexBuffer = device.createVertexBuffer('Cube Vertex Buffer', {'usage':'static'});
+      cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static'});
+      cubeProgram = device.createShaderProgram('Cube Program', {});
+      il = device.createInputLayout('Cube Input Layout', {});
+      resourceManager.addEventCallback(cubeMeshResource, ResourceEvents.TypeUpdate, (type, resource) {
+        MeshResource cube = resource;
+        var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
+                        InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vTexCoord', 0, 'TEXCOORD0'), cube)];
         
-        complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
+        device.configureDeviceChild(il, {'elements': elements});
+        device.configureDeviceChild(il, {'shaderProgram': cubeProgram});
+        
+        cubeNumIndices = cube.numIndices;
+        
+        immediateContext.updateBuffer(cubeVertexBuffer, cube.vertexArray);
+        immediateContext.updateBuffer(cubeIndexBuffer, cube.indexArray);
+        
+        // Build frame program
+        ProgramBuilder pb = new ProgramBuilder();
+        pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
+        pb.setRasterizerState(rs);
+        pb.setShaderProgram(cubeProgram);
+        pb.setUniformMatrix4('objectTransform', objectTransform);
+        pb.setUniformMatrix4('cameraTransform', cameraTransform);
+        pb.setTextures(0, [texture]);
+        pb.setSamplers(0, [sampler]);
+        pb.setInputLayout(il);
+        pb.setIndexBuffer(cubeIndexBuffer);
+        pb.setVertexBuffers(0, [cubeVertexBuffer]);
+        pb.drawIndexed(cubeNumIndices, 0);
+        _frameProgram = pb.ops;
       });
+      
+      resourceManager.addEventCallback(cubeTextureResource, ResourceEvents.TypeUpdate, (type, resource) {
+        immediateContext.updateTexture2DFromResource(texture, cubeTextureResource, resourceManager);
+        immediateContext.generateMipmap(texture);
+      });
+      
+      resourceManager.addEventCallback(cubeVertexShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
+        immediateContext.compileShaderFromResource(cubeVertexShader, cubeVertexShaderResource, resourceManager);
+        device.configureDeviceChild(cubeProgram, { 'VertexProgram': cubeVertexShader });
+      });
+      
+      resourceManager.addEventCallback(cubeFragmentShaderResource, ResourceEvents.TypeUpdate, (type, resource) {
+        immediateContext.compileShaderFromResource(cubeFragmentShader, cubeFragmentShaderResource, resourceManager);
+        device.configureDeviceChild(cubeProgram, { 'FragmentProgram': cubeFragmentShader });
+      });
+      
+      resourceManager.loadResource(cubeVertexShaderResource);
+      resourceManager.loadResource(cubeFragmentShaderResource);
+      resourceManager.loadResource(cubeMeshResource);
+      resourceManager.loadResource(cubeTextureResource);
+      
+      complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
     });
     return complete.future;
   }

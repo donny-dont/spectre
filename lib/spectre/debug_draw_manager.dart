@@ -50,7 +50,7 @@ class _DebugDrawLineManager {
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
     List inputElements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 7*4, 0, 0),
                           new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
-    _vboLayout = device.createInputLayout('$name Layout', inputElements, lineShaderHandle);
+    _vboLayout = device.createInputLayout('$name Layout', {'shaderProgram': lineShaderHandle, 'elements':inputElements});
   }
 
   bool hasRoomFor(int lineCount) {
@@ -323,7 +323,7 @@ class DebugDrawManager {
     {
       MeshResource sphere = rm.getResource(sphereMeshResourceHandle);
       var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), sphere)];
-      sphereInputLayout = device.createInputLayout('Debug Sphere Input', elements, _handles[_sphereShaderProgramHandleIndex]);
+      sphereInputLayout = device.createInputLayout('Debug Sphere Input', {'elements':elements, 'shaderProgram':_handles[_sphereShaderProgramHandleIndex]});
     }
 
     _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);

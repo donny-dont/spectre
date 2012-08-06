@@ -73,7 +73,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
       int vertexStride = 2*3*4;
       var elements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, vertexStride, 0, 0),
                       new InputElementDescription('vNormal', Device.DeviceFormatFloat3, vertexStride, 0, 12)];
-      _fluidInputLayoutHandle = device.createInputLayout('Fluid Input Layout', elements, _fluidShaderProgramHandle);
+      _fluidInputLayoutHandle = device.createInputLayout('Fluid Input Layout', {'elements':elements, 'shaderProgram':_fluidShaderProgramHandle});
       complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
     });
     return complete.future;
@@ -216,7 +216,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
         
     if (keyboard.pressed(JavelineKeyCodes.KeyP)) {
-      _makeWave(1, 0.3);
+      _makeWave(2, 0.3);
       
     }
     if (keyboard.pressed(JavelineKeyCodes.KeyO)) {
@@ -237,10 +237,10 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
     
     Profiler.enter('fluid prepare to draw');
-    if (frameCounter % 20 == 0) {
+    //if (frameCounter % 20 == 0) {
       _buildFluidVertexData();
       _updateFluidVertexData();  
-    }
+    //}
     Profiler.exit();
     
     { 

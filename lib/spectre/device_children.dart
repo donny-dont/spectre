@@ -37,15 +37,62 @@ class _InputLayoutElement {
 class InputLayout extends DeviceChild {
   int _maxAttributeIndex;
   List<_InputLayoutElement> _elements;
-
+  List<InputElementDescription> _elementDescription;
+  int _shaderProgramHandle;
+  
   InputLayout(String name, Device device) : super(name, device) {
     _maxAttributeIndex = 0;
     _elements = null;
+    _shaderProgramHandle = 0;
+    _elementDescription = null;
   }
 
   void _createDeviceState() {
   }
+  
+  void _bind() {
+    ShaderProgram sp = device.getDeviceChild(_shaderProgramHandle);
+    if (_elementDescription == null || _elementDescription.length <= 0 || sp == null) {
+      return;
+    }
+    
+    _InputElementChecker checker = new _InputElementChecker();
+    
+    _maxAttributeIndex = -1;
+    _elements = new List<_InputLayoutElement>();
+    for (InputElementDescription e in _elementDescription) {
+      checker.add(e);
+      var index = device.gl.getAttribLocation(sp._program, e.name);
+      if (index == -1) {
+        spectreLog.Warning('Can\'t find ${e.name} in ${sp.name}');
+        continue;
+      }
+      _InputLayoutElement el = new _InputLayoutElement();
+      el._attributeIndex = index;
+      if (index > _maxAttributeIndex) {
+        _maxAttributeIndex = index;
+      }
+      el._attributeFormat = e.format;
+      el._vboOffset = e.vertexBufferOffset;
+      el._vboSlot = e.vertexBufferSlot;
+      el._attributeStride = e.elementStride;
+      _elements.add(el);
+    }
+  }
+  
   void _configDeviceState(Dynamic props) {
+
+    Dynamic o;
+    
+    o = props['shaderProgram'];
+    if (o != null && o is int) {
+      _shaderProgramHandle = o;
+    }
+    o = props['elements'];
+    if (o != null && o is List) {
+      _elementDescription = o;
+    }
+    _bind();
   }
   void _destroyDeviceState() {
   }
