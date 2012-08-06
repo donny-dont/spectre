@@ -21,7 +21,7 @@
 */
 
 class ProfilerTreeListGUI {
-  static UListElement buildNode(ProfilerTreeNode node) {
+  static UListElement buildNode(ProfilerTreeNode node, int totalTicks) {
     UListElement list = new UListElement();
     for (ProfilerTreeNode child in node.children) {
       if (child.enterCount == 0) {
@@ -37,11 +37,13 @@ class ProfilerTreeListGUI {
         // determine microseconds
         inclusiveTime ~/= microsecondFrequency;
         exclusiveTime ~/= microsecondFrequency;
-        p.innerHTML = '${child.name} I: ${inclusiveTime} µs E: ${exclusiveTime} µs C: ${child.enterCount} calls';
+        int inclusivePercent = (child.inclusiveTicks * 100) ~/ node.inclusiveTicks;
+        int exclusivePercent = (child.exclusiveTicks * 100) ~/ totalTicks;
+        p.innerHTML = '${child.name} I: ${inclusiveTime} µs ${inclusivePercent} % E: ${exclusiveTime} µs ${exclusivePercent} %';
       }
       item.nodes.add(p);
       if (child.children.length > 0) {
-        item.nodes.add(buildNode(child));
+        item.nodes.add(buildNode(child, totalTicks));
       }
       list.nodes.add(item);
     }
@@ -52,9 +54,9 @@ class ProfilerTreeListGUI {
     UListElement root = new UListElement();
     LIElement item = new LIElement();
     ParagraphElement p = new ParagraphElement();
-    p.innerHTML = '<p>Root</p>';
+    p.innerHTML = '<p>Root ${tree.root.inclusiveTicks}</p>';
     item.nodes.add(p);
-    Element r = buildNode(tree.root);
+    Element r = buildNode(tree.root, tree.root.inclusiveTicks);
     if (r != null) {
       item.nodes.add(r);
     }

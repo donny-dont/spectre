@@ -65,9 +65,16 @@ class ProfilerTreeNode {
 }
 
 class ProfilerTree {
+  int _firstTime;
+  int _lastTime;
   ProfilerTree() {
     root = new ProfilerTreeNode(null, 'Root');
+    _firstTime = 0;
+    _lastTime = 0;
   }
+  
+  int get firstTime() => _firstTime;
+  int get lastTime() => _lastTime;
   
   ProfilerTreeNode root;
   
@@ -76,6 +83,8 @@ class ProfilerTree {
   }
   
   void resetStatistics() {
+    _firstTime = 0;
+    _lastTime = 0;
     root.resetStatistics();
   }
   
@@ -84,10 +93,15 @@ class ProfilerTree {
     while (events.length > 0) {
       ProfilerEvent event = events.first();
       events.removeFirst();
-      
+      if (_firstTime == 0) {
+        _firstTime = event.now;
+      }
+      if (event.now > _lastTime) {
+        _lastTime = event.now;
+      }
       if (event.event == ProfilerEvent.Exit) {
         int totalTime = event.now - enterTime;
-        node.inclusiveTicks += event.now - enterTime;
+        node.inclusiveTicks += totalTime;
         node.exclusiveTicks += totalTime - timeInChild;
         return event.now;
       }
@@ -105,5 +119,12 @@ class ProfilerTree {
   
   void processEvents(Queue<ProfilerEvent> events) {
     processEvent(events, root, 0);
+    int totalTime = _lastTime - _firstTime;
+    root.inclusiveTicks += totalTime;
+    int timeInChild = 0;
+    for (ProfilerTreeNode childNode in root.children) {
+      timeInChild += childNode.inclusiveTicks;
+    }
+    root.exclusiveTicks += totalTime - timeInChild;
   }
 }

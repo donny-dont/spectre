@@ -26,6 +26,7 @@
 #import('../../lib/javeline.dart');
 #import('../../lib/profiler.dart');
 #import('../../lib/profiler_gui.dart');
+#import('../../lib/profiler_client.dart');
 #import('hfluid.dart');
 
 // Demos
@@ -42,12 +43,21 @@ class JavelineDemoDescription {
 class JavelineDemoLaunch {
   JavelineBaseDemo _demo;
   List<JavelineDemoDescription> demos;
-
+  ProfilerClient profilerClient;
+  
   Device device;
   ResourceManager resourceManager;
   DebugDrawManager debugDrawManager;
   ProfilerTree tree;
 
+  void captured(String data) {
+    print('Captured - $data');
+  }
+  
+  void captureControl(int command) {
+    
+  }
+  
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -60,6 +70,8 @@ class JavelineDemoLaunch {
     _demo = null;
     demos = new List<JavelineDemoDescription>();
     tree = new ProfilerTree();
+    profilerClient = new ProfilerClient('Javeline', captured, captureControl, ProfilerClient.TypeUserApplication);
+    profilerClient.connect('ws://127.0.0.1:8087/');
   }
 
   void updateStatus(String message) {
