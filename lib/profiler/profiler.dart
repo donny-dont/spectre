@@ -8,6 +8,15 @@ class ProfilerEvent {
   int now;
   
   ProfilerEvent(this.event, this.name, this.now);
+  
+  Map serialize() {
+    var response = {
+                    'event':event,
+                    'name':name,
+                    'now':now,
+    };
+    return response;
+  }
 }
 
 class Profiler {
@@ -38,6 +47,14 @@ class Profiler {
     ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameEnd, 'Frame $frameCounter', Clock.now());
     events.add(event);
     frameCounter++;
+  }
+  
+  static List makeCapture() {
+    List<Map> capture = new List<Map>();
+    for (ProfilerEvent pe in events) {
+      capture.add(pe.serialize());
+    }
+    return capture;
   }
   
   static clear() {

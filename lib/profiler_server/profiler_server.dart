@@ -57,11 +57,14 @@ class ProfilerServer {
     clients.remove(client);
   }
   
-  void _dispatch(String name, String message) {
+  void _dispatch(String name, Map message) {
+    print('Finding $name to send message to');
     _ProfilerClient client = findClientWithName(name);
     if (client == null) {
       return;
     }
-    client.connection.send(message);
+    String messageString = JSON.stringify(message);
+    //print('Sending $messageString');
+    client.connection.send(messageString);
   }
 }

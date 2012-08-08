@@ -49,22 +49,23 @@ class _ProfilerClient implements Hashable {
   }
   
   void _onClosed(int status, String reason) {
-    print('closed');
+    print('closed $name');
     server._clientClose(this);
   }
   
   void _onError(e) {
-    print('error');
+    print('error $name - $e');
     server._clientClose(this);
   }
   
   void _onMessage(String messageString) {
-    print('$messageString');
+    //print('Got $messageString');
     Map message = JSON.parse(messageString);
     if (type == TypeUninitialized) {
       if (message['command'] == 'identity') {
         name = message['name'];
         type = message['type'];
+        print('client $name ($type)');
       }
       return;
     }
@@ -73,8 +74,7 @@ class _ProfilerClient implements Hashable {
       case 'deliverCapture':
       {
         String target = message['target'];
-        String payload = message['payload'];
-        server._dispatch(target, payload);
+        server._dispatch(target, message);
       }
       break;
       case 'startCapture':
@@ -84,7 +84,7 @@ class _ProfilerClient implements Hashable {
                        'command': 'startCapture',
                        'requester': name
         };
-        server._dispatch(target, JSON.stringify(request));
+        server._dispatch(target, request);
       }
       break;
       case 'stopCapture':
@@ -94,7 +94,7 @@ class _ProfilerClient implements Hashable {
                        'command': 'stopCapture',
                        'requester': name
         };
-        server._dispatch(target, JSON.stringify(request));
+        server._dispatch(target, request);
       }
       break;
     }

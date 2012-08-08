@@ -33,7 +33,7 @@
  	min-height: 100%;
 }
 
-#DemoPicker {
+#CommandBar {
 	display: -webkit-flex;
 }
 
@@ -41,37 +41,17 @@
 	display: -webkit-flex;
 }
 
-.DemoButton {
+.ButtonOn {
+	background: #333;
+}
+
+.ButtonOff {
+	.background: #fff;
+}
+
+.Button {
 	padding: 5px;
 	margin: 5px;
 	border-style: solid;
 	border-width: medium;
-}
-
-#ResourceManagerTable {
-	display: -webkit-flex;
-	-webkit-flex-direction: column;
-	-webkit-flex: auto;
-	overflow:scroll;
-}
-
-#ProfilerRoot {
-	display: -webkit-flex;
-	-webkit-flex-direction: column;
-	-webkit-flex: auto;
-	overflow:scroll;
-	background: #f0f;
-}
-
-.ResourceRow {
-display: -webkit-flex;
-	-webkit-flex-direction: row;
-	-webkit-flex: auto;
-}
-
-#DeviceChildTable {
-	display: -webkit-flex;
-	-webkit-flex-direction: column;
-	-webkit-flex: auto;
-	overflow:scroll;
 }

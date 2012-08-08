@@ -2,26 +2,25 @@
 
 <html>
   <head>
-    <title>Javeline Playground</title>
+    <title>Remote Profiler</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
     <div id="RootDiv">
     	<div id="StatusBar">
     		<div id="DartStatus">Dart is not running</div>
-    		<div id="DemoPicker"></div>
+    		<div id="CommandBar">
+    			<div id="StartCapture" class="Button">Start Capture</div>
+    			<div id="StopCapture" class="Button">Stop Capture</div>
+    			<div id="AutoCapture" class="Button ButtonOff">Auto Capture</div>
+    		</div>
     	</div>
-    	<div id="MainView">
-    		<canvas id="webGLFrontBuffer"></canvas>
+    	<div id="TimelineView">
 		</div>
-		<div id="ResourceTable">
-			<div id="ResourceManagerTable"></div>
-			<div id="DeviceChildTable"></div>
+		<div id="TableView">
 		</div>
-		<div id="ProfilerRoot"></div>
-    	<div id="SpectreLog"></div>
     </div>
-	<script type="application/dart" src="demo_launcher.dart"></script>
+	<script type="application/dart" src="remote_profiler.dart"></script>
     <script src="../../vendor/dart.js"></script>
   </body>
 </html>

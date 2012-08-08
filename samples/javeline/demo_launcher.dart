@@ -50,12 +50,20 @@ class JavelineDemoLaunch {
   DebugDrawManager debugDrawManager;
   ProfilerTree tree;
 
-  void captured(String data) {
-    print('Captured - $data');
+  void captured(List data) {
   }
   
-  void captureControl(int command) {
-    
+  void captureControl(int command, String requester) {
+    if (command == ProfilerClient.StartCapture) {
+      spectreLog.Info('$requester started capture');
+      Profiler.clear();
+    }
+    if (command == ProfilerClient.StopCapture) {
+      spectreLog.Info('$requester stopped capture');
+      List capture = Profiler.makeCapture();
+      //spectreLog.Info('$capture');
+      profilerClient.deliverCapture(requester, capture);
+    }
   }
   
   void registerDemo(String name, Function constructDemo) {
@@ -201,19 +209,6 @@ class JavelineDemoLaunch {
     });
     return inited.future;
   }
-
-  void refreshProfiler() {
-    final String divName = '#ProfilerRoot';
-    DivElement d = document.query(divName);
-    d.nodes.clear();
-    tree.resetStatistics();
-    tree.processEvents(Profiler.events);
-    Element gui = ProfilerTreeListGUI.buildTree(tree);
-    if (gui != null) {
-      d.nodes.add(gui);
-    }
-  }
-  
   void run() {
     updateStatus("Pick a demo: ");
     window.on.resize.add(resizeHandler);
@@ -230,7 +225,7 @@ class JavelineDemoLaunch {
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
-      window.setInterval(refreshProfiler, 1000);
+      
     });
   }
 

@@ -21,6 +21,6 @@
 */
 
 #library('profiler');
-
+#import('dart:json');
 #source('profiler/profiler.dart');
 #source('profiler/profiler_tree.dart');

@@ -1,6 +1,6 @@
 
-typedef void CaptureCallback(String data);
-typedef void CaptureControlCallback(int command);
+typedef void CaptureCallback(List events);
+typedef void CaptureControlCallback(int command, String requester);
 
 class ProfilerClient {
   static final int TypeUserApplication = 0x1;
@@ -28,7 +28,7 @@ class ProfilerClient {
   }
   
   void _onMessage(messageEvent) {
-    print('${messageEvent.data}');
+    //print('Got ${messageEvent.data}');
     Map message = JSON.parse(messageEvent.data);
     String command = message['command'];
     if (command == 'identify') {
@@ -38,6 +38,20 @@ class ProfilerClient {
                       'type':_type
       };
       socket.send(JSON.stringify(response));
+      return;
+    }
+    if (command == 'startCapture') {
+      _onCaptureControl(StartCapture, message['requester']);
+      return;
+    }
+    if (command == 'stopCapture') {
+      _onCaptureControl(StopCapture, message['requester']);
+      return;
+    }
+    if (command == 'deliverCapture') {
+      print('payload = ${message['payload']}');
+      _onCapture(message['payload']);
+      return;
     }
   }
   
@@ -47,6 +61,7 @@ class ProfilerClient {
   }
   
   void startCapture(String target) {
+    print('startCapture $target');
     var response = {
                     'command':'startCapture',
                     'target':target
@@ -55,6 +70,7 @@ class ProfilerClient {
   }
   
   void stopCapture(String target) {
+    print('stopCapture $target');
     var response = {
                     'command':'stopCapture',
                     'target':target
@@ -62,7 +78,8 @@ class ProfilerClient {
     socket.send(JSON.stringify(response));
   }
   
-  void deliverCapture(String target, String capture) {
+  void deliverCapture(String target, List capture) {
+    print('deliverCapture $target');
     var response = {
                     'command':'deliverCapture',
                     'target':target,
