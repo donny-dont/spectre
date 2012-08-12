@@ -52,19 +52,19 @@ class JavelineBaseDemo {
   mat4x4 viewMatrix;
   mat4x4 projectionViewMatrix;
   mat4x4 normalMatrix;
-  
+
   Float32Array projectionTransform;
   Float32Array viewTransform;
   Float32Array projectionViewTransform;
   Float32Array normalTransform;
-  
+
   Device get device() => _device;
   ImmediateContext get immediateContext() => _immediateContext;
   DebugDrawManager get debugDrawManager() => _debugDrawManager;
   ResourceManager get resourceManager() => _resourceManager;
 
   int frameCounter;
-  
+
   bool _quit;
   Camera _camera;
   MouseKeyboardCameraController _cameraController;
@@ -246,7 +246,7 @@ class JavelineBaseDemo {
     immediateContext.setDepthState(_depthState);
     immediateContext.setViewport(_viewPort);
     debugDrawManager.update(dt);
-    
+
     frameCounter++;
   }
 
@@ -256,7 +256,7 @@ class JavelineBaseDemo {
 
   void mouseMoveEventHandler(MouseEvent event) {
     mouse.mouseMoveEvent(event);
-    if (mouse.pressed(JavelineMouseButtonCodes.MouseButtonLeft)) {
+    if (mouse.locked) {
       _cameraController.accumDX += event.webkitMovementX;
       _cameraController.accumDY += event.webkitMovementY;
     }
