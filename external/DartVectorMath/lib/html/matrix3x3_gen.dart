@@ -527,7 +527,7 @@ class mat3x3 {
   mat3x3 copy() {
     return new mat3x3.copy(this);
   }
-  void copyIntoMatrix(mat3x3 arg) {
+  mat3x3 copyInto(mat3x3 arg) {
     arg.col0.x = col0.x;
     arg.col0.y = col0.y;
     arg.col0.z = col0.z;
@@ -537,8 +537,9 @@ class mat3x3 {
     arg.col2.x = col2.x;
     arg.col2.y = col2.y;
     arg.col2.z = col2.z;
+    return arg;
   }
-  void copyFromMatrix(mat3x3 arg) {
+  mat3x3 copyFrom(mat3x3 arg) {
     col0.x = arg.col0.x;
     col0.y = arg.col0.y;
     col0.z = arg.col0.z;
@@ -548,6 +549,7 @@ class mat3x3 {
     col2.x = arg.col2.x;
     col2.y = arg.col2.y;
     col2.z = arg.col2.z;
+    return this;
   }
   mat3x3 selfAdd(mat3x3 o) {
     col0.x = col0.x + o.col0.x;
@@ -749,5 +751,26 @@ class mat3x3 {
     i++;
     col2.z = array[i];
     i++;
+  }
+  vec3 get right() {
+    vec3 f = new vec3.zero();
+    f.x = col0.x;
+    f.y = col0.y;
+    f.z = col0.z;
+    return f;
+  }
+  vec3 get up() {
+    vec3 f = new vec3.zero();
+    f.x = col1.x;
+    f.y = col1.y;
+    f.z = col1.z;
+    return f;
+  }
+  vec3 get forward() {
+    vec3 f = new vec3.zero();
+    f.x = col2.x;
+    f.y = col2.y;
+    f.z = col2.z;
+    return f;
   }
 }

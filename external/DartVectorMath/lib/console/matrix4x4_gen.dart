@@ -463,9 +463,9 @@ class mat4x4 {
     }
     if (arg is vec3) {
       vec3 r = new vec3.zero();
-      r.x =  (this.col0.x * arg.x) + (this.col1.x * arg.y) + (this.col2.x * arg.z);
-      r.y =  (this.col0.y * arg.x) + (this.col1.y * arg.y) + (this.col2.y * arg.z);
-      r.z =  (this.col0.z * arg.x) + (this.col1.z * arg.y) + (this.col2.z * arg.z);
+      r.x =  (this.col0.x * arg.x) + (this.col1.x * arg.y) + (this.col2.x * arg.z) + col3.x;
+      r.y =  (this.col0.y * arg.x) + (this.col1.y * arg.y) + (this.col2.y * arg.z) + col3.y;
+      r.z =  (this.col0.z * arg.x) + (this.col1.z * arg.y) + (this.col2.z * arg.z) + col3.z;
       return r;
     }
     if (4 == arg.rows) {
@@ -855,7 +855,7 @@ class mat4x4 {
   mat4x4 copy() {
     return new mat4x4.copy(this);
   }
-  void copyIntoMatrix(mat4x4 arg) {
+  mat4x4 copyInto(mat4x4 arg) {
     arg.col0.x = col0.x;
     arg.col0.y = col0.y;
     arg.col0.z = col0.z;
@@ -872,8 +872,9 @@ class mat4x4 {
     arg.col3.y = col3.y;
     arg.col3.z = col3.z;
     arg.col3.w = col3.w;
+    return arg;
   }
-  void copyFromMatrix(mat4x4 arg) {
+  mat4x4 copyFrom(mat4x4 arg) {
     col0.x = arg.col0.x;
     col0.y = arg.col0.y;
     col0.z = arg.col0.z;
@@ -890,6 +891,7 @@ class mat4x4 {
     col3.y = arg.col3.y;
     col3.z = arg.col3.z;
     col3.w = arg.col3.w;
+    return this;
   }
   mat4x4 selfAdd(mat4x4 o) {
     col0.x = col0.x + o.col0.x;
@@ -1088,6 +1090,19 @@ class mat4x4 {
     col3.w =  (m30 * arg.col0.w) + (m31 * arg.col1.w) + (m32 * arg.col2.w) + (m33 * arg.col3.w);
     return this;
   }
+  vec3 rotateDirect3(vec3 arg) {
+    num x_ =  (this.col0.x * arg.x) + (this.col1.x * arg.y) + (this.col2.x * arg.z);
+    num y_ =  (this.col0.y * arg.x) + (this.col1.y * arg.y) + (this.col2.y * arg.z);
+    num z_ =  (this.col0.z * arg.x) + (this.col1.z * arg.y) + (this.col2.z * arg.z);
+    arg.x = x_;
+    arg.y = y_;
+    arg.z = z_;
+    return arg;
+  }
+  vec3 rotate3(vec3 arg) {
+    vec3 d = arg.copy();
+    return rotateDirect3(d);
+  }
   vec3 transformDirect3(vec3 arg) {
     num x_ =  (this.col0.x * arg.x) + (this.col1.x * arg.y) + (this.col2.x * arg.z) + col3.x;
     num y_ =  (this.col0.y * arg.x) + (this.col1.y * arg.y) + (this.col2.y * arg.z) + col3.y;
@@ -1225,5 +1240,26 @@ class mat4x4 {
     i++;
     col3.w = array[i];
     i++;
+  }
+  vec3 get right() {
+    vec3 f = new vec3.zero();
+    f.x = col0.x;
+    f.y = col0.y;
+    f.z = col0.z;
+    return f;
+  }
+  vec3 get up() {
+    vec3 f = new vec3.zero();
+    f.x = col1.x;
+    f.y = col1.y;
+    f.z = col1.z;
+    return f;
+  }
+  vec3 get forward() {
+    vec3 f = new vec3.zero();
+    f.x = col2.x;
+    f.y = col2.y;
+    f.z = col2.z;
+    return f;
   }
 }

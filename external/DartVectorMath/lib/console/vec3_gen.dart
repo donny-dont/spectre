@@ -83,6 +83,13 @@ class vec3 {
     z = array[i];
     i++;
   }
+  /// Splats a scalar into all lanes of the vector.
+  vec3 splat(num arg) {
+    x = arg;
+    y = arg;
+    z = arg;
+    return this;
+  }
   /// Returns a printable string
   String toString() => '$x,$y,$z';
   /// Returns a new vec3 from -this
@@ -233,6 +240,22 @@ class vec3 {
     z = arg.x;
     y = arg.y;
     x = arg.z;
+  }
+  /// Returns true if any component is infinite.
+  bool isInfinite() {
+    bool is_infinite = false;
+    is_infinite = is_infinite || x.isInfinite();
+    is_infinite = is_infinite || y.isInfinite();
+    is_infinite = is_infinite || z.isInfinite();
+    return is_infinite;
+  }
+  /// Returns true if any component is NaN.
+  bool isNaN() {
+    bool is_nan = false;
+    is_nan = is_nan || x.isNaN();
+    is_nan = is_nan || y.isNaN();
+    is_nan = is_nan || z.isNaN();
+    return is_nan;
   }
   set r(num arg) => x = arg;
   set g(num arg) => y = arg;
@@ -741,19 +764,33 @@ class vec3 {
     z = -z;
     return this;
   }
+  vec3 selfAbsolute() {
+    x = x.abs();
+    y = y.abs();
+    z = z.abs();
+    return this;
+  }
   vec3 copy() {
     vec3 c = new vec3.copy(this);
     return c;
   }
-  void copyIntoVector(vec3 arg) {
+  vec3 copyInto(vec3 arg) {
     arg.x = x;
     arg.y = y;
     arg.z = z;
+    return arg;
   }
-  void copyFromVector(vec3 arg) {
+  vec3 copyFrom(vec3 arg) {
     x = arg.x;
     y = arg.y;
     z = arg.z;
+    return this;
+  }
+  vec3 set(vec3 arg) {
+    x = arg.x;
+    y = arg.y;
+    z = arg.z;
+    return this;
   }
   /// Copies [this] into [array] starting at [offset].
   void copyIntoArray(Float32List array, [int offset=0]) {
