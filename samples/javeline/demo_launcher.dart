@@ -28,12 +28,14 @@
 #import('../../lib/profiler_gui.dart');
 #import('../../lib/profiler_client.dart');
 #import('hfluid.dart');
+#import('skybox.dart');
 
 // Demos
 #source('demo_empty.dart');
 #source('demo_debug_draw.dart');
 #source('demo_spinning_cube.dart');
 #source('demo_hfluid.dart');
+#source('demo_skybox.dart');
 
 class JavelineDemoDescription {
   String name;
@@ -239,6 +241,7 @@ class JavelineDemoLaunch {
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
     });
