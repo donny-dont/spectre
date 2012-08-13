@@ -24,9 +24,9 @@
 class ImmediateContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
-  static final int numVertexBuffers = 1;
-  static final int numTextures = 1;
-  
+  static final int numVertexBuffers = 2;
+  static final int numTextures = 2;
+
   Device _device;
   // Input Assembler
   int _primitiveTopology;
@@ -66,26 +66,26 @@ class ImmediateContext {
       spectreLog.Error('Prepare for draw no input layout');
       return;
     }
-    
+
     InputLayout inputLayout = _device.getDeviceChild(_inputLayoutHandle);
     if (inputLayout == null) {
       spectreLog.Error('Prepare for draw no input layout.');
       return;
     }
-    
+
     if (_preparedInputLayoutHandle == _inputLayoutHandle) {
       // Early out
       return;
     }
-    
+
     _preparedInputLayoutHandle = _inputLayoutHandle;
-    
+
     // Disable old arrays
     for (int index in _enabledVertexAttributeArrays) {
       _device.gl.disableVertexAttribArray(index);
     }
     _enabledVertexAttributeArrays.clear();
-    
+
 
     for (var element in inputLayout._elements) {
       VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
@@ -346,6 +346,36 @@ class ImmediateContext {
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformInt(String name, int i) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform1i(index, i);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformNum(String name, num i) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform1f(index, i);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {
@@ -374,7 +404,7 @@ class ImmediateContext {
     }
     _device.gl.uniform4fv(index, vector);
   }
-  
+
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector3(String name, Float32Array vector) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
