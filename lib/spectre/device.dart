@@ -156,6 +156,32 @@ class Device {
   static final int MaxDeviceChildren = 2048;
   static final int MaxStaticDeviceChildren = 512;
 
+  int _fallbackTextureID;
+
+  void _drawSquare(CanvasRenderingContext2D context, int x, int y, int w, int h) {
+    context.save();
+    context.beginPath();
+    context.translate(x, y);
+    context.fillStyle = "#656565";
+    context.fillRect(0, 0, w, h);
+    context.restore();
+  }
+  
+  void _drawGrid(CanvasRenderingContext2D context, int width, int height, int horizSlices, int vertSlices) {
+    int sliceWidth = width ~/ horizSlices;
+    int sliceHeight = height ~/ vertSlices;
+    int sliceHalfWidth = sliceWidth ~/ 2;
+    for (int i = 0; i < horizSlices; i++) {
+      for (int j = 0; j < vertSlices; j++) {
+        if (j % 2 == 0) {
+          _drawSquare(context, i * sliceWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+        } else {
+          _drawSquare(context, i * sliceWidth + sliceHalfWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+        }
+      }
+    }
+  }
+  
   /// Constructs a GPU device
   Device(WebGLRenderingContext gl) {
     _gl = gl;
@@ -163,6 +189,16 @@ class Device {
     _childrenObjects = new List(MaxDeviceChildren);
     _nameMapping = new Map<String, int>();
     _immediateContext = new ImmediateContext(this);
+    _fallbackTextureID = createTexture2D('Device.Fallback', {'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGBA, 'pixelFormat': Texture.PixelFormatUnsignedByte});
+    {
+      CanvasElement canvas = new CanvasElement();
+      canvas.width = 512;
+      canvas.height = 512;
+      CanvasRenderingContext2D context = canvas.getContext('2d');
+      _drawGrid(context, 512, 512, 8, 8);
+      configureDeviceChild(_fallbackTextureID, {'pixels': canvas});
+      immediateContext.generateMipmap(_fallbackTextureID);
+    }
   }
 
   /// Returns the handle to the device child named [name]
@@ -177,7 +213,7 @@ class Device {
   Map<String, int> get children() => _nameMapping;
 
   /// Lookup the actual device child object given the [handle]
-  Dynamic getDeviceChild(int handle) {
+  Dynamic getDeviceChild(int handle, [bool noFallback=false]) {
     if (handle == 0) {
       return null;
     }
@@ -186,6 +222,11 @@ class Device {
       return null;
     }
     int index = Handle.getIndex(handle);
+    if (noFallback == false && _childrenObjects[index].ready == false && _childrenObjects[index].fallback != 0) {
+      // Recurse
+      //print('Fetching fallback: ${_childrenObjects[index].fallback}');
+      return getDeviceChild(_childrenObjects[index].fallback);
+    }
     return _childrenObjects[index];
   }
 
@@ -365,6 +406,11 @@ class Device {
     _setChildObject(handle, tex);
     tex._createDeviceState();
     tex._configDeviceState(props);
+    if (_fallbackTextureID != null) {
+      // After the fallback texture is ready we mark all textures unready.
+      tex.ready = false;
+      tex.fallback = _fallbackTextureID;
+    }
     return handle;
   }
 

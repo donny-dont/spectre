@@ -86,7 +86,10 @@ class ImmediateContext {
     }
     _enabledVertexAttributeArrays.clear();
 
-
+    if (inputLayout._elements == null) {
+      return;
+    }
+    
     for (var element in inputLayout._elements) {
       VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
       if (vb == null) {
@@ -470,7 +473,10 @@ class ImmediateContext {
     if (ir == null) {
       return;
     }
-    Texture2D tex = _device.getDeviceChild(textureHandle);
+    Texture2D tex = _device.getDeviceChild(textureHandle, true);
+    if (tex == null) {
+      return;
+    }
     _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = _device.gl.getParameter(tex._target_param);
     _device.gl.bindTexture(tex._target, tex._buffer);
@@ -480,12 +486,16 @@ class ImmediateContext {
 
   /// Generate the full mipmap pyramid for [textureHandle]
   void generateMipmap(int textureHandle) {
-    Texture2D tex = _device.getDeviceChild(textureHandle);
+    Texture2D tex = _device.getDeviceChild(textureHandle, true);
+    if (tex == null) {
+      return;
+    }
     _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = _device.gl.getParameter(tex._target_param);
     _device.gl.bindTexture(tex._target, tex._buffer);
     _device.gl.generateMipmap(tex._target);
     _device.gl.bindTexture(tex._target, oldBind);
+    tex.ready = true;
   }
 
   void compileShader(int shaderHandle, String source) {
@@ -530,14 +540,14 @@ class ImmediateContext {
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
   void setTextures(int texUnitOffset, List<int> textureHandles) {
-    for (int i = texUnitOffset; i < numTextures; i++) {
+    for (int i = texUnitOffset; i < textureHandles.length; i++) {
       _textureHandles[i] = textureHandles[i-texUnitOffset];
     }
   }
 
   /// Sets a list of [samplerHandles] starting at [texUnitOffset]
   void setSamplers(int texUnitOffset, List<int> samplerHandles) {
-    for (int i = texUnitOffset; i < numTextures; i++) {
+    for (int i = texUnitOffset; i < samplerHandles.length; i++) {
       _samplerStateHandles[i] = samplerHandles[i-texUnitOffset];
     }
   }

@@ -1,15 +1,43 @@
 /// A resource created by a device
 /// All resources have a [name]
 class DeviceChild implements Hashable {
+  static final int StatusDirty = 0x1;
+  static final int StatusReady = 0x2;
+  
   String name;
   Device device;
-  bool dirty;
-
-  DeviceChild(this.name, this.device);
+  int _status;
+  int fallback;
+  
+  void set dirty(bool r) {
+    if (r) {
+      _status |= StatusDirty;
+    } else { 
+      _status &= ~StatusDirty;
+    }
+  }
+  bool get dirty() => (_status & StatusDirty) != 0;
+  void set ready(bool r) {
+    if (r) {
+      _status |= StatusReady;
+    } else { 
+      _status &= ~StatusReady;
+    }
+  }
+  bool get ready() => (_status & StatusReady) != 0;
+  
+  DeviceChild(this.name, this.device) {
+    _status = 0;
+    fallback = 0;
+    ready = true;
+    dirty = false;
+  }
 
   int hashCode() {
     return name.hashCode();
   }
+  
+  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
   }
@@ -706,18 +734,27 @@ class Texture2D extends Texture {
   void _configDeviceState(Dynamic props) {
     super._configDeviceState(props);
 
-    if (props != null) {
-      _width = props['width'] != null ? props['width'] : _width;
-      _height = props['height'] != null ? props['height'] : _height;
-      _textureFormat = props['textureFormat'] != null ? props['textureFormat'] : _textureFormat;
-      _pixelFormat = props['pixelFormat'] != null ? props['pixelFormat'] : _pixelFormat;
+    if (props != null && props['pixels'] != null) {
+      var pixels = props['pixels'];
+      if ((pixels is CanvasElement)) {
+        WebGLTexture oldBind = device.gl.getParameter(_target_param);
+        device.gl.bindTexture(_target, _buffer);
+        device.gl.texImage2D(WebGLRenderingContext.TEXTURE_2D, 0, _textureFormat, _textureFormat, _pixelFormat, pixels);
+        device.gl.bindTexture(_target, oldBind);
+      }
+    } else {
+      if (props != null) {
+        _width = props['width'] != null ? props['width'] : _width;
+        _height = props['height'] != null ? props['height'] : _height;
+        _textureFormat = props['textureFormat'] != null ? props['textureFormat'] : _textureFormat;
+        _pixelFormat = props['pixelFormat'] != null ? props['pixelFormat'] : _pixelFormat;
+      }
+      WebGLTexture oldBind = device.gl.getParameter(_target_param);
+      device.gl.bindTexture(_target, _buffer);
+      // Allocate memory for texture
+      device.gl.texImage2D(_target, 0, _textureFormat, _width, _height, 0, _textureFormat, _pixelFormat, null);
+      device.gl.bindTexture(_target, oldBind);
     }
-
-    WebGLTexture oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindTexture(_target, _buffer);
-    // Allocate memory for texture
-    device.gl.texImage2D(_target, 0, _textureFormat, _width, _height, 0, _textureFormat, _pixelFormat, null);
-    device.gl.bindTexture(_target, oldBind);
   }
 
   void _destroyDeviceState() {
@@ -813,9 +850,9 @@ class RenderTarget extends DeviceChild {
     } else {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
     }
-    int status = device.gl.checkFramebufferStatus(_target);
-    if (status != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = $status');
+    int fbStatus = device.gl.checkFramebufferStatus(_target);
+    if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
+      spectreLog.Error('RenderTarget $name incomplete status = fbStatus');
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
