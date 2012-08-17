@@ -11,17 +11,22 @@
 	text-align: center;
 }
 
-#MainView {
+#TimelineView {
 	background: #ccc;
-	display: -webkit-flex;
-	min-width: 853px;
-	width: 853px;
-	height: 480px;
-	min-height: 480px;
-	-webkit-flex: none;
-	-webkit-flex-direction: row;
-	-webkit-justify-content: space-around;
-	-webkit-align-self: center;
+}
+
+.TimelineLabel {
+	background: #fff;
+}
+
+.TimelineRanges {
+	background: #fff;
+}
+
+.TimelineRange {
+	background: #0f0;
+	position: relative;
+	float: left;
 }
 
 

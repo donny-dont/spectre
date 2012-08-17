@@ -49,7 +49,7 @@ class ProfilerClient {
       return;
     }
     if (command == 'deliverCapture') {
-      print('payload = ${message['payload']}');
+      print('payload = ${messageEvent.data}');
       _onCapture(message['payload']);
       return;
     }
