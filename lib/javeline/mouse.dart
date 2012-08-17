@@ -1,7 +1,7 @@
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
-  
+
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
   arising from the use of this software.
@@ -24,7 +24,7 @@ class JavelineMouseButtonCodes {
   static final int MouseButtonLeft = 0;
   static final int MouseButtonMid = 1;
   static final int MouseButtonRight = 2;
-  
+
   static final int NumMouseButtonCodes = 3;
 }
 
@@ -34,7 +34,8 @@ class JavelineMouse {
   int _accumDY;
   int _X;
   int _Y;
-  
+  bool locked;
+
   JavelineMouse() {
     _accumDX = 0;
     _accumDY = 0;
@@ -44,29 +45,30 @@ class JavelineMouse {
     for (int i = 0; i < JavelineMouseButtonCodes.NumMouseButtonCodes; i++) {
       _buttons[i] = false;
     }
+    locked = false;
   }
-  
+
   bool pressed(int mouseButtonCode) {
     return _buttons[mouseButtonCode];
   }
-  
+
   mouseButtonEvent(MouseEvent event, bool down) {
     _buttons[event.button] = down;
   }
-  
+
   mouseMoveEvent(MouseEvent event) {
     _accumDX += event.webkitMovementX;
     _accumDY += event.webkitMovementY;
     _X = event.screenX;
     _Y = event.screenY;
   }
-  
+
   int get accumulatedDX() => _accumDX;
   int get accumulatedDY() => _accumDY;
-  
+
   int get X() => _X;
   int get Y() => _Y;
-  
+
   void resetAccumulator() {
     _accumDX = 0;
     _accumDY = 0;

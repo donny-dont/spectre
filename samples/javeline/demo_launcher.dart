@@ -28,12 +28,14 @@
 #import('../../lib/profiler_gui.dart');
 #import('../../lib/profiler_client.dart');
 #import('hfluid.dart');
+#import('skybox.dart');
 
 // Demos
 #source('demo_empty.dart');
 #source('demo_debug_draw.dart');
 #source('demo_spinning_cube.dart');
 #source('demo_hfluid.dart');
+#source('demo_skybox.dart');
 
 class JavelineDemoDescription {
   String name;
@@ -44,15 +46,17 @@ class JavelineDemoLaunch {
   JavelineBaseDemo _demo;
   List<JavelineDemoDescription> demos;
   ProfilerClient profilerClient;
-  
+
   Device device;
   ResourceManager resourceManager;
   DebugDrawManager debugDrawManager;
   ProfilerTree tree;
 
+  bool isLocked;
+
   void captured(List data) {
   }
-  
+
   void captureControl(int command, String requester) {
     if (command == ProfilerClient.StartCapture) {
       spectreLog.Info('$requester started capture');
@@ -65,7 +69,7 @@ class JavelineDemoLaunch {
       profilerClient.deliverCapture(requester, capture);
     }
   }
-  
+
   void registerDemo(String name, Function constructDemo) {
     JavelineDemoDescription jdd = new JavelineDemoDescription();
     jdd.name = name;
@@ -74,12 +78,26 @@ class JavelineDemoLaunch {
     refreshDemoList('#DemoPicker');
   }
 
+  void webglClicked(Event ev) {
+    document.query('#webGLFrontBuffer').webkitRequestPointerLock();
+  }
+
+  void pointerLockChanged(Event ev) {
+    isLocked = document.query('#webGLFrontBuffer') == document.webkitPointerLockElement;
+    if (_demo != null) {
+      _demo.mouse.locked = isLocked;
+    }
+  }
+
   JavelineDemoLaunch() {
     _demo = null;
     demos = new List<JavelineDemoDescription>();
     tree = new ProfilerTree();
+    isLocked = false;
     profilerClient = new ProfilerClient('Javeline', captured, captureControl, ProfilerClient.TypeUserApplication);
     profilerClient.connect('ws://127.0.0.1:8087/');
+    document.on.pointerLockChange.add(pointerLockChanged);
+    document.query('#webGLFrontBuffer').on.click.add(webglClicked);
   }
 
   void updateStatus(String message) {
@@ -223,9 +241,9 @@ class JavelineDemoLaunch {
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
-      
     });
   }
 
@@ -250,6 +268,7 @@ class JavelineDemoLaunch {
         started.then((sv) {
           print('Running demo $name');
           updateSize();
+          _demo.mouse.locked = isLocked;
           _demo.run();
         });
       }

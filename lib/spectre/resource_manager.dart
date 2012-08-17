@@ -79,11 +79,11 @@ class ResourceManager {
     {
       // Resource already exists
       int existingHandle = getResourceHandle(resource.url);
-      if (existingHandle == Handle.BadHandle) {
+      if (existingHandle != Handle.BadHandle) {
         return existingHandle;
       }
     }
-    
+
     if (handle != Handle.BadHandle) {
       // Static handle
       int r = _handleSystem.setStaticHandle(handle);
@@ -104,12 +104,12 @@ class ResourceManager {
     int index = Handle.getIndex(handle);
     // Nothing is at this index
     assert(_resources[index] == null);
-    
+
     _resources[index] = resource;
     _urlToHandle[resource.url] = handle;
     return handle;
   }
-  
+
   int registerResource(String url, [int handle = Handle.BadHandle]) {
     {
       // Resource already exists
@@ -147,7 +147,7 @@ class ResourceManager {
     int index = Handle.getIndex(handle);
     // Nothing is at this index
     assert(_resources[index] == null);
-    
+
     _resources[index] = rb;
     _urlToHandle[url] = handle;
     return handle;
@@ -171,7 +171,7 @@ class ResourceManager {
     _resources[index] = null;
     _handleSystem.freeHandle(handle);
   }
-  
+
   void updateResource(int handle, Dynamic state) {
     if (handle == 0) {
       return;
@@ -237,7 +237,7 @@ class ResourceManager {
       unloadResource(h);
     }
   }
-  
+
   void batchDeregister(List<int> handles) {
     for (int h in handles) {
       deregisterResource(h);

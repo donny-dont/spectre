@@ -64,6 +64,12 @@ class vec2 {
     y = array[i];
     i++;
   }
+  /// Splats a scalar into all lanes of the vector.
+  vec2 splat(num arg) {
+    x = arg;
+    y = arg;
+    return this;
+  }
   /// Returns a printable string
   String toString() => '$x,$y';
   /// Returns a new vec2 from -this
@@ -137,6 +143,10 @@ class vec2 {
     sum += (y * other.y);
     return sum;
   }
+  /// Returns the cross product of [this] and [other]
+  num cross(vec2 other) {
+    return x * other.y - y * other.x;
+  }
   /// Returns the relative error between [this] and [correct]
   num relativeError(vec2 correct) {
     num this_norm = length;
@@ -158,6 +168,20 @@ class vec2 {
   set yx(vec2 arg) {
     y = arg.x;
     x = arg.y;
+  }
+  /// Returns true if any component is infinite.
+  bool isInfinite() {
+    bool is_infinite = false;
+    is_infinite = is_infinite || x.isInfinite();
+    is_infinite = is_infinite || y.isInfinite();
+    return is_infinite;
+  }
+  /// Returns true if any component is NaN.
+  bool isNaN() {
+    bool is_nan = false;
+    is_nan = is_nan || x.isNaN();
+    is_nan = is_nan || y.isNaN();
+    return is_nan;
   }
   set r(num arg) => x = arg;
   set g(num arg) => y = arg;
@@ -297,17 +321,29 @@ class vec2 {
     y = -y;
     return this;
   }
+  vec2 selfAbsolute() {
+    x = x.abs();
+    y = y.abs();
+    return this;
+  }
   vec2 copy() {
     vec2 c = new vec2.copy(this);
     return c;
   }
-  void copyIntoVector(vec2 arg) {
+  vec2 copyInto(vec2 arg) {
     arg.x = x;
     arg.y = y;
+    return arg;
   }
-  void copyFromVector(vec2 arg) {
+  vec2 copyFrom(vec2 arg) {
     x = arg.x;
     y = arg.y;
+    return this;
+  }
+  vec2 set(vec2 arg) {
+    x = arg.x;
+    y = arg.y;
+    return this;
   }
   /// Copies [this] into [array] starting at [offset].
   void copyIntoArray(Float32Array array, [int offset=0]) {

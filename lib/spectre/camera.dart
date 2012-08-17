@@ -85,25 +85,25 @@ class Camera {
 
   void copyProjectionMatrix(mat4x4 pm) {
     mat4x4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
-    m.copyIntoMatrix(pm);
+    m.copyInto(pm);
   }
 
   void copyViewMatrix(mat4x4 vm) {
     mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
-    m.copyIntoMatrix(vm);
+    m.copyInto(vm);
   }
 
   void copyNormalMatrix(mat4x4 nm) {
     mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
-    m.copyIntoMatrix(nm);
+    m.copyInto(nm);
   }
 
   void copyEyePosition(vec3 ep) {
-    eyePosition.copyIntoVector(ep);
+    eyePosition.copyInto(ep);
   }
 
   void copyLookAtPosition(vec3 lap) {
-    lookAtPosition.copyIntoVector(lap);
+    lookAtPosition.copyInto(lap);
   }
 
   vec3 get frontDirection() => lookAtPosition - eyePosition;

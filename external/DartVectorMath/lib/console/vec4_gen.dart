@@ -94,6 +94,14 @@ class vec4 {
     w = array[i];
     i++;
   }
+  /// Splats a scalar into all lanes of the vector.
+  vec4 splat(num arg) {
+    x = arg;
+    y = arg;
+    z = arg;
+    w = arg;
+    return this;
+  }
   /// Returns a printable string
   String toString() => '$x,$y,$z,$w';
   /// Returns a new vec4 from -this
@@ -504,6 +512,24 @@ class vec4 {
     z = arg.y;
     y = arg.z;
     x = arg.w;
+  }
+  /// Returns true if any component is infinite.
+  bool isInfinite() {
+    bool is_infinite = false;
+    is_infinite = is_infinite || x.isInfinite();
+    is_infinite = is_infinite || y.isInfinite();
+    is_infinite = is_infinite || z.isInfinite();
+    is_infinite = is_infinite || w.isInfinite();
+    return is_infinite;
+  }
+  /// Returns true if any component is NaN.
+  bool isNaN() {
+    bool is_nan = false;
+    is_nan = is_nan || x.isNaN();
+    is_nan = is_nan || y.isNaN();
+    is_nan = is_nan || z.isNaN();
+    is_nan = is_nan || w.isNaN();
+    return is_nan;
   }
   set r(num arg) => x = arg;
   set g(num arg) => y = arg;
@@ -2195,21 +2221,37 @@ class vec4 {
     w = -w;
     return this;
   }
+  vec4 selfAbsolute() {
+    x = x.abs();
+    y = y.abs();
+    z = z.abs();
+    w = w.abs();
+    return this;
+  }
   vec4 copy() {
     vec4 c = new vec4.copy(this);
     return c;
   }
-  void copyIntoVector(vec4 arg) {
+  vec4 copyInto(vec4 arg) {
     arg.x = x;
     arg.y = y;
     arg.z = z;
     arg.w = w;
+    return arg;
   }
-  void copyFromVector(vec4 arg) {
+  vec4 copyFrom(vec4 arg) {
     x = arg.x;
     y = arg.y;
     z = arg.z;
     w = arg.w;
+    return this;
+  }
+  vec4 set(vec4 arg) {
+    x = arg.x;
+    y = arg.y;
+    z = arg.z;
+    w = arg.w;
+    return this;
   }
   /// Copies [this] into [array] starting at [offset].
   void copyIntoArray(Float32List array, [int offset=0]) {
