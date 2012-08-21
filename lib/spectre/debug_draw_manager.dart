@@ -427,7 +427,7 @@ class DebugDrawManager {
   /// X,Y, and Z axes are colored Red,Green, and Blue
   ///
   /// Options: [duration] and [depthEnabled]
-  void addAxes(mat4x4 xform, num size, [num duration = 0.0, bool depthEnabled = true]) {
+  void addAxes(mat4 xform, num size, [num duration = 0.0, bool depthEnabled = true]) {
     vec4 origin = new vec4.raw(0.0, 0.0, 0.0, 1.0);
     num size_90p = 0.9 * size;
     num size_10p = 0.1 * size;
@@ -571,9 +571,9 @@ class DebugDrawManager {
   void render(Camera cam) {
     Profiler.enter('DebugDrawManager.render');
     {
-      mat4x4 pm = cam.projectionMatrix;
-      mat4x4 la = cam.lookAtMatrix;
-      pm.selfMultiply(la);
+      mat4 pm = cam.projectionMatrix;
+      mat4 la = cam.lookAtMatrix;
+      pm.multiply(la);
       pm.copyIntoArray(_cameraMatrix);
     }
     {

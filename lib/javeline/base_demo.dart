@@ -48,10 +48,10 @@ class JavelineBaseDemo {
   ResourceManager _resourceManager;
   DebugDrawManager _debugDrawManager;
 
-  mat4x4 projectionMatrix;
-  mat4x4 viewMatrix;
-  mat4x4 projectionViewMatrix;
-  mat4x4 normalMatrix;
+  mat4 projectionMatrix;
+  mat4 viewMatrix;
+  mat4 projectionViewMatrix;
+  mat4 normalMatrix;
 
   Float32Array projectionTransform;
   Float32Array viewTransform;
@@ -92,10 +92,10 @@ class JavelineBaseDemo {
     _accumTime = 0;
     _lastYaw = 0;
     _lastPitch = 0;
-    projectionMatrix = new mat4x4.zero();
-    viewMatrix = new mat4x4.zero();
-    projectionViewMatrix = new mat4x4.zero();
-    normalMatrix = new mat4x4.zero();
+    projectionMatrix = new mat4.zero();
+    viewMatrix = new mat4.zero();
+    projectionViewMatrix = new mat4.zero();
+    normalMatrix = new mat4.zero();
     projectionTransform = new Float32Array(16);
     viewTransform = new Float32Array(16);
     projectionViewTransform = new Float32Array(16);
@@ -214,7 +214,7 @@ class JavelineBaseDemo {
       _camera.copyViewMatrix(viewMatrix);
       _camera.copyProjectionMatrix(projectionMatrix);
       _camera.copyProjectionMatrix(projectionViewMatrix);
-      projectionViewMatrix.selfMultiply(viewMatrix);
+      projectionViewMatrix.multiply(viewMatrix);
       _camera.copyNormalMatrix(normalMatrix);
       normalMatrix.setTranslation(new vec3(0.0, 0.0, 0.0));
       projectionMatrix.copyIntoArray(projectionTransform);

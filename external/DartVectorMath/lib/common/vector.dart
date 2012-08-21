@@ -29,12 +29,12 @@ num dot(Dynamic x, Dynamic y) {
 
 /// Returns the length of vector [x]
 num length(Dynamic x) {
-  return x.length();
+  return x.length;
 }
 
 /// Returns the length squared of vector [x]
 num length2(Dynamic x) {
-  return x.length2();
+  return x.length2;
 }
 
 /// Returns the distance between vectors [x] and [y]. The dimension of [x] and [y] must match.
@@ -48,14 +48,25 @@ num distance2(Dynamic x, Dynamic y) {
 }
 
 /// Returns the cross product between [x] and [y]. [x] and [y] can be vec2, vec3 or num, but not all combinations are supported.
-Dynamic cross(Dynamic x, Dynamic y) {
-  if ((x is vec3 && y is vec3) ||
-      (x is vec2 && y is vec2)) {
+Dynamic cross(Dynamic x, Dynamic y, [Dynamic out=null]) {
+  if (x is vec3 && y is vec3) {
+    return x.cross(y, out);
+  } else if (x is vec2 && y is vec2) {
     return x.cross(y);
   } else if (x is num && y is vec2) {
-    return new vec2(-x * y.y, x * y.x);
+    if (out == null) {
+      out = new vec2.zero();
+    }
+    out.x = -x * y.y;
+    out.y = x * y.x;
+    return out;
   } else if (x is vec2 && y is num) {
-    return new vec2(y * x.y, -y * x.y);
+    if (out == null) {
+      out = new vec2.zero();
+    }
+    out.x = y * x.y;
+    out.y = -y * x.x;
+    return out;
   } else {
     assert(false);
   }
@@ -63,26 +74,35 @@ Dynamic cross(Dynamic x, Dynamic y) {
 }
 
 /// Returns [x] normalized. Supports [num], [vec2], [vec3], and [vec4] input types. The return type will match the type of [x]
-Dynamic normalize(Dynamic x) {
+Dynamic normalize(Dynamic x, [Dynamic out=null]) {
   if (x is num) {
     return 1.0 * sign(x);
   }
-  Dynamic r;
   if (x is vec2) {
-    r = new vec2(x);
-    r.normalize();
+    if (out == null) {
+      out = new vec2.copy(x);
+    }
+    out.normalize();
+    return out;
   }
   if (x is vec3) {
-    r = new vec3(x);
-    r.normalize();
+    if (out == null) {
+      out = new vec3.copy(x);
+    }
+    out.normalize();
+    return out;
   }
   if (x is vec4) {
-    r = new vec4(x);
-    r.normalize();
+    if (out == null) {
+      out = new vec4.copy(x);
+    }
+    out.normalize();
+    return out;
   }
-  return r;
+  return null;
 }
 
+/// Sets [u] and [v] to be two vectors orthogonal to each other and [planeNormal]
 void buildPlaneVectors(final vec3 planeNormal, vec3 u, vec3 v) {
   if (planeNormal.z.abs() > _ScalerHelpers._sqrtOneHalf) {
     // choose u in y-z plane

@@ -27,9 +27,9 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
   vec3 _unitX;
   vec3 _unitY;
   vec3 _unitZ;
-  mat4x4 _rotateX;
-  mat4x4 _rotateY;
-  mat4x4 _rotateZ;
+  mat4 _rotateX;
+  mat4 _rotateY;
+  mat4 _rotateZ;
   num _angle;
   num _scale;
   JavelineDebugDrawTest(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
@@ -46,9 +46,9 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
     _unitZ = new vec3(0.0, 0.0, 1.0);
     _angle = 0.0;
     _scale = 0.0;
-    _rotateX = new mat4x4.identity();
-    _rotateY = new mat4x4.identity();
-    _rotateZ = new mat4x4.identity();
+    _rotateX = new mat4.identity();
+    _rotateY = new mat4.identity();
+    _rotateZ = new mat4.identity();
   }
 
   Future<JavelineDemoStatus> startup() {
@@ -67,9 +67,9 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
 
     _angle += dt * 3.14159;
     _scale = (sin(_angle) + 1.0)/2.0;
-    _rotateX.setRotationAroundX(_angle);
-    _rotateY.setRotationAroundY(_angle);
-    _rotateZ.setRotationAroundZ(_angle);
+    _rotateX.rotationX(_angle);
+    _rotateY.rotationY(_angle);
+    _rotateZ.rotationZ(_angle);
 
     // Global Axis
     debugDrawManager.addLine(_origin, _unitX * 20.0, _colors['Red']);
@@ -78,12 +78,12 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
 
     // Rotating transformations
     {
-      mat4x4 T = null;
-      T = new mat4x4.translateRaw(5.0, 0.0, 0.0) * _rotateX;
+      mat4 T = null;
+      T = new mat4.translationRaw(5.0, 0.0, 0.0) * _rotateX;
       debugDrawManager.addAxes(T, 4.0);
-      T = new mat4x4.translateRaw(0.0, 5.0, 0.0) * _rotateY;
+      T = new mat4.translationRaw(0.0, 5.0, 0.0) * _rotateY;
       debugDrawManager.addAxes(T, 4.0);
-      T = new mat4x4.translateRaw(0.0, 0.0, 5.0) * _rotateZ;
+      T = new mat4.translationRaw(0.0, 0.0, 5.0) * _rotateZ;
       debugDrawManager.addAxes(T, 4.0);
     }
 

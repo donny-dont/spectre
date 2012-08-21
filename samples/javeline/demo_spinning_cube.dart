@@ -140,11 +140,11 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     return base;
   }
 
-  void drawCube(mat4x4 T) {
+  void drawCube(mat4 T) {
     {
-      mat4x4 pm = camera.projectionMatrix;
-      mat4x4 la = camera.lookAtMatrix;
-      pm.selfMultiply(la);
+      mat4 pm = camera.projectionMatrix;
+      mat4 la = camera.lookAtMatrix;
+      pm.multiply(la);
       pm.copyIntoArray(cameraTransform);
       T.copyIntoArray(objectTransform);
     }
@@ -158,7 +158,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     drawGrid(20);
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);
-    mat4x4 I = new mat4x4.rotationY(_angle);
+    mat4 I = new mat4.rotationY(_angle);
     drawCube(I);
   }
 }

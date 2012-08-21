@@ -128,13 +128,27 @@ class vec2 {
     return sum;
   }
   /// Normalizes this
-  void normalize() {
+  vec2 normalize() {
     num l = length;
     if (l == 0.0) {
-      return;
+      return this;
     }
     x /= l;
     y /= l;
+    return this;
+  }
+  /// Normalizes this returns new vector or optional [out]
+  vec2 normalized([vec2 out = null]) {
+    if (out == null) {
+      out = new vec2.raw(x, y);
+    }
+    num l = out.length;
+    if (l == 0.0) {
+      return out;
+    }
+    out.x /= l;
+    out.y /= l;
+    return out;
   }
   /// Returns the dot product of [this] and [other]
   num dot(vec2 other) {
@@ -143,7 +157,7 @@ class vec2 {
     sum += (y * other.y);
     return sum;
   }
-  /// Returns the cross product of [this] and [other]
+  /// Returns the cross product of [this] and [other], optionally pass in output storage [out]
   num cross(vec2 other) {
     return x * other.y - y * other.x;
   }
@@ -291,37 +305,37 @@ class vec2 {
   vec4 get ttst() => new vec4(t, t, s, t);
   vec4 get ttts() => new vec4(t, t, t, s);
   vec4 get tttt() => new vec4(t, t, t, t);
-  vec2 selfAdd(vec2 arg) {
+  vec2 add(vec2 arg) {
     x = x + arg.x;
     y = y + arg.y;
     return this;
   }
-  vec2 selfSub(vec2 arg) {
+  vec2 sub(vec2 arg) {
     x = x - arg.x;
     y = y - arg.y;
     return this;
   }
-  vec2 selfMul(vec2 arg) {
+  vec2 multiply(vec2 arg) {
     x = x * arg.x;
     y = y * arg.y;
     return this;
   }
-  vec2 selfDiv(vec2 arg) {
+  vec2 div(vec2 arg) {
     x = x / arg.x;
     y = y / arg.y;
     return this;
   }
-  vec2 selfScale(num arg) {
+  vec2 scale(num arg) {
     x = x * arg;
     y = y * arg;
     return this;
   }
-  vec2 selfNegate() {
+  vec2 negate_() {
     x = -x;
     y = -y;
     return this;
   }
-  vec2 selfAbsolute() {
+  vec2 absolute() {
     x = x.abs();
     y = y.abs();
     return this;

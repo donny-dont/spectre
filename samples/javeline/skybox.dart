@@ -425,9 +425,9 @@ class Skybox {
 
   void draw(Camera camera, num blendT) {
     {
-      mat4x4 T = camera.projectionMatrix;
-      mat4x4 L = makeLookAt(new vec3.zero(), camera.frontDirection, new vec3.raw(0.0, 1.0, 0.0));
-      T.selfMultiply(L);
+      mat4 T = camera.projectionMatrix;
+      mat4 L = makeLookAt(new vec3.zero(), camera.frontDirection, new vec3.raw(0.0, 1.0, 0.0));
+      T.multiply(L);
       T.copyIntoArray(_lookatMatrix);
     }
     device.immediateContext.setDepthState(_deviceHandles[_depthStateHandleIndex]);

@@ -92,9 +92,9 @@ class MouseKeyboardCameraController implements CameraController {
     frontDirection.normalize();
     vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
     vec3 strafeDirection = frontDirection.cross(upDirection);
-    strafeDirection.selfScale(scale);
-    cam.lookAtPosition.selfAdd(strafeDirection);
-    cam.eyePosition.selfAdd(strafeDirection);
+    strafeDirection.scale(scale);
+    cam.lookAtPosition.add(strafeDirection);
+    cam.eyePosition.add(strafeDirection);
   }
 
   void _MoveForward(num dt, bool positive, bool negative, Camera cam) {
@@ -113,9 +113,9 @@ class MouseKeyboardCameraController implements CameraController {
     vec3 frontDirection = cam.frontDirection;
     //print('$frontDirection');
     frontDirection.normalize();
-    frontDirection.selfScale(scale);
-    cam.lookAtPosition.selfAdd(frontDirection);
-    cam.eyePosition.selfAdd(frontDirection);
+    frontDirection.scale(scale);
+    cam.lookAtPosition.add(frontDirection);
+    cam.eyePosition.add(frontDirection);
   }
 
   void _RotateView(num dt, Camera cam) {
@@ -165,7 +165,7 @@ class MouseKeyboardCameraController implements CameraController {
     quat q = new quat(axis, delta_angle);
     vec3 frontDirection = cam.frontDirection;
     frontDirection.normalize();
-    q.rotateSelf(frontDirection);
+    q.rotate(frontDirection);
     frontDirection.normalize();
     cam.lookAtPosition = cam.eyePosition + frontDirection;
   }

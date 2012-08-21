@@ -60,41 +60,41 @@ class Camera {
     return d;
   }
 
-  mat4x4 get projectionMatrix() {
+  mat4 get projectionMatrix() {
     return makePerspective(FOV, aspectRatio, zNear, zFar);
   }
 
-  mat4x4 get lookAtMatrix() {
+  mat4 get lookAtMatrix() {
     return makeLookAt(eyePosition, lookAtPosition, upDirection);
   }
 
   void copyProjectionMatrixIntoArray(Float32Array pm) {
-    mat4x4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
+    mat4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
     m.copyIntoArray(pm);
   }
 
   void copyViewMatrixIntoArray(Float32Array vm) {
-    mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
     m.copyIntoArray(vm);
   }
 
   void copyNormalMatrixIntoArray(Float32Array nm) {
-    mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
     m.copyIntoArray(nm);
   }
 
-  void copyProjectionMatrix(mat4x4 pm) {
-    mat4x4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
+  void copyProjectionMatrix(mat4 pm) {
+    mat4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
     m.copyInto(pm);
   }
 
-  void copyViewMatrix(mat4x4 vm) {
-    mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+  void copyViewMatrix(mat4 vm) {
+    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
     m.copyInto(vm);
   }
 
-  void copyNormalMatrix(mat4x4 nm) {
-    mat4x4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+  void copyNormalMatrix(mat4 nm) {
+    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
     m.copyInto(nm);
   }
 
