@@ -29,22 +29,22 @@ class Profiler {
   static Queue<ProfilerEvent> events;
   
   static enter(String name) {
-    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Enter, name, Clock.now());
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Enter, name, 0);
     events.add(event);
   }
   
   static exit() {
-    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Exit, null, Clock.now());
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.Exit, null, 0);
     events.add(event);
   }
   
   static frameStart() {
-    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameStart, 'Frame $frameCounter', Clock.now());
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameStart, 'Frame $frameCounter', 0);
     events.add(event);
   }
   
   static frameEnd() {
-    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameEnd, 'Frame $frameCounter', Clock.now());
+    ProfilerEvent event = new ProfilerEvent(ProfilerEvent.FrameEnd, 'Frame $frameCounter', 0);
     events.add(event);
     frameCounter++;
   }
