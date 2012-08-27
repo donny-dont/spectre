@@ -190,13 +190,13 @@ class JavelineBaseDemo {
     vec3 z = new vec3.raw(0.0, 0.0, 1.0);
     vec4 color = new vec4.raw(0.0, 1.0, 0.0, 1.0);
 
-    for (int i = 0; i < gridLines; i++) {
+    for (int i = 0; i <= gridLines; i++) {
       vec3 start = o + (z * (i-midLine)) + (x * -midLine);
       vec3 end = o + (z * (i-midLine)) + (x * midLine);
       debugDrawManager.addLine(start, end, color);
     }
 
-    for (int i = 0; i < gridLines; i++) {
+    for (int i = 0; i <= gridLines; i++) {
       vec3 start = o + (x * (i-midLine)) + (z * -midLine);
       vec3 end = o + (x * (i-midLine)) + (z * midLine);
       debugDrawManager.addLine(start, end, color);
