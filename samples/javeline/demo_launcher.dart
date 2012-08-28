@@ -29,6 +29,7 @@
 #import('../../lib/profiler_client.dart');
 #import('hfluid.dart');
 #import('skybox.dart');
+#import('particle_system.dart');
 
 // Demos
 #source('demo_empty.dart');
@@ -36,6 +37,8 @@
 #source('demo_spinning_cube.dart');
 #source('demo_hfluid.dart');
 #source('demo_skybox.dart');
+#source('demo_cloth.dart');
+#source('demo_particles.dart');
 
 class JavelineDemoDescription {
   String name;
@@ -242,6 +245,8 @@ class JavelineDemoLaunch {
       registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Particles', () { return new JavelineParticlesDemo(device, resourceManager, debugDrawManager); });
       window.setInterval(refreshResourceManagerTable, 1000);
       window.setInterval(refreshDeviceManagerTable, 1000);
     });
