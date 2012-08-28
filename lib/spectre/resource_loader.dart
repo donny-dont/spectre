@@ -45,7 +45,7 @@ class ResourceLoader {
 
 class ImageResourceLoader extends ResourceLoader {
   bool canLoad(String URL, String extension) {
-    return extension == 'jpeg' || extension == 'jpg' || extension == 'png';
+    return extension == 'jpeg' || extension == 'jpg' || extension == 'png' || extension == 'gif';
   }
 
   Future<ResourceLoaderResult> load(String url) {
