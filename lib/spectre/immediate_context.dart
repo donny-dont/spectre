@@ -24,6 +24,7 @@
 class ImmediateContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
+  static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
   static final int numVertexBuffers = 2;
   static final int numTextures = 2;
 
@@ -262,6 +263,7 @@ class ImmediateContext {
       return;
     }
     _device.gl.enable(WebGLRenderingContext.BLEND);
+    //_device.gl.blendFunc(bs.blendSourceColorFunc, bs.blendDestColorFunc);
     _device.gl.blendFuncSeparate(bs.blendSourceColorFunc, bs.blendDestColorFunc, bs.blendSourceAlphaFunc, bs.blendDestAlphaFunc);
     _device.gl.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
     _device.gl.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
