@@ -110,8 +110,8 @@ class JavelineParticlesDemo extends JavelineBaseDemo {
   Future<JavelineDemoStatus> shutdown() {
     Future<JavelineDemoStatus> base = super.shutdown();
     _particlesVertexData = null;
-    resourceManager.batchDeregister([_particlesVSResourceHandle, _particlesVSResourceHandle, _particlePointSpriteResourceHandle]);
-    device.batchDeleteDeviceChildren([_particlesVBOHandle, _particlesShaderProgramHandle, _particlesVSHandle, _particlesFSHandle, _particlesInputLayoutHandle, _particlePointSpriteHandle, _particleDepthStateHandle, _particleBlendStateHandle]);
+    resourceManager.batchDeregister([_particlesVSResourceHandle, _particlesFSResourceHandle, _particlePointSpriteResourceHandle]);
+    device.batchDeleteDeviceChildren([_particlesVBOHandle, _particlesShaderProgramHandle, _particlesVSHandle, _particlesFSHandle, _particlesInputLayoutHandle, _particlePointSpriteHandle, _particleDepthStateHandle, _particleBlendStateHandle, _particlePointSpriteSamplerHandle]);
     return base;
   }
   

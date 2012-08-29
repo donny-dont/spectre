@@ -114,7 +114,7 @@ class JavelineClothDemo extends JavelineBaseDemo {
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
     
-    _particleIBHandle = device.createIndexBuffer('Cloth Index Buffer', {'usage':'stream', 'size':2*(_gridWidth-1)*(_gridWidth-1)*6});
+    _particleIBHandle = device.createIndexBuffer('Cloth Index Buffer', {'usage':'static', 'size':2*(_gridWidth-1)*(_gridWidth-1)*6});
     
     {
       Uint16Array indexArray = new Uint16Array((_gridWidth-1)*(_gridWidth-1)*6);
@@ -160,12 +160,12 @@ class JavelineClothDemo extends JavelineBaseDemo {
     allLoaded.then((list) {
       immediateContext.compileShaderFromResource(_particlesVSHandle, _particlesVSResourceHandle, resourceManager);
       immediateContext.compileShaderFromResource(_particlesFSHandle, _particlesFSResourceHandle, resourceManager);
-      _particlesShaderProgramHandle = device.createShaderProgram('Particle Shader Program', { 'VertexProgram': _particlesVSHandle, 'FragmentProgram': _particlesFSHandle});
+      _particlesShaderProgramHandle = device.createShaderProgram('Cloth Shader Program', { 'VertexProgram': _particlesVSHandle, 'FragmentProgram': _particlesFSHandle});
       int vertexStride = _particleVertexSize*4;
       var elements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, vertexStride, 0, 0),
                       new InputElementDescription('vColor', Device.DeviceFormatFloat3, vertexStride, 0, 12),
                       new InputElementDescription('vTexCoord', Device.DeviceFormatFloat2, vertexStride, 0, 24)];
-      _particlesInputLayoutHandle = device.createInputLayout('Particles Input Layout', {'elements':elements, 'shaderProgram':_particlesShaderProgramHandle});
+      _particlesInputLayoutHandle = device.createInputLayout('Cloth Input Layout', {'elements':elements, 'shaderProgram':_particlesShaderProgramHandle});
       immediateContext.updateTexture2DFromResource(_particlePointSpriteHandle, _particlePointSpriteResourceHandle, resourceManager);
       immediateContext.generateMipmap(_particlePointSpriteHandle);
       complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
@@ -176,8 +176,20 @@ class JavelineClothDemo extends JavelineBaseDemo {
   Future<JavelineDemoStatus> shutdown() {
     Future<JavelineDemoStatus> base = super.shutdown();
     _particlesVertexData = null;
-    resourceManager.batchDeregister([_particlesVSResourceHandle, _particlesVSResourceHandle, _particlePointSpriteResourceHandle]);
-    device.batchDeleteDeviceChildren([_particlesVBOHandle, _particlesShaderProgramHandle, _particlesVSHandle, _particlesFSHandle, _particlesInputLayoutHandle, _particlePointSpriteHandle, _particleDepthStateHandle, _particleBlendStateHandle]);
+    resourceManager.batchDeregister([_particlesVSResourceHandle,
+                                     _particlesFSResourceHandle,
+                                     _particlePointSpriteResourceHandle]);
+    device.batchDeleteDeviceChildren([_particlesVBOHandle,
+                                      _particleIBHandle,
+                                      _particlesShaderProgramHandle,
+                                      _particlesVSHandle,
+                                      _particlesFSHandle,
+                                      _particlesInputLayoutHandle,
+                                      _particlePointSpriteHandle,
+                                      _particleDepthStateHandle,
+                                      _particlePointSpriteSamplerHandle,
+                                      _particleBlendStateHandle,
+                                      _particleRasterizerStateHandle]);
     return base;
   }
   

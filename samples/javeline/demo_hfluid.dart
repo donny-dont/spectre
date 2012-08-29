@@ -223,6 +223,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
       _makeDrop(_centerColumnIndex, 0.8);
     }
     
+    drawGrid(20);
     Profiler.enter('fluid update');
     _fluid.update();
     _fluid.setReflectiveBoundaryAll();
@@ -237,10 +238,8 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
     
     Profiler.enter('fluid prepare to draw');
-    //if (frameCounter % 20 == 0) {
-      _buildFluidVertexData();
-      _updateFluidVertexData();  
-    //}
+    _buildFluidVertexData();
+    _updateFluidVertexData();
     Profiler.exit();
     
     { 
