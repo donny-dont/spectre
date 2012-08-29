@@ -1,6 +1,5 @@
 /*
-  Spectre
-  
+
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
   
   This software is provided 'as-is', without any express or implied
@@ -18,5 +17,18 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
+
 */
+
+#library('Javeline');
+#import('dart:html');
+#import('dart:json');
+#import('../external/DartVectorMath/lib/vector_math_html.dart');
+#import('spectre.dart');
+#import('profiler.dart');
+
+#source('javeline/config.dart');
+#source('javeline/keyboard.dart');
+#source('javeline/mouse.dart');
+#source('javeline/base_demo.dart');
 

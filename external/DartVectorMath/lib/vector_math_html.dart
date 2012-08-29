@@ -1,5 +1,6 @@
 /*
-  Spectre
+
+  VectorMath.dart
   
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
   
@@ -18,5 +19,22 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
+
 */
 
+#library("vector_math_html");
+#import("dart:html");
+#source("common/scalar_math.dart");
+#source("html/vec2_gen.dart");
+#source("html/vec3_gen.dart");
+#source("html/vec4_gen.dart");
+#source("common/vector.dart");
+#source("common/trig_gen.dart");
+#source("common/exponent_gen.dart");
+#source("common/common_gen.dart");
+#source("common/handwritten.dart");
+#source("html/mat2_gen.dart");
+#source("html/mat3_gen.dart");
+#source("html/mat4_gen.dart");
+#source("common/matrix.dart");
+#source("common/quat.dart");

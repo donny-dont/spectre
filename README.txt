@@ -7,11 +7,12 @@ Spectre is a modern graphics API wrapping WebGL.
 
 A "modern graphics API" consists of:
 
-Device - Vertex buffers, index buffers, textures, shaders are created here.
-ImmediateContext - All commands submitted are here.
-CommandBuffer - Commands to be sent to ImmediateContext can be construct once and submitted in batches.
+Device - Manage vertex buffers, index buffers, textures, shaders, and other GPU objects
+ImmediateContext - Set GPU state and initiate draw calls
+ProgramBuilder - Build your rendering commands once
+Interpreter - Execute your prebuilt programs
+Resource - Resource types including images, meshes, shaders, and more
+ResourceManager - Manage and load resources 
 
 Spectre also includes a resource manager and a demo framework called 'Javeline'.
 
-
- 

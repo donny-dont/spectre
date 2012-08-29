@@ -1,6 +1,5 @@
 /*
-  Spectre
-  
+
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
   
   This software is provided 'as-is', without any express or implied
@@ -18,5 +17,27 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
+
 */
 
+class JavelineEmptyDemo extends JavelineBaseDemo {
+  JavelineEmptyDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
+  }
+  
+  Future<JavelineDemoStatus> startup() {
+    Future<JavelineDemoStatus> base = super.startup();
+    return base;
+  }
+  
+  Future<JavelineDemoStatus> shutdown() {
+    Future<JavelineDemoStatus> base = super.shutdown();
+    return base;
+  }
+  
+  void update(num time, num dt) {
+    super.update(time, dt);
+    
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(camera);
+  }
+}
