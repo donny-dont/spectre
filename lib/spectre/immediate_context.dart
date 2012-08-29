@@ -155,6 +155,9 @@ class ImmediateContext {
   void reset() {
     // TODO: Update GPU state
     _primitiveTopology = 0;
+    for (int index in _enabledVertexAttributeArrays) {
+      _device.gl.disableVertexAttribArray(index);
+    }
     _enabledVertexAttributeArrays.clear();
     _indexBufferHandle = 0;
     for (int i = 0; i < numVertexBuffers; i++) {
