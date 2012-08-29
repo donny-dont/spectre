@@ -67,7 +67,7 @@ class ImageResourceLoader extends ResourceLoader {
 class HttpResourceLoader extends ResourceLoader {
   Future<ResourceLoaderResult> load(String url) {
     Completer<ResourceLoaderResult> completer = new Completer<ResourceLoaderResult>();
-    var req = new XMLHttpRequest();
+    var req = new HttpRequest();
     req.open("GET", url, true);
     req.on.load.add((event) {
       ResourceLoaderResult r = new ResourceLoaderResult(req.response != null, req.response);
