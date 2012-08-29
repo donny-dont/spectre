@@ -260,6 +260,7 @@ class JavelineDemoLaunch {
       shut = new Future.immediate(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
     }
     shut.then((statusValue) {
+      device.immediateContext.reset();
       _demo = null;
       for (final JavelineDemoDescription jdd in demos) {
         if (jdd.name == name) {
