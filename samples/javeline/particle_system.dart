@@ -1,6 +1,7 @@
 #library('particle_system');
 #import('../../external/DartVectorMath/lib/vector_math_html.dart');
 #import('../../lib/spectre.dart');
+#import('dart:math', prefix:'Math');
 
 class ParticleSystemBackend {
   int _numParticles;
@@ -13,6 +14,8 @@ class ParticleSystemBackend {
   
   int _index;
   
+  Math.Random _random;
+  
   ParticleSystemBackend(this._numParticles, this._timeStep) {
     gravityDirection = new vec3(0.0, -1.0, 0.0);
     // 5x5x5 box for particles
@@ -20,6 +23,7 @@ class ParticleSystemBackend {
     _max = new vec3(10.0, 10.0, 10.0);
     _timeStep2 = _timeStep * _timeStep;
     _index = 0;
+    _random = new Math.Random();
   }
   
   void setBounds(vec3 min, vec3 max) {
@@ -29,7 +33,7 @@ class ParticleSystemBackend {
   
   num getRandomBetween(num min, num max) {
     num len = max - min;
-    return min + Math.random() * len;
+    return min + _random.nextDouble() * len;
   }
     
   void getRandomPosition(vec3 p) {
