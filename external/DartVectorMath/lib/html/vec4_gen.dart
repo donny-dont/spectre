@@ -2244,10 +2244,6 @@ class vec4 {
     w = w.abs();
     return this;
   }
-  vec4 copy() {
-    vec4 c = new vec4.copy(this);
-    return c;
-  }
   vec4 copyInto(vec4 arg) {
     arg.x = x;
     arg.y = y;
@@ -2267,6 +2263,13 @@ class vec4 {
     y = arg.y;
     z = arg.z;
     w = arg.w;
+    return this;
+  }
+  vec4 setComponents(num x_, num y_, num z_, num w_) {
+    x = x_;
+    y = y_;
+    z = z_;
+    w = w_;
     return this;
   }
   /// Copies [this] into [array] starting at [offset].

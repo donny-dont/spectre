@@ -340,10 +340,6 @@ class vec2 {
     y = y.abs();
     return this;
   }
-  vec2 copy() {
-    vec2 c = new vec2.copy(this);
-    return c;
-  }
   vec2 copyInto(vec2 arg) {
     arg.x = x;
     arg.y = y;
@@ -357,6 +353,11 @@ class vec2 {
   vec2 set(vec2 arg) {
     x = arg.x;
     y = arg.y;
+    return this;
+  }
+  vec2 setComponents(num x_, num y_) {
+    x = x_;
+    y = y_;
     return this;
   }
   /// Copies [this] into [array] starting at [offset].

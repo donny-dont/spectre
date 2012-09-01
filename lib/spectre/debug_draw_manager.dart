@@ -370,7 +370,7 @@ class DebugDrawManager {
     line.duration = duration;
     if (depthEnabled && _depthEnabledLines.hasRoomFor(1)) {
       _depthEnabledLines.add(line);
-    } else if (_depthDisabledLines.hasRoomFor(1)){
+    } else if (depthEnabled == false && _depthDisabledLines.hasRoomFor(1)){
       _depthDisabledLines.add(line);
     }
   }

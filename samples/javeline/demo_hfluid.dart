@@ -245,7 +245,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     { 
       vec3 lightDirection = new vec3(1.0, -1.0, 1.0);
       lightDirection.normalize();
-      normalMatrix.transformDirect3(lightDirection);
+      normalMatrix.transform3(lightDirection);
       lightDirection.normalize();
       lightDirection.copyIntoArray(_lightDirection);
     }

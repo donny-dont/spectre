@@ -67,15 +67,16 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
 
     _angle += dt * 3.14159;
     _scale = (sin(_angle) + 1.0)/2.0;
-    _rotateX.rotationX(_angle);
-    _rotateY.rotationY(_angle);
-    _rotateZ.rotationZ(_angle);
+    _rotateX.setRotationX(_angle);
+    _rotateY.setRotationY(_angle);
+    _rotateZ.setRotationZ(_angle);
 
     // Global Axis
-    debugDrawManager.addLine(_origin, _unitX * 20.0, _colors['Red']);
-    debugDrawManager.addLine(_origin, _unitY * 20.0, _colors['Green']);
-    debugDrawManager.addLine(_origin, _unitZ * 20.0, _colors['Blue']);
+    debugDrawManager.addLine(_origin, (_unitX * 20.0), _colors['Red']);
+    debugDrawManager.addLine(_origin, (_unitY * 20.0), _colors['Green']);
+    debugDrawManager.addLine(_origin, (_unitZ * 20.0), _colors['Blue']);
 
+    
     // Rotating transformations
     {
       mat4 T = null;
@@ -86,14 +87,16 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
       T = new mat4.translationRaw(0.0, 0.0, 5.0) * _rotateZ;
       debugDrawManager.addAxes(T, 4.0);
     }
-
+    
+    
     // Rotating circles
     {
-      debugDrawManager.addCircle(new vec3(0.0, 10.0, 0.0), _rotateY.transform3(_unitX), 3.14, _colors['Red']);
-      debugDrawManager.addCircle(new vec3(0.0, 0.0, 10.0), _rotateZ.transform3(_unitY), 3.14, _colors['Green']);
-      debugDrawManager.addCircle(new vec3(10.0, 0.0, 0.0), _rotateX.transform3(_unitZ), 3.14, _colors['Blue']);
+      debugDrawManager.addCircle(new vec3(0.0, 10.0, 0.0), _rotateY.transformed3(_unitX), 3.14, _colors['Red']);
+      debugDrawManager.addCircle(new vec3(0.0, 0.0, 10.0), _rotateZ.transformed3(_unitY), 3.14, _colors['Green']);
+      debugDrawManager.addCircle(new vec3(10.0, 0.0, 0.0), _rotateX.transformed3(_unitZ), 3.14, _colors['Blue']);
     }
 
+    
     // AABB and a line from min to max
     {
       debugDrawManager.addAABB(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Gray']);
@@ -101,7 +104,7 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
       debugDrawManager.addCross(new vec3(10.0, 10.0, 10.0), _colors['White']);
       debugDrawManager.addLine(new vec3(5.0, 5.0, 5.0), new vec3(10.0, 10.0, 10.0), _colors['Orange']);
     }
-
+    
     // Spheres
     {
       num radius = _scale * 2.0 + 1.0;
@@ -109,7 +112,6 @@ class JavelineDebugDrawTest extends JavelineBaseDemo {
       debugDrawManager.addSphere(_unitY * 22.0, radius, _colors['Green']);
       debugDrawManager.addSphere(_unitZ * 22.0, radius, _colors['Blue']);
     }
-
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);
   }

@@ -791,10 +791,6 @@ class vec3 {
     z = z.abs();
     return this;
   }
-  vec3 copy() {
-    vec3 c = new vec3.copy(this);
-    return c;
-  }
   vec3 copyInto(vec3 arg) {
     arg.x = x;
     arg.y = y;
@@ -811,6 +807,12 @@ class vec3 {
     x = arg.x;
     y = arg.y;
     z = arg.z;
+    return this;
+  }
+  vec3 setComponents(num x_, num y_, num z_) {
+    x = x_;
+    y = y_;
+    z = z_;
     return this;
   }
   /// Copies [this] into [array] starting at [offset].

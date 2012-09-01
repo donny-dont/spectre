@@ -75,7 +75,6 @@ class ImmediateContext {
     }
 
     if (_preparedInputLayoutHandle == _inputLayoutHandle) {
-      // Early out
       return;
     }
 
@@ -83,6 +82,9 @@ class ImmediateContext {
 
     // Disable old arrays
     for (int index in _enabledVertexAttributeArrays) {
+      if (index == 0) {
+        continue;
+      }
       _device.gl.disableVertexAttribArray(index);
     }
     _enabledVertexAttributeArrays.clear();
@@ -156,8 +158,12 @@ class ImmediateContext {
     // TODO: Update GPU state
     _primitiveTopology = 0;
     for (int index in _enabledVertexAttributeArrays) {
+      if (index == 0) {
+        continue;
+      }
       _device.gl.disableVertexAttribArray(index);
     }
+    _preparedInputLayoutHandle = 0;
     _enabledVertexAttributeArrays.clear();
     _indexBufferHandle = 0;
     for (int i = 0; i < numVertexBuffers; i++) {
