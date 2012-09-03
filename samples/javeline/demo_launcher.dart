@@ -23,6 +23,7 @@
 #import('dart:html');
 #import('../../external/DartVectorMath/lib/vector_math_html.dart');
 #import('../../lib/spectre.dart');
+#import('../../lib/spectre_scene.dart');
 #import('../../lib/javeline.dart');
 #import('../../lib/profiler.dart');
 #import('../../lib/profiler_gui.dart');
@@ -179,6 +180,18 @@ class JavelineDemoLaunch {
       d.nodes.add(resourceDiv);
     });
   }
+  
+  void refreshProfileTree() {
+    tree.processEvents(Profiler.events);
+    Profiler.clear();
+    document.query('#ProfilerRoot').innerHTML = ProfilerTreeListGUI.buildTree(tree);
+  }
+  
+  void refresh() {
+    refreshResourceManagerTable();
+    refreshDeviceManagerTable();
+    refreshProfileTree();
+  }
 
   void resizeHandler(Event event) {
     updateSize();
@@ -247,8 +260,7 @@ class JavelineDemoLaunch {
       registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Particles', () { return new JavelineParticlesDemo(device, resourceManager, debugDrawManager); });
-      window.setInterval(refreshResourceManagerTable, 1000);
-      window.setInterval(refreshDeviceManagerTable, 1000);
+      window.setInterval(refresh, 1000);
     });
   }
 

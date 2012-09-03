@@ -40,7 +40,8 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   num _angle;
   List _frameProgram;
   List _shutdownProgram;
-
+  TransformGraph _transformGraph;
+  List<int> _transformNodes;
   JavelineSpinningCube(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
     cubeMeshResource = 0;
     cubeVertexShaderResource = 0;
@@ -49,6 +50,16 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     cameraTransform = new Float32Array(16);
     objectTransform = new Float32Array(16);
     _angle = 0.0;
+    _transformGraph = new TransformGraph(16);
+    _transformNodes = new List<int>();
+    _transformNodes.add(_transformGraph.createNode());
+    _transformNodes.add(_transformGraph.createNode());
+    _transformNodes.add(_transformGraph.createNode());
+    _transformNodes.add(_transformGraph.createNode());
+    _transformGraph.reparent(_transformNodes[3], _transformNodes[2]);
+    _transformGraph.reparent(_transformNodes[2], _transformNodes[1]);
+    _transformGraph.reparent(_transformNodes[1], _transformNodes[0]);
+    _transformGraph.updateGraph();
   }
 
   /*
@@ -158,7 +169,11 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     drawGrid(20);
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);
-    mat4 I = new mat4.rotationY(_angle);
-    drawCube(I);
+    num h = sin(_angle);
+    _transformGraph.setLocalMatrix(_transformNodes[2], new mat4.scaleRaw(1.0, 2.0, 3.0));
+    _transformGraph.setLocalMatrix(_transformNodes[0], new mat4.translationRaw(h, 0.0, 1-h));
+    _transformGraph.setLocalMatrix(_transformNodes[1], new mat4.rotationZ(_angle));
+    _transformGraph.updateWorldMatrices();
+    drawCube(_transformGraph.refWorldMatrix(_transformNodes[3]));
   }
 }

@@ -27,7 +27,7 @@ class _DebugLine implements Hashable {
   vec4 colorEnd;
   num duration;
   int hashCode() {
-    return positionStart.x.hashCode() ^ positionEnd.y.hashCode() ^ colorStart.z.hashCode();
+    return positionStart.x.hashCode();
   }
 }
 

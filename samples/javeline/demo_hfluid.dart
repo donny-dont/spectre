@@ -198,15 +198,23 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
   }
   
   void _makeWave(int column, num h) {
-    for (int j = 1; j < _fluid.columnsWide-1; j++) {
+    int half = _fluid.columnsWide~/2;
+    int quarter = half~/2;
+    for (int j = quarter; j < half+quarter; j++) {
       int columnIndex = _fluid.columnIndex(column, j);
       _fluid.columns[columnIndex].height += h;
     }
   }
   
   void _makeDrop(int column, num h) {
-    int columnIndex = _fluid.columnIndex(column, column);
-    _fluid.columns[columnIndex].height += h;
+    int columnIndex1 = _fluid.columnIndex(column, column);
+    int columnIndex2 = _fluid.columnIndex(column+1, column);
+    int columnIndex3 = _fluid.columnIndex(column, column+1);
+    int columnIndex4 = _fluid.columnIndex(column+1, column+1);
+    _fluid.columns[columnIndex1].height += h;
+    _fluid.columns[columnIndex2].height += h;
+    _fluid.columns[columnIndex3].height += h;
+    _fluid.columns[columnIndex4].height += h;
   }
   
   void update(num time, num dt) {
@@ -216,8 +224,8 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
         
     if (keyboard.pressed(JavelineKeyCodes.KeyP)) {
+      _makeWave(3, 0.3);
       _makeWave(2, 0.3);
-      
     }
     if (keyboard.pressed(JavelineKeyCodes.KeyO)) {
       _makeDrop(_centerColumnIndex, 0.8);
@@ -227,7 +235,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.enter('fluid update');
     _fluid.update();
     _fluid.setReflectiveBoundaryAll();
-    //_fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, 0.1);
+    _fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, -0.001);
     //_fluid.setFlowBoundary(HeightFieldFluid.BoundarySouth, -0.05);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryNorth);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryWest);
