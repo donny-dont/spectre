@@ -167,13 +167,19 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     super.update(time, dt);
     _angle += dt * 3.14159;
     drawGrid(20);
-    debugDrawManager.prepareForRender();
-    debugDrawManager.render(camera);
     num h = sin(_angle);
     _transformGraph.setLocalMatrix(_transformNodes[2], new mat4.scaleRaw(1.0, 2.0, 3.0));
     _transformGraph.setLocalMatrix(_transformNodes[0], new mat4.translationRaw(h, 0.0, 1-h));
     _transformGraph.setLocalMatrix(_transformNodes[1], new mat4.rotationZ(_angle));
     _transformGraph.updateWorldMatrices();
     drawCube(_transformGraph.refWorldMatrix(_transformNodes[3]));
+    {
+      aabb3 aabb = new aabb3.minmax(new vec3.raw(0.0, 0.0, -1.0), new vec3(1.0, 1.0, 0.0));
+      aabb3 out = new aabb3();
+      aabb.transformed(_transformGraph.refWorldMatrix(_transformNodes[3]), out);
+      debugDrawManager.addAABB(out.min, out.max, new vec4(1.0, 1.0, 1.0, 1.0));
+    }
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(camera);
   }
 }
