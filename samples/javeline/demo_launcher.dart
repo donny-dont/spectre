@@ -260,6 +260,7 @@ class JavelineDemoLaunch {
       registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Particles', () { return new JavelineParticlesDemo(device, resourceManager, debugDrawManager); });
+      switchToDemo(JavelineConfigStorage.get('javeline.demo'));
       window.setInterval(refresh, 1000);
     });
   }
@@ -288,6 +289,7 @@ class JavelineDemoLaunch {
           updateSize();
           _demo.mouse.locked = isLocked;
           _demo.run();
+          JavelineConfigStorage.set('javeline.demo', name, true);
         });
       }
     });
@@ -297,7 +299,7 @@ class JavelineDemoLaunch {
 void main() {
   Profiler.init();
   JavelineConfigStorage.init();
-  // Comment out the following line to keep defaults
+  // Comment out the following line to reset defaults
   JavelineConfigStorage.load();
   spectreLog = new HtmlLogger('#SpectreLog');
   new JavelineDemoLaunch().run();
