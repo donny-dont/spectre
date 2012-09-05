@@ -23,10 +23,46 @@
 class JavelineConfigType {
   abstract String serialize(Dynamic o);
   abstract Dynamic deserialize(String data);
+  bool istype(Dynamic o) => false;
+}
+
+class JavelineConfigType_bool extends JavelineConfigType {
+  String serialize(Dynamic o) {
+    assert(o is bool);
+    return JSON.stringify(o);
+  }
+  Dynamic deserialize(String data) {
+    bool o = JSON.parse(data);
+    return o;
+  }
+  bool istype(Dynamic o) => o is bool;
+}
+
+class JavelineConfigType_num extends JavelineConfigType {
+  String serialize(Dynamic o) {
+    assert(o is num);
+    return JSON.stringify(o);
+  }
+  Dynamic deserialize(String data) {
+    num o = JSON.parse(data);
+    return o;
+  }
+  bool istype(Dynamic o) => o is num;
+}
+
+class JavelineConfigType_String extends JavelineConfigType {
+  String serialize(Dynamic o) {
+    return o;
+  }
+  Dynamic deserialize(Dynamic o) {
+    return o;
+  }
+  bool istype(Dynamic o) => o is String;
 }
 
 class JavelineConfigType_vec3 extends JavelineConfigType {
   String serialize(Dynamic o) {
+    assert(o is vec3);
     Map<String, num> target = new Map<String, num>();
     target['x'] = o.x;
     target['y'] = o.y;
@@ -41,6 +77,7 @@ class JavelineConfigType_vec3 extends JavelineConfigType {
     o.z = src['z'];
     return o;
   }
+  bool istype(Dynamic o) => o is vec3;
 }
 
 class JavelineConfigTypes {
@@ -48,6 +85,9 @@ class JavelineConfigTypes {
   static init() {
     types = new Map<String, JavelineConfigType>();
     types['vec3'] = new JavelineConfigType_vec3();
+    types['bool'] = new JavelineConfigType_bool();
+    types['num'] = new JavelineConfigType_num();
+    types['String'] = new JavelineConfigType_String();
   }
   static JavelineConfigType find(String name) {
     return JavelineConfigTypes.types[name];
@@ -77,6 +117,8 @@ class JavelineConfigStorage {
     variables = new Map<String, JavelineConfigVariable>();
     variables['camera.eyePosition'] = new JavelineConfigVariable('camera.eyePosition', 'vec3', () => new vec3(0.0, 2.0, 0.0));
     variables['camera.lookAtPosition'] = new JavelineConfigVariable('camera.lookAtPosition', 'vec3', () => new vec3(0.0, 2.0, 2.0));
+    variables['drawlist.update'] = new JavelineConfigVariable('drawlist.update', 'bool', () => true);
+    variables['javeline.demo'] = new JavelineConfigVariable('javeline.demo', 'String', () => 'Empty');
   }
 
   static void loadVariable(String name) {
