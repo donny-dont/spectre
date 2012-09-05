@@ -35,6 +35,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   int sampler;
   int rs;
   int il;
+  int ds;
   Float32Array cameraTransform;
   Float32Array objectTransform;
   num _angle;
@@ -84,6 +85,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
       cubeIndexBuffer = device.createIndexBuffer('Cube Index Buffer', {'usage':'static'});
       cubeProgram = device.createShaderProgram('Cube Program', {});
       il = device.createInputLayout('Cube Input Layout', {});
+      ds = device.getDeviceChildHandle('DepthState.TestWrite');
       resourceManager.addEventCallback(cubeMeshResource, ResourceEvents.TypeUpdate, (type, resource) {
         MeshResource cube = resource;
         var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), cube),
@@ -101,6 +103,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
         ProgramBuilder pb = new ProgramBuilder();
         pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
         pb.setRasterizerState(rs);
+        pb.setDepthState(ds);
         pb.setShaderProgram(cubeProgram);
         pb.setUniformMatrix4('objectTransform', objectTransform);
         pb.setUniformMatrix4('cameraTransform', cameraTransform);

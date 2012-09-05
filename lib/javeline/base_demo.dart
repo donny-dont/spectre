@@ -40,8 +40,13 @@ class JavelineBaseDemo {
   num _lastPitch;
   int _viewPort;
   int _blendState;
+  int _blendState1;
   int _depthState;
+  int _depthState1;
+  int _depthState2;
   int _rasterizerState;
+  int _rasterizerState1;
+  int _rasterizerState2;
 
   Device _device;
   ImmediateContext _immediateContext;
@@ -121,9 +126,14 @@ class JavelineBaseDemo {
     completer.complete(status);
     {
       _viewPort = _device.createViewport('Default VP', {'x':0, 'y':0, 'width':viewportWidth, 'height':viewportHeight});
-      _blendState = _device.createBlendState('Default BS', {});
-      _depthState = _device.createDepthState('Default DS', {});
-      _rasterizerState = _device.createRasterizerState('Default RS', {});
+      _blendState = _device.createBlendState('BlendState.AlphaBlend.', {'blendEnable':true, 'blendSourceColorFunc': BlendState.BlendSourceShaderAlpha, 'blendDestColorFunc': BlendState.BlendSourceShaderInverseAlpha, 'blendSourceAlphaFunc': BlendState.BlendSourceShaderAlpha, 'blendDestAlphaFunc': BlendState.BlendSourceShaderInverseAlpha});
+      _blendState1 = _device.createBlendState('BlendState.Opaque', {});
+      _depthState = _device.createDepthState('DepthState.TestWrite', {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
+      _depthState1 = _device.createDepthState('DepthState.Test', {'depthTestEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
+      _depthState2 = _device.createDepthState('DepthState.Write', {'depthWriteEnabled': true});
+      _rasterizerState = _device.createRasterizerState('RasterizerState.CCW.CullBack', {'cullEnabled': true, 'cullMode': RasterizerState.CullBack, 'cullFrontFace': RasterizerState.FrontCCW});
+      _rasterizerState1 = _device.createRasterizerState('RasterizerState.CCW.CullFront', {'cullEnabled': true, 'cullMode': RasterizerState.CullFront, 'cullFrontFace': RasterizerState.FrontCCW});
+      _rasterizerState2 = _device.createRasterizerState('RasterizerState.CullDisabled', {'cullEnabled': false});
     }
     document.on.keyDown.add(_keyDownHandler);
     document.on.keyUp.add(_keyUpHandler);
@@ -140,10 +150,7 @@ class JavelineBaseDemo {
     document.on.mouseMove.remove(_mouseMoveHandler);
     document.on.mouseDown.remove(_mouseDownHandler);
     document.on.mouseUp.remove(_mouseUpHandler);
-    _device.deleteDeviceChild(_rasterizerState);
-    _device.deleteDeviceChild(_depthState);
-    _device.deleteDeviceChild(_blendState);
-    _device.deleteDeviceChild(_viewPort);
+    _device.batchDeleteDeviceChildren([_rasterizerState, _rasterizerState1, _rasterizerState2, _depthState, _depthState1, _depthState2, _blendState, _blendState1, _viewPort]);
     _quit = true;
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');
