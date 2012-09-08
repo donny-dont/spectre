@@ -30,13 +30,14 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
   int _fluidFSHandle;
   int _fluidInputLayoutHandle;
   int _fluidShaderProgramHandle;
-  
+  int rs;
+  int ds;
   Float32Array _fluidVertexData;
   int _fluidNumVertices;
   Float32Array _lightDirection;
   
   JavelineHFluidDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
-    _fluid = new HeightFieldFluid(25, 1.0);
+    _fluid = new HeightFieldFluid(50, 1.0);
     _centerColumnIndex = 12;
   }
   
@@ -56,6 +57,9 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     _fluidFSResourceHandle = resourceManager.registerResource('/shaders/simple_fluid.fs');
     _fluidVSHandle = device.createVertexShader('Fluid Vertex Shader',{});
     _fluidFSHandle = device.createFragmentShader('Fluid Fragment Shader', {});
+    
+    rs = device.getDeviceChildHandle('RasterizerState.CullDisabled');
+    ds = device.getDeviceChildHandle('DepthState.TestWrite');
     
     List loadedResources = [];
     base.then((value) {
@@ -93,6 +97,8 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     device.immediateContext.setIndexBuffer(0);
     device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
     device.immediateContext.setShaderProgram(_fluidShaderProgramHandle);
+    device.immediateContext.setDepthState(ds);
+    device.immediateContext.setRasterizerState(rs);
     device.immediateContext.setUniformMatrix4('projectionViewTransform', projectionViewTransform);
     device.immediateContext.setUniformMatrix4('projectionTransform', projectionTransform);
     device.immediateContext.setUniformMatrix4('viewTransform', viewTransform);
@@ -231,11 +237,11 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
       _makeDrop(_centerColumnIndex, 0.8);
     }
     
-    drawGrid(20);
+    //drawGrid(20);
     Profiler.enter('fluid update');
     _fluid.update();
     _fluid.setReflectiveBoundaryAll();
-    _fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, -0.001);
+    //_fluid.setFlowBoundary(HeightFieldFluid.BoundaryNorth, -0.001);
     //_fluid.setFlowBoundary(HeightFieldFluid.BoundarySouth, -0.05);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryNorth);
     //_fluid.setReflectiveBoundary(HeightFieldFluid.BoundaryWest);
@@ -253,7 +259,7 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     { 
       vec3 lightDirection = new vec3(1.0, -1.0, 1.0);
       lightDirection.normalize();
-      normalMatrix.transform3(lightDirection);
+      normalMatrix.rotate3(lightDirection);
       lightDirection.normalize();
       lightDirection.copyIntoArray(_lightDirection);
     }
