@@ -72,7 +72,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
     base.then((value) {
       // Once the base is done, we load our resources
-      cubeMeshResource = resourceManager.registerResource('/meshes/TexturedCube.mesh');
+      cubeMeshResource = resourceManager.registerResource('/meshes/UnitCylinder.mesh');
       cubeVertexShaderResource = resourceManager.registerResource('/shaders/simple_texture.vs');
       cubeFragmentShaderResource = resourceManager.registerResource('/shaders/simple_texture.fs');
       cubeTextureResource = resourceManager.registerResource('/textures/WoodPlank.jpg');
@@ -171,13 +171,13 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     _angle += dt * 3.14159;
     drawGrid(20);
     num h = sin(_angle);
-    _transformGraph.setLocalMatrix(_transformNodes[2], new mat4.scaleRaw(1.0, 2.0, 3.0));
+    _transformGraph.setLocalMatrix(_transformNodes[2], new mat4.scaleRaw(1.0, 1.0, 1.0));
     _transformGraph.setLocalMatrix(_transformNodes[0], new mat4.translationRaw(h, 0.0, 1-h));
     _transformGraph.setLocalMatrix(_transformNodes[1], new mat4.rotationZ(_angle));
     _transformGraph.updateWorldMatrices();
     drawCube(_transformGraph.refWorldMatrix(_transformNodes[3]));
     {
-      aabb3 aabb = new aabb3.minmax(new vec3.raw(0.0, 0.0, -1.0), new vec3(1.0, 1.0, 0.0));
+      aabb3 aabb = new aabb3.minmax(new vec3.raw(-0.5, -0.5, -0.5), new vec3(0.5, 0.5, 0.5));
       aabb3 out = new aabb3();
       aabb.transformed(_transformGraph.refWorldMatrix(_transformNodes[3]), out);
       debugDrawManager.addAABB(out.min, out.max, new vec4(1.0, 1.0, 1.0, 1.0));
