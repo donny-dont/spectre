@@ -112,6 +112,14 @@ class PackResourceLoader extends HttpResourceLoader {
   PackResource createResource(String url, ResourceManager rm) => new PackResource(url, rm);
 }
 
+class RenderConfigResourceLoader extends HttpResourceLoader {
+  bool canLoad(String URL, String extension) {
+    return extension == 'rc';
+  }
+  
+  RenderConfigResource createResource(String url, ResourceManager rm) => new RenderConfigResource(url, rm);
+}
+
 class ResourceLoaders {
   static String urlExtension(String URL) {
     List<String> chunks = URL.split('.');
@@ -130,6 +138,7 @@ class ResourceLoaders {
     _resourceLoaders.add(new MeshResourceLoader());
     _resourceLoaders.add(new PackResourceLoader());
     _resourceLoaders.add(new ShaderProgramResourceLoader());
+    _resourceLoaders.add(new RenderConfigResourceLoader());
   }
 
   ResourceLoader findResourceLoader(String URL) {

@@ -31,6 +31,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   int cubeFragmentShader;
   int cubeTextureResource;
   int cubeProgram;
+  int renderConfigResource;
   int texture;
   int sampler;
   int rs;
@@ -68,10 +69,10 @@ class JavelineSpinningCube extends JavelineBaseDemo {
    */
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
-
     Completer<JavelineDemoStatus> complete = new Completer<JavelineDemoStatus>();
     base.then((value) {
       // Once the base is done, we load our resources
+      renderConfigResource = resourceManager.registerResource('/renderer/basic.rc');
       cubeMeshResource = resourceManager.registerResource('/meshes/UnitCylinder.mesh');
       cubeVertexShaderResource = resourceManager.registerResource('/shaders/simple_texture.vs');
       cubeFragmentShaderResource = resourceManager.registerResource('/shaders/simple_texture.fs');
@@ -131,12 +132,16 @@ class JavelineSpinningCube extends JavelineBaseDemo {
         device.configureDeviceChild(cubeProgram, { 'FragmentProgram': cubeFragmentShader });
       });
       
-      resourceManager.loadResource(cubeVertexShaderResource);
-      resourceManager.loadResource(cubeFragmentShaderResource);
-      resourceManager.loadResource(cubeMeshResource);
-      resourceManager.loadResource(cubeTextureResource);
-      
-      complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
+      resourceManager.loadResource(renderConfigResource).then((_dd) {
+        RenderConfigResource rcr = resourceManager.getResource(renderConfigResource);
+        renderConfig.load(rcr.renderConfig);
+        resourceManager.loadResource(cubeVertexShaderResource);
+        resourceManager.loadResource(cubeFragmentShaderResource);
+        resourceManager.loadResource(cubeMeshResource);
+        resourceManager.loadResource(cubeTextureResource);
+        
+        complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));  
+      });      
     });
     return complete.future;
   }

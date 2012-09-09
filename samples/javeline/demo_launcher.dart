@@ -55,7 +55,6 @@ class JavelineDemoLaunch {
   ResourceManager resourceManager;
   DebugDrawManager debugDrawManager;
   ProfilerTree tree;
-
   bool isLocked;
 
   void captured(List data) {
@@ -184,7 +183,7 @@ class JavelineDemoLaunch {
   void refreshProfileTree() {
     tree.processEvents(Profiler.events);
     Profiler.clear();
-    document.query('#ProfilerRoot').innerHTML = ProfilerTreeListGUI.buildTree(tree);
+    //document.query('#ProfilerRoot').innerHTML = ProfilerTreeListGUI.buildTree(tree);
   }
   
   void refresh() {
@@ -224,7 +223,6 @@ class JavelineDemoLaunch {
     resourceManager = new ResourceManager();
     var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
     resourceManager.setBaseURL(baseUrl);
-
     Future<int> debugPackLoaded = null;
     {
       int debugPackResourceHandle = resourceManager.registerResource('/packs/debug.pack');

@@ -67,7 +67,10 @@ class JavelineBaseDemo {
   ImmediateContext get immediateContext() => _immediateContext;
   DebugDrawManager get debugDrawManager() => _debugDrawManager;
   ResourceManager get resourceManager() => _resourceManager;
-
+  RenderConfig get renderConfig() => _renderConfig;
+  
+  RenderConfig _renderConfig;
+  
   int frameCounter;
 
   bool _quit;
@@ -84,7 +87,7 @@ class JavelineBaseDemo {
     _immediateContext = device.immediateContext;
     _resourceManager = resourceManager;
     _debugDrawManager = debugDrawManager;
-
+    _renderConfig = new RenderConfig(_device);
     keyboard = new JavelineKeyboard();
     mouse = new JavelineMouse();
     _camera = new Camera();

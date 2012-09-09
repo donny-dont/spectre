@@ -372,7 +372,7 @@ class PackResource extends ResourceBase {
       _fireUpdated();
       Future allLoaded = Futures.wait(futures);
       allLoaded.then((_unused) {
-        result.completer.complete(result.handle);  
+        result.completer.complete(result.handle);
       });
     }
   }
@@ -411,5 +411,24 @@ class ProgramResource extends ResourceBase {
   }
   
   void deregister() {
+  }
+}
+
+class RenderConfigResource extends ResourceBase {
+  Map renderConfig;
+  
+  RenderConfigResource(String url, ResourceManager rm) : super(url, rm) {
+    renderConfig = null;
+  }
+  
+  void load(ResourceLoaderResult result) {
+    renderConfig = JSON.parse(result.data);
+    _fireUpdated();
+    result.completer.complete(result.handle);
+  }
+  
+  void unload() {
+    _fireUnloaded();
+    renderConfig = null;
   }
 }

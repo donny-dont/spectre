@@ -661,6 +661,7 @@ class RenderBuffer extends DeviceChild {
       case 'R8G8B8A8':
         _format = WebGLRenderingContext.RGB565;
       break;
+      case 'D32':
       case 'DEPTH32':
         _format = WebGLRenderingContext.DEPTH_COMPONENT16;
       break;
@@ -833,6 +834,7 @@ class RenderTarget extends DeviceChild {
     _depth = props['depth'];
     _stencil = props['stencil'];
 
+    /*
     WebGLFramebuffer oldBind = device.gl.getParameter(WebGLRenderingContext.FRAMEBUFFER_BINDING);
     device.gl.bindFramebuffer(_target, _buffer);
     if (_color0 != null) {
@@ -857,6 +859,7 @@ class RenderTarget extends DeviceChild {
       spectreLog.Info('RenderTarget $name complete.');
     }
     device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+    */
   }
 
   void _destroyDeviceState() {

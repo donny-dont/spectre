@@ -31,4 +31,5 @@
 #source('javeline/keyboard.dart');
 #source('javeline/mouse.dart');
 #source('javeline/base_demo.dart');
+#source('javeline/render_config.dart');
 
