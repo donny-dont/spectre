@@ -191,13 +191,13 @@ class JavelineSpinningCube extends JavelineBaseDemo {
       aabb.transformed(_transformGraph.refWorldMatrix(_transformNodes[3]), out);
       debugDrawManager.addAABB(out.min, out.max, new vec4(1.0, 1.0, 1.0, 1.0));
     }
+    debugDrawManager.prepareForRender();
+    debugDrawManager.render(camera);
     device.immediateContext.generateMipmap(renderConfig.getBufferHandle('colorbuffer'));
-    SpectrePost.pass('blit', renderConfig.getLayerHandle('final'), {
+    SpectrePost.pass('blur', renderConfig.getLayerHandle('final'), {
       'textures': [renderConfig.getBufferHandle('colorbuffer')],
       'samplers': [sampler]
     });
-    debugDrawManager.prepareForRender();
     renderConfig.setupLayer('final');
-    debugDrawManager.render(camera);
   }
 }
