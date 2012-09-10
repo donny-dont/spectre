@@ -110,6 +110,30 @@ uniform sampler2D blitSource;
 void main() {
     gl_FragColor = vec4(1.0, 0.5, 0.5, 1.0);
 }''');
+      
+      addFragmentPass('blur', '''
+          precision mediump float;
+
+          const float blurSize = 1.0/512.0;
+ 
+          varying vec2 samplePoint;
+          uniform sampler2D RTScene;
+
+          void main() {
+            vec2 vTexCoord = samplePoint;
+   vec4 sum = texture2D(RTScene, vec2(vTexCoord.x - 4.0*blurSize, vTexCoord.y)) * 0.05;
+   sum += texture2D(RTScene, vec2(vTexCoord.x - 3.0*blurSize, vTexCoord.y)) * 0.09;
+   sum += texture2D(RTScene, vec2(vTexCoord.x - 2.0*blurSize, vTexCoord.y)) * 0.12;
+   sum += texture2D(RTScene, vec2(vTexCoord.x - blurSize, vTexCoord.y)) * 0.15;
+   sum += texture2D(RTScene, vec2(vTexCoord.x, vTexCoord.y)) * 0.16;
+   sum += texture2D(RTScene, vec2(vTexCoord.x + blurSize, vTexCoord.y)) * 0.15;
+   sum += texture2D(RTScene, vec2(vTexCoord.x + 2.0*blurSize, vTexCoord.y)) * 0.12;
+   sum += texture2D(RTScene, vec2(vTexCoord.x + 3.0*blurSize, vTexCoord.y)) * 0.09;
+   sum += texture2D(RTScene, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
+ 
+   gl_FragColor = sum;
+          
+      }''');
     } else {
       // already initialized...
       spectreLog.Error('Cannot initialize SpectrePost more than once.');
