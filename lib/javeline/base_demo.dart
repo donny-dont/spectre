@@ -129,7 +129,7 @@ class JavelineBaseDemo {
     completer.complete(status);
     {
       _viewPort = _device.createViewport('Default VP', {'x':0, 'y':0, 'width':viewportWidth, 'height':viewportHeight});
-      _blendState = _device.createBlendState('BlendState.AlphaBlend.', {'blendEnable':true, 'blendSourceColorFunc': BlendState.BlendSourceShaderAlpha, 'blendDestColorFunc': BlendState.BlendSourceShaderInverseAlpha, 'blendSourceAlphaFunc': BlendState.BlendSourceShaderAlpha, 'blendDestAlphaFunc': BlendState.BlendSourceShaderInverseAlpha});
+      _blendState = _device.createBlendState('BlendState.AlphaBlend', {'blendEnable':true, 'blendSourceColorFunc': BlendState.BlendSourceShaderAlpha, 'blendDestColorFunc': BlendState.BlendSourceShaderInverseAlpha, 'blendSourceAlphaFunc': BlendState.BlendSourceShaderAlpha, 'blendDestAlphaFunc': BlendState.BlendSourceShaderInverseAlpha});
       _blendState1 = _device.createBlendState('BlendState.Opaque', {});
       _depthState = _device.createDepthState('DepthState.TestWrite', {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
       _depthState1 = _device.createDepthState('DepthState.Test', {'depthTestEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
