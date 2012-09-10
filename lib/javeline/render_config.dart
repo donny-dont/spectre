@@ -83,6 +83,7 @@ class RenderConfig {
       String sort = layerDesc['sort'];
       if (color == "system" && depth == "system") {
         // Layer only depends on system, 0 handle
+        spectreLog.Info('Created system render layer $name');
         _layers[name] = new RenderLayer(name, type, sort, 0);
       } else {
         if (color == "system" || depth == "system") {
@@ -106,11 +107,22 @@ class RenderConfig {
           if (renderTargetHandle == 0) {
             spectreLog.Error('Could not create render $layerDesc');
           } else {
+            spectreLog.Info('Created render layer $name');
             _layers[name] = new RenderLayer(name, type, sort, renderTargetHandle);
           }
         }
       }
     });
+  }
+  
+  int getBufferHandle(String bufferName) {
+    RenderResource resource = _buffers[bufferName];
+    return resource.handle;
+  }
+  
+  int getLayerHandle(String layerName) {
+    RenderLayer layer = _layers[layerName];
+    return layer.handle;
   }
   
   void load(Map<String, Dynamic> conf) {
@@ -121,5 +133,6 @@ class RenderConfig {
   
   void setupLayer(String layerName) {
     RenderLayer layer = _layers[layerName];
+    _device.immediateContext.setRenderTarget(layer.handle);
   }
 }
