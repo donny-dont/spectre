@@ -611,6 +611,8 @@ class ShaderProgram extends DeviceChild {
         return 'ivec3';
       case WebGLRenderingContext.INT_VEC4:
         return 'ivec4';
+      case WebGLRenderingContext.SAMPLER_2D:
+        return 'sampler2D';
       default:
         return 'unknown code: $type';
     }
@@ -813,14 +815,13 @@ class SamplerState extends DeviceChild {
 }
 
 class RenderTarget extends DeviceChild {
-  Dynamic _color0;
-  Dynamic _depth;
-  Dynamic _stencil;
   WebGLFramebuffer _buffer;
   int _target;
+  int _target_param;
 
   RenderTarget(String name, Device device) : super(name, device) {
     _target = WebGLRenderingContext.FRAMEBUFFER;
+    _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
   }
 
   void _createDeviceState() {
@@ -829,37 +830,48 @@ class RenderTarget extends DeviceChild {
   }
 
   void _configDeviceState(Dynamic props) {
-
-    _color0 = props['color0'];
-    _depth = props['depth'];
-    _stencil = props['stencil'];
-
-    /*
-    WebGLFramebuffer oldBind = device.gl.getParameter(WebGLRenderingContext.FRAMEBUFFER_BINDING);
+    int colorHandle = props['color0'] != null ? props['color0'] : 0;
+    int colorType = Handle.getType(colorHandle);
+    int depthHandle = props['depth'] != null ? props['depth'] : 0;
+    int depthType = Handle.getType(depthHandle);
+    int stencilHandle = props['stencil'] != null ? props['stencil'] : 0;
+    if (stencilHandle != 0) {
+      spectreLog.Error('No support for stencil buffers yet.');
+    }
+    
+    WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (_color0 != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, _color0._buffer);
+    if (colorHandle != 0) {
+      if (colorType == Device.RenderBufferHandleType) {
+        RenderBuffer rb = device.getDeviceChild(colorHandle, true);
+        device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
+      } else if (colorType == Device.TextureHandleType) {
+        Texture2D t2d = device.getDeviceChild(colorHandle, true);
+        device.gl.framebufferTexture2D(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
+      }
     } else {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, null);
     }
-    if (_depth != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, _depth._buffer);
+    if (depthHandle != 0) {
+      if (depthType == Device.RenderBufferHandleType) {
+        RenderBuffer rb = device.getDeviceChild(depthHandle, true);
+        device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
+      } else if (depthType == Device.TextureHandleType) {
+        Texture2D t2d = device.getDeviceChild(depthHandle, true);
+        device.gl.framebufferTexture2D(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
+      }
     } else {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
     }
-    if (_stencil != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, _stencil._buffer);
-    } else {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
-    }
+    device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
+    
     int fbStatus = device.gl.checkFramebufferStatus(_target);
     if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = fbStatus');
+      spectreLog.Error('RenderTarget $name incomplete status = $fbStatus');
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
     device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
-    */
   }
 
   void _destroyDeviceState() {

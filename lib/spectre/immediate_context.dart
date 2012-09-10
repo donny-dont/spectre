@@ -310,8 +310,13 @@ class ImmediateContext {
     if (_renderTargetHandle == renderTargetHandle) {
       return;
     }
-    RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
-    _device.gl.bindFramebuffer(rt._target, rt._buffer);
+    _renderTargetHandle = renderTargetHandle;
+    if (_renderTargetHandle == 0) {
+      _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+    } else {
+      RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
+      _device.gl.bindFramebuffer(rt._target, rt._buffer);  
+    }
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
