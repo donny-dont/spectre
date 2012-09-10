@@ -150,6 +150,7 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     Interpreter interpreter = new Interpreter();
     // Build shutdown program
     ProgramBuilder pb = new ProgramBuilder();
+    renderConfig.cleanup();
     pb.deregisterResources([cubeMeshResource, cubeVertexShaderResource, cubeFragmentShaderResource, cubeTextureResource]);
     pb.deleteDeviceChildren([il, rs, sampler, texture, cubeProgram, cubeVertexBuffer, cubeIndexBuffer, cubeVertexShader, cubeFragmentShader]);
     _shutdownProgram = pb.ops;
@@ -180,6 +181,9 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     _transformGraph.setLocalMatrix(_transformNodes[0], new mat4.translationRaw(h, 0.0, 1-h));
     _transformGraph.setLocalMatrix(_transformNodes[1], new mat4.rotationZ(_angle));
     _transformGraph.updateWorldMatrices();
+    renderConfig.setupLayer('forward');
+    device.immediateContext.clearDepthBuffer(1.0);
+    device.immediateContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
     drawCube(_transformGraph.refWorldMatrix(_transformNodes[3]));
     {
       aabb3 aabb = new aabb3.minmax(new vec3.raw(-0.5, -0.5, -0.5), new vec3(0.5, 0.5, 0.5));
@@ -187,7 +191,13 @@ class JavelineSpinningCube extends JavelineBaseDemo {
       aabb.transformed(_transformGraph.refWorldMatrix(_transformNodes[3]), out);
       debugDrawManager.addAABB(out.min, out.max, new vec4(1.0, 1.0, 1.0, 1.0));
     }
+    device.immediateContext.generateMipmap(renderConfig.getBufferHandle('colorbuffer'));
+    SpectrePost.pass('blit', renderConfig.getLayerHandle('final'), {
+      'textures': [renderConfig.getBufferHandle('colorbuffer')],
+      'samplers': [sampler]
+    });
     debugDrawManager.prepareForRender();
+    renderConfig.setupLayer('final');
     debugDrawManager.render(camera);
   }
 }
