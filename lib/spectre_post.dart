@@ -23,5 +23,8 @@
 /** Spectre Post Processing */
 
 #library('spectre_post');
+#import('dart:html');
 #import('spectre.dart');
-#source('spectre_post/spectre_post_base.dart');
+#source('spectre_post/spectre_post_pass.dart');
+#source('spectre_post/spectre_post_fragment.dart');
+#source('spectre_post/spectre_post_static.dart');
