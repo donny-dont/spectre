@@ -24,6 +24,7 @@
 #import('../../external/DartVectorMath/lib/vector_math_html.dart');
 #import('../../lib/spectre.dart');
 #import('../../lib/spectre_scene.dart');
+#import('../../lib/spectre_post.dart');
 #import('../../lib/javeline.dart');
 #import('../../lib/profiler.dart');
 #import('../../lib/profiler_gui.dart');
@@ -219,6 +220,7 @@ class JavelineDemoLaunch {
     CanvasElement canvas = document.query(webGLCanvasName);
     WebGLRenderingContext webGL = canvas.getContext("experimental-webgl");
     device = new Device(webGL);
+    SpectrePost.init(device);
     debugDrawManager = new DebugDrawManager();
     resourceManager = new ResourceManager();
     var baseUrl = "${window.location.href.substring(0, window.location.href.length - "index.html".length)}data/";
