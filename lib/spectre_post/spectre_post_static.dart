@@ -83,10 +83,12 @@ attribute vec2 vTexCoord;
 
 varying vec2 samplePoint;
 
+uniform vec2 texScale;
+
 void main() {
     vec4 vPosition4 = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
     gl_Position = vPosition4;
-    samplePoint = vTexCoord;
+    samplePoint = vTexCoord * texScale;
 }
 ''');
       addFragmentPass('blit', '''
@@ -96,7 +98,7 @@ varying vec2 samplePoint;
 uniform sampler2D blitSource;
 
 void main() {
-    gl_FragColor = texture2D(blitSource, samplePoint * 1.0);
+    gl_FragColor = texture2D(blitSource, samplePoint);
 }''');
 
       addFragmentPass('testblit', '''
@@ -170,6 +172,8 @@ void main() {
     _device.immediateContext.setRasterizerState(_rasterizerState);
     _device.immediateContext.setDepthState(_depthState);
     _device.immediateContext.setBlendState(_blendState);
+    // FIXME: Make the following dynamic:
+    _device.immediateContext.setUniform2f('texScale', 0.833, 0.46875);
     _device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
     _device.immediateContext.setRenderTarget(renderTargetHandle);
     _device.immediateContext.draw(6, 0);
