@@ -69,6 +69,8 @@ class JavelineParticlesDemo extends JavelineBaseDemo {
     }
   }
   
+  String get demoDescription() => 'Particles';
+  
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
     

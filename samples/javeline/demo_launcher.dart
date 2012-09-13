@@ -21,6 +21,7 @@
 */
 
 #import('dart:html');
+#import('dart:math', prefix:'Math');
 #import('../../external/DartVectorMath/lib/vector_math_html.dart');
 #import('../../lib/spectre.dart');
 #import('../../lib/spectre_scene.dart');
@@ -255,7 +256,7 @@ class JavelineDemoLaunch {
       device.immediateContext.clearDepthBuffer(1.0);
       registerDemo('Empty', () { return new JavelineEmptyDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
-      registerDemo('Spinning Cube', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
+      registerDemo('Spinning Mesh', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
@@ -290,6 +291,19 @@ class JavelineDemoLaunch {
           _demo.mouse.locked = isLocked;
           _demo.run();
           JavelineConfigStorage.set('javeline.demo', name, true);
+          {
+            DivElement elem = document.query('#DemoDescription');
+            elem.nodes.clear();
+            elem.innerHTML = '<p>${_demo.demoDescription}</p>';
+          }
+          {
+            DivElement elem = document.query('#DemoUI');
+            elem.nodes.clear();
+            Element e = _demo.makeDemoUI();
+            if (e != null) {
+              elem.nodes.add(e);  
+            }
+          }
         });
       }
     });
@@ -301,6 +315,7 @@ void main() {
   JavelineConfigStorage.init();
   // Comment out the following line to reset defaults
   JavelineConfigStorage.load();
+  //JavelineConfigStorage.set('demo.postprocess', 'blit', true);
   spectreLog = new HtmlLogger('#SpectreLog');
   new JavelineDemoLaunch().run();
 }

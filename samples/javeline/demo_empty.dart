@@ -24,6 +24,8 @@ class JavelineEmptyDemo extends JavelineBaseDemo {
   JavelineEmptyDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
   }
   
+  String get demoDescription() => 'Empty';
+  
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
     return base;

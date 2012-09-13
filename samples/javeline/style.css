@@ -75,3 +75,21 @@ display: -webkit-flex;
 	-webkit-flex: auto;
 	overflow:scroll;
 }
+
+.configtable {
+	display: -webkit-flex;
+	-webkit-flex-flow: column;
+}
+
+.configitem {
+	display: -webkit-flex;
+	-webkit-flex-pack: justify;
+}
+
+.configlabel {
+}
+
+.configvalue {
+	width: 90%;
+	text-align: center;
+}

@@ -44,6 +44,9 @@ class JavelineSpinningCube extends JavelineBaseDemo {
   List _shutdownProgram;
   TransformGraph _transformGraph;
   List<int> _transformNodes;
+  ConfigUI _configUI;
+  String get demoDescription() => 'Spinning Mesh';
+  
   JavelineSpinningCube(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
     cubeMeshResource = 0;
     cubeVertexShaderResource = 0;
@@ -62,6 +65,15 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     _transformGraph.reparent(_transformNodes[2], _transformNodes[1]);
     _transformGraph.reparent(_transformNodes[1], _transformNodes[0]);
     _transformGraph.updateGraph();
+    _configUI = new ConfigUI();
+    _configUI.addItem({
+      'name': 'demo.postprocess',
+      'widget': 'dropdown',
+      'settings': {
+        'values': ['blit','blur']
+      }
+    });
+    _configUI.build();
   }
 
   /*
@@ -172,6 +184,10 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     interpreter.run(_frameProgram, device, resourceManager, immediateContext);
   }
 
+  Element makeDemoUI() {
+    return _configUI.root;
+  }
+  
   void update(num time, num dt) {
     super.update(time, dt);
     _angle += dt * 3.14159;
@@ -194,7 +210,8 @@ class JavelineSpinningCube extends JavelineBaseDemo {
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);
     device.immediateContext.generateMipmap(renderConfig.getBufferHandle('colorbuffer'));
-    SpectrePost.pass('blur', renderConfig.getLayerHandle('final'), {
+    String postpass = JavelineConfigStorage.get('demo.postprocess');
+    SpectrePost.pass(postpass, renderConfig.getLayerHandle('final'), {
       'textures': [renderConfig.getBufferHandle('colorbuffer')],
       'samplers': [sampler]
     });

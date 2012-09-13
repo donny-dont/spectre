@@ -35,10 +35,30 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
   Float32Array _fluidVertexData;
   int _fluidNumVertices;
   Float32Array _lightDirection;
-  
+  ConfigUI _configUI;
   JavelineHFluidDemo(Device device, ResourceManager resourceManager, DebugDrawManager debugDrawManager) : super(device, resourceManager, debugDrawManager) {
-    _fluid = new HeightFieldFluid(50, 1.0);
+    _fluid = new HeightFieldFluid(20, 1.0);
     _centerColumnIndex = 12;
+    _configUI = new ConfigUI();
+    _configUI.addItem({
+      'name': 'demo.hfluid.dropheight',
+      'widget': 'slider',
+      'settings': {
+        'min': 0.0,
+        'max': 3.0,
+        'step': 0.1
+      }
+    });
+    _configUI.addItem({
+      'name': 'demo.hfluid.waveheight',
+      'widget': 'slider',
+      'settings': {
+        'min': 0.0,
+        'max': 3.0,
+        'step': 0.1
+      }
+    });
+    _configUI.build();
   }
   
   Future<JavelineDemoStatus> startup() {
@@ -81,6 +101,12 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
       complete.complete(new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, ''));
     });
     return complete.future;
+  }
+  
+  String get demoDescription() => 'Height Field Fluid';
+  
+  Element makeDemoUI() {
+    return _configUI.root;
   }
   
   Future<JavelineDemoStatus> shutdown() {
@@ -230,11 +256,11 @@ class JavelineHFluidDemo extends JavelineBaseDemo {
     Profiler.exit();
         
     if (keyboard.pressed(JavelineKeyCodes.KeyP)) {
-      _makeWave(3, 0.3);
-      _makeWave(2, 0.3);
+      _makeWave(3, JavelineConfigStorage.get('demo.hfluid.waveheight'));
+      _makeWave(2, JavelineConfigStorage.get('demo.hfluid.waveheight'));
     }
     if (keyboard.pressed(JavelineKeyCodes.KeyO)) {
-      _makeDrop(_centerColumnIndex, 0.8);
+      _makeDrop(_centerColumnIndex, JavelineConfigStorage.get('demo.hfluid.dropheight'));
     }
     
     //drawGrid(20);
