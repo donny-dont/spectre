@@ -123,6 +123,10 @@ class JavelineBaseDemo {
     print('Resized to $elementWidth $elementHeight');
   }
 
+  String get demoDescription() => 'Base Demo';
+  Element makeDemoUI() {
+    return null;
+  }
   Future<JavelineDemoStatus> startup() {
     Completer<JavelineDemoStatus> completer = new Completer();
     JavelineDemoStatus status = new JavelineDemoStatus(JavelineDemoStatus.DemoStatusOKAY, 'Base OKAY');

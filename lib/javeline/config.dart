@@ -109,16 +109,22 @@ class JavelineConfigVariable {
   }
 }
 
+typedef ConfigVariableChanged(JavelineConfigVariable variable);
+
 class JavelineConfigStorage {
   static Map<String, JavelineConfigVariable> variables;
-  
+  static ConfigVariableChanged notification;
   static void init() {
+    notification = null;
     JavelineConfigTypes.init();
     variables = new Map<String, JavelineConfigVariable>();
     variables['camera.eyePosition'] = new JavelineConfigVariable('camera.eyePosition', 'vec3', () => new vec3(0.0, 2.0, 0.0));
     variables['camera.lookAtPosition'] = new JavelineConfigVariable('camera.lookAtPosition', 'vec3', () => new vec3(0.0, 2.0, 2.0));
     variables['drawlist.update'] = new JavelineConfigVariable('drawlist.update', 'bool', () => true);
     variables['javeline.demo'] = new JavelineConfigVariable('javeline.demo', 'String', () => 'Empty');
+    variables['demo.hfluid.waveheight'] = new JavelineConfigVariable('demo.hfluid.waveheight', 'num', () => 0.8);
+    variables['demo.hfluid.dropheight'] = new JavelineConfigVariable('demo.hfluid.dropheight', 'num', () => 0.3);
+    variables['demo.postprocess'] = new JavelineConfigVariable('demo.postprocess', 'String', () => 'blit');
   }
 
   static void loadVariable(String name) {
