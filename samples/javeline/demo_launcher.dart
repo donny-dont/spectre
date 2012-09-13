@@ -143,10 +143,11 @@ class JavelineDemoLaunch {
       DivElement resourceUnloadDiv = new DivElement();
       DivElement resourceLoadDiv = new DivElement();
       resourceNameDiv.innerHTML = '${name}';
-      resourceLoadDiv.innerHTML = 'Load';
+      resourceLoadDiv.innerHTML = 'Reload';
       resourceLoadDiv.on.click.add((Event event) {
         resourceManager.loadResource(resource);
       });
+      resourceLoadDiv.style.float = 'right';
       resourceUnloadDiv.innerHTML = 'Unload';
       resourceUnloadDiv.on.click.add((Event event) {
         resourceManager.unloadResource(resource);
@@ -155,7 +156,7 @@ class JavelineDemoLaunch {
       resourceUnloadDiv.classes.add('DemoButton');
       resourceDiv.nodes.add(resourceNameDiv);
       resourceDiv.nodes.add(resourceLoadDiv);
-      resourceDiv.nodes.add(resourceUnloadDiv);
+      //resourceDiv.nodes.add(resourceUnloadDiv);
       resourceDiv.classes.add('ResourceRow');
       d.nodes.add(resourceDiv);
     });
@@ -174,11 +175,27 @@ class JavelineDemoLaunch {
     if (_demo == null) {
       return;
     }
+    var tableSortedByType = new Map<String, List<String>>();
     _demo.device.children.forEach((name, handle) {
-      DivElement resourceDiv = new DivElement();
       String type = _demo.device.getHandleType(handle);
-      resourceDiv.innerHTML = '${name} ($type)';
-      d.nodes.add(resourceDiv);
+      var list = tableSortedByType[type]; 
+      if (list == null) {
+        list = tableSortedByType[type] = new List<String>();
+      }
+      list.add(name);
+    });
+    tableSortedByType.forEach((type, names) {
+      DivElement label = new DivElement();
+      label.text = '$type';
+      label.style.fontWeight = 'bold';
+      
+      d.nodes.add(label);
+      names.forEach((name) {
+        DivElement resourceDiv = new DivElement();
+        resourceDiv.innerHTML = '${name}';
+        resourceDiv.style.marginLeft = '20px';
+        d.nodes.add(resourceDiv);
+      });
     });
   }
   
@@ -317,5 +334,30 @@ void main() {
   JavelineConfigStorage.load();
   //JavelineConfigStorage.set('demo.postprocess', 'blit', true);
   spectreLog = new HtmlLogger('#SpectreLog');
+  {
+    var e = document.query('#ResourceTableHeader');
+    var rt = document.query('#ResourceTable');
+    var rth = document.query('#ResourceTableHolder');
+    var collapsed = false;
+    var heightValue = e.style.height;
+    print('$heightValue');
+    rth.on.transitionEnd.add((event) {
+      if (collapsed == false) {
+      } else {
+        
+      }
+      print('transition ended');
+    });
+    e.on.click.add((event) {
+      if (collapsed == false) {
+        e.style.height = "30px";           
+        rt.style.display = "none";
+      } else {
+        e.style.height = '${heightValue}px';
+        rt.style.display = "-webkit-flex";
+      }
+      collapsed = !collapsed;
+    });
+  }
   new JavelineDemoLaunch().run();
 }
