@@ -250,9 +250,9 @@ class Device {
       // Check if name is already registered
       int existingHandle = getDeviceChildHandle(name);
       if (existingHandle != Handle.BadHandle) {
-        int handleType = Handle.getType(handle);
+        int handleType = Handle.getType(existingHandle);
         if (handleType != type) {
-          spectreLog.Error('Returning existing handle for $name but types do not match. Requested type = $type found type = $type');
+          spectreLog.Error('Returning existing handle for $name but types do not match. Requested type = $type found type = $handleType');
         }
         return existingHandle;
       }
