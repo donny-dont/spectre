@@ -20,22 +20,22 @@
 
 */
 
-class ResourceLoaderResult {
+class _ResourceLoaderResult {
   bool success;
   Dynamic data;
   int handle;
   Completer<int> completer;
-  ResourceLoaderResult(this.success, this.data) {
+  _ResourceLoaderResult(this.success, this.data) {
     handle = 0;
   }
 }
 
-class ResourceLoader {
+class _ResourceLoader {
   bool canLoad(String URL, String extension) {
     return false;
   }
 
-  abstract Future<ResourceLoaderResult> load(String url);
+  abstract Future<_ResourceLoaderResult> load(String url);
 
   Dynamic createResource(String URL, ResourceManager rm) {
     return null;
@@ -43,34 +43,43 @@ class ResourceLoader {
 }
 
 
-class ImageResourceLoader extends ResourceLoader {
+class _ImageResourceLoader extends _ResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'jpeg' || extension == 'jpg' || extension == 'png' || extension == 'gif';
   }
 
-  Future<ResourceLoaderResult> load(String url) {
+  Future<_ResourceLoaderResult> load(String url) {
     ImageElement image = new ImageElement();
-    Completer<ResourceLoaderResult> completer = new Completer<ResourceLoaderResult>();
+    Completer<_ResourceLoaderResult> completer = new Completer<_ResourceLoaderResult>();
     image.on.load.add((event) {
-      ResourceLoaderResult r = new ResourceLoaderResult(true, image);
+      _ResourceLoaderResult r = new _ResourceLoaderResult(true, image);
+      spectreLog.Info('Request for $url succesful.');
+      completer.complete(r);
+    });
+    image.on.error.add((event) {
+      _ResourceLoaderResult r = new _ResourceLoaderResult(false, image);
+      spectreLog.Info('Request for $url failed..');
       completer.complete(r);
     });
     // Initiate load
     image.src = url;
-    spectreLog.Info('Request for $url was handled by ImageResourceLoader.');
     return completer.future;
   }
 
   ImageResource createResource(String url, ResourceManager rm) => new ImageResource(url, rm);
 }
 
-class HttpResourceLoader extends ResourceLoader {
-  Future<ResourceLoaderResult> load(String url) {
-    Completer<ResourceLoaderResult> completer = new Completer<ResourceLoaderResult>();
+class _HttpResourceLoader extends _ResourceLoader {
+  Future<_ResourceLoaderResult> load(String url) {
+    Completer<_ResourceLoaderResult> completer = new Completer<_ResourceLoaderResult>();
     var req = new HttpRequest();
     req.open("GET", url, true);
     req.on.load.add((event) {
-      ResourceLoaderResult r = new ResourceLoaderResult(req.response != null, req.response);
+      _ResourceLoaderResult r = new _ResourceLoaderResult(req.response != null, req.response);
+      completer.complete(r);
+    });
+    req.on.error.add((event) {
+      _ResourceLoaderResult r = new _ResourceLoaderResult(false, req.response);
       completer.complete(r);
     });
     // Initiate load
@@ -80,7 +89,7 @@ class HttpResourceLoader extends ResourceLoader {
   }
 }
 
-class MeshResourceLoader extends HttpResourceLoader {
+class _MeshResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'mesh';
   }
@@ -88,7 +97,7 @@ class MeshResourceLoader extends HttpResourceLoader {
   MeshResource createResource(String url, ResourceManager rm) => new MeshResource(url, rm);
 }
 
-class ShaderResourceLoader extends HttpResourceLoader {
+class _ShaderResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'vs' || extension == 'fs';
   }
@@ -96,7 +105,7 @@ class ShaderResourceLoader extends HttpResourceLoader {
   ShaderResource createResource(String url, ResourceManager rm) => new ShaderResource(url, rm);
 }
 
-class ShaderProgramResourceLoader extends HttpResourceLoader {
+class _ShaderProgramResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'sp';
   }
@@ -104,7 +113,7 @@ class ShaderProgramResourceLoader extends HttpResourceLoader {
   ShaderProgramResource createResource(String url, ResourceManager rm) => new ShaderProgramResource(url, rm);
 }
 
-class PackResourceLoader extends HttpResourceLoader {
+class _PackResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'pack';
   }
@@ -112,12 +121,20 @@ class PackResourceLoader extends HttpResourceLoader {
   PackResource createResource(String url, ResourceManager rm) => new PackResource(url, rm);
 }
 
-class RenderConfigResourceLoader extends HttpResourceLoader {
+class _RenderConfigResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'rc';
   }
   
   RenderConfigResource createResource(String url, ResourceManager rm) => new RenderConfigResource(url, rm);
+}
+
+class _SceneResourceLoader extends _HttpResourceLoader {
+  bool canLoad(String URL, String extension) {
+    return extension == 'scene';
+  }
+  
+  SceneResource createResource(String url, ResourceManager rm) => new SceneResource(url, rm);
 }
 
 class ResourceLoaders {
@@ -129,21 +146,22 @@ class ResourceLoaders {
     return '';
   }
 
-  List<ResourceLoader> _resourceLoaders;
+  List<_ResourceLoader> _resourceLoaders;
 
   ResourceLoaders() {
     _resourceLoaders = new List();
-    _resourceLoaders.add(new ImageResourceLoader());
-    _resourceLoaders.add(new ShaderResourceLoader());
-    _resourceLoaders.add(new MeshResourceLoader());
-    _resourceLoaders.add(new PackResourceLoader());
-    _resourceLoaders.add(new ShaderProgramResourceLoader());
-    _resourceLoaders.add(new RenderConfigResourceLoader());
+    _resourceLoaders.add(new _ImageResourceLoader());
+    _resourceLoaders.add(new _ShaderResourceLoader());
+    _resourceLoaders.add(new _MeshResourceLoader());
+    _resourceLoaders.add(new _PackResourceLoader());
+    _resourceLoaders.add(new _ShaderProgramResourceLoader());
+    _resourceLoaders.add(new _RenderConfigResourceLoader());
+    _resourceLoaders.add(new _SceneResourceLoader());
   }
 
-  ResourceLoader findResourceLoader(String URL) {
+  _ResourceLoader findResourceLoader(String URL) {
     String extension = urlExtension(URL);
-    for (ResourceLoader loader in _resourceLoaders) {
+    for (_ResourceLoader loader in _resourceLoaders) {
       if (loader.canLoad(URL, extension)) {
         return loader;
       }

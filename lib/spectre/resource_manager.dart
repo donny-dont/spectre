@@ -119,7 +119,7 @@ class ResourceManager {
       }
     }
 
-    ResourceLoader rl = _loaders.findResourceLoader(url);
+    _ResourceLoader rl = _loaders.findResourceLoader(url);
     if (rl == null) {
       spectreLog.Error('Resource Manager cannot load $url.');
       return Handle.BadHandle;
@@ -200,20 +200,37 @@ class ResourceManager {
     if (rb == null) {
       return null;
     }
-    ResourceLoader rl = _loaders.findResourceLoader(rb.url);
+    _ResourceLoader rl = _loaders.findResourceLoader(rb.url);
     if (rl == null) {
       return null;
     }
     // Start the load...
-    Future<ResourceLoaderResult> futureResult = rl.load('$_baseURL${rb.url}');
     Completer<int> completer = new Completer<int>();
-    if (futureResult != null) {
-      futureResult.then((result) {
-        result.handle = handle;
-        result.completer = completer;
-        rb.load(result);
-      });
-    }
+    rl.load('$_baseURL${rb.url}').then((result) {
+      // The raw resource data has been loaded.
+      // Set the resource handle
+      // The resource class is responsible for completing the load
+      // 
+      result.handle = handle;
+      result.completer = completer;
+      rb.load(result);
+    });    
+    return completer.future;
+  }
+  
+  Future loadResources(List<int> handles) {
+    List<Future<int>> futures = new List<Future<int>>();
+    handles.forEach((handle) {
+      var r = loadResource(handle);
+      if (r != null) {
+        futures.add(r);  
+      }
+    });
+    Future<List> allFutures = Futures.wait(futures);
+    Completer<int> completer = new Completer<int>();
+    allFutures.then((result) {
+      completer.complete(0);
+    });
     return completer.future;
   }
 

@@ -76,7 +76,7 @@ class ResourceBase {
     on = new ResourceEvents();
   }
 
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     _fireUpdated();
   }
   
@@ -121,7 +121,7 @@ class Float32ArrayResource extends ResourceBase {
     _fireUpdated();
   }
   
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
@@ -158,7 +158,21 @@ class Uint16ArrayResource extends ResourceBase {
     _fireUpdated();
   }
   
-  void load(ResourceLoaderResult result) {
+  void update(Map state) {
+    Dynamic o;
+    o = state['array'];
+    if (o != null && o is Uint16Array) {
+      _array = o;
+      _fireUpdated();
+    }
+    o = state['list'];
+    if (o != null && o is List<num>) {
+      _array = new Uint16Array.fromList(o);
+      _fireUpdated();
+    }
+  }
+  
+  void load(_ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
@@ -181,7 +195,7 @@ class MeshResource extends ResourceBase {
     return meshData['meshes'][0]['indices'].length;
   }
 
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     if (result.success == false) {
       return;
     }
@@ -207,7 +221,7 @@ class ShaderResource extends ResourceBase {
     source = '';
   }
 
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     if (result.success == false) {
       return;
     }
@@ -239,7 +253,7 @@ class ShaderProgramResource extends ResourceBase {
     fragmentShaderSource = '';
   }
 
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     if (result.success == false) {
       return;
     }
@@ -257,14 +271,14 @@ class ShaderProgramResource extends ResourceBase {
       }
       if (fetchVertexShader != null) {
         fetchedVertex = true;
-        futures.add(new ShaderResourceLoader().load('${_rm._baseURL}${fetchVertexShader}'));
+        futures.add(new _ShaderResourceLoader().load('${_rm._baseURL}${fetchVertexShader}'));
       }
       if (inlineFragmentShader != null) {
         fragmentShaderSource = inlineFragmentShader;
       }
       if (fetchFragmentShader != null) {
         fetchedFragment = true;
-        futures.add(new ShaderResourceLoader().load('${_rm._baseURL}${fetchFragmentShader}'));        
+        futures.add(new _ShaderResourceLoader().load('${_rm._baseURL}${fetchFragmentShader}'));        
       }
     }
     if (futures.length > 0) {
@@ -272,14 +286,14 @@ class ShaderProgramResource extends ResourceBase {
       all.then((results) {
         int index = 0;
         if (fetchedVertex) {
-          ResourceLoaderResult vsResult = results[index];
+          _ResourceLoaderResult vsResult = results[index];
           index++;
           if (vsResult.success) {
             vertexShaderSource = vsResult.data;
           }
         }
         if (fetchedFragment) {
-          ResourceLoaderResult fsResult = results[index];
+          _ResourceLoaderResult fsResult = results[index];
           if (fsResult.success) {
             fragmentShaderSource = fsResult.data;
           }
@@ -321,7 +335,7 @@ class ImageResource extends ResourceBase {
   
   ImageElement get image() => _image;
 
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     if (result.success == false) {
       return;
     }
@@ -350,7 +364,7 @@ class PackResource extends ResourceBase {
     childResources = new List<int>();
   }
   
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     if (childResources.length > 0) {
       _rm.batchUnload(childResources);
       childResources.clear();
@@ -421,7 +435,7 @@ class RenderConfigResource extends ResourceBase {
     renderConfig = null;
   }
   
-  void load(ResourceLoaderResult result) {
+  void load(_ResourceLoaderResult result) {
     renderConfig = JSON.parse(result.data);
     _fireUpdated();
     result.completer.complete(result.handle);
@@ -430,5 +444,24 @@ class RenderConfigResource extends ResourceBase {
   void unload() {
     _fireUnloaded();
     renderConfig = null;
+  }
+}
+
+class SceneResource extends ResourceBase {
+  Map sceneDescription;
+  
+  SceneResource(String url, ResourceManager rm) : super(url, rm) {
+    sceneDescription = null;
+  }
+  
+  void load(_ResourceLoaderResult result) {
+    sceneDescription = JSON.parse(result.data);
+    _fireUpdated();
+    result.completer.complete(result.handle);
+  }
+  
+  void unload() {
+    _fireUnloaded();
+    sceneDescription = null;
   }
 }
