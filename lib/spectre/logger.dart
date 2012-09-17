@@ -75,7 +75,7 @@ class HtmlLogger implements Logger {
     _Append('<p style=\"color:orange\">${_line_num}: $w</p>');
   }
   void Info(String i) {
-    _Append('<p style=\"color:white\">${_line_num}: $i</p>');
+    _Append('<p style=\"color:black\">${_line_num}: $i</p>');
   }
   void Log(String i) => Info(i);
 }

@@ -125,6 +125,7 @@ class JavelineConfigStorage {
     variables['demo.hfluid.waveheight'] = new JavelineConfigVariable('demo.hfluid.waveheight', 'num', () => 0.8);
     variables['demo.hfluid.dropheight'] = new JavelineConfigVariable('demo.hfluid.dropheight', 'num', () => 0.3);
     variables['demo.postprocess'] = new JavelineConfigVariable('demo.postprocess', 'String', () => 'blit');
+    variables['demo.normalmap.style'] = new JavelineConfigVariable('demo.normalmap.style', 'String', () => 'basic');
   }
 
   static void loadVariable(String name) {

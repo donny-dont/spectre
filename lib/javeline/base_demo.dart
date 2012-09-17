@@ -197,12 +197,11 @@ class JavelineBaseDemo {
     return true;
   }
 
-  void drawGrid(int gridLines) {
+  void drawGridRaw(int gridLines, vec3 x, vec3 z, vec4 color) {
     final int midLine = gridLines~/2;
     vec3 o = new vec3.zero();
-    vec3 x = new vec3.raw(1.0, 0.0, 0.0);
-    vec3 z = new vec3.raw(0.0, 0.0, 1.0);
-    vec4 color = new vec4.raw(0.0, 1.0, 0.0, 1.0);
+    o.sub(z*midLine);
+    o.sub(x*midLine);
 
     for (int i = 0; i <= gridLines; i++) {
       vec3 start = o + (z * (i-midLine)) + (x * -midLine);
@@ -215,6 +214,24 @@ class JavelineBaseDemo {
       vec3 end = o + (x * (i-midLine)) + (z * midLine);
       debugDrawManager.addLine(start, end, color);
     }
+  }
+  
+  void drawGrid(int gridLines) {
+    drawGridRaw(gridLines, new vec3(1.0, 0.0, 0.0),
+                new vec3(0.0, 0.0, 1.0),
+                new vec4(0.0, 1.0, 0.0, 1.0));
+  }
+  
+  void drawHolodeck(int gridLines) {
+    vec3 x = new vec3(1.0, 0.0, 0.0);
+    vec3 y = new vec3(0.0, 1.0, 0.0);
+    vec3 z = new vec3(0.0, 0.0, 1.0);
+    vec4 colorRed = new vec4(1.0, 0.0, 0.0, 1.0);
+    vec4 colorGreen = new vec4(0.0, 1.0, 0.0, 1.0);
+    vec4 colorBlue = new vec4(0.0, 0.0, 1.0, 1.0);
+    drawGridRaw(gridLines, x, z, colorGreen);
+    drawGridRaw(gridLines, -y, z, colorBlue);
+    drawGridRaw(gridLines, -y, x, colorRed);
   }
 
   void update(num time, num dt) {

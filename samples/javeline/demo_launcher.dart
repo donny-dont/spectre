@@ -42,6 +42,8 @@
 #source('demo_skybox.dart');
 #source('demo_cloth.dart');
 #source('demo_particles.dart');
+#source('demo_normal_map.dart');
+#source('demo_projector.dart');
 
 class JavelineDemoDescription {
   String name;
@@ -256,7 +258,7 @@ class JavelineDemoLaunch {
         resourceManager.getResourceHandle('/shaders/debug_line.fs'),
         resourceManager.getResourceHandle('/shaders/debug_sphere.vs'),
         resourceManager.getResourceHandle('/shaders/debug_sphere.fs'),
-        resourceManager.getResourceHandle('/meshes/unitSphere.mesh'));
+        resourceManager.getResourceHandle('/meshes/DebugSphere.mesh'));
       inited.complete(true);
     });
     return inited.future;
@@ -278,6 +280,8 @@ class JavelineDemoLaunch {
       registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Particles', () { return new JavelineParticlesDemo(device, resourceManager, debugDrawManager); });
+      registerDemo('Normal Map', () { return new JavelineNormalMap(device, resourceManager, debugDrawManager); });
+      registerDemo('Projector', () { return new JavelineProjector(device, resourceManager, debugDrawManager); });
       switchToDemo(JavelineConfigStorage.get('javeline.demo'));
       window.setInterval(refresh, 1000);
     });

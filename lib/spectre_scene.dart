@@ -26,4 +26,10 @@
 #import('handle.dart');
 #import('../external/DartVectorMath/lib/vector_math_html.dart');
 //#import('../external/DartVectorMath/lib/vector_math_console.dart');
+#import('spectre.dart');
 #source('spectre_scene/transform_graph.dart');
+#source('spectre_scene/loader.dart');
+#source('spectre_scene/scene_child.dart');
+#source('spectre_scene/scene.dart');
+#source('spectre_scene/mesh.dart');
+#source('spectre_scene/material.dart');

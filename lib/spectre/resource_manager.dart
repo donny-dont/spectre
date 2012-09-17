@@ -218,18 +218,16 @@ class ResourceManager {
     return completer.future;
   }
   
-  Future loadResources(List<int> handles) {
+  Future<bool> loadResources(List<int> handles) {
     List<Future<int>> futures = new List<Future<int>>();
     handles.forEach((handle) {
       var r = loadResource(handle);
-      if (r != null) {
-        futures.add(r);  
-      }
+      futures.add(r);  
     });
     Future<List> allFutures = Futures.wait(futures);
-    Completer<int> completer = new Completer<int>();
+    Completer<bool> completer = new Completer<bool>();
     allFutures.then((result) {
-      completer.complete(0);
+      completer.complete(true);
     });
     return completer.future;
   }

@@ -1,0 +1,65 @@
+{
+	"name": "Projector",
+	"entities": [
+		{
+			"name": "ground",
+			"type": "model",
+			"mesh": "/meshes/UnitPlane.mesh",
+			"shader": "/shaders/litsolid.sp",
+			"transform": {
+				"translate": [0.0, 0.0, 0.0]
+			},
+			"uniforms": {
+				"color": [0.3, 0.3, 0.3, 1.0]
+			},
+			"uniformsets": ["sun"]
+		},
+		{
+			"name": "sky",
+			"type": "skybox",
+			"textures": [
+				"/textures/skybox1.png",
+				"/textures/skybox2.png"
+			]
+		},
+		{
+			"name": "cone",
+			"type": "model",
+			"mesh": "/meshes/UnitCone.mesh",
+			"transform": {
+				"translate": [0.0, 3.0, 0.0],
+				"rotateX": 45.0
+			},
+			"shader": "/shaders/litsolid.sp",
+			"uniforms": {
+				"color": [1.0, 0.0, 0.0, 1.0]
+			},
+			"uniformsets": ["sun"]
+		},
+		{
+			"name": "box",
+			"type": "model",
+			"mesh": "/meshes/UnitCube.mesh",
+			"transform": {
+				"parent": "cone",
+				"translate": [5.0, 0.0, 5.0]
+			},
+			"shader": "/shaders/litsolid.sp",
+			"uniforms": {
+				"color": [0.0, 0.0, 1.0, 1.0]
+			},
+			"uniformsets": ["sun"]
+		},
+		{
+			"name": "sun",
+			"type": "uniformset",
+			"uniforms": {
+				"color": [0.95, 0.95, 0.8],
+				"lightDir": [1.0, -1.0, 1.0]
+			}
+		}
+	],
+	"resources": [
+		"/textures/colorcircle.png"
+	]
+}

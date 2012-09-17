@@ -76,15 +76,17 @@ class _HttpResourceLoader extends _ResourceLoader {
     req.open("GET", url, true);
     req.on.load.add((event) {
       _ResourceLoaderResult r = new _ResourceLoaderResult(req.response != null, req.response);
+      spectreLog.Info('Request for $url succesful.');
       completer.complete(r);
     });
     req.on.error.add((event) {
       _ResourceLoaderResult r = new _ResourceLoaderResult(false, req.response);
+      spectreLog.Info('Request for $url failed.');
       completer.complete(r);
     });
     // Initiate load
     req.send();
-    spectreLog.Info('Request for $url was handled by HttpResourceLoader.');
+
     return completer.future;
   }
 }
