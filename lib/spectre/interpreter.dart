@@ -305,6 +305,30 @@ class Interpreter {
             im.setUniformVector4(name, buf);
           }
           break;
+        case Ops.SetUniformVector3:
+          skip = 3;
+          {
+            final String name = program[i+1];
+            final Float32Array buf = program[i+2];
+            im.setUniformVector3(name, buf);
+          }
+          break;
+        case Ops.SetUniformVector2:
+          skip = 3;
+          {
+            final String name = program[i+1];
+            final Float32Array buf = program[i+2];
+            im.setUniformVector2(name, buf);
+          }
+          break;
+        case Ops.SetUniformInt:
+          skip = 3;
+          {
+            final String name = program[i+1];
+            final int buf = program[i+2];
+            im.setUniformInt(name, buf);
+          }
+          break;
         case Ops.Draw:
           skip = 3;
           {

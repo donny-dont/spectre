@@ -140,6 +140,21 @@ class Ops {
   /// Arg1 - Float32Array
   static final int SetUniformVector4 = 0xB1;
 
+  /// Set a uniform variable
+  /// Arg0 - Uniform name
+  /// Arg1 - Float32Array
+  static final int SetUniformVector3 = 0xB2;
+
+  /// Set a uniform variable
+  /// Arg0 - Uniform name
+  /// Arg1 - Float32Array
+  static final int SetUniformVector2 = 0xB3;
+
+  /// Set a uniform variable
+  /// Arg0 - Uniform name
+  /// Arg1 - Int
+  static final int SetUniformInt = 0xB4;
+  
   /// Draw vertices
   /// Arg0 - Vertex Count
   /// Arg1 - Vertex Buffer Offset
