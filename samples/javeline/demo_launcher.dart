@@ -27,11 +27,12 @@
 #import('../../lib/spectre_scene.dart');
 #import('../../lib/spectre_post.dart');
 #import('../../lib/javeline.dart');
+#import('../../lib/javeline_scene.dart');
 #import('../../lib/profiler.dart');
 #import('../../lib/profiler_gui.dart');
 #import('../../lib/profiler_client.dart');
-#import('hfluid.dart');
-#import('skybox.dart');
+#import('../../lib/hfluid.dart');
+#import('../../lib/skybox.dart');
 #import('particle_system.dart');
 
 // Demos

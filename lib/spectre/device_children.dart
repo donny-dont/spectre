@@ -503,6 +503,8 @@ class FragmentShader extends Shader {
   }
 }
 
+typedef void UniformCallback(String name, int index, String type, int size);
+
 /// A shader program defines how the programmable units of the GPU pipeline function
 /// Create using [Device.createShaderProgram]
 /// Set using [ImmediateContext.setShaderProgram]
@@ -633,6 +635,14 @@ class ShaderProgram extends DeviceChild {
     for (int i = 0; i < numAttributes; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveAttrib(_program, i);
       spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+    }
+  }
+  
+  void forEachUniforms(UniformCallback callback) {
+    numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
+    for (int i = 0; i < numUniforms; i++) {
+      WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
+      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size);
     }
   }
 }

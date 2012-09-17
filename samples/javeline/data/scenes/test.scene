@@ -1,11 +1,18 @@
 {
 	"name": "Projector",
+	"materials": [
+	],
 	"entities": [
 		{
 			"name": "ground",
 			"type": "model",
 			"mesh": "/meshes/UnitPlane.mesh",
 			"shader": "/shaders/litsolid.sp",
+			"meshinputs": [
+			{ "name": "vPosition", "type": "POSITION" },
+			{ "name": "vNormal", "type": "NORMAL" },
+			{ "name": "vTexCoord", "type": "TEXCOORD0" }
+			],
 			"transform": {
 				"translate": [0.0, 0.0, 0.0]
 			},
@@ -18,7 +25,7 @@
 			"name": "sky",
 			"type": "skybox",
 			"textures": [
-				"/textures/skybox1.png",
+				"/textures/skybox2.png",
 				"/textures/skybox2.png"
 			]
 		},
@@ -27,10 +34,18 @@
 			"type": "model",
 			"mesh": "/meshes/UnitCone.mesh",
 			"transform": {
-				"translate": [0.0, 3.0, 0.0],
-				"rotateX": 45.0
+				"translate": [1.0, 5.0, 0.0],
+				"rotateZ": 2.0,
+				"rotateX": 1.0,
+				"scale": [1.0, 1.0, 1.0]
 			},
+			"controller": "foo.dart",
 			"shader": "/shaders/litsolid.sp",
+			"meshinputs": [
+			{ "name": "vPosition", "type": "POSITION" },
+			{ "name": "vNormal", "type": "NORMAL" },
+			{ "name": "vTexCoord", "type": "TEXCOORD0" }
+			],
 			"uniforms": {
 				"color": [1.0, 0.0, 0.0, 1.0]
 			},
@@ -42,9 +57,14 @@
 			"mesh": "/meshes/UnitCube.mesh",
 			"transform": {
 				"parent": "cone",
-				"translate": [5.0, 0.0, 5.0]
+				"translate": [0.0, 4.0, 0.0]
 			},
 			"shader": "/shaders/litsolid.sp",
+			"meshinputs": [
+			{ "name": "vPosition", "type": "POSITION" },
+			{ "name": "vNormal", "type": "NORMAL" },
+			{ "name": "vTexCoord", "type": "TEXCOORD0" }
+			],
 			"uniforms": {
 				"color": [0.0, 0.0, 1.0, 1.0]
 			},

@@ -33,16 +33,6 @@ class JavelineProjector extends JavelineBaseDemo {
   
   Future<JavelineDemoStatus> startup() {
     Future<JavelineDemoStatus> base = super.startup();
-    /*
-    Completer<JavelineDemoStatus> completer = new Completer<JavelineDemoStatus>();
-    base.then((r) {
-      Future r = _loader.loadFromUrl('/scenes/test.scene');
-      r.then((_) {
-        completer.complete(new JavelineDemoStatus(0, ''));  
-      });
-    });
-    return completer.future;
-    */
     return base.chain((r) {
       return _loader.loadFromUrl('/scenes/test.scene');
     });
@@ -55,6 +45,13 @@ class JavelineProjector extends JavelineBaseDemo {
   
   void update(num time, num dt) {
     super.update(time, dt);
+    _scene.update(time, dt);
+    _scene.render(camera, {
+      'projectionTransform': projectionTransform,
+      'viewTransform': viewTransform,
+      'projectionViewTransform': projectionViewTransform,
+      'normalTransform': normalTransform
+    });
     drawHolodeck(20);
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);

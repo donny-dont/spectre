@@ -15,6 +15,7 @@ class TransformGraph {
   HandleSystem _handleSystem;
   List<mat4> _localTransforms;
   List<mat4> _worldTransforms;
+  List<Float32Array> _worldTransformArrays;
   List<_TransformGraphNode> _nodes;
   List<int> _sortedNodes;
   int _sortedNodesCursor;
@@ -25,12 +26,15 @@ class TransformGraph {
     _handleSystem = new HandleSystem(_maxNodes, 0);
     _localTransforms = new List<mat4>(_maxNodes);
     _worldTransforms = new List<mat4>(_maxNodes);
+    _worldTransformArrays = new List<Float32Array>(_maxNodes);
     _nodes = new List<_TransformGraphNode>(_maxNodes);
     _sortedNodes = new List<int>(_maxNodes);
+    _sortedNodesCursor = 0;
     _nodeCount = 0;
     for (int i = 0; i < _maxNodes; i++) {
       _localTransforms[i] = new mat4.identity();
       _worldTransforms[i] = new mat4.identity();
+      _worldTransformArrays[i] = new Float32Array(16);
       _nodes[i] = new _TransformGraphNode();
       _nodes[i].reset();
     }
@@ -74,9 +78,9 @@ class TransformGraph {
       return;
     }
     int index = Handle.getIndex(nodeHandle);
+    int parentNodeHandle = _nodes[index].parentId;
     _nodes[index].parentId = 0;
     // Cleanup parent
-    int parentNodeHandle = _nodes[index].parentId;
     if (parentNodeHandle == 0) {
       return;
     }
@@ -159,6 +163,17 @@ class TransformGraph {
     return _worldTransforms[index];
   }
   
+  Float32Array refWorldMatrixArray(int nodeHandle) {
+    if (nodeHandle == 0) {
+      return null;
+    }
+    if (_handleSystem.validHandle(nodeHandle) == false) {
+      return null;
+    }
+    int index = Handle.getIndex(nodeHandle);
+    return _worldTransformArrays[index];
+  }
+  
   /// Set the local transform for [nodeHandle]
   void setLocalMatrix(int nodeHandle, mat4 m) {
     if (nodeHandle == 0) {
@@ -185,9 +200,16 @@ class TransformGraph {
   
   /// Updates the world transformation matrices for all nodes in the graph
   void updateWorldMatrices() {
+    //print('Updating world.');
     for (int i = _sortedNodesCursor-1; i >= 0 ; i--) {
       int nodeIndex = Handle.getIndex(_sortedNodes[i]);
       _TransformGraphNode node = _nodes[nodeIndex];
+      if (_sortedNodes[i] == 286261249) {
+        //print('updating cone world.');
+        //print('${node.parentId}');
+        //print('${node.selfId}');
+        //print('$nodeIndex');
+      }
       if (node.parentId != 0) {
         int parentNodeIndex = Handle.getIndex(node.parentId);
         _worldTransforms[nodeIndex].copyFrom(_worldTransforms[parentNodeIndex]);
@@ -195,6 +217,7 @@ class TransformGraph {
       } else {
         _worldTransforms[nodeIndex].copyFrom(_localTransforms[nodeIndex]);
       }
+      _worldTransforms[nodeIndex].copyIntoArray(_worldTransformArrays[nodeIndex], 0);
     }
   }
 }
