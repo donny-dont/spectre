@@ -77,6 +77,7 @@ class ResourceBase {
   }
 
   void load(_ResourceLoaderResult result) {
+    _isLoaded = true;
     _fireUpdated();
   }
   
@@ -85,8 +86,10 @@ class ResourceBase {
   }
   
   void unload() {
+    _isLoaded = false;
     _fireUnloaded();
   }
+  
   void deregister() {
   }
   

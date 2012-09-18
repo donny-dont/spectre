@@ -1,33 +1,64 @@
 {
 	"name": "Projector",
+	"resources": [
+		"/textures/colorcircle.png"
+	],
 	"materials": [
+		{
+			"name": "litdiffuse",
+			"shader": "/shaders/litdiffuse.sp",
+			"meshinputs": [
+				{ "name": "vPosition", "type": "POSITION" },
+				{ "name": "vNormal", "type": "NORMAL" },
+				{ "name": "vTexCoord", "type": "TEXCOORD0" }
+			],
+			"textures": {
+				"diffuse": "/textures/WoodPlank.jpg"
+			},
+			"samplers": {
+				"diffuse": {
+				}
+			},
+			"blend": {
+				"blendEnable": true,
+				"blendSourceColorFunc": "BlendSourceShaderAlpha",
+				"blendDestColorFunc": "BlendSourceShaderInverseAlpha",
+				"blendSourceAlphaFunc": "BlendSourceShaderAlpha",
+				"blendDestAlphaFunc": "BlendSourceShaderInverseAlpha"
+			},
+			"depth": {
+				"depthTestEnabled": true,
+				"depthWriteEnabled": true,
+				"depthComparisonOp": "DepthComparisonOpLess"
+			},
+			"rasterizer": {
+				"cullEnabled": true,
+				"cullMode": "CullBack",
+				"cullFrontFace": "FrontCCW"
+			},
+			"uniformset": {
+				"lightColor": [0.6, 0.9, 0.8],
+				"lightDirection": [1.0, -1.0, 1.0]
+			}
+		}
 	],
 	"entities": [
 		{
 			"name": "ground",
 			"type": "model",
 			"mesh": "/meshes/UnitPlane.mesh",
-			"shader": "/shaders/litsolid.sp",
-			"meshinputs": [
-			{ "name": "vPosition", "type": "POSITION" },
-			{ "name": "vNormal", "type": "NORMAL" },
-			{ "name": "vTexCoord", "type": "TEXCOORD0" }
-			],
+			"material": "litdiffuse",
 			"transform": {
 				"translate": [0.0, 0.0, 0.0]
-			},
-			"uniforms": {
-				"color": [0.3, 0.3, 0.3, 1.0]
-			},
-			"uniformsets": ["sun"]
+			}
 		},
 		{
 			"name": "sky",
 			"type": "skybox",
-			"textures": [
-				"/textures/skybox2.png",
-				"/textures/skybox2.png"
-			]
+			"textures": {
+				"0": "/textures/skybox2.png",
+				"1": "/textures/skybox2.png"
+			}
 		},
 		{
 			"name": "cone",
@@ -39,17 +70,10 @@
 				"rotateX": 1.0,
 				"scale": [1.0, 1.0, 1.0]
 			},
-			"controller": "foo.dart",
-			"shader": "/shaders/litsolid.sp",
-			"meshinputs": [
-			{ "name": "vPosition", "type": "POSITION" },
-			{ "name": "vNormal", "type": "NORMAL" },
-			{ "name": "vTexCoord", "type": "TEXCOORD0" }
-			],
-			"uniforms": {
-				"color": [1.0, 0.0, 0.0, 1.0]
-			},
-			"uniformsets": ["sun"]
+			"material": "litdiffuse",
+			"textures": {
+				"diffuse": "/textures/felt.png"
+			}
 		},
 		{
 			"name": "box",
@@ -59,27 +83,16 @@
 				"parent": "cone",
 				"translate": [0.0, 4.0, 0.0]
 			},
-			"shader": "/shaders/litsolid.sp",
-			"meshinputs": [
-			{ "name": "vPosition", "type": "POSITION" },
-			{ "name": "vNormal", "type": "NORMAL" },
-			{ "name": "vTexCoord", "type": "TEXCOORD0" }
-			],
-			"uniforms": {
-				"color": [0.0, 0.0, 1.0, 1.0]
-			},
-			"uniformsets": ["sun"]
+			"material": "litdiffuse",
+			"uniformsets": [ "sun" ]
 		},
 		{
 			"name": "sun",
 			"type": "uniformset",
-			"uniforms": {
-				"color": [0.95, 0.95, 0.8],
-				"lightDir": [1.0, -1.0, 1.0]
+			"uniformset": {
+				"lightColor": [0.0, 1.0, 0.0],
+				"lightDirection": [1.0, 0.0, 0.0]
 			}
 		}
-	],
-	"resources": [
-		"/textures/colorcircle.png"
 	]
 }

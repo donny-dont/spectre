@@ -10,22 +10,28 @@ class Material extends SceneChild {
   int vertexShaderHandle;
   int fragmentShaderHandle;
   int shaderProgramHandle;
+  int blendStateHandle;
+  int depthStateHandle;
+  int rasterizerStateHandle;
   Map<String, MaterialUniform> uniforms;
   
   Material(String name, Scene scene) : super(name, scene) {
     vertexShaderHandle = 0;
     fragmentShaderHandle = 0;
     shaderProgramHandle = 0;
+    blendStateHandle = 0;
+    depthStateHandle = 0;
+    rasterizerStateHandle = 0;
   }
   
   void uniformCallback(String name, int index, String type, int size) {
-    //print('$type $name [$index] $size');
     uniforms[name] = new MaterialUniform(name, index, type, size);
   }
   
   void loadUniforms() {
     uniforms = new Map<String, MaterialUniform>();
     scene.device.getDeviceChild(shaderProgramHandle).forEachUniforms(uniformCallback);
+    spectreLog.Info('$uniforms');
   }
   
   int uniformIndex(String name) {
@@ -37,31 +43,54 @@ class Material extends SceneChild {
   }
   
   void load(Map o) {
-    int handle = scene.resourceManager.getResourceHandle(name);
+    String shaderName = o['shader'];
+    int handle = scene.resourceManager.getResourceHandle(shaderName);
     ShaderProgramResource spr = scene.resourceManager.getResource(handle);
     if (spr == null) {
       spectreLog.Error('Could not load $name');
       return;
     }
     if (vertexShaderHandle == 0) {
-      vertexShaderHandle = scene.device.createVertexShader('${name}.vs', {});
+      vertexShaderHandle = scene.device.createVertexShader('$shaderName.vs', {});
     }
     if (fragmentShaderHandle == 0) {
-      fragmentShaderHandle = scene.device.createFragmentShader('${name}.fs', {});
+      fragmentShaderHandle = scene.device.createFragmentShader('$shaderName.fs', {});
     }
     if (shaderProgramHandle == 0) {
-      shaderProgramHandle = scene.device.createShaderProgram('${name}.shader', {});  
+      shaderProgramHandle = scene.device.createShaderProgram('$shaderName.sp', {});  
+    }
+    if (blendStateHandle == 0) {
+      blendStateHandle = scene.device.createBlendState('$name.bs', {});
+    }
+    if (depthStateHandle == 0) {
+      depthStateHandle = scene.device.createDepthState('$name.ds', {});
+    }
+    if (rasterizerStateHandle == 0) {
+      rasterizerStateHandle = scene.device.createRasterizerState('$name.rs', {});
+    }
+    bool relink = false;
+    VertexShader vs = scene.device.getDeviceChild(vertexShaderHandle);
+    if (vs.source != spr.vertexShaderSource) {
+      vs.source = spr.vertexShaderSource;
+      vs.compile();
+      relink = true;
     }
     
-    scene.device.getDeviceChild(vertexShaderHandle).source = spr.vertexShaderSource;
-    scene.device.getDeviceChild(vertexShaderHandle).compile();
-    scene.device.getDeviceChild(fragmentShaderHandle).source = spr.fragmentShaderSource;
-    scene.device.getDeviceChild(fragmentShaderHandle).compile();
-    scene.device.configureDeviceChild(shaderProgramHandle, {
-      'VertexProgram': vertexShaderHandle,
-      'FragmentProgram': fragmentShaderHandle,
-    });
-    loadUniforms();
+    FragmentShader fs = scene.device.getDeviceChild(fragmentShaderHandle);
+    if (fs.source != spr.fragmentShaderSource) {
+      fs.source = spr.fragmentShaderSource;
+      fs.compile();
+      relink = true;
+    }
+    
+    ShaderProgram sp = scene.device.getDeviceChild(shaderProgramHandle);
+    if (!sp.linked || relink) {
+      scene.device.configureDeviceChild(shaderProgramHandle, {
+        'VertexProgram': vertexShaderHandle,
+        'FragmentProgram': fragmentShaderHandle,
+      });
+      loadUniforms();  
+    }
   }
   
   void preDraw() {

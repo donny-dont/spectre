@@ -115,6 +115,7 @@ class ResourceManager {
       // Resource already exists
       int existingHandle = getResourceHandle(url);
       if (existingHandle != Handle.BadHandle) {
+        print('RR: $url $existingHandle');
         return existingHandle;
       }
     }
@@ -150,6 +151,7 @@ class ResourceManager {
 
     _resources[index] = rb;
     _urlToHandle[url] = handle;
+    print('RR: $url $handle');
     return handle;
   }
 
@@ -164,9 +166,9 @@ class ResourceManager {
     int index = Handle.getIndex(handle);
     ResourceBase rb = _resources[index];
     if (rb != null) {
+      _urlToHandle.remove(rb.url);
       rb.unload();
       rb.deregister();
-      _urlToHandle.remove(rb.url);
     }
     _resources[index] = null;
     _handleSystem.freeHandle(handle);
@@ -195,7 +197,7 @@ class ResourceManager {
   }
 
   /// Load the resource [handle]. Can be called again to reload.
-  Future<int> loadResource(int handle) {
+  Future<int> loadResource(int handle, [bool force=true]) {
     ResourceBase rb = getResource(handle);
     if (rb == null) {
       return null;
@@ -204,24 +206,29 @@ class ResourceManager {
     if (rl == null) {
       return null;
     }
-    // Start the load...
     Completer<int> completer = new Completer<int>();
-    rl.load('$_baseURL${rb.url}').then((result) {
-      // The raw resource data has been loaded.
-      // Set the resource handle
-      // The resource class is responsible for completing the load
-      // 
-      result.handle = handle;
-      result.completer = completer;
-      rb.load(result);
-    });    
+    if (rb.isLoaded && !force) {
+      // Skip load
+      completer.complete(handle);
+    } else {
+      // Start the load...
+      rl.load('$_baseURL${rb.url}').then((result) {
+        // The raw resource data has been loaded.
+        // Set the resource handle
+        // The resource class is responsible for completing the load
+        // 
+        result.handle = handle;
+        result.completer = completer;
+        rb.load(result);
+      });      
+    }
     return completer.future;
   }
   
-  Future<bool> loadResources(Collection<int> handles) {
+  Future<bool> loadResources(Collection<int> handles, [bool force=true]) {
     List<Future<int>> futures = new List<Future<int>>();
     handles.forEach((handle) {
-      var r = loadResource(handle);
+      var r = loadResource(handle, force);
       if (r == null) {
         int index = Handle.getIndex(handle);
         print('Eh $handle $index');

@@ -35,23 +35,27 @@ class Loader {
     sceneDescription['resources'].forEach((r) {
       resources.add(r);
     });
-    sceneDescription['entities'].forEach((e) {
-      if (e['mesh'] != null) {
-        resources.add(e['mesh']);
+    var en = sceneDescription['entities'];
+    en.forEach((Map e) {
+      String mesh = e['mesh'];
+      Map<String, String> textures = e['textures'];
+      if (mesh != null) {
+        resources.add(mesh);
       }
-      if (e['shader'] != null) {
-        resources.add(e['shader']);
-      }
-      if (e['textures'] != null) {
-        e['textures'].forEach((t) {
-          resources.add(t);
+      if (textures != null) {
+        textures.forEach((k, v) {
+          resources.add(v);
         });
       }
+    });
+    en = sceneDescription['materials'];
+    en.forEach((Map e) {
+      resources.add(e['shader']);
     });
     resources.forEach((r) {
       _resourceHandleTable.add(_resourceManager.registerResource(r));
     });
-    return _resourceManager.loadResources(_resourceHandleTable);
+    return _resourceManager.loadResources(_resourceHandleTable, false);
   }
   
   Mesh _loadMesh(Map entity) {
@@ -67,13 +71,13 @@ class Loader {
   }
   
   Material _loadMaterial(Map entity) {
-    final String name = entity['shader'];
+    final String name = entity['name'];
     Material material = _scene.materials[name];
     if (material == null) {
       material = new Material(name, _scene);
       _scene.materials[name] = material;
     }
-    material.load({});
+    material.load(entity);
     print('loaded $name');
     return material;
   }
@@ -83,14 +87,18 @@ class Loader {
       _scene.skybox.fini();
       _scene.skybox = null;
     }
-    String texture0 = entity['textures'][0];
-    String texture1 = entity['textures'][1];
-    _scene.skybox = new Skybox(_device, _resourceManager, texture0, texture1);
+    String texture0 = entity['textures']['0'];
+    String texture1 = entity['textures']['1'];
+    int texture0Handle = _scene.resourceManager.getResourceHandle(texture0);
+    int texture1Handle = _scene.resourceManager.getResourceHandle(texture1);
+    _scene.skybox = new Skybox(_device, _resourceManager,
+                                texture0Handle,
+                                texture1Handle);
     _scene.skybox.init();
   }
   
   void _spawnModel(Map entity) {
-    Material mat = _scene.materials[entity['shader']];
+    Material mat = null; //_scene.materials[entity['shader']];
     Mesh mesh = _scene.meshes[entity['mesh']];
     Model model = _scene.models[entity['name']];
     if (model == null) {
@@ -149,15 +157,15 @@ class Loader {
       completer.complete(false);
       return completer.future;
     }
+    // Materials
+    _sceneDescription['materials'].forEach((m) {
+      _loadMaterial(m);
+    });
     // Create entities
     _sceneDescription['entities'].forEach((e) {
       if (e['mesh'] != null) {
         _loadMesh(e);
-      }
-      if (e['shader'] != null) {
-        _loadMaterial(e);
-      }
-      
+      }      
       if (e['type'] == 'skybox') {
         _spawnSkybox(e);
       }

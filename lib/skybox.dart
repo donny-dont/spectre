@@ -55,8 +55,6 @@ class Skybox {
   static final int _skyboxVertexShaderResourceHandleIndex = 0;
   static final int _skyboxFragmentShaderResourceHandleIndex = 1;
   static final int _skyboxVertexResourceHandleIndex = 2;
-  static final int _skyboxTexture1ResourceHandleIndex = 3;
-  static final int _skyboxTexture2ResourceHandleIndex = 4;
 
   static final String _skyboxVertexShaderResourceName = '/shaders/skybox.vs';
   static final String _skyboxFragmentShaderResourceName = '/shaders/skybox.fs';
@@ -71,10 +69,10 @@ class Skybox {
   Float32Array _blendT;
 
   Float32ArrayResource skyboxVertexResource;
-  String skyboxTexture1ResourceName;
-  String skyboxTexture2ResourceName;
+  int skyboxTexture1ResourceHandle;
+  int skyboxTexture2ResourceHandle;
 
-  Skybox(this.device, this.resourceManager, this.skyboxTexture1ResourceName, this.skyboxTexture2ResourceName) {
+  Skybox(this.device, this.resourceManager, this.skyboxTexture1ResourceHandle, this.skyboxTexture2ResourceHandle) {
     _deviceHandles = new List<int>();
     _resourceHandles = new List<int>();
     skyboxVertexResource = new Float32ArrayResource(_skyboxVertexResourceName, resourceManager);
@@ -103,17 +101,21 @@ class Skybox {
     _resourceHandles.add(resourceManager.registerResource(_skyboxVertexShaderResourceName));
     _resourceHandles.add(resourceManager.registerResource(_skyboxFragmentShaderResourceName));
     _resourceHandles.add(resourceManager.registerDynamicResource(skyboxVertexResource));
-    _resourceHandles.add(resourceManager.registerResource(skyboxTexture1ResourceName));
-    _resourceHandles.add(resourceManager.registerResource(skyboxTexture2ResourceName));
+
+    device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture1HandleIndex], skyboxTexture1ResourceHandle, resourceManager);
+    device.immediateContext.generateMipmap(_deviceHandles[_skyboxTexture1HandleIndex]);
+
+    device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture2HandleIndex], skyboxTexture2ResourceHandle, resourceManager);
+    device.immediateContext.generateMipmap(_deviceHandles[_skyboxTexture2HandleIndex]);
 
     // load callbacks
-    resourceManager.addEventCallback(_resourceHandles[_skyboxTexture1ResourceHandleIndex], ResourceEvents.TypeUpdate, (type, resource) {
-      device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture1HandleIndex], _resourceHandles[_skyboxTexture1ResourceHandleIndex], resourceManager);
+    resourceManager.addEventCallback(skyboxTexture1ResourceHandle, ResourceEvents.TypeUpdate, (type, resource) {
+      device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture1HandleIndex], skyboxTexture1ResourceHandle, resourceManager);
       device.immediateContext.generateMipmap(_deviceHandles[_skyboxTexture1HandleIndex]);
     });
 
-    resourceManager.addEventCallback(_resourceHandles[_skyboxTexture2ResourceHandleIndex], ResourceEvents.TypeUpdate, (type, resource) {
-      device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture2HandleIndex], _resourceHandles[_skyboxTexture2ResourceHandleIndex], resourceManager);
+    resourceManager.addEventCallback(skyboxTexture2ResourceHandle, ResourceEvents.TypeUpdate, (type, resource) {
+      device.immediateContext.updateTexture2DFromResource(_deviceHandles[_skyboxTexture2HandleIndex], skyboxTexture2ResourceHandle, resourceManager);
       device.immediateContext.generateMipmap(_deviceHandles[_skyboxTexture2HandleIndex]);
     });
 
@@ -132,8 +134,6 @@ class Skybox {
     // Kick off loads
     resourceManager.loadResource(_resourceHandles[_skyboxVertexShaderResourceHandleIndex]);
     resourceManager.loadResource(_resourceHandles[_skyboxFragmentShaderResourceHandleIndex]);
-    resourceManager.loadResource(_resourceHandles[_skyboxTexture1ResourceHandleIndex]);
-    resourceManager.loadResource(_resourceHandles[_skyboxTexture2ResourceHandleIndex]);
 
     buildVertexBuffer();
   }
