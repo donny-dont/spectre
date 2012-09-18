@@ -51,9 +51,31 @@ class Loader {
     en = sceneDescription['materials'];
     en.forEach((Map e) {
       resources.add(e['shader']);
+      Map<String, String> textures = e['textures'];
+      if (textures != null) {
+        textures.forEach((k, v) {
+          resources.add(v);
+        });
+      }
     });
     resources.forEach((r) {
-      _resourceHandleTable.add(_resourceManager.registerResource(r));
+      int handle = _resourceManager.getResourceHandle(r);
+      if (handle != Handle.BadHandle) {
+        // Duplicate
+        return;
+      }
+      handle = _resourceManager.registerResource(r);
+      ResourceBase rb = _resourceManager.getResource(handle);
+      if (rb is ImageResource) {
+        int textureHandle = _device.createTexture2D(rb.url, {});
+        _resourceManager.addEventCallback(handle, ResourceEvents.TypeUpdate, (type, resource) {
+          _device.immediateContext.updateTexture2DFromResource(textureHandle, handle, _resourceManager);
+          _device.immediateContext.generateMipmap(textureHandle);
+          spectreLog.Info('Updated texture - ${rb.url}');
+        });
+        _deviceHandleTable.add(textureHandle);
+      }
+      _resourceHandleTable.add(handle);
     });
     return _resourceManager.loadResources(_resourceHandleTable, false);
   }
@@ -66,7 +88,6 @@ class Loader {
       _scene.meshes[name] = mesh;
     }
     mesh.load({});
-    print('loaded $name');
     return mesh;
   }
   
@@ -78,8 +99,27 @@ class Loader {
       _scene.materials[name] = material;
     }
     material.load(entity);
-    print('loaded $name');
     return material;
+  }
+  
+  MaterialInstance _loadMaterialInstance(Map entity) {
+    String materialName = entity['material'];
+    if (materialName == null) {
+      return null;
+    }
+    Material material = _scene.materials[materialName];
+    if (material == null) {
+      spectreLog.Error('No material named $materialName');
+      return null;
+    }
+    String materialInstanceName = '${entity['material']}.${entity['name']}';
+    MaterialInstance materialInstance = _scene.materialInstances[materialInstanceName];
+    if (materialInstance == null) {
+      materialInstance = new MaterialInstance(materialInstanceName, material, _scene);
+      _scene.materialInstances[materialInstanceName] = materialInstance;
+    }
+    materialInstance.load(entity);
+    return materialInstance;
   }
   
   void _spawnSkybox(Map entity) {
@@ -89,8 +129,8 @@ class Loader {
     }
     String texture0 = entity['textures']['0'];
     String texture1 = entity['textures']['1'];
-    int texture0Handle = _scene.resourceManager.getResourceHandle(texture0);
-    int texture1Handle = _scene.resourceManager.getResourceHandle(texture1);
+    int texture0Handle = _scene.device.getDeviceChildHandle(texture0);
+    int texture1Handle = _scene.device.getDeviceChildHandle(texture1);
     _scene.skybox = new Skybox(_device, _resourceManager,
                                 texture0Handle,
                                 texture1Handle);
@@ -98,14 +138,15 @@ class Loader {
   }
   
   void _spawnModel(Map entity) {
-    Material mat = _scene.materials[entity['material']];
+    String materialInstanceName = '${entity['material']}.${entity['name']}';
+    MaterialInstance materialInstance = _scene.materialInstances[materialInstanceName];
     Mesh mesh = _scene.meshes[entity['mesh']];
     Model model = _scene.models[entity['name']];
     if (model == null) {
       model = new Model(entity['name'], _scene);
       _scene.models[entity['name']] = model;
     }
-    model.update(mat, mesh, mat.meshinputs);
+    model.update(materialInstance, mesh, materialInstance.material.meshinputs);
   }
   
   void _setModelTransform(String name, Map transform) {
@@ -115,7 +156,7 @@ class Loader {
     }
     int xformHandle = model.transformHandle;
     if (name == 'cone') {
-      print('Cone model. $xformHandle');
+      //print('Cone model. $xformHandle');
     }
     mat4 T = _scene.transformGraph.refLocalMatrix(xformHandle);
     T.setIdentity();
@@ -141,6 +182,7 @@ class Loader {
     }
     String parent = transform['parent'];
     if (parent != null) {
+      _scene.transformGraph.unparent(xformHandle);
       Model parentModel = _scene.models[parent];
       if (parentModel != null) {
         _scene.transformGraph.reparent(xformHandle, parentModel.transformHandle);  
@@ -161,15 +203,24 @@ class Loader {
     _sceneDescription['materials'].forEach((m) {
       _loadMaterial(m);
     });
+   
+    var foo = _sceneDescription['entities'];
+    print('$foo');
+    _sceneDescription['entities'].forEach((e) {
+      _loadMaterialInstance(e);
+    });
+    
+    Set<String> existingModels = new Set<String>();
     // Create entities
     _sceneDescription['entities'].forEach((e) {
       if (e['mesh'] != null) {
         _loadMesh(e);
-      }      
+      }
       if (e['type'] == 'skybox') {
         _spawnSkybox(e);
       }
       if (e['type'] == 'model') {
+        existingModels.add(e['name']);
         _spawnModel(e);
       }
       if (e['type'] == 'uniformset') {
@@ -189,7 +240,7 @@ class Loader {
       _setModelTransform(e['name'], transform);
     });
     
-    _scene.reloaded();
+    _scene.reloaded(existingModels);
     
     completer.complete(true);
     return completer.future;

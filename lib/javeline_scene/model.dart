@@ -1,6 +1,6 @@
 
 class Model extends SceneChild {
-  Material _material;
+  MaterialInstance _materialInstance;
   Mesh _mesh;
   int _inputLayoutHandle;
   int transformHandle;
@@ -11,8 +11,8 @@ class Model extends SceneChild {
     print('Spawned $name with $transformHandle');
   }
   
-  void update(Material material, Mesh mesh, List layout) {
-    _material = material;
+  void update(MaterialInstance materialInstance, Mesh mesh, List layout) {
+    _materialInstance = materialInstance;
     _mesh = mesh;
     if (_inputLayoutHandle == 0) {
       _inputLayoutHandle = scene.device.createInputLayout('$name.il', {});
@@ -25,7 +25,7 @@ class Model extends SceneChild {
     });
     
     scene.device.configureDeviceChild(_inputLayoutHandle, {
-      'shaderProgram': material.shaderProgramHandle,
+      'shaderProgram': _materialInstance.material.shaderProgramHandle,
       'elements': descriptions
     });
   }
@@ -33,7 +33,7 @@ class Model extends SceneChild {
   void draw(Camera camera, Map globalUniforms) {
     scene.device.immediateContext.setInputLayout(_inputLayoutHandle);
     _mesh.preDraw();
-    _material.preDraw();
+    _materialInstance.preDraw();
     globalUniforms.forEach((k,v) {
       scene.device.immediateContext.setUniformMatrix4(k, v);
     });

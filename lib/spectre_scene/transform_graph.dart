@@ -52,6 +52,14 @@ class TransformGraph {
     return nodeHandle;
   }
   
+  void _unparentChildren(int parentNode) {
+    for (int i = 0; i < _maxNodes; i++) {
+      if (_nodes[i].parentId == parentNode) {
+        unparent(_nodes[i].selfId);
+      }
+    }
+  }
+  
   /// Delete an existing transform node [nodeHandle]
   void deleteNode(int nodeHandle) {
     if (nodeHandle == 0) {
@@ -60,8 +68,11 @@ class TransformGraph {
     if (_handleSystem.validHandle(nodeHandle) == false) {
       return;
     }
-    _handleSystem.freeHandle(nodeHandle);
     int index = Handle.getIndex(nodeHandle);
+    if (_nodes[index].childCount > 0) {
+      _unparentChildren(nodeHandle);
+    }
+    _handleSystem.freeHandle(nodeHandle);
     _localTransforms[index].setIdentity();
     assert(_nodes[index].childCount == 0);
     _nodes[index].reset();

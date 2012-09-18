@@ -1,6 +1,7 @@
 #library('javeline_scene');
 #import('dart:html');
 #import('../external/DartVectorMath/lib/vector_math_html.dart');
+#import('handle.dart');
 #import('spectre.dart');
 #import('spectre_scene.dart');
 #import('skybox.dart');
@@ -11,4 +12,5 @@
 #source('javeline_scene/mesh.dart');
 #source('javeline_scene/uniformset.dart');
 #source('javeline_scene/material.dart');
+#source('javeline_scene/material_instance.dart');
 #source('javeline_scene/model.dart');

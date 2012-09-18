@@ -52,7 +52,7 @@ class JavelineProjector extends JavelineBaseDemo {
       'projectionViewTransform': projectionViewTransform,
       'normalTransform': normalTransform
     });
-    drawHolodeck(20);
+    drawHolodeck(4);
     debugDrawManager.prepareForRender();
     debugDrawManager.render(camera);
   }

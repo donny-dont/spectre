@@ -151,7 +151,7 @@ class ResourceManager {
 
     _resources[index] = rb;
     _urlToHandle[url] = handle;
-    print('RR: $url $handle');
+    //print('RR: $url $handle');
     return handle;
   }
 
@@ -207,7 +207,7 @@ class ResourceManager {
       return null;
     }
     Completer<int> completer = new Completer<int>();
-    if (rb.isLoaded && !force) {
+    if (rb.isLoaded && force == false) {
       // Skip load
       completer.complete(handle);
     } else {
@@ -231,7 +231,7 @@ class ResourceManager {
       var r = loadResource(handle, force);
       if (r == null) {
         int index = Handle.getIndex(handle);
-        print('Eh $handle $index');
+        print('Load resource invalid handle $handle $index');
         return;
       }
       futures.add(r);  

@@ -82,6 +82,7 @@ class ResourceBase {
   }
   
   void update(Map state) {
+    _isLoaded = true;
     _fireUpdated();
   }
   
@@ -257,6 +258,7 @@ class ShaderProgramResource extends ResourceBase {
   }
 
   void load(_ResourceLoaderResult result) {
+    super.load(result);
     if (result.success == false) {
       return;
     }
@@ -302,10 +304,13 @@ class ShaderProgramResource extends ResourceBase {
           }
         }
         _fireUpdated();
+        _isLoaded = true;
         result.completer.complete(result.handle);
       });  
     } else {
+      
       _fireUpdated();
+      _isLoaded = true;
       result.completer.complete(result.handle);
     }
   }
@@ -339,6 +344,7 @@ class ImageResource extends ResourceBase {
   ImageElement get image() => _image;
 
   void load(_ResourceLoaderResult result) {
+    _isLoaded = true;
     if (result.success == false) {
       return;
     }

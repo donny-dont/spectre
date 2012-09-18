@@ -279,7 +279,7 @@ class Device {
     }
     assert(_childrenHandles.validHandle(handle));
     int index = Handle.getIndex(handle);
-    print('$index - $name');
+    //print('$index - $name');
     // Nothing is at this index
     assert(_childrenObjects[index] == null);
 

@@ -233,42 +233,67 @@ class BlendState extends DeviceChild {
   void _createDeviceState() {
   }
 
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+       "BlendSourceZero": WebGLRenderingContext.ZERO,
+       "BlendSourceOne": WebGLRenderingContext.ONE,
+       "BlendSourceShaderColor": WebGLRenderingContext.SRC_COLOR,
+       "BlendSourceShaderInverseColor": WebGLRenderingContext.ONE_MINUS_SRC_COLOR,
+       "BlendSourceShaderAlpha": WebGLRenderingContext.SRC_ALPHA,
+       "BlendSourceShaderInverseAlpha": WebGLRenderingContext.ONE_MINUS_SRC_ALPHA,
+       "BlendSourceTargetColor": WebGLRenderingContext.DST_COLOR,
+       "BlendSourceTargetInverseColor": WebGLRenderingContext.ONE_MINUS_DST_COLOR,
+       "BlendSourceTargetAlpha": WebGLRenderingContext.DST_ALPHA,
+       "BlendSourceTargetInverseAlpha": WebGLRenderingContext.ONE_MINUS_DST_ALPHA,
+       "BlendSourceBlendColor": WebGLRenderingContext.CONSTANT_COLOR,
+       "BlendSourceBlendAlpha": WebGLRenderingContext.CONSTANT_ALPHA,
+       "BlendSourceBlendInverseColor": WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR,
+       "BlendSourceBlendInverseAlpha": WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA,
+       "BlendOpAdd": WebGLRenderingContext.FUNC_ADD,
+       "BlendOpSubtract": WebGLRenderingContext.FUNC_SUBTRACT,
+       "BlendOpReverseSubtract": WebGLRenderingContext.FUNC_REVERSE_SUBTRACT
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
       o = props['blendColorRed'];
-      blendColorRed = o != null ? o : blendColorRed;
+      blendColorRed = o != null ? filter(o) : blendColorRed;
       o = props['blendColorGreen'];
-      blendColorGreen = o != null ? o : blendColorGreen;
+      blendColorGreen = o != null ? filter(o) : blendColorGreen;
       o = props['blendColorBlue'];
-      blendColorBlue = o != null ? o : blendColorBlue;
+      blendColorBlue = o != null ? filter(o) : blendColorBlue;
       o = props['blendColorAlpha'];
-      blendColorAlpha = o != null ? o : blendColorAlpha;
+      blendColorAlpha = o != null ? filter(o) : blendColorAlpha;
 
       o = props['blendEnable'];
-      blendEnable = o != null ? o : blendEnable;
+      blendEnable = o != null ? filter(o) : blendEnable;
       o = props['blendSourceColorFunc'];
-      blendSourceColorFunc = o != null ? o : blendSourceColorFunc;
+      blendSourceColorFunc = o != null ? filter(o) : blendSourceColorFunc;
       o = props['blendDestColorFunc'];
-      blendDestColorFunc = o != null ? o : blendDestColorFunc;
+      blendDestColorFunc = o != null ? filter(o) : blendDestColorFunc;
       o = props['blendSourceAlphaFunc'];
-      blendSourceAlphaFunc = o != null ? o : blendSourceAlphaFunc;
+      blendSourceAlphaFunc = o != null ? filter(o) : blendSourceAlphaFunc;
       o = props['blendDestAlphaFunc'];
-      blendDestAlphaFunc = o != null ? o : blendDestAlphaFunc;
+      blendDestAlphaFunc = o != null ? filter(o) : blendDestAlphaFunc;
 
       o = props['blendColorOp'];
-      blendColorOp = o != null ? o : blendColorOp;
+      blendColorOp = o != null ? filter(o) : blendColorOp;
       o = props['blendAlphaOp'];
-      blendAlphaOp = o != null ? o : blendAlphaOp;
+      blendAlphaOp = o != null ? filter(o) : blendAlphaOp;
 
       o = props['writeRenderTargetRed'];
-      writeRenderTargetRed = o != null ? o : writeRenderTargetRed;
+      writeRenderTargetRed = o != null ? filter(o) : writeRenderTargetRed;
       o = props['writeRenderTargetGreen'];
-      writeRenderTargetGreen = o != null ? o : writeRenderTargetGreen;
+      writeRenderTargetGreen = o != null ? filter(o) : writeRenderTargetGreen;
       o = props['writeRenderTargetBlue'];
-      writeRenderTargetBlue = o != null ? o : writeRenderTargetBlue;
+      writeRenderTargetBlue = o != null ? filter(o) : writeRenderTargetBlue;
       o = props['writeRenderTargetAlpha'];
-      writeRenderTargetAlpha = o != null ? o : writeRenderTargetAlpha;
+      writeRenderTargetAlpha = o != null ? filter(o) : writeRenderTargetAlpha;
     }
   }
 
@@ -339,22 +364,22 @@ class DepthState extends DeviceChild {
       Dynamic o;
 
       o = props['depthTestEnabled'];
-      depthTestEnabled = o != null ? filter(o) : filter(depthTestEnabled);
+      depthTestEnabled = o != null ? filter(o) : depthTestEnabled;
       o = props['depthWriteEnabled'];
-      depthWriteEnabled = o != null ? filter(o) : filter(depthWriteEnabled);
+      depthWriteEnabled = o != null ? filter(o) : depthWriteEnabled;
       o = props['polygonOffsetEnabled'];
-      polygonOffsetEnabled = o != null ? filter(o) : filter(polygonOffsetEnabled);
+      polygonOffsetEnabled = o != null ? filter(o) : polygonOffsetEnabled;
 
       o = props['depthNearVal'];
-      depthNearVal = o != null ? filter(o) : filter(depthNearVal);
+      depthNearVal = o != null ? filter(o) : depthNearVal;
       o = props['depthFarVal'];
-      depthFarVal = o != null ? filter(o) : filter(depthFarVal);
+      depthFarVal = o != null ? filter(o) : depthFarVal;
       o = props['polygonOffsetFactor'];
-      polygonOffsetFactor = o != null ? filter(o) :filter(polygonOffsetFactor);
+      polygonOffsetFactor = o != null ? filter(o) : polygonOffsetFactor;
       o = props['polygonOffsetUnits'];
-      polygonOffsetUnits = o != null ? filter(o) : filter(polygonOffsetUnits);
+      polygonOffsetUnits = o != null ? filter(o) : polygonOffsetUnits;
       o = props['depthComparisonOp'];
-      depthComparisonOp = o != null ? filter(o) : filter(depthComparisonOp);
+      depthComparisonOp = o != null ? filter(o) : depthComparisonOp;
     }
 
   }
@@ -428,13 +453,13 @@ class RasterizerState extends DeviceChild {
       Dynamic o;
 
       o = props['cullEnabled'];
-      cullEnabled = o != null ? o : cullEnabled;
+      cullEnabled = o != null ? filter(o) : cullEnabled;
       o = props['cullMode'];
-      cullMode = o != null ? o : cullMode;
+      cullMode = o != null ? filter(o) : cullMode;
       o = props['cullFrontFace'];
-      cullFrontFace = o != null ? o : cullFrontFace;
+      cullFrontFace = o != null ? filter(o) : cullFrontFace;
       o = props['lineWidth'];
-      lineWidth = o != null ? o : lineWidth;
+      lineWidth = o != null ? filter(o) : lineWidth;
     }
   }
 
@@ -537,7 +562,7 @@ class FragmentShader extends Shader {
   }
 }
 
-typedef void UniformCallback(String name, int index, String type, int size);
+typedef void UniformCallback(String name, int index, String type, int size, int location);
 
 /// A shader program defines how the programmable units of the GPU pipeline function
 /// Create using [Device.createShaderProgram]
@@ -683,7 +708,8 @@ class ShaderProgram extends DeviceChild {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
-      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size);
+      var location = device.gl.getUniformLocation(_program, activeUniform.name);
+      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size, location);
     }
   }
 }
@@ -850,13 +876,37 @@ class SamplerState extends DeviceChild {
     super._createDeviceState();
   }
 
-
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+        "TextureWrapClampToEdge": WebGLRenderingContext.CLAMP_TO_EDGE,
+        "TextureWrapMirroredRepeat": WebGLRenderingContext.MIRRORED_REPEAT,
+        "TextureWrapRepeat": WebGLRenderingContext.REPEAT,
+        "TextureMagFilterLinear": WebGLRenderingContext.LINEAR,
+        "TextureMagFilterNearest": WebGLRenderingContext.NEAREST,
+        "TextureMinFilterLinear": WebGLRenderingContext.LINEAR,
+        "TextureMinFilterNearest": WebGLRenderingContext.NEAREST,
+        "TextureMinFilterNearestMipmapNearest": WebGLRenderingContext.NEAREST_MIPMAP_NEAREST,
+        "TextureMinFilterNearestMipmapLinear": WebGLRenderingContext.NEAREST_MIPMAP_LINEAR,
+        "TextureMinFilterLinearMipmapNearest": WebGLRenderingContext.LINEAR_MIPMAP_NEAREST,
+        "TextureMinFilterLinearMipmapLinear": WebGLRenderingContext.LINEAR_MIPMAP_LINEAR
+      };
+      return table[o];
+    }
+    return o;
+  }
+  
   void _configDeviceState(Dynamic props) {
     if (props != null) {
-      _wrapS = props['wrapS'] != null ? props['wrapS'] : _wrapS;
-      _wrapT = props['wrapT'] != null ? props['wrapT'] : _wrapT;
-      _minFilter = props['minFilter'] != null ? props['minFilter'] : _minFilter;
-      _magFilter = props['magFilter'] != null ? props['magFilter'] : _magFilter;
+      Dynamic o;
+      o = props['wrapS'];
+      _wrapS = o != null ? filter(o) : _wrapS;
+      o = props['wrapT'];
+      _wrapT = o != null ? filter(o) : _wrapT;
+      o = props['minFilter'];
+      _minFilter = o != null ? filter(o) : _minFilter;
+      o = props['magFilter'];
+      _magFilter = o != null ? filter(o) : _magFilter;
     }
 
   }

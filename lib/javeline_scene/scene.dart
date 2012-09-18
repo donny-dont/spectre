@@ -5,6 +5,7 @@ class Scene {
   TransformGraph transformGraph;
   Map<String, Mesh> meshes;
   Map<String, Material> materials;
+  Map<String, MaterialInstance> materialInstances;
   Map<String, Model> models;
   num _blendT;
   num _blendTDirection;
@@ -14,12 +15,29 @@ class Scene {
     transformGraph.updateWorldMatrices();
     meshes = new Map<String, Mesh>();
     materials = new Map<String, Material>();
+    materialInstances = new Map<String, MaterialInstance>();
     models = new Map<String, Model>();
     _blendT = 0;
     _blendTDirection = 1.0;
   }
   
-  void reloaded() {
+  void removeModel(String name) {
+    Model m = models[name];
+    if (m == null) {
+      return;
+    }
+    models.remove(name);
+    transformGraph.deleteNode(m.transformHandle);
+  }
+  
+  void reloaded(Set<String> existingModels) {
+    Set<String> deadModels = new Set<String>();
+    models.forEach((k,v) {
+      if (!existingModels.contains(k)) {
+        deadModels.add(k);
+      }
+    });
+    deadModels.forEach(removeModel);
     transformGraph.updateGraph();
   }
   

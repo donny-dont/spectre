@@ -17,6 +17,8 @@
 			},
 			"samplers": {
 				"diffuse": {
+					"wrapS": "TextureWrapRepeat",
+					"wrapT": "TextureWrapClampToEdge"
 				}
 			},
 			"blend": {
@@ -38,7 +40,7 @@
 			},
 			"uniformset": {
 				"lightColor": [0.6, 0.9, 0.8],
-				"lightDirection": [1.0, -1.0, 1.0]
+				"lightDirection": [0.0, -1.0, 0.0]
 			}
 		}
 	],
@@ -49,15 +51,24 @@
 			"mesh": "/meshes/UnitPlane.mesh",
 			"material": "litdiffuse",
 			"transform": {
-				"translate": [0.0, 0.0, 0.0]
+				"translate": [0.0, 0.0, 0.0],
+				"scale": [10.0, 10.0, 10.0]
+			},
+			"rasterizer": {
+				"cullEnabled": true,
+				"cullMode": "CullBack",
+				"cullFrontFace": "FrontCCW"
+			},
+			"textures": {
+				"diffuse": "/textures/felt.png"
 			}
 		},
 		{
 			"name": "sky",
 			"type": "skybox",
 			"textures": {
-				"0": "/textures/skybox2.png",
-				"1": "/textures/skybox2.png"
+				"0": "/textures/skybox3.png",
+				"1": "/textures/skybox3.png"
 			}
 		},
 		{
@@ -65,15 +76,22 @@
 			"type": "model",
 			"mesh": "/meshes/UnitCone.mesh",
 			"transform": {
-				"translate": [1.0, 5.0, 0.0],
+				"translate": [1.0, 5.0, -5.0],
 				"rotateZ": 2.0,
 				"rotateX": 1.0,
 				"scale": [1.0, 1.0, 1.0]
 			},
-			"material": "litdiffuse",
-			"textures": {
-				"diffuse": "/textures/felt.png"
-			}
+			"material": "litdiffuse"
+		},
+		{
+			"name": "cone4",
+			"type": "model",
+			"mesh": "/meshes/UnitCone.mesh",
+			"transform": {
+				"translate": [10.0, 5.0, -5.0],
+				"scale": [1.0, 1.0, 1.0]
+			},
+			"material": "litdiffuse"
 		},
 		{
 			"name": "box",
@@ -81,9 +99,12 @@
 			"mesh": "/meshes/UnitCube.mesh",
 			"transform": {
 				"parent": "cone",
-				"translate": [0.0, 0.0, 0.0]
+				"translate": [0.0, 3.0, 0.0]
 			},
 			"material": "litdiffuse",
+			"textures": {
+				"diffuse": "/textures/felt.png"
+			},
 			"uniformsets": [ "sun" ]
 		},
 		{

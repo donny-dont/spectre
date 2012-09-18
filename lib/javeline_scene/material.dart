@@ -1,50 +1,79 @@
-class MaterialUniform {
-  final String name;
-  final int uniformIndex;
-  final String type;
-  final int size;
-  MaterialUniform(this.name, this.uniformIndex, this.type, this.size);
-}
-
 class Material extends SceneChild {
   int vertexShaderHandle;
   int fragmentShaderHandle;
   int shaderProgramHandle;
-  int blendStateHandle;
-  int depthStateHandle;
-  int rasterizerStateHandle;
+  Map<String, int> textureNameToUnit;
   Map entity;
-  Map<String, MaterialUniform> uniforms;
+
   List<Map> meshinputs;
+  Map uniformset;
   Material(String name, Scene scene) : super(name, scene) {
     vertexShaderHandle = 0;
     fragmentShaderHandle = 0;
     shaderProgramHandle = 0;
-    blendStateHandle = 0;
-    depthStateHandle = 0;
-    rasterizerStateHandle = 0;
+    textureNameToUnit = new Map<String, int>();
   }
   
-  void uniformCallback(String name, int index, String type, int size) {
-    uniforms[name] = new MaterialUniform(name, index, type, size);
+  void processUniforms() {
+    textureNameToUnit.clear();
+    int textureUnitIndex = 0;
+    scene.device.getDeviceChild(shaderProgramHandle).forEachUniforms((String name, int index, String type, int size, location) {
+      if (type == 'sampler2D') {
+        textureNameToUnit[name] = textureUnitIndex++;
+      }
+    });
   }
-  
-  void loadUniforms() {
-    uniforms = new Map<String, MaterialUniform>();
-    scene.device.getDeviceChild(shaderProgramHandle).forEachUniforms(uniformCallback);
-    spectreLog.Info('$uniforms');
+
+  static List<int> buildTextureHandleList(Map nameToUnit, Map nameToHandle) {
+    List<int> out = new List<int>(nameToUnit.length);
+    nameToHandle.forEach((k, v) {
+      int slot = nameToUnit[k];
+      int handle = v;
+      out[slot] = handle;
+    });
+    return out;
   }
-  
-  int uniformIndex(String name) {
-    MaterialUniform uniform = uniforms[name];
-    if (uniform != null) {
-      return uniform.uniformIndex;
+
+  static void updateTextureTable(Scene scene, Map textureNameToResourceName, Map textures, Map textureNameToHandle) {
+    if (textures == null) {
+      return;
     }
-    return -1;
+    textures.forEach((textureName, resourceName) {
+      if (textureNameToResourceName[textureName] == resourceName) {
+        // Already up to date
+        return;
+      }
+      // New or changed texture resource
+      textureNameToResourceName[textureName] = resourceName;
+      int resourceTextureHandle = scene.device.getDeviceChildHandle(resourceName);
+      if (resourceTextureHandle != Handle.BadHandle) {
+        // Texture already exists, update table
+        textureNameToHandle[textureName] = resourceTextureHandle;
+        return;
+      }
+    });
   }
   
+  static void updateSamplerTable(Scene scene, String prefix, Map textures, Map samplers, Map samplerNameToHandle) {
+    if (textures == null || samplers == null) {
+      return;
+    }
+    textures.forEach((textureName, _) {
+      int handle = samplerNameToHandle[textureName];
+      if (handle == null) {
+        handle = scene.device.createSamplerState('$prefix.$textureName.sampler', {});
+        samplerNameToHandle[textureName] = handle;
+      }
+      Map sampler = samplers[textureName];
+      if (sampler != null) {
+        scene.device.configureDeviceChild(handle, sampler);
+      }
+    });
+  }
+    
   void load(Map o) {
     entity = o;
+    uniformset = o['uniformset'];
     meshinputs = o['meshinputs'];
     String shaderName = o['shader'];
     int handle = scene.resourceManager.getResourceHandle(shaderName);
@@ -62,15 +91,7 @@ class Material extends SceneChild {
     if (shaderProgramHandle == 0) {
       shaderProgramHandle = scene.device.createShaderProgram('$shaderName.sp', {});  
     }
-    if (blendStateHandle == 0) {
-      blendStateHandle = scene.device.createBlendState('$name.bs', {});
-    }
-    if (depthStateHandle == 0) {
-      depthStateHandle = scene.device.createDepthState('$name.ds', {});
-    }
-    if (rasterizerStateHandle == 0) {
-      rasterizerStateHandle = scene.device.createRasterizerState('$name.rs', {});
-    }
+
     bool relink = false;
     VertexShader vs = scene.device.getDeviceChild(vertexShaderHandle);
     if (vs.source != spr.vertexShaderSource) {
@@ -92,27 +113,16 @@ class Material extends SceneChild {
         'VertexProgram': vertexShaderHandle,
         'FragmentProgram': fragmentShaderHandle,
       });
-      loadUniforms();  
-    }
-    
-    var bs = entity['blend'];
-    var ds = entity['depth'];
-    var rs = entity['rasterizer'];
-    
-    if (bs != null) {
-      scene.device.configureDeviceChild(blendStateHandle, ds);
-    }
-    
-    if (ds != null) {
-      scene.device.configureDeviceChild(depthStateHandle, ds);
-    }
-    
-    if (rs != null) {
-      scene.device.configureDeviceChild(rasterizerStateHandle, rs);
+      processUniforms();
     }
   }
   
   void preDraw() {
     scene.device.immediateContext.setShaderProgram(shaderProgramHandle);
+    if (uniformset != null) {
+      uniformset.forEach((name, value) {
+        scene.device.immediateContext.setUniform3f(name, value[0], value[1], value[2]);
+      });
+    }
   }
 }
