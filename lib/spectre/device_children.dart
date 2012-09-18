@@ -318,28 +318,43 @@ class DepthState extends DeviceChild {
   void _createDeviceState() {
   }
 
-
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      Map table = {
+        "DepthComparisonOpNever": WebGLRenderingContext.NEVER,
+        "DepthComparisonOpAlways": WebGLRenderingContext.ALWAYS,
+        "DepthComparisonOpEqual": WebGLRenderingContext.EQUAL,
+        "DepthComparisonOpNotEqual": WebGLRenderingContext.NOTEQUAL,
+        "DepthComparisonOpLess": WebGLRenderingContext.LESS,
+        "DepthComparisonOpLessEqual": WebGLRenderingContext.LEQUAL,
+        "DepthComparisonOpGreaterEqual": WebGLRenderingContext.GEQUAL,
+        "DepthComparisonOpGreater": WebGLRenderingContext.GREATER,
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
 
       o = props['depthTestEnabled'];
-      depthTestEnabled = o != null ? o : depthTestEnabled;
+      depthTestEnabled = o != null ? filter(o) : filter(depthTestEnabled);
       o = props['depthWriteEnabled'];
-      depthWriteEnabled = o != null ? o : depthWriteEnabled;
+      depthWriteEnabled = o != null ? filter(o) : filter(depthWriteEnabled);
       o = props['polygonOffsetEnabled'];
-      polygonOffsetEnabled = o != null ? o : polygonOffsetEnabled;
+      polygonOffsetEnabled = o != null ? filter(o) : filter(polygonOffsetEnabled);
 
       o = props['depthNearVal'];
-      depthNearVal = o != null ? o : depthNearVal;
+      depthNearVal = o != null ? filter(o) : filter(depthNearVal);
       o = props['depthFarVal'];
-      depthFarVal = o != null ? o : depthFarVal;
+      depthFarVal = o != null ? filter(o) : filter(depthFarVal);
       o = props['polygonOffsetFactor'];
-      polygonOffsetFactor = o != null ? o :polygonOffsetFactor;
+      polygonOffsetFactor = o != null ? filter(o) :filter(polygonOffsetFactor);
       o = props['polygonOffsetUnits'];
-      polygonOffsetUnits = o != null ? o : polygonOffsetUnits;
+      polygonOffsetUnits = o != null ? filter(o) : filter(polygonOffsetUnits);
       o = props['depthComparisonOp'];
-      depthComparisonOp = o != null ? o : depthComparisonOp;
+      depthComparisonOp = o != null ? filter(o) : filter(depthComparisonOp);
     }
 
   }
@@ -395,6 +410,19 @@ class RasterizerState extends DeviceChild {
 
   }
 
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+       "CullFront": WebGLRenderingContext.FRONT,
+       "CullBack": WebGLRenderingContext.BACK,
+       "CullFrontAndBack": WebGLRenderingContext.FRONT_AND_BACK,
+       "FrontCW": WebGLRenderingContext.CW,
+       "FrontCCW": WebGLRenderingContext.CCW,
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;

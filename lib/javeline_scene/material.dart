@@ -94,6 +94,22 @@ class Material extends SceneChild {
       });
       loadUniforms();  
     }
+    
+    var bs = entity['blend'];
+    var ds = entity['depth'];
+    var rs = entity['rasterizer'];
+    
+    if (bs != null) {
+      scene.device.configureDeviceChild(blendStateHandle, ds);
+    }
+    
+    if (ds != null) {
+      scene.device.configureDeviceChild(depthStateHandle, ds);
+    }
+    
+    if (rs != null) {
+      scene.device.configureDeviceChild(rasterizerStateHandle, rs);
+    }
   }
   
   void preDraw() {
