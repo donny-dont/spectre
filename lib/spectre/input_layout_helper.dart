@@ -73,4 +73,39 @@ class InputLayoutHelper {
     }
     return new InputElementDescription(description.shaderAttributeName, format, stride, description.vertexBufferIndex, offset);
   }
+  
+  static InputElementDescription inputElementDescriptionFromAttributes(InputLayoutDescription description, Map attributes) {
+    Map attribute = attributes[description.meshAttributeName];
+    if (attribute == null) {
+      spectreLog.Info('mesh is does not have ${description.meshAttributeName}');
+      // mesh doesn't have this attribute
+      return null;
+    }
+
+    String type = attribute['type'];
+    num numElements = attribute['numElements'];
+    bool normalized = attribute['normalized'];
+    num stride = attribute['stride'];
+    num offset = attribute['offset'];
+    DeviceFormat format = null;
+    if (type == 'float') {
+      if (numElements == 1) {
+        format = Device.DeviceFormatFloat1;
+      }
+      if (numElements == 2) {
+        format = Device.DeviceFormatFloat2;
+      }
+      if (numElements == 3) {
+        format = Device.DeviceFormatFloat3;
+      }
+      if (numElements == 4) {
+        format = Device.DeviceFormatFloat4;
+      }
+    }
+    if (format == null) {
+      spectreLog.Info('cant find format for $type $numElements');
+      return null;
+    }
+    return new InputElementDescription(description.shaderAttributeName, format, stride, description.vertexBufferIndex, offset);
+  }
 }

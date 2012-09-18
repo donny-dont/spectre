@@ -222,12 +222,13 @@ class Device {
       return null;
     }
     int index = Handle.getIndex(handle);
-    if (noFallback == false && _childrenObjects[index].ready == false && _childrenObjects[index].fallback != 0) {
+    DeviceChild dc = _childrenObjects[index];
+    if (noFallback == false && dc.ready == false && dc.fallback != 0) {
       // Recurse
       //print('Fetching fallback: ${_childrenObjects[index].fallback}');
       return getDeviceChild(_childrenObjects[index].fallback);
     }
-    return _childrenObjects[index];
+    return dc;
   }
 
   String getDeviceChildName(int handle) {
@@ -278,6 +279,7 @@ class Device {
     }
     assert(_childrenHandles.validHandle(handle));
     int index = Handle.getIndex(handle);
+    print('$index - $name');
     // Nothing is at this index
     assert(_childrenObjects[index] == null);
 
@@ -305,6 +307,7 @@ class Device {
     dc._destroyDeviceState();
     _nameMapping.remove(dc.name);
     _childrenObjects[index] = null;
+    print('remove: $index - ${dc.name}');
   }
 
   void batchDeleteDeviceChildren(List<int> handles) {

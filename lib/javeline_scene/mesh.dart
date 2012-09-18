@@ -1,10 +1,9 @@
 
 class Mesh extends SceneChild {
   int indexedMesh;
-  Map layout;
+  Map attributes;
   Mesh(String name, Scene scene) : super(name, scene) {
     indexedMesh = 0;
-    layout = null;
   }
   
   void load(Map o) {
@@ -29,5 +28,18 @@ class Mesh extends SceneChild {
         }
       });
     }
+    attributes = mr.meshData['meshes'][0]['attributes'];
+  }
+  
+  void preDraw() {
+    IndexedMesh im = scene.device.getDeviceChild(indexedMesh);
+    scene.device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
+    scene.device.immediateContext.setIndexBuffer(im.indexArrayHandle);
+    scene.device.immediateContext.setVertexBuffers(0, [im.vertexArrayHandle]);
+  }
+  
+  void draw() {
+    IndexedMesh im = scene.device.getDeviceChild(indexedMesh);
+    scene.device.immediateContext.drawIndexed(im.numIndices, im.indexOffset);
   }
 }

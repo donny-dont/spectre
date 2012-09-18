@@ -218,10 +218,15 @@ class ResourceManager {
     return completer.future;
   }
   
-  Future<bool> loadResources(List<int> handles) {
+  Future<bool> loadResources(Collection<int> handles) {
     List<Future<int>> futures = new List<Future<int>>();
     handles.forEach((handle) {
       var r = loadResource(handle);
+      if (r == null) {
+        int index = Handle.getIndex(handle);
+        print('Eh $handle $index');
+        return;
+      }
       futures.add(r);  
     });
     Future<List> allFutures = Futures.wait(futures);

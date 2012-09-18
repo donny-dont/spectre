@@ -22,8 +22,8 @@
 
 #library('skybox');
 #import('dart:html');
-#import('../../external/DartVectorMath/lib/vector_math_html.dart');
-#import('../../lib/spectre.dart');
+#import('../external/DartVectorMath/lib/vector_math_html.dart');
+#import('spectre.dart');
 
 class Skybox {
   static final int _depthStateHandleIndex = 0;

@@ -1,15 +1,39 @@
+class MaterialUniform {
+  final String name;
+  final int uniformIndex;
+  final String type;
+  final int size;
+  MaterialUniform(this.name, this.uniformIndex, this.type, this.size);
+}
 
 class Material extends SceneChild {
   int vertexShaderHandle;
   int fragmentShaderHandle;
   int shaderProgramHandle;
-  Map<String, int> uniforms;
+  Map<String, MaterialUniform> uniforms;
   
   Material(String name, Scene scene) : super(name, scene) {
     vertexShaderHandle = 0;
     fragmentShaderHandle = 0;
     shaderProgramHandle = 0;
-    uniforms = new Map<String, int>();
+  }
+  
+  void uniformCallback(String name, int index, String type, int size) {
+    //print('$type $name [$index] $size');
+    uniforms[name] = new MaterialUniform(name, index, type, size);
+  }
+  
+  void loadUniforms() {
+    uniforms = new Map<String, MaterialUniform>();
+    scene.device.getDeviceChild(shaderProgramHandle).forEachUniforms(uniformCallback);
+  }
+  
+  int uniformIndex(String name) {
+    MaterialUniform uniform = uniforms[name];
+    if (uniform != null) {
+      return uniform.uniformIndex;
+    }
+    return -1;
   }
   
   void load(Map o) {
@@ -37,5 +61,10 @@ class Material extends SceneChild {
       'VertexProgram': vertexShaderHandle,
       'FragmentProgram': fragmentShaderHandle,
     });
+    loadUniforms();
+  }
+  
+  void preDraw() {
+    scene.device.immediateContext.setShaderProgram(shaderProgramHandle);
   }
 }
