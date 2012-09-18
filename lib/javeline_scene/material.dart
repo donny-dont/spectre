@@ -13,8 +13,9 @@ class Material extends SceneChild {
   int blendStateHandle;
   int depthStateHandle;
   int rasterizerStateHandle;
+  Map entity;
   Map<String, MaterialUniform> uniforms;
-  
+  List<Map> meshinputs;
   Material(String name, Scene scene) : super(name, scene) {
     vertexShaderHandle = 0;
     fragmentShaderHandle = 0;
@@ -43,6 +44,8 @@ class Material extends SceneChild {
   }
   
   void load(Map o) {
+    entity = o;
+    meshinputs = o['meshinputs'];
     String shaderName = o['shader'];
     int handle = scene.resourceManager.getResourceHandle(shaderName);
     ShaderProgramResource spr = scene.resourceManager.getResource(handle);

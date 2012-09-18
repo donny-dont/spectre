@@ -18,7 +18,6 @@ class Model extends SceneChild {
       _inputLayoutHandle = scene.device.createInputLayout('$name.il', {});
     }
     List<InputElementDescription> descriptions = new List<InputElementDescription>();
-    /*
     layout.forEach((e) {
       InputLayoutDescription ild = new InputLayoutDescription(e['name'], 0, e['type']);
       InputElementDescription ied = InputLayoutHelper.inputElementDescriptionFromAttributes(ild, _mesh.attributes);
@@ -29,18 +28,17 @@ class Model extends SceneChild {
       'shaderProgram': material.shaderProgramHandle,
       'elements': descriptions
     });
-    */
   }
   
   void draw(Camera camera, Map globalUniforms) {
     scene.device.immediateContext.setInputLayout(_inputLayoutHandle);
     _mesh.preDraw();
-    //_material.preDraw();
+    _material.preDraw();
     globalUniforms.forEach((k,v) {
       scene.device.immediateContext.setUniformMatrix4(k, v);
     });
     Float32Array objectTransformArray = scene.transformGraph.refWorldMatrixArray(transformHandle);
     scene.device.immediateContext.setUniformMatrix4('objectTransform', objectTransformArray);
-    //_mesh.draw();
+    _mesh.draw();
   }
 }

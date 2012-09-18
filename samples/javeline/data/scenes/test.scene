@@ -81,7 +81,7 @@
 			"mesh": "/meshes/UnitCube.mesh",
 			"transform": {
 				"parent": "cone",
-				"translate": [0.0, 4.0, 0.0]
+				"translate": [0.0, 0.0, 0.0]
 			},
 			"material": "litdiffuse",
 			"uniformsets": [ "sun" ]

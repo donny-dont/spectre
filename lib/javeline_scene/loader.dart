@@ -98,14 +98,14 @@ class Loader {
   }
   
   void _spawnModel(Map entity) {
-    Material mat = null; //_scene.materials[entity['shader']];
+    Material mat = _scene.materials[entity['material']];
     Mesh mesh = _scene.meshes[entity['mesh']];
     Model model = _scene.models[entity['name']];
     if (model == null) {
       model = new Model(entity['name'], _scene);
       _scene.models[entity['name']] = model;
     }
-    model.update(mat, mesh, entity['meshinputs']);
+    model.update(mat, mesh, mat.meshinputs);
   }
   
   void _setModelTransform(String name, Map transform) {
