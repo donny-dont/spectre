@@ -419,7 +419,7 @@ class Shader extends DeviceChild {
   String _source;
   WebGLShader _shader;
   int _type;
-
+  
   Shader(String name, Device device) : super(name, device) {
     _source = '';
     _shader = null;
@@ -440,10 +440,16 @@ class Shader extends DeviceChild {
     return _source;
   }
 
+  bool get compiled() {
+    if (_shader != null) {
+      return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
+    }
+    return false;
+  }
+  
   void compile() {
     device.gl.compileShader(_shader);
   }
-
 
   void _createDeviceState() {
     _shader = device.gl.createShader(_type);
@@ -618,6 +624,13 @@ class ShaderProgram extends DeviceChild {
     }
   }
 
+  bool get linked() {
+    if (_program != null) {
+      return device.gl.getProgramParameter(_program, WebGLRenderingContext.LINK_STATUS);
+    }
+    return false;
+  }
+  
   void refreshUniforms() {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     spectreLog.Info('$name has $numUniforms uniform variables');
