@@ -2,6 +2,9 @@ class Scene {
   Device device;
   ResourceManager resourceManager;
   Skybox skybox;
+  int skyboxVertexShader;
+  int skyboxFragmentShader;
+  int skyboxShaderProgram;
   TransformGraph transformGraph;
   Map<String, Mesh> meshes;
   Map<String, Material> materials;
@@ -9,7 +12,7 @@ class Scene {
   Map<String, Model> models;
   num _blendT;
   num _blendTDirection;
-  
+
   Scene(this.device, this.resourceManager) {
     transformGraph = new TransformGraph(1024);
     transformGraph.updateWorldMatrices();
@@ -20,7 +23,7 @@ class Scene {
     _blendT = 0;
     _blendTDirection = 1.0;
   }
-  
+
   void removeModel(String name) {
     Model m = models[name];
     if (m == null) {
@@ -29,7 +32,7 @@ class Scene {
     models.remove(name);
     transformGraph.deleteNode(m.transformHandle);
   }
-  
+
   void reloaded(Set<String> existingModels) {
     Set<String> deadModels = new Set<String>();
     models.forEach((k,v) {
@@ -40,7 +43,7 @@ class Scene {
     deadModels.forEach(removeModel);
     transformGraph.updateGraph();
   }
-  
+
   void _updateBlendT(num dt) {
     _blendT += dt * _blendTDirection;
     if (_blendT > 1.0) {
@@ -51,12 +54,12 @@ class Scene {
       _blendTDirection *= -1.0;
     }
   }
-  
+
   void update(num time, num dt) {
     _updateBlendT(dt);
     transformGraph.updateWorldMatrices();
   }
-  
+
   void render(Camera camera, Map globalUniforms) {
     if (skybox != null) {
       skybox.draw(camera, _blendT);

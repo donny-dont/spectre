@@ -66,6 +66,7 @@
 		{
 			"name": "sky",
 			"type": "skybox",
+			"shader": "/shaders/skybox.sp",
 			"textures": {
 				"0": "/textures/skybox3.png",
 				"1": "/textures/skybox3.png"

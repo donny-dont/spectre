@@ -6,7 +6,7 @@ class ConfigEditorItem {
     readOnly = false;
   }
   DivElement makeElement(JavelineConfigVariable value) {
-    return null;  
+    return null;
   }
 }
 
@@ -21,7 +21,7 @@ class ConfigSlider extends ConfigEditorItem {
   }
   DivElement makeElement(JavelineConfigVariable variable) {
     DivElement root = new DivElement();
-    
+
     if (variable.value is num) {
       LabelElement l = new LabelElement();
       l.text = '${variable.value}';
@@ -33,20 +33,20 @@ class ConfigSlider extends ConfigEditorItem {
       e.value = '${variable.value}';
       e.on.input.add((event) {
         l.text = e.value;
-        variable.value = Math.parseDouble(e.value);
+        variable.value = double.parse(e.value);
         JavelineConfigStorage.storeVariable(variable.name);
       });
       root.nodes.add(l);
       root.nodes.add(e);
     }
-    
+
     return root;
   }
 }
 
 class ConfigToggle extends ConfigEditorItem {
   ConfigToggle(String name, Map props) : super(name) {
-    
+
   }
 }
 
@@ -71,7 +71,7 @@ class ConfigDropdown extends ConfigEditorItem {
       values = [''];
     }
   }
-  
+
   DivElement makeElement(JavelineConfigVariable variable) {
     DivElement root = new DivElement();
     SelectElement selector = new SelectElement();
@@ -96,7 +96,7 @@ class ConfigUI {
   ConfigUI() {
     _items = new List<ConfigEditorItem>();
   }
-  
+
   void addItem(Map props) {
     String name = props['name'];
     String widget = props['widget'];
@@ -128,18 +128,18 @@ class ConfigUI {
     item.readOnly = props['readOnly'] != null;
     _items.add(item);
   }
-  
+
   void load(Map conf) {
-    if (conf['items'] == null) {  
+    if (conf['items'] == null) {
       return;
     }
-    
+
     List<Map> items = conf['items'];
     items.forEach((item) {
       addItem(item);
     });
   }
-  
+
   void build() {
     root = new TableElement();
     _items.forEach((configitem) {

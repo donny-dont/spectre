@@ -29,19 +29,13 @@ class Skybox {
   static final int _depthStateHandleIndex = 0;
   static final int _blendStateHandleIndex = 1;
   static final int _rasterizerStateHandleIndex = 2;
-  static final int _vertexShaderHandleIndex = 3;
-  static final int _fragmentShaderHandleIndex = 4;
-  static final int _shaderProgramHandleIndex = 5;
-  static final int _vertexBufferHandleIndex = 6;
-  static final int _skyboxSamplerHandleIndex = 7;
-  static final int _inputLayoutHandleIndex = 8;
+  static final int _vertexBufferHandleIndex = 3;
+  static final int _skyboxSamplerHandleIndex = 4;
+  static final int _inputLayoutHandleIndex = 5;
 
   static final String _depthStateName = 'Skybox.Depth State';
   static final String _blendStateName = 'Skybox.Blend State';
   static final String _rasterizerStateName = 'Skybox.Rasterizer State';
-  static final String _vertexShaderName = 'Skybox.Vertex Shader';
-  static final String _fragmentShaderName = 'Skybox.Fragment Shader';
-  static final String _shaderProgramName = 'Skybox.Program';
   static final String _vertexBufferName = 'Skybox.Vertex Buffer';
   static final String _skyboxTexture1Name = 'Skybox.Texture1';
   static final String _skyboxTexture2Name = 'Skybox.Texture2';
@@ -50,12 +44,8 @@ class Skybox {
 
   List<int> _deviceHandles;
 
-  static final int _skyboxVertexShaderResourceHandleIndex = 0;
-  static final int _skyboxFragmentShaderResourceHandleIndex = 1;
-  static final int _skyboxVertexResourceHandleIndex = 2;
+  static final int _skyboxVertexResourceHandleIndex = 0;
 
-  static final String _skyboxVertexShaderResourceName = '/shaders/skybox.vs';
-  static final String _skyboxFragmentShaderResourceName = '/shaders/skybox.fs';
   static final String _skyboxVertexResourceName = 'SkyBoxVBO';
 
   List<int> _resourceHandles;
@@ -69,8 +59,8 @@ class Skybox {
   Float32ArrayResource skyboxVertexResource;
   int skyboxTexture1Handle;
   int skyboxTexture2Handle;
-
-  Skybox(this.device, this.resourceManager, this.skyboxTexture1Handle, this.skyboxTexture2Handle) {
+  int shaderProgramHandle;
+  Skybox(this.device, this.resourceManager, this.shaderProgramHandle, this.skyboxTexture1Handle, this.skyboxTexture2Handle) {
     _deviceHandles = new List<int>();
     _resourceHandles = new List<int>();
     skyboxVertexResource = new Float32ArrayResource(_skyboxVertexResourceName, resourceManager);
@@ -82,9 +72,6 @@ class Skybox {
     _deviceHandles.add(device.createDepthState(_depthStateName, {'depthTestEnabled': false, 'depthWriteEnabled': false}));
     _deviceHandles.add(device.createBlendState(_blendStateName, {}));
     _deviceHandles.add(device.createRasterizerState(_rasterizerStateName, {'cullEnabled': false}));
-    _deviceHandles.add(device.createVertexShader(_vertexShaderName, {}));
-    _deviceHandles.add(device.createFragmentShader(_fragmentShaderName, {}));
-    _deviceHandles.add(device.createShaderProgram(_shaderProgramName, {}));
     _deviceHandles.add(device.createVertexBuffer(_vertexBufferName, {}));
     _deviceHandles.add(device.createSamplerState(_skyboxSamplerName, {}));
     _deviceHandles.add(device.createInputLayout(_inputLayoutName, {}));
@@ -92,28 +79,9 @@ class Skybox {
     //   InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
     var elements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 20, 0, 0), new InputElementDescription('vTexCoord', Device.DeviceFormatFloat2, 20, 0, 12)];
 
-    device.configureDeviceChild(_deviceHandles[_inputLayoutHandleIndex], {'elements': elements});
+    device.configureDeviceChild(_deviceHandles[_inputLayoutHandleIndex], {'elements': elements, 'shaderProgram': shaderProgramHandle});
 
-    _resourceHandles.add(resourceManager.registerResource(_skyboxVertexShaderResourceName));
-    _resourceHandles.add(resourceManager.registerResource(_skyboxFragmentShaderResourceName));
     _resourceHandles.add(resourceManager.registerDynamicResource(skyboxVertexResource));
-
-    // load callbacks
-    resourceManager.addEventCallback(_resourceHandles[_skyboxVertexShaderResourceHandleIndex], ResourceEvents.TypeUpdate, (type, resource) {
-      device.immediateContext.compileShaderFromResource(_deviceHandles[_vertexShaderHandleIndex], _resourceHandles[_skyboxVertexShaderResourceHandleIndex], resourceManager);
-      device.configureDeviceChild(_deviceHandles[_shaderProgramHandleIndex], { 'VertexProgram': _deviceHandles[_vertexShaderHandleIndex] });
-      device.configureDeviceChild(_deviceHandles[_inputLayoutHandleIndex], {'shaderProgram': _deviceHandles[_shaderProgramHandleIndex]});
-    });
-
-    resourceManager.addEventCallback(_resourceHandles[_skyboxFragmentShaderResourceHandleIndex], ResourceEvents.TypeUpdate, (type, resource) {
-      device.immediateContext.compileShaderFromResource(_deviceHandles[_fragmentShaderHandleIndex], _resourceHandles[_skyboxFragmentShaderResourceHandleIndex], resourceManager);
-      device.configureDeviceChild(_deviceHandles[_shaderProgramHandleIndex], { 'FragmentProgram': _deviceHandles[_fragmentShaderHandleIndex] });
-      device.configureDeviceChild(_deviceHandles[_inputLayoutHandleIndex], {'shaderProgram': _deviceHandles[_shaderProgramHandleIndex]});
-    });
-
-    // Kick off loads
-    resourceManager.loadResource(_resourceHandles[_skyboxVertexShaderResourceHandleIndex]);
-    resourceManager.loadResource(_resourceHandles[_skyboxFragmentShaderResourceHandleIndex]);
 
     buildVertexBuffer();
   }
@@ -413,7 +381,7 @@ class Skybox {
     device.immediateContext.setDepthState(_deviceHandles[_depthStateHandleIndex]);
     device.immediateContext.setBlendState(_deviceHandles[_blendStateHandleIndex]);
     device.immediateContext.setRasterizerState(_deviceHandles[_rasterizerStateHandleIndex]);
-    device.immediateContext.setShaderProgram(_deviceHandles[_shaderProgramHandleIndex]);
+    device.immediateContext.setShaderProgram(shaderProgramHandle);
     device.immediateContext.setTextures(0, [skyboxTexture1Handle, skyboxTexture2Handle]);
     device.immediateContext.setSamplers(0, [_deviceHandles[_skyboxSamplerHandleIndex], _deviceHandles[_skyboxSamplerHandleIndex]]);
     device.immediateContext.setVertexBuffers(0, [_deviceHandles[_vertexBufferHandleIndex]]);

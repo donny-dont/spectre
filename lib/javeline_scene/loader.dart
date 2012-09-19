@@ -6,17 +6,17 @@ class Loader {
   Scene _scene;
   Device _device;
   ResourceManager _resourceManager;
-  
+
   Loader(this._scene, this._device, this._resourceManager) {
     _resourceHandleTable = new Set<int>();
     _deviceHandleTable = new Set<int>();
   }
-  
+
   void reload(int type, SceneResource resource) {
     print('reloading');
     load(resource.sceneDescription);
   }
-  
+
   Future loadFromUrl(String url) {
     int handle = _resourceManager.registerResource(url);
     _resourceManager.addEventCallback(handle, ResourceEvents.TypeUpdate, reload);
@@ -29,7 +29,7 @@ class Loader {
     });
     */
   }
-  
+
   Future _loadResources(Map sceneDescription) {
     Set<String> resources = new Set<String>();
     sceneDescription['resources'].forEach((r) {
@@ -37,6 +37,10 @@ class Loader {
     });
     var en = sceneDescription['entities'];
     en.forEach((Map e) {
+      String shader = e['shader'];
+      if (shader != null) {
+        resources.add(shader);
+      }
       String mesh = e['mesh'];
       Map<String, String> textures = e['textures'];
       if (mesh != null) {
@@ -79,7 +83,7 @@ class Loader {
     });
     return _resourceManager.loadResources(_resourceHandleTable, false);
   }
-  
+
   Mesh _loadMesh(Map entity) {
     final String name = entity['mesh'];
     Mesh mesh = _scene.meshes[name];
@@ -90,7 +94,7 @@ class Loader {
     mesh.load({});
     return mesh;
   }
-  
+
   Material _loadMaterial(Map entity) {
     final String name = entity['name'];
     Material material = _scene.materials[name];
@@ -101,7 +105,7 @@ class Loader {
     material.load(entity);
     return material;
   }
-  
+
   MaterialInstance _loadMaterialInstance(Map entity) {
     String materialName = entity['material'];
     if (materialName == null) {
@@ -121,22 +125,63 @@ class Loader {
     materialInstance.load(entity);
     return materialInstance;
   }
-  
+
   void _spawnSkybox(Map entity) {
     if (_scene.skybox != null) {
       _scene.skybox.fini();
       _scene.skybox = null;
     }
+
+    String shaderName = entity['shader'];
+
+    int sprHandle = _scene.resourceManager.getResourceHandle(shaderName);
+
+    ShaderProgramResource spr = _scene.resourceManager.getResource(sprHandle);
+
+    if (_scene.skyboxVertexShader == null) {
+      _scene.skyboxVertexShader = _scene.device.createVertexShader('$shaderName.vs', {});
+    }
+    if (_scene.skyboxFragmentShader == null) {
+      _scene.skyboxFragmentShader = _scene.device.createFragmentShader('$shaderName.fs', {});
+    }
+    if (_scene.skyboxShaderProgram == null) {
+      _scene.skyboxShaderProgram = _scene.device.createShaderProgram('$shaderName.sp', {});
+    }
+
+    bool relink = false;
+    VertexShader vs = _scene.device.getDeviceChild(_scene.skyboxVertexShader);
+    if (vs.source != spr.vertexShaderSource) {
+      vs.source = spr.vertexShaderSource;
+      vs.compile();
+      relink = true;
+    }
+
+    FragmentShader fs = _scene.device.getDeviceChild(_scene.skyboxFragmentShader);
+    if (fs.source != spr.fragmentShaderSource) {
+      fs.source = spr.fragmentShaderSource;
+      fs.compile();
+      relink = true;
+    }
+
+    ShaderProgram sp = _scene.device.getDeviceChild(_scene.skyboxShaderProgram);
+    if (!sp.linked || relink) {
+      _scene.device.configureDeviceChild(_scene.skyboxShaderProgram, {
+        'VertexProgram': _scene.skyboxVertexShader,
+        'FragmentProgram': _scene.skyboxFragmentShader,
+      });
+    }
+
     String texture0 = entity['textures']['0'];
     String texture1 = entity['textures']['1'];
     int texture0Handle = _scene.device.getDeviceChildHandle(texture0);
     int texture1Handle = _scene.device.getDeviceChildHandle(texture1);
-    _scene.skybox = new Skybox(_device, _resourceManager,
+    _scene.skybox = new Skybox(_device, _scene.resourceManager,
+                                _scene.skyboxShaderProgram,
                                 texture0Handle,
                                 texture1Handle);
     _scene.skybox.init();
   }
-  
+
   void _spawnModel(Map entity) {
     String materialInstanceName = '${entity['material']}.${entity['name']}';
     MaterialInstance materialInstance = _scene.materialInstances[materialInstanceName];
@@ -148,7 +193,7 @@ class Loader {
     }
     model.update(materialInstance, mesh, materialInstance.material.meshinputs);
   }
-  
+
   void _setModelTransform(String name, Map transform) {
     Model model = _scene.models[name];
     if (model == null) {
@@ -185,14 +230,14 @@ class Loader {
       _scene.transformGraph.unparent(xformHandle);
       Model parentModel = _scene.models[parent];
       if (parentModel != null) {
-        _scene.transformGraph.reparent(xformHandle, parentModel.transformHandle);  
+        _scene.transformGraph.reparent(xformHandle, parentModel.transformHandle);
       }
     }
   }
-  
+
   void _spawnUniformset(Map entity) {
   }
-  
+
   Future _loadEntities(bool resourcesLoaded) {
     Completer<bool> completer = new Completer<bool>();
     if (!resourcesLoaded) {
@@ -203,13 +248,13 @@ class Loader {
     _sceneDescription['materials'].forEach((m) {
       _loadMaterial(m);
     });
-   
+
     var foo = _sceneDescription['entities'];
     print('$foo');
     _sceneDescription['entities'].forEach((e) {
       _loadMaterialInstance(e);
     });
-    
+
     Set<String> existingModels = new Set<String>();
     // Create entities
     _sceneDescription['entities'].forEach((e) {
@@ -227,7 +272,7 @@ class Loader {
         _spawnUniformset(e);
       }
     });
-    
+
     // Setup transforms
     _sceneDescription['entities'].forEach((e) {
       if (e['type'] != 'model') {
@@ -239,13 +284,13 @@ class Loader {
       }
       _setModelTransform(e['name'], transform);
     });
-    
+
     _scene.reloaded(existingModels);
-    
+
     completer.complete(true);
     return completer.future;
   }
-  
+
   Future load(Map sceneDescription) {
     if (_sceneDescription != null) {
       _sceneDescription = sceneDescription;
@@ -256,7 +301,7 @@ class Loader {
       return _loadResources(sceneDescription).chain(_loadEntities);
     }
   }
-  
+
   void setupScene() {
     print('setup scene!');
   }

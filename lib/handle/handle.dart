@@ -23,23 +23,23 @@
 class Handle {
   // Handle fits in 32-bits
   // 20 bits for index (1MB of handles)
-  static final int IndexMask = 0xFFFFF;
-  static final int IndexShift = 0;
+  static const int IndexMask = 0xFFFFF;
+  static const int IndexShift = 0;
   // 4 bits for a serial number
-  static final int SerialMask = 0xF;
-  static final int SerialShift = 20;
+  static const int SerialMask = 0xF;
+  static const int SerialShift = 20;
   // 4 bits for a type
-  static final int TypeMask = 0xF;
-  static final int TypeShift = 24;
+  static const int TypeMask = 0xF;
+  static const int TypeShift = 24;
   // 4 bits for a status
-  static final int StatusMask = 0xF;
-  static final int StatusShift = 28;
+  static const int StatusMask = 0xF;
+  static const int StatusShift = 28;
 
-  static final int StatusUsed = 0x1;
-  static final int StatusFreeList = 0x2;
-  static final int StatusReg = 0x4;
+  static const int StatusUsed = 0x1;
+  static const int StatusFreeList = 0x2;
+  static const int StatusReg = 0x4;
 
-  static final int BadHandle = 0xFFFFFFFF;
+  static const int BadHandle = 0xFFFFFFFF;
 
   static int getStatus(int handle) {
     return (handle >> StatusShift) & StatusMask;
