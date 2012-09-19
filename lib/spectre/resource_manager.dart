@@ -167,6 +167,7 @@ class ResourceManager {
     ResourceBase rb = _resources[index];
     if (rb != null) {
       _urlToHandle.remove(rb.url);
+      print('Removing ${rb.url} $handle');
       rb.unload();
       rb.deregister();
     }

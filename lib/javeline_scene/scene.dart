@@ -24,6 +24,31 @@ class Scene {
     _blendTDirection = 1.0;
   }
 
+  void shutdown() {
+    materialInstances.forEach((k,SceneChild v) {
+      v.delete();
+    });
+    meshes.forEach((k, SceneChild v) {
+      v.delete();
+    });
+    materials.forEach((k, SceneChild v) {
+      v.delete();
+    });
+    models.forEach((k, SceneChild v) {
+      v.delete();
+    });
+    skybox.fini();
+    if (skyboxFragmentShader != null) {
+      device.deleteDeviceChild(skyboxFragmentShader);
+    }
+    if (skyboxVertexShader != null) {
+      device.deleteDeviceChild(skyboxVertexShader);
+    }
+    if (skyboxShaderProgram != null) {
+      device.deleteDeviceChild(skyboxShaderProgram);
+    }
+  }
+  
   void removeModel(String name) {
     Model m = models[name];
     if (m == null) {

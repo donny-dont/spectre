@@ -19,6 +19,13 @@ class MaterialInstance extends SceneChild {
     samplerNameToHandle = new Map<String, int>();
     textureNameToResourceName = new Map<String, String>();
   }
+
+  
+  void delete() {
+    scene.device.deleteDeviceChild(blendStateHandle);
+    scene.device.deleteDeviceChild(depthStateHandle);
+    scene.device.deleteDeviceChild(rasterizerStateHandle);
+  }
   
   Map copyMap(Map i) {
     Map o = new Map();

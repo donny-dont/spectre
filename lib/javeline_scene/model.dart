@@ -4,11 +4,15 @@ class Model extends SceneChild {
   Mesh _mesh;
   int _inputLayoutHandle;
   int transformHandle;
-  
+
   Model(String name, Scene scene) : super(name, scene) {
     _inputLayoutHandle = 0;
     transformHandle = scene.transformGraph.createNode();
     print('Spawned $name with $transformHandle');
+  }
+  
+  void delete() {
+    scene.device.deleteDeviceChild(_inputLayoutHandle);
   }
   
   void update(MaterialInstance materialInstance, Mesh mesh, List layout) {

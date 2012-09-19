@@ -6,6 +6,12 @@ class Mesh extends SceneChild {
     indexedMesh = 0;
   }
   
+  void delete() {
+    if (indexedMesh != 0) {
+      scene.device.deleteDeviceChild(indexedMesh);
+    }
+  }
+  
   void load(Map o) {
     int resourceHandle = scene.resourceManager.getResourceHandle(name);
     MeshResource mr = scene.resourceManager.getResource(resourceHandle);

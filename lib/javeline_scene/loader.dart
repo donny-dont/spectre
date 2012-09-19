@@ -6,10 +6,25 @@ class Loader {
   Scene _scene;
   Device _device;
   ResourceManager _resourceManager;
-
+  int sceneResourceHandle;
+  int sceneResourceCallback;
   Loader(this._scene, this._device, this._resourceManager) {
     _resourceHandleTable = new Set<int>();
     _deviceHandleTable = new Set<int>();
+    sceneResourceHandle = 0;
+    sceneResourceCallback = 0;
+  }
+  
+  void shutdown() {
+    _resourceHandleTable.forEach((r) {
+      _resourceManager.deregisterResource(r);
+    });
+    _deviceHandleTable.forEach((d) {
+      _device.deleteDeviceChild(d);
+    });
+    _deviceHandleTable.clear();
+    _resourceHandleTable.clear();
+    _resourceManager.removeEventCallback(sceneResourceHandle,  ResourceEvents.TypeUpdate, sceneResourceCallback);
   }
 
   void reload(int type, SceneResource resource) {
@@ -18,9 +33,9 @@ class Loader {
   }
 
   Future loadFromUrl(String url) {
-    int handle = _resourceManager.registerResource(url);
-    _resourceManager.addEventCallback(handle, ResourceEvents.TypeUpdate, reload);
-    return _resourceManager.loadResource(handle);
+    sceneResourceHandle = _resourceManager.registerResource(url);
+    sceneResourceCallback = _resourceManager.addEventCallback(sceneResourceHandle, ResourceEvents.TypeUpdate, reload);
+    return _resourceManager.loadResource(sceneResourceHandle);
     /*
     Future r = _resourceManager.loadResource(handle);
     return r.chain((result) {

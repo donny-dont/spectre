@@ -14,6 +14,12 @@ class Material extends SceneChild {
     textureNameToUnit = new Map<String, int>();
   }
   
+  void delete() {
+    scene.device.deleteDeviceChild(vertexShaderHandle);
+    scene.device.deleteDeviceChild(fragmentShaderHandle);
+    scene.device.deleteDeviceChild(shaderProgramHandle);
+  }
+  
   void processUniforms() {
     textureNameToUnit.clear();
     int textureUnitIndex = 0;
@@ -25,9 +31,15 @@ class Material extends SceneChild {
   }
 
   static List<int> buildTextureHandleList(Map nameToUnit, Map nameToHandle) {
+    if (nameToUnit == null) {
+      print('null nameToUnit');
+    }
     List<int> out = new List<int>(nameToUnit.length);
     nameToHandle.forEach((k, v) {
       int slot = nameToUnit[k];
+      if (slot == null) {
+        print('slot null');
+      }
       int handle = v;
       out[slot] = handle;
     });

@@ -60,7 +60,7 @@
 				"cullFrontFace": "FrontCCW"
 			},
 			"textures": {
-				"diffuse": "/textures/felt.png"
+				"diffuse": "/textures/rug.jpg"
 			}
 		},
 		{
@@ -68,8 +68,8 @@
 			"type": "skybox",
 			"shader": "/shaders/skybox.sp",
 			"textures": {
-				"0": "/textures/skybox3.png",
-				"1": "/textures/skybox3.png"
+				"0": "/textures/skybox1.png",
+				"1": "/textures/skybox1.png"
 			}
 		},
 		{
@@ -89,7 +89,7 @@
 			"type": "model",
 			"mesh": "/meshes/UnitCone.mesh",
 			"transform": {
-				"translate": [10.0, 5.0, -5.0],
+				"translate": [10.0, 0.0, -5.0],
 				"scale": [1.0, 1.0, 1.0]
 			},
 			"material": "litdiffuse"
@@ -99,12 +99,12 @@
 			"type": "model",
 			"mesh": "/meshes/UnitCube.mesh",
 			"transform": {
-				"parent": "cone",
+				"parent": "cone4",
 				"translate": [0.0, 3.0, 0.0]
 			},
 			"material": "litdiffuse",
 			"textures": {
-				"diffuse": "/textures/felt.png"
+				"diffuse": "/textures/WoodPlank.jpg"
 			},
 			"uniformsets": [ "sun" ]
 		},

@@ -40,6 +40,10 @@ class JavelineProjector extends JavelineBaseDemo {
   
   Future<JavelineDemoStatus> shutdown() {
     Future<JavelineDemoStatus> base = super.shutdown();
+    _scene.shutdown();
+    _loader.shutdown();
+    _loader = null;
+    _scene = null;
     return base;
   }
   
