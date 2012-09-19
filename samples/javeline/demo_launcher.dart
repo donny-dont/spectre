@@ -181,7 +181,7 @@ class JavelineDemoLaunch {
     var tableSortedByType = new Map<String, List<String>>();
     _demo.device.children.forEach((name, handle) {
       String type = _demo.device.getHandleType(handle);
-      var list = tableSortedByType[type]; 
+      var list = tableSortedByType[type];
       if (list == null) {
         list = tableSortedByType[type] = new List<String>();
       }
@@ -191,7 +191,7 @@ class JavelineDemoLaunch {
       DivElement label = new DivElement();
       label.text = '$type';
       label.style.fontWeight = 'bold';
-      
+
       d.nodes.add(label);
       names.forEach((name) {
         DivElement resourceDiv = new DivElement();
@@ -201,13 +201,13 @@ class JavelineDemoLaunch {
       });
     });
   }
-  
+
   void refreshProfileTree() {
     tree.processEvents(Profiler.events);
     Profiler.clear();
     //document.query('#ProfilerRoot').innerHTML = ProfilerTreeListGUI.buildTree(tree);
   }
-  
+
   void refresh() {
     refreshResourceManagerTable();
     refreshDeviceManagerTable();
@@ -278,11 +278,11 @@ class JavelineDemoLaunch {
       registerDemo('Debug Draw Test', () { return new JavelineDebugDrawTest(device, resourceManager, debugDrawManager); });
       registerDemo('Spinning Mesh', () { return new JavelineSpinningCube(device, resourceManager, debugDrawManager); });
       registerDemo('Height Field Fluid', () { return new JavelineHFluidDemo(device, resourceManager, debugDrawManager); });
-      registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
+      //registerDemo('Skybox', () { return new JavelineSkyboxDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Cloth', () { return new JavelineClothDemo(device, resourceManager, debugDrawManager); });
       registerDemo('Particles', () { return new JavelineParticlesDemo(device, resourceManager, debugDrawManager); });
-      registerDemo('Normal Map', () { return new JavelineNormalMap(device, resourceManager, debugDrawManager); });
-      registerDemo('Projector', () { return new JavelineProjector(device, resourceManager, debugDrawManager); });
+      //registerDemo('Normal Map', () { return new JavelineNormalMap(device, resourceManager, debugDrawManager); });
+      registerDemo('Scene', () { return new JavelineProjector(device, resourceManager, debugDrawManager); });
       switchToDemo(JavelineConfigStorage.get('javeline.demo'));
       window.setInterval(refresh, 1000);
     });
@@ -323,7 +323,7 @@ class JavelineDemoLaunch {
             elem.nodes.clear();
             Element e = _demo.makeDemoUI();
             if (e != null) {
-              elem.nodes.add(e);  
+              elem.nodes.add(e);
             }
           }
         });
@@ -349,13 +349,13 @@ void main() {
     rth.on.transitionEnd.add((event) {
       if (collapsed == false) {
       } else {
-        
+
       }
       print('transition ended');
     });
     e.on.click.add((event) {
       if (collapsed == false) {
-        e.style.height = "30px";           
+        e.style.height = "30px";
         rt.style.display = "none";
       } else {
         e.style.height = '${heightValue}px';
