@@ -4,7 +4,8 @@ class Model extends SceneChild {
   Mesh _mesh;
   int _inputLayoutHandle;
   int transformHandle;
-
+  TransformController controller;
+  
   Model(String name, Scene scene) : super(name, scene) {
     _inputLayoutHandle = 0;
     transformHandle = scene.transformGraph.createNode();

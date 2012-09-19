@@ -82,6 +82,11 @@ class Scene {
 
   void update(num time, num dt) {
     _updateBlendT(dt);
+    models.forEach((k,v) {
+      if (v.controller != null) {
+        v.controller.control(dt);
+      }
+    });
     transformGraph.updateWorldMatrices();
   }
 

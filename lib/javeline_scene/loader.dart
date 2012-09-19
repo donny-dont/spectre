@@ -215,8 +215,9 @@ class Loader {
       return;
     }
     int xformHandle = model.transformHandle;
-    if (name == 'cone') {
-      //print('Cone model. $xformHandle');
+    if (transform['controller'] != null) {
+      model.controller = new TransformController(_scene.transformGraph, xformHandle);
+      model.controller.load(transform);
     }
     mat4 T = _scene.transformGraph.refLocalMatrix(xformHandle);
     T.setIdentity();
