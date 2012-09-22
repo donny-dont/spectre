@@ -24,7 +24,8 @@
 #import('dart:math', prefix:'Math');
 #import('dart:html');
 #import('dart:json');
-#import('../external/DartVectorMath/lib/vector_math_html.dart');
+// TODO: turn dart vector math into pub project. 
+#import('external/DartVectorMath/lib/vector_math_html.dart');
 #import('spectre.dart');
 #import('profiler.dart');
 

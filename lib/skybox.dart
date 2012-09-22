@@ -22,7 +22,8 @@
 
 #library('skybox');
 #import('dart:html');
-#import('../external/DartVectorMath/lib/vector_math_html.dart');
+// TODO: turn dart vector math into pub project. 
+#import('external/DartVectorMath/lib/vector_math_html.dart');
 #import('spectre.dart');
 
 class Skybox {

@@ -22,17 +22,19 @@
 
 #import('dart:html');
 #import('dart:math', prefix:'Math');
-#import('../../external/DartVectorMath/lib/vector_math_html.dart');
-#import('../../lib/spectre.dart');
-#import('../../lib/spectre_scene.dart');
-#import('../../lib/spectre_post.dart');
-#import('../../lib/javeline.dart');
-#import('../../lib/javeline_scene.dart');
-#import('../../lib/profiler.dart');
-#import('../../lib/profiler_gui.dart');
-#import('../../lib/profiler_client.dart');
-#import('../../lib/hfluid.dart');
-#import('../../lib/skybox.dart');
+//#import('../../external/DartVectorMath/lib/vector_math_html.dart');
+// TODO: turn dart vector math into pub project. 
+#import('package:spectre/external/DartVectorMath/lib/vector_math_html.dart'); 
+#import('package:spectre/spectre.dart');
+#import('package:spectre/spectre_scene.dart');
+#import('package:spectre/spectre_post.dart');
+#import('package:spectre/javeline.dart');
+#import('package:spectre/javeline_scene.dart');
+#import('package:spectre/profiler.dart');
+#import('package:spectre/profiler_gui.dart');
+#import('package:spectre/profiler_client.dart');
+#import('package:spectre/hfluid.dart');
+#import('package:spectre/skybox.dart');
 #import('particle_system.dart');
 
 // Demos
