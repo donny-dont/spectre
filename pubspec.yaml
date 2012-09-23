@@ -6,3 +6,5 @@ dependencies:
     sdk: unittest
   markerprof:
     git: https://github.com/johnmccutchan/markerprof.git
+  DartVectorMath:
+    git: https://github.com/johnmccutchan/DartVectorMath.git

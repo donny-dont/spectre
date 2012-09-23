@@ -22,9 +22,7 @@
 
 #import('dart:html');
 #import('dart:math', prefix:'Math');
-//#import('../../external/DartVectorMath/lib/vector_math_html.dart');
-// TODO: turn dart vector math into pub project. 
-#import('package:spectre/external/DartVectorMath/lib/vector_math_html.dart'); 
+#import('package:DartVectorMath/vector_math_html.dart'); 
 #import('package:spectre/spectre.dart');
 #import('package:spectre/spectre_scene.dart');
 #import('package:spectre/spectre_post.dart');

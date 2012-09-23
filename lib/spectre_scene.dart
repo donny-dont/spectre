@@ -25,7 +25,6 @@
 #library('spectre_scene');
 #import('dart:html');
 #import('handle.dart');
-// TODO: turn dart vector math into pub project. 
-#import('external/DartVectorMath/lib/vector_math_html.dart');
+#import('package:DartVectorMath/vector_math_html.dart');
 #import('spectre.dart');
 #source('spectre_scene/transform_graph.dart');

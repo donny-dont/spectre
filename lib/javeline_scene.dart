@@ -1,8 +1,7 @@
 #library('javeline_scene');
 #import('dart:html');
 #import('dart:math', prefix:'Math');
-// TODO: turn dart vector math into pub project. 
-#import('external/DartVectorMath/lib/vector_math_html.dart');
+#import('package:DartVectorMath/vector_math_html.dart');
 #import('handle.dart');
 #import('spectre.dart');
 #import('spectre_scene.dart');
