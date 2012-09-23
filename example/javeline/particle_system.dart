@@ -1,6 +1,8 @@
 #library('particle_system');
-#import('../../external/DartVectorMath/lib/vector_math_html.dart');
-#import('../../lib/spectre.dart');
+//#import('../../lib/external/DartVectorMath/lib/vector_math_html.dart');
+// TODO: turn dart vector math into pub project. 
+#import('package:spectre/external/DartVectorMath/lib/vector_math_html.dart'); 
+#import('package:spectre/spectre.dart');
 #import('dart:math', prefix:'Math');
 
 class ParticleSystemBackend {
