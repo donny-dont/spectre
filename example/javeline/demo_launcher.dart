@@ -30,9 +30,9 @@
 #import('package:spectre/spectre_post.dart');
 #import('package:spectre/javeline.dart');
 #import('package:spectre/javeline_scene.dart');
-#import('package:spectre/profiler.dart');
-#import('package:spectre/profiler_gui.dart');
-#import('package:spectre/profiler_client.dart');
+#import('package:markerprof/profiler.dart');
+#import('package:markerprof/profiler_gui.dart');
+#import('package:markerprof/profiler_client.dart');
 #import('package:spectre/hfluid.dart');
 #import('package:spectre/skybox.dart');
 #import('particle_system.dart');

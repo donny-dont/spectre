@@ -4,3 +4,5 @@ version: 0.0.1
 dependencies:
   unittest:
     sdk: unittest
+  markerprof:
+    git: https://github.com/johnmccutchan/markerprof.git

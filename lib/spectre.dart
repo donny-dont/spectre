@@ -28,7 +28,7 @@
 // TODO: turn dart vector math into pub project. 
 #import('external/DartVectorMath/lib/vector_math_html.dart');
 #import('handle.dart');
-#import('profiler.dart');
+#import('package:markerprof/profiler.dart');
 #source('spectre/logger.dart');
 #source('spectre/device_children.dart');
 #source('spectre/device.dart');
