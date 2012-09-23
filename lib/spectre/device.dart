@@ -79,24 +79,24 @@ class _InputElementChecker {
 
 /// An existing resource can be looked up using its name.
 class Device {
-  static final DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
-  static final DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
-  static final DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
-  static final DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
+  static const DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
+  static const DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
+  static const DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
+  static const DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
-  static final int BufferHandleType = 1;
-  static final int RenderBufferHandleType = 2;
-  static final int RenderTargetHandleType = 3;
-  static final int TextureHandleType = 4;
-  static final int SamplerStateHandleType = 5;
-  static final int ShaderHandleType = 6;
-  static final int ShaderProgramHandleType = 7;
-  static final int ViewportHandleType = 8;
-  static final int DepthStateHandleType = 9;
-  static final int BlendStateHandleType = 10;
-  static final int RasterizerStateHandleType = 11;
-  static final int InputLayoutHandleType = 12;
-  static final int MeshHandleType = 13;
+  static const int BufferHandleType = 1;
+  static const int RenderBufferHandleType = 2;
+  static const int RenderTargetHandleType = 3;
+  static const int TextureHandleType = 4;
+  static const int SamplerStateHandleType = 5;
+  static const int ShaderHandleType = 6;
+  static const int ShaderProgramHandleType = 7;
+  static const int ViewportHandleType = 8;
+  static const int DepthStateHandleType = 9;
+  static const int BlendStateHandleType = 10;
+  static const int RasterizerStateHandleType = 11;
+  static const int InputLayoutHandleType = 12;
+  static const int MeshHandleType = 13;
 
   Map _getPropertyMap(Dynamic props) {
     if (props is String) {
@@ -153,8 +153,8 @@ class Device {
   // Maps from child object name to handle
   Map<String, int> _nameMapping;
 
-  static final int MaxDeviceChildren = 2048;
-  static final int MaxStaticDeviceChildren = 512;
+  static const int MaxDeviceChildren = 2048;
+  static const int MaxStaticDeviceChildren = 512;
 
   int _fallbackTextureID;
 
@@ -222,12 +222,17 @@ class Device {
       return null;
     }
     int index = Handle.getIndex(handle);
-    if (noFallback == false && _childrenObjects[index].ready == false && _childrenObjects[index].fallback != 0) {
+    DeviceChild dc = _childrenObjects[index];
+    if (dc == null) {
+      spectreLog.Warning('$handle is not a valid handle [2]');
+      return null;
+    }
+    if (noFallback == false && dc.ready == false && dc.fallback != 0) {
       // Recurse
       //print('Fetching fallback: ${_childrenObjects[index].fallback}');
       return getDeviceChild(_childrenObjects[index].fallback);
     }
-    return _childrenObjects[index];
+    return dc;
   }
 
   String getDeviceChildName(int handle) {
@@ -250,9 +255,9 @@ class Device {
       // Check if name is already registered
       int existingHandle = getDeviceChildHandle(name);
       if (existingHandle != Handle.BadHandle) {
-        int handleType = Handle.getType(handle);
+        int handleType = Handle.getType(existingHandle);
         if (handleType != type) {
-          spectreLog.Error('Returning existing handle for $name but types do not match. Requested type = $type found type = $type');
+          spectreLog.Error('Returning existing handle for $name but types do not match. Requested type = $type found type = $handleType');
         }
         return existingHandle;
       }
@@ -278,6 +283,7 @@ class Device {
     }
     assert(_childrenHandles.validHandle(handle));
     int index = Handle.getIndex(handle);
+    //print('$index - $name');
     // Nothing is at this index
     assert(_childrenObjects[index] == null);
 
@@ -305,6 +311,7 @@ class Device {
     dc._destroyDeviceState();
     _nameMapping.remove(dc.name);
     _childrenObjects[index] = null;
+    print('remove: $index - ${dc.name}');
   }
 
   void batchDeleteDeviceChildren(List<int> handles) {

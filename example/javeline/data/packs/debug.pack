@@ -1,0 +1,8 @@
+{
+    "packContents" : [ "/shaders/debug_line.vs",
+                        "/shaders/debug_line.fs",
+                        "/shaders/debug_sphere.vs",
+                        "/shaders/debug_sphere.fs",
+                        "/meshes/DebugSphere.mesh"
+                    ]
+}

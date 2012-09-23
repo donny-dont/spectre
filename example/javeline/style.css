@@ -1,0 +1,121 @@
+body {
+	background-image:url('bg.jpg')
+}
+
+#RootDiv {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-justify-content: space-around;
+	
+}
+
+#DartStatus {
+	text-align: center;
+}
+
+#MainView {
+	display: -webkit-flex;
+	min-width: 853px;
+	width: 853px;
+	height: 480px;
+	min-height: 480px;
+	-webkit-flex: none;
+	-webkit-flex-direction: row;
+	-webkit-justify-content: space-around;
+	-webkit-align-self: center;
+}
+
+
+#SpectreLog {
+}
+
+
+#ResourceTableHolder
+{
+	width:100%; 
+   border:1px solid #9a9a9a;
+	background-color:#ffa500;                      
+   -webkit-transition-delay:0.1s;
+   -webkit-transition-duration:0.2s;
+   -webkit-transition-property:height;   
+}
+
+#ResourceTableHeader
+{
+           width:100%;
+           height:30px;
+           background-color:#ddd;
+           border-bottom:1px solid #9a9a9a;
+           overflow:hidden;                                 
+}
+#ResourceTableHeader img
+       {
+           float:right;
+       }
+       
+#ResourceTable {
+	display: -webkit-flex;
+}
+
+#DemoPicker {
+	display: -webkit-flex;
+}
+
+#StatusBar {
+	display: -webkit-flex;
+}
+
+.DemoButton {
+	padding: 5px;
+	margin: 5px;
+	border-style: solid;
+	border-width: medium;
+}
+
+#ResourceManagerTable {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex: auto;
+	overflow:scroll;
+}
+
+#ProfilerRoot {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex: auto;
+	overflow:scroll;
+}
+
+.ResourceRow {
+	display: -webkit-flex;
+	-webkit-flex-direction: row;
+	-webkit-flex: auto;
+}
+
+#DeviceChildTable {
+	display: -webkit-flex;
+	-webkit-flex-direction: column;
+	-webkit-flex: auto;
+	overflow:scroll;
+	width:100%;
+	border:1px solid #9a9a9a;
+	background-color:#ccc;
+}
+
+.configtable {
+	display: -webkit-flex;
+	-webkit-flex-flow: column;
+}
+
+.configitem {
+	display: -webkit-flex;
+	-webkit-flex-pack: justify;
+}
+
+.configlabel {
+}
+
+.configvalue {
+	width: 90%;
+	text-align: center;
+}

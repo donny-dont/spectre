@@ -3,5 +3,6 @@ class _FrustumNode {
   int rejectPlaneId;
 }
 
-class FrustumCull {  
+class FrustumCull {
+  
 }

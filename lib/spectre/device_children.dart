@@ -233,42 +233,67 @@ class BlendState extends DeviceChild {
   void _createDeviceState() {
   }
 
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+       "BlendSourceZero": WebGLRenderingContext.ZERO,
+       "BlendSourceOne": WebGLRenderingContext.ONE,
+       "BlendSourceShaderColor": WebGLRenderingContext.SRC_COLOR,
+       "BlendSourceShaderInverseColor": WebGLRenderingContext.ONE_MINUS_SRC_COLOR,
+       "BlendSourceShaderAlpha": WebGLRenderingContext.SRC_ALPHA,
+       "BlendSourceShaderInverseAlpha": WebGLRenderingContext.ONE_MINUS_SRC_ALPHA,
+       "BlendSourceTargetColor": WebGLRenderingContext.DST_COLOR,
+       "BlendSourceTargetInverseColor": WebGLRenderingContext.ONE_MINUS_DST_COLOR,
+       "BlendSourceTargetAlpha": WebGLRenderingContext.DST_ALPHA,
+       "BlendSourceTargetInverseAlpha": WebGLRenderingContext.ONE_MINUS_DST_ALPHA,
+       "BlendSourceBlendColor": WebGLRenderingContext.CONSTANT_COLOR,
+       "BlendSourceBlendAlpha": WebGLRenderingContext.CONSTANT_ALPHA,
+       "BlendSourceBlendInverseColor": WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR,
+       "BlendSourceBlendInverseAlpha": WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA,
+       "BlendOpAdd": WebGLRenderingContext.FUNC_ADD,
+       "BlendOpSubtract": WebGLRenderingContext.FUNC_SUBTRACT,
+       "BlendOpReverseSubtract": WebGLRenderingContext.FUNC_REVERSE_SUBTRACT
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
       o = props['blendColorRed'];
-      blendColorRed = o != null ? o : blendColorRed;
+      blendColorRed = o != null ? filter(o) : blendColorRed;
       o = props['blendColorGreen'];
-      blendColorGreen = o != null ? o : blendColorGreen;
+      blendColorGreen = o != null ? filter(o) : blendColorGreen;
       o = props['blendColorBlue'];
-      blendColorBlue = o != null ? o : blendColorBlue;
+      blendColorBlue = o != null ? filter(o) : blendColorBlue;
       o = props['blendColorAlpha'];
-      blendColorAlpha = o != null ? o : blendColorAlpha;
+      blendColorAlpha = o != null ? filter(o) : blendColorAlpha;
 
       o = props['blendEnable'];
-      blendEnable = o != null ? o : blendEnable;
+      blendEnable = o != null ? filter(o) : blendEnable;
       o = props['blendSourceColorFunc'];
-      blendSourceColorFunc = o != null ? o : blendSourceColorFunc;
+      blendSourceColorFunc = o != null ? filter(o) : blendSourceColorFunc;
       o = props['blendDestColorFunc'];
-      blendDestColorFunc = o != null ? o : blendDestColorFunc;
+      blendDestColorFunc = o != null ? filter(o) : blendDestColorFunc;
       o = props['blendSourceAlphaFunc'];
-      blendSourceAlphaFunc = o != null ? o : blendSourceAlphaFunc;
+      blendSourceAlphaFunc = o != null ? filter(o) : blendSourceAlphaFunc;
       o = props['blendDestAlphaFunc'];
-      blendDestAlphaFunc = o != null ? o : blendDestAlphaFunc;
+      blendDestAlphaFunc = o != null ? filter(o) : blendDestAlphaFunc;
 
       o = props['blendColorOp'];
-      blendColorOp = o != null ? o : blendColorOp;
+      blendColorOp = o != null ? filter(o) : blendColorOp;
       o = props['blendAlphaOp'];
-      blendAlphaOp = o != null ? o : blendAlphaOp;
+      blendAlphaOp = o != null ? filter(o) : blendAlphaOp;
 
       o = props['writeRenderTargetRed'];
-      writeRenderTargetRed = o != null ? o : writeRenderTargetRed;
+      writeRenderTargetRed = o != null ? filter(o) : writeRenderTargetRed;
       o = props['writeRenderTargetGreen'];
-      writeRenderTargetGreen = o != null ? o : writeRenderTargetGreen;
+      writeRenderTargetGreen = o != null ? filter(o) : writeRenderTargetGreen;
       o = props['writeRenderTargetBlue'];
-      writeRenderTargetBlue = o != null ? o : writeRenderTargetBlue;
+      writeRenderTargetBlue = o != null ? filter(o) : writeRenderTargetBlue;
       o = props['writeRenderTargetAlpha'];
-      writeRenderTargetAlpha = o != null ? o : writeRenderTargetAlpha;
+      writeRenderTargetAlpha = o != null ? filter(o) : writeRenderTargetAlpha;
     }
   }
 
@@ -318,28 +343,43 @@ class DepthState extends DeviceChild {
   void _createDeviceState() {
   }
 
-
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      Map table = {
+        "DepthComparisonOpNever": WebGLRenderingContext.NEVER,
+        "DepthComparisonOpAlways": WebGLRenderingContext.ALWAYS,
+        "DepthComparisonOpEqual": WebGLRenderingContext.EQUAL,
+        "DepthComparisonOpNotEqual": WebGLRenderingContext.NOTEQUAL,
+        "DepthComparisonOpLess": WebGLRenderingContext.LESS,
+        "DepthComparisonOpLessEqual": WebGLRenderingContext.LEQUAL,
+        "DepthComparisonOpGreaterEqual": WebGLRenderingContext.GEQUAL,
+        "DepthComparisonOpGreater": WebGLRenderingContext.GREATER,
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
 
       o = props['depthTestEnabled'];
-      depthTestEnabled = o != null ? o : depthTestEnabled;
+      depthTestEnabled = o != null ? filter(o) : depthTestEnabled;
       o = props['depthWriteEnabled'];
-      depthWriteEnabled = o != null ? o : depthWriteEnabled;
+      depthWriteEnabled = o != null ? filter(o) : depthWriteEnabled;
       o = props['polygonOffsetEnabled'];
-      polygonOffsetEnabled = o != null ? o : polygonOffsetEnabled;
+      polygonOffsetEnabled = o != null ? filter(o) : polygonOffsetEnabled;
 
       o = props['depthNearVal'];
-      depthNearVal = o != null ? o : depthNearVal;
+      depthNearVal = o != null ? filter(o) : depthNearVal;
       o = props['depthFarVal'];
-      depthFarVal = o != null ? o : depthFarVal;
+      depthFarVal = o != null ? filter(o) : depthFarVal;
       o = props['polygonOffsetFactor'];
-      polygonOffsetFactor = o != null ? o :polygonOffsetFactor;
+      polygonOffsetFactor = o != null ? filter(o) : polygonOffsetFactor;
       o = props['polygonOffsetUnits'];
-      polygonOffsetUnits = o != null ? o : polygonOffsetUnits;
+      polygonOffsetUnits = o != null ? filter(o) : polygonOffsetUnits;
       o = props['depthComparisonOp'];
-      depthComparisonOp = o != null ? o : depthComparisonOp;
+      depthComparisonOp = o != null ? filter(o) : depthComparisonOp;
     }
 
   }
@@ -395,18 +435,31 @@ class RasterizerState extends DeviceChild {
 
   }
 
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+       "CullFront": WebGLRenderingContext.FRONT,
+       "CullBack": WebGLRenderingContext.BACK,
+       "CullFrontAndBack": WebGLRenderingContext.FRONT_AND_BACK,
+       "FrontCW": WebGLRenderingContext.CW,
+       "FrontCCW": WebGLRenderingContext.CCW,
+      };
+      return table[o];
+    }
+    return o;
+  }
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
 
       o = props['cullEnabled'];
-      cullEnabled = o != null ? o : cullEnabled;
+      cullEnabled = o != null ? filter(o) : cullEnabled;
       o = props['cullMode'];
-      cullMode = o != null ? o : cullMode;
+      cullMode = o != null ? filter(o) : cullMode;
       o = props['cullFrontFace'];
-      cullFrontFace = o != null ? o : cullFrontFace;
+      cullFrontFace = o != null ? filter(o) : cullFrontFace;
       o = props['lineWidth'];
-      lineWidth = o != null ? o : lineWidth;
+      lineWidth = o != null ? filter(o) : lineWidth;
     }
   }
 
@@ -419,7 +472,7 @@ class Shader extends DeviceChild {
   String _source;
   WebGLShader _shader;
   int _type;
-
+  
   Shader(String name, Device device) : super(name, device) {
     _source = '';
     _shader = null;
@@ -440,10 +493,16 @@ class Shader extends DeviceChild {
     return _source;
   }
 
+  bool get compiled() {
+    if (_shader != null) {
+      return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
+    }
+    return false;
+  }
+  
   void compile() {
     device.gl.compileShader(_shader);
   }
-
 
   void _createDeviceState() {
     _shader = device.gl.createShader(_type);
@@ -502,6 +561,8 @@ class FragmentShader extends Shader {
     super._destroyDeviceState();
   }
 }
+
+typedef void UniformCallback(String name, int index, String type, int size, int location);
 
 /// A shader program defines how the programmable units of the GPU pipeline function
 /// Create using [Device.createShaderProgram]
@@ -611,11 +672,20 @@ class ShaderProgram extends DeviceChild {
         return 'ivec3';
       case WebGLRenderingContext.INT_VEC4:
         return 'ivec4';
+      case WebGLRenderingContext.SAMPLER_2D:
+        return 'sampler2D';
       default:
         return 'unknown code: $type';
     }
   }
 
+  bool get linked() {
+    if (_program != null) {
+      return device.gl.getProgramParameter(_program, WebGLRenderingContext.LINK_STATUS);
+    }
+    return false;
+  }
+  
   void refreshUniforms() {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     spectreLog.Info('$name has $numUniforms uniform variables');
@@ -631,6 +701,15 @@ class ShaderProgram extends DeviceChild {
     for (int i = 0; i < numAttributes; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveAttrib(_program, i);
       spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+    }
+  }
+  
+  void forEachUniforms(UniformCallback callback) {
+    numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
+    for (int i = 0; i < numUniforms; i++) {
+      WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
+      var location = device.gl.getUniformLocation(_program, activeUniform.name);
+      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size, location);
     }
   }
 }
@@ -797,13 +876,37 @@ class SamplerState extends DeviceChild {
     super._createDeviceState();
   }
 
-
+  Dynamic filter(Dynamic o) {
+    if (o is String) {
+      var table = {
+        "TextureWrapClampToEdge": WebGLRenderingContext.CLAMP_TO_EDGE,
+        "TextureWrapMirroredRepeat": WebGLRenderingContext.MIRRORED_REPEAT,
+        "TextureWrapRepeat": WebGLRenderingContext.REPEAT,
+        "TextureMagFilterLinear": WebGLRenderingContext.LINEAR,
+        "TextureMagFilterNearest": WebGLRenderingContext.NEAREST,
+        "TextureMinFilterLinear": WebGLRenderingContext.LINEAR,
+        "TextureMinFilterNearest": WebGLRenderingContext.NEAREST,
+        "TextureMinFilterNearestMipmapNearest": WebGLRenderingContext.NEAREST_MIPMAP_NEAREST,
+        "TextureMinFilterNearestMipmapLinear": WebGLRenderingContext.NEAREST_MIPMAP_LINEAR,
+        "TextureMinFilterLinearMipmapNearest": WebGLRenderingContext.LINEAR_MIPMAP_NEAREST,
+        "TextureMinFilterLinearMipmapLinear": WebGLRenderingContext.LINEAR_MIPMAP_LINEAR
+      };
+      return table[o];
+    }
+    return o;
+  }
+  
   void _configDeviceState(Dynamic props) {
     if (props != null) {
-      _wrapS = props['wrapS'] != null ? props['wrapS'] : _wrapS;
-      _wrapT = props['wrapT'] != null ? props['wrapT'] : _wrapT;
-      _minFilter = props['minFilter'] != null ? props['minFilter'] : _minFilter;
-      _magFilter = props['magFilter'] != null ? props['magFilter'] : _magFilter;
+      Dynamic o;
+      o = props['wrapS'];
+      _wrapS = o != null ? filter(o) : _wrapS;
+      o = props['wrapT'];
+      _wrapT = o != null ? filter(o) : _wrapT;
+      o = props['minFilter'];
+      _minFilter = o != null ? filter(o) : _minFilter;
+      o = props['magFilter'];
+      _magFilter = o != null ? filter(o) : _magFilter;
     }
 
   }
@@ -813,14 +916,13 @@ class SamplerState extends DeviceChild {
 }
 
 class RenderTarget extends DeviceChild {
-  Dynamic _color0;
-  Dynamic _depth;
-  Dynamic _stencil;
   WebGLFramebuffer _buffer;
   int _target;
+  int _target_param;
 
   RenderTarget(String name, Device device) : super(name, device) {
     _target = WebGLRenderingContext.FRAMEBUFFER;
+    _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
   }
 
   void _createDeviceState() {
@@ -829,37 +931,48 @@ class RenderTarget extends DeviceChild {
   }
 
   void _configDeviceState(Dynamic props) {
-
-    _color0 = props['color0'];
-    _depth = props['depth'];
-    _stencil = props['stencil'];
-
-    /*
-    WebGLFramebuffer oldBind = device.gl.getParameter(WebGLRenderingContext.FRAMEBUFFER_BINDING);
+    int colorHandle = props['color0'] != null ? props['color0'] : 0;
+    int colorType = Handle.getType(colorHandle);
+    int depthHandle = props['depth'] != null ? props['depth'] : 0;
+    int depthType = Handle.getType(depthHandle);
+    int stencilHandle = props['stencil'] != null ? props['stencil'] : 0;
+    if (stencilHandle != 0) {
+      spectreLog.Error('No support for stencil buffers yet.');
+    }
+    
+    WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (_color0 != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, _color0._buffer);
+    if (colorHandle != 0) {
+      if (colorType == Device.RenderBufferHandleType) {
+        RenderBuffer rb = device.getDeviceChild(colorHandle, true);
+        device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
+      } else if (colorType == Device.TextureHandleType) {
+        Texture2D t2d = device.getDeviceChild(colorHandle, true);
+        device.gl.framebufferTexture2D(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
+      }
     } else {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, null);
     }
-    if (_depth != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, _depth._buffer);
+    if (depthHandle != 0) {
+      if (depthType == Device.RenderBufferHandleType) {
+        RenderBuffer rb = device.getDeviceChild(depthHandle, true);
+        device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
+      } else if (depthType == Device.TextureHandleType) {
+        Texture2D t2d = device.getDeviceChild(depthHandle, true);
+        device.gl.framebufferTexture2D(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
+      }
     } else {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
     }
-    if (_stencil != null) {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, _stencil._buffer);
-    } else {
-      device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
-    }
+    device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
+    
     int fbStatus = device.gl.checkFramebufferStatus(_target);
     if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = fbStatus');
+      spectreLog.Error('RenderTarget $name incomplete status = $fbStatus');
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
     device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
-    */
   }
 
   void _destroyDeviceState() {

@@ -176,6 +176,24 @@ class ProgramBuilder {
     ops.add(name);
     ops.add(buf);
   }
+  
+  void setUniformVector3(String name, Float32Array buf) {
+    ops.add(Ops.SetUniformVector3);
+    ops.add(name);
+    ops.add(buf);
+  }
+  
+  void setUniformInt(String name, int i) {
+    ops.add(Ops.SetUniformInt);
+    ops.add(name);
+    ops.add(i);
+  }
+  
+  void setUniformVector2(String name, Float32Array buf) {
+    ops.add(Ops.SetUniformVector2);
+    ops.add(name);
+    ops.add(buf);
+  }
 
   void setIndexedMesh(int indexedMeshHandle) {
     ops.add(Ops.SetIndexedMesh);

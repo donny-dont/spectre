@@ -26,7 +26,7 @@ class ImmediateContext {
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
   static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
   static final int numVertexBuffers = 2;
-  static final int numTextures = 2;
+  static final int numTextures = 3;
 
   Device _device;
   // Input Assembler
@@ -310,10 +310,30 @@ class ImmediateContext {
     if (_renderTargetHandle == renderTargetHandle) {
       return;
     }
-    RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
-    _device.gl.bindFramebuffer(rt._target, rt._buffer);
+    _renderTargetHandle = renderTargetHandle;
+    if (_renderTargetHandle == 0) {
+      _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+    } else {
+      RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
+      _device.gl.bindFramebuffer(rt._target, rt._buffer);  
+    }
   }
 
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniform2f(String name, num v0, num v1) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform2f(index,v0, v1);
+  }
+  
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
@@ -343,7 +363,7 @@ class ImmediateContext {
     }
     _device.gl.uniform4f(index,v0, v1, v2, v3);
   }
-
+  
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
@@ -434,6 +454,22 @@ class ImmediateContext {
     _device.gl.uniform3fv(index, vector);
   }
 
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector2(String name, Float32Array vector) {
+    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    if (sp == null) {
+      spectreLog.Error('Attempting to set uniform with invalid program bound.');
+      return;
+    }
+    var index = _device.gl.getUniformLocation(sp._program, name);
+    if (index == -1) {
+      spectreLog.Error('Could not find uniform $name in ${sp.name}');
+      return;
+    }
+    _device.gl.uniform2fv(index, vector);
+  }
+
+  
   void setUniformFloat4Array(String name, Float32Array array) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {

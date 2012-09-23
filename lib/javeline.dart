@@ -21,13 +21,16 @@
 */
 
 #library('Javeline');
+#import('dart:math', prefix:'Math');
 #import('dart:html');
 #import('dart:json');
-#import('../external/DartVectorMath/lib/vector_math_html.dart');
+// TODO: turn dart vector math into pub project. 
+#import('external/DartVectorMath/lib/vector_math_html.dart');
 #import('spectre.dart');
 #import('profiler.dart');
 
 #source('javeline/config.dart');
+#source('javeline/config_ui.dart');
 #source('javeline/keyboard.dart');
 #source('javeline/mouse.dart');
 #source('javeline/base_demo.dart');

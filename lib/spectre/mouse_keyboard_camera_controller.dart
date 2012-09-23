@@ -71,9 +71,9 @@ class MouseKeyboardCameraController implements CameraController {
     }
     scale = scale * dt * floatVelocity;
     vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
-    upDirection.selfScale(scale);
-    cam.lookAtPosition.selfAdd(upDirection);
-    cam.eyePosition.selfAdd(upDirection);
+    upDirection.scale(scale);
+    cam.lookAtPosition.add(upDirection);
+    cam.eyePosition.add(upDirection);
   }
 
   void _MoveStrafe(num dt, bool positive, bool negative, Camera cam) {
