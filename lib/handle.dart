@@ -21,5 +21,5 @@
 */
 
 #library('handle_system');
-#source('handle/handle.dart');
-#source('handle/handle_system.dart');
+#source('src/handle/handle.dart');
+#source('src/handle/handle_system.dart');

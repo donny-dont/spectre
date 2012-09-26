@@ -1,6 +1,10 @@
 name: spectre
 description: Graphics Library
 version: 0.0.1
+authors: 
+- John McCutchan <john@johnmccutchan.com>
+- Adam Singer <financeCoding@gmail.com>
+homepage: https://github.com/johnmccutchan/markerprof
 dependencies:
   unittest:
     sdk: unittest

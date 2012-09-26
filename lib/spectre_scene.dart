@@ -27,4 +27,4 @@
 #import('handle.dart');
 #import('package:DartVectorMath/vector_math_html.dart');
 #import('spectre.dart');
-#source('spectre_scene/transform_graph.dart');
+#source('src/spectre_scene/transform_graph.dart');
