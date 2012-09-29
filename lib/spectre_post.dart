@@ -25,6 +25,6 @@
 #library('spectre_post');
 #import('dart:html');
 #import('spectre.dart');
-#source('spectre_post/spectre_post_pass.dart');
-#source('spectre_post/spectre_post_fragment.dart');
-#source('spectre_post/spectre_post_static.dart');
+#source('src/spectre_post/spectre_post_pass.dart');
+#source('src/spectre_post/spectre_post_fragment.dart');
+#source('src/spectre_post/spectre_post_static.dart');
