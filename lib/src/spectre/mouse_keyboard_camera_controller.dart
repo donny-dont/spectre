@@ -20,7 +20,7 @@
 
 */
 
-class MouseKeyboardCameraController implements CameraController {
+class MouseKeyboardCameraController extends CameraController {
   bool up;
   bool down;
   bool strafeLeft;

@@ -40,7 +40,6 @@
 #source('src/spectre/interpreter.dart');
 #source('src/spectre/input_layout_helper.dart');
 #source('src/spectre/debug_draw_manager.dart');
-
 #source('src/spectre/camera.dart');
 #source('src/spectre/camera_controller.dart');
 #source('src/spectre/mouse_keyboard_camera_controller.dart');

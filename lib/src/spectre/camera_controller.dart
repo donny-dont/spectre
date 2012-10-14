@@ -20,6 +20,6 @@
 
 */
 
-class CameraController {
+abstract class CameraController {
   abstract void UpdateCamera(num seconds, Camera cam);
 }
