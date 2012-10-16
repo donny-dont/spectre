@@ -1,9 +1,7 @@
 name: spectre
 description: Graphics Library
-version: 0.0.1
-authors: 
-- John McCutchan <john@johnmccutchan.com>
-- Adam Singer <financeCoding@gmail.com>
+version: 0.5.0
+author: John McCutchan <john@johnmccutchan.com>
 homepage: https://github.com/johnmccutchan/spectre
 dependencies:
   unittest:

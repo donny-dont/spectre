@@ -17,8 +17,8 @@ ResourceManager - Manage and load resources
 Spectre also includes a resource manager and a demo framework called 'Javeline'.
 
 
-## Status: Alpha ##
-Stuff works, not in release yet.
+## Status: Beta ##
+Stuff works but the API is not guaranteed yet.
 
 
 ## Getting Started ##
