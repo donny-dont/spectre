@@ -1,3 +1,7 @@
-John McCutchan <john@johnmccutchan.com>
-Adam Singer <financeCoding@gmail.com>
+Authors:
 
+John McCutchan <john@johnmccutchan.com>
+
+Contributors:
+
+Adam Singer <financeCoding@gmail.com>
