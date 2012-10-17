@@ -58,7 +58,7 @@ class MouseKeyboardCameraController extends CameraController {
     _RotateView(seconds, cam);
   }
 
-  void _MoveFloat(num dt, bool positive, bool negative, Camera cam) {
+  void _MoveFloat(num dt, bool negative, bool positive, Camera cam) {
     num scale = 0.0;
     if (positive) {
       scale += 1.0;
@@ -76,7 +76,7 @@ class MouseKeyboardCameraController extends CameraController {
     cam.eyePosition.add(upDirection);
   }
 
-  void _MoveStrafe(num dt, bool positive, bool negative, Camera cam) {
+  void _MoveStrafe(num dt, bool negative, bool positive, Camera cam) {
     num scale = 0.0;
     if (positive) {
       scale += 1.0;
@@ -97,7 +97,7 @@ class MouseKeyboardCameraController extends CameraController {
     cam.eyePosition.add(strafeDirection);
   }
 
-  void _MoveForward(num dt, bool positive, bool negative, Camera cam) {
+  void _MoveForward(num dt, bool negative, bool positive, Camera cam) {
     num scale = 0.0;
     if (positive) {
       scale += 1.0;
@@ -145,17 +145,7 @@ class MouseKeyboardCameraController extends CameraController {
       final num minPitchDegrees = degrees(minPitchAngle);
       final num maxPitchDegrees = degrees(maxPitchAngle);
 
-      _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-
-      if (above) {
-        if (pitchAngle > minPitchAngle || (pitchAngle <= minPitchAngle && mousePitchDelta > 0.0)) {
-          _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-        }
-      } else {
-        if (pitchAngle < maxPitchAngle || (pitchAngle >= maxPitchAngle && mousePitchDelta < 0.0)) {
-          _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-        }
-      }
+      _RotateEyeAndLook(-mousePitchDelta, strafeDirection, cam);
     }
 
     _RotateEyeAndLook(mouseYawDelta, upDirection, cam);
