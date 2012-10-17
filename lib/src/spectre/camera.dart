@@ -106,5 +106,5 @@ class Camera {
     lookAtPosition.copyInto(lap);
   }
 
-  vec3 get frontDirection() => lookAtPosition - eyePosition;
+  vec3 get frontDirection() =>  eyePosition - lookAtPosition;
 }
