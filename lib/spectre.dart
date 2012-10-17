@@ -25,9 +25,9 @@
 #library('Spectre');
 #import('dart:html');
 #import('dart:json');
-#import('package:dartvectormath/vector_math_html.dart');
-#import('package:handlesystem/handlesystem.dart');
-#import('package:markerprof/profiler.dart');
+#import('package:vector_math/vector_math_browser.dart');
+#import('package:handle_system/handle_system.dart');
+#import('package:marker_prof/profiler.dart');
 #source('src/spectre/logger.dart');
 #source('src/spectre/device_children.dart');
 #source('src/spectre/device.dart');
