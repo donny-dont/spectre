@@ -21,9 +21,9 @@ class SpectrePostFragment extends SpectrePostPass {
   void setup(GraphicsDevice device, Map<String, Dynamic> args) {
     List<int> textures = args['textures'];
     List<int> samplers = args['samplers'];
-    device.immediateContext.setTextures(0, textures);
-    device.immediateContext.setSamplers(0, samplers);
-    device.immediateContext.setShaderProgram(shaderProgram);
-    device.immediateContext.setInputLayout(inputLayout);
+    device.context.setTextures(0, textures);
+    device.context.setSamplers(0, samplers);
+    device.context.setShaderProgram(shaderProgram);
+    device.context.setInputLayout(inputLayout);
   }
 }

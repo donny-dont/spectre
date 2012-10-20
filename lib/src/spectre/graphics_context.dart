@@ -20,8 +20,8 @@
 
 */
 
-/** The [ImmediateContext] configures the GPU pipeline and executes draw commands */
-class ImmediateContext {
+/** The [GraphicsContext] configures the GPU pipeline and executes draw commands */
+class GraphicsContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
   static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
@@ -145,7 +145,7 @@ class ImmediateContext {
     }
   }
 
-  ImmediateContext(GraphicsDevice device) {
+  GraphicsContext(GraphicsDevice device) {
     _device = device;
     _vertexBufferHandles = new List<int>(numVertexBuffers);
     _samplerStateHandles = new List<int>(numTextures);

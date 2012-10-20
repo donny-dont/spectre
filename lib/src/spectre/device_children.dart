@@ -1117,8 +1117,8 @@ class IndexedMesh extends DeviceChild {
         }*/
         if (rm != null && rm is ResourceManager && meshResourceHandle != null) {
           MeshResource mesh = rm.getResource(meshResourceHandle);
-          device.immediateContext.updateBuffer(vertexArrayHandle, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
-          device.immediateContext.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(vertexArrayHandle, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
           indexOffset = 0;
           numIndices = mesh.numIndices;
         }
@@ -1129,8 +1129,8 @@ class IndexedMesh extends DeviceChild {
         Map mesh = o['meshes'][0];
         if (o != null && o is Map) {
           var indices = new Uint16Array.fromList(mesh['indices']);
-          device.immediateContext.updateBuffer(vertexArrayHandle, new Float32Array.fromList(mesh['vertices']), WebGLRenderingContext.STATIC_DRAW);
-          device.immediateContext.updateBuffer(indexArrayHandle, indices, WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(vertexArrayHandle, new Float32Array.fromList(mesh['vertices']), WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(indexArrayHandle, indices, WebGLRenderingContext.STATIC_DRAW);
           indexOffset = 0;
           numIndices = indices.length;
         }

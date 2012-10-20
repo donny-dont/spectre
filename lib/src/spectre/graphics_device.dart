@@ -140,8 +140,8 @@ class GraphicsDevice {
     }
   }
 
-  ImmediateContext _immediateContext;
-  ImmediateContext get immediateContext() => _immediateContext;
+  GraphicsContext _context;
+  GraphicsContext get context() => _context;
 
   WebGLRenderingContext _gl;
   WebGLRenderingContext get gl() => _gl;
@@ -188,7 +188,7 @@ class GraphicsDevice {
     _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
     _childrenObjects = new List(MaxDeviceChildren);
     _nameMapping = new Map<String, int>();
-    _immediateContext = new ImmediateContext(this);
+    _context = new GraphicsContext(this);
     _fallbackTextureID = createTexture2D('Device.Fallback', {'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGBA, 'pixelFormat': Texture.PixelFormatUnsignedByte});
     {
       CanvasElement canvas = new CanvasElement();
@@ -197,7 +197,7 @@ class GraphicsDevice {
       CanvasRenderingContext2D context = canvas.getContext('2d');
       _drawGrid(context, 512, 512, 8, 8);
       configureDeviceChild(_fallbackTextureID, {'pixels': canvas});
-      immediateContext.generateMipmap(_fallbackTextureID);
+      _context.generateMipmap(_fallbackTextureID);
     }
   }
 

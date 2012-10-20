@@ -59,7 +59,7 @@ class _DebugDrawLineManager {
     _lines.add(line);
   }
 
-  void _prepareForRender(ImmediateContext context) {
+  void _prepareForRender(GraphicsContext context) {
     _vboUsed = 0;
     for (_DebugLine line in _lines) {
       _vboStorage[_vboUsed] = line.positionStart.x;
@@ -165,13 +165,13 @@ class _DebugDrawSphereManager {
     return current+sphereCount < _maxSpheres;
   }
 
-  void _prepareForRender(ImmediateContext context, Float32Array cameraMatrix) {
+  void _prepareForRender(GraphicsContext context, Float32Array cameraMatrix) {
     // Reset draw program
     _drawProgram.clear();
     ProgramBuilder pb = new ProgramBuilder.append(_drawProgram);
     pb.setShaderProgram(_sphereProgramHandle);
     pb.setUniformMatrix4('cameraTransform', cameraMatrix);
-    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    pb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
     pb.setIndexedMesh(_sphereIndexedMeshHandle);
     pb.setInputLayout(_sphereInputLayout);
     for (final _DebugDrawSphere sphere in _spheres) {
@@ -183,7 +183,7 @@ class _DebugDrawSphereManager {
 
   void _render(GraphicsDevice device, Float32Array cameraMatrix) {
     Interpreter interpreter = new Interpreter();
-    interpreter.run(_drawProgram, device, null, device.immediateContext);
+    interpreter.run(_drawProgram, device, null, device.context);
   }
 
   void add(_DebugDrawSphere sphere) {
@@ -262,7 +262,7 @@ class DebugDrawManager {
   Float32Array _cameraMatrix;
 
   GraphicsDevice _device;
-  ImmediateContext _context;
+  GraphicsContext _context;
 
   DebugDrawManager() {
     _handles = new List<int>();
@@ -278,7 +278,7 @@ class DebugDrawManager {
 
   void init(GraphicsDevice device, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
-    _context = device.immediateContext;
+    _context = device.context;
 
     int handle;
 
@@ -345,7 +345,7 @@ class DebugDrawManager {
     pb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
     pb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
     pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
-    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
+    pb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
     pb.setIndexBuffer(0);
     // Depth enabled lines
     pb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
@@ -592,7 +592,7 @@ class DebugDrawManager {
       interpreter.setRegister(3, 0);
       interpreter.run(_drawCommands, _device, null, _context);
     }
-    _device.immediateContext.setDepthState(_handles[_depthEnabledStateHandleIndex]);
+    _device.context.setDepthState(_handles[_depthEnabledStateHandleIndex]);
     _depthEnabledSpheres._render(_device, _cameraMatrix);
     _depthDisabledSpheres._render(_device, _cameraMatrix);
     Profiler.exit();

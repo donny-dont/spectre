@@ -31,7 +31,7 @@
 #source('src/spectre/logger.dart');
 #source('src/spectre/device_children.dart');
 #source('src/spectre/graphics_device.dart');
-#source('src/spectre/immediate_context.dart');
+#source('src/spectre/graphics_context.dart');
 #source('src/spectre/resource_loader.dart');
 #source('src/spectre/resource.dart');
 #source('src/spectre/resource_manager.dart');

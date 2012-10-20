@@ -191,15 +191,15 @@ void main() {
       return;
     }
     pass.setup(_device, arguments);
-    _device.immediateContext.setVertexBuffers(0, [vertexBuffer]);
-    _device.immediateContext.setIndexBuffer(0);
-    _device.immediateContext.setRasterizerState(_rasterizerState);
-    _device.immediateContext.setDepthState(_depthState);
-    _device.immediateContext.setBlendState(_blendState);
+    _device.context.setVertexBuffers(0, [vertexBuffer]);
+    _device.context.setIndexBuffer(0);
+    _device.context.setRasterizerState(_rasterizerState);
+    _device.context.setDepthState(_depthState);
+    _device.context.setBlendState(_blendState);
     // FIXME: Make the following dynamic:
-    _device.immediateContext.setUniform2f('texScale', 0.833, 0.46875);
-    _device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
-    _device.immediateContext.setRenderTarget(renderTargetHandle);
-    _device.immediateContext.draw(6, 0);
+    _device.context.setUniform2f('texScale', 0.833, 0.46875);
+    _device.context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+    _device.context.setRenderTarget(renderTargetHandle);
+    _device.context.draw(6, 0);
   }
 }

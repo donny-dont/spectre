@@ -6,7 +6,7 @@ import 'package:vector_math/vector_math_browser.dart';
 final String _canvasId = '#backbuffer';
 
 GraphicsDevice _graphicsDevice;
-ImmediateContext _graphicsContext;
+GraphicsContext _graphicsContext;
 ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
 
@@ -85,7 +85,7 @@ main() {
   // Create a GraphicsDevice
   _graphicsDevice = new GraphicsDevice(gl);
   // Get a reference to the GraphicsContext
-  _graphicsContext = _graphicsDevice.immediateContext;
+  _graphicsContext = _graphicsDevice.context;
   // Create a resource manager and set it's base URL
   _resourceManager = new ResourceManager();
   _resourceManager.setBaseURL(baseUrl);
