@@ -24,21 +24,13 @@ class InputLayoutDescription {
   String meshAttributeName;
   int vertexBufferIndex;
   String shaderAttributeName;
-  
+
   InputLayoutDescription(this.shaderAttributeName, this.vertexBufferIndex, this.meshAttributeName);
 }
 
 class InputLayoutHelper {
-  static InputElementDescription inputElementDescriptionFromMesh(InputLayoutDescription description, MeshResource mesh, [num meshIndex=0]) {
-    if (mesh == null) {
-      spectreLog.Info('mesh is null');
-      return null;
-    }
-    if (mesh is MeshResource == false) {
-      spectreLog.Info('mesh is not a MeshResource');
-      return null;
-    }
-    Map innerMesh = mesh.meshData['meshes'][meshIndex];
+  static InputElementDescription inputElementDescriptionFromMeshMap(InputLayoutDescription description, Map mesh, [num meshIndex=0]) {
+    Map innerMesh = mesh['meshes'][meshIndex];
     Map attributes = innerMesh['attributes'];
     Map attribute = attributes[description.meshAttributeName];
     if (attribute == null) {
@@ -73,7 +65,19 @@ class InputLayoutHelper {
     }
     return new InputElementDescription(description.shaderAttributeName, format, stride, description.vertexBufferIndex, offset);
   }
-  
+
+  static InputElementDescription inputElementDescriptionFromMesh(InputLayoutDescription description, MeshResource mesh, [num meshIndex=0]) {
+    if (mesh == null) {
+      spectreLog.Info('mesh is null');
+      return null;
+    }
+    if (mesh is MeshResource == false) {
+      spectreLog.Info('mesh is not a MeshResource');
+      return null;
+    }
+    return inputElementDescriptionFromMeshMap(description, mesh.meshData, meshIndex);
+  }
+
   static InputElementDescription inputElementDescriptionFromAttributes(InputLayoutDescription description, Map attributes) {
     Map attribute = attributes[description.meshAttributeName];
     if (attribute == null) {

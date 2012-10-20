@@ -3,16 +3,16 @@
 class DeviceChild implements Hashable {
   static final int StatusDirty = 0x1;
   static final int StatusReady = 0x2;
-  
+
   String name;
   Device device;
   int _status;
   int fallback;
-  
+
   void set dirty(bool r) {
     if (r) {
       _status |= StatusDirty;
-    } else { 
+    } else {
       _status &= ~StatusDirty;
     }
   }
@@ -20,12 +20,12 @@ class DeviceChild implements Hashable {
   void set ready(bool r) {
     if (r) {
       _status |= StatusReady;
-    } else { 
+    } else {
       _status &= ~StatusReady;
     }
   }
   bool get ready() => (_status & StatusReady) != 0;
-  
+
   DeviceChild(this.name, this.device) {
     _status = 0;
     fallback = 0;
@@ -36,7 +36,7 @@ class DeviceChild implements Hashable {
   int hashCode() {
     return name.hashCode();
   }
-  
+
   bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
@@ -67,7 +67,7 @@ class InputLayout extends DeviceChild {
   List<_InputLayoutElement> _elements;
   List<InputElementDescription> _elementDescription;
   int _shaderProgramHandle;
-  
+
   InputLayout(String name, Device device) : super(name, device) {
     _maxAttributeIndex = 0;
     _elements = null;
@@ -77,15 +77,15 @@ class InputLayout extends DeviceChild {
 
   void _createDeviceState() {
   }
-  
+
   void _bind() {
     ShaderProgram sp = device.getDeviceChild(_shaderProgramHandle);
     if (_elementDescription == null || _elementDescription.length <= 0 || sp == null) {
       return;
     }
-    
+
     _InputElementChecker checker = new _InputElementChecker();
-    
+
     _maxAttributeIndex = -1;
     _elements = new List<_InputLayoutElement>();
     for (InputElementDescription e in _elementDescription) {
@@ -107,11 +107,11 @@ class InputLayout extends DeviceChild {
       _elements.add(el);
     }
   }
-  
+
   void _configDeviceState(Dynamic props) {
 
     Dynamic o;
-    
+
     o = props['shaderProgram'];
     if (o != null && o is int) {
       _shaderProgramHandle = o;
@@ -472,7 +472,7 @@ class Shader extends DeviceChild {
   String _source;
   WebGLShader _shader;
   int _type;
-  
+
   Shader(String name, Device device) : super(name, device) {
     _source = '';
     _shader = null;
@@ -499,7 +499,7 @@ class Shader extends DeviceChild {
     }
     return false;
   }
-  
+
   void compile() {
     device.gl.compileShader(_shader);
   }
@@ -592,14 +592,14 @@ class ShaderProgram extends DeviceChild {
       device.gl.detachShader(_program, shader._shader);
     }
   }
-  
+
   void _attach(int shaderHandle) {
     Shader shader = device.getDeviceChild(shaderHandle);
     if (shader != null) {
       device.gl.attachShader(_program, shader._shader);
     }
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -609,14 +609,14 @@ class ShaderProgram extends DeviceChild {
         vertexShaderHandle = o;
         _attach(vertexShaderHandle);
       }
-      
+
       o = props['FragmentProgram'];
       if (o != null && o is int) {
         _detach(fragmentShaderHandle);
         fragmentShaderHandle = o;
         _attach(fragmentShaderHandle);
       }
-      
+
       VertexShader vertexShader = device.getDeviceChild(vertexShaderHandle);
       FragmentShader fragmentShader = device.getDeviceChild(fragmentShaderHandle);
       if (vertexShader != null && fragmentShader != null) {
@@ -685,7 +685,7 @@ class ShaderProgram extends DeviceChild {
     }
     return false;
   }
-  
+
   void refreshUniforms() {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     spectreLog.Info('$name has $numUniforms uniform variables');
@@ -703,7 +703,7 @@ class ShaderProgram extends DeviceChild {
       spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
     }
   }
-  
+
   void forEachUniforms(UniformCallback callback) {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     for (int i = 0; i < numUniforms; i++) {
@@ -895,7 +895,7 @@ class SamplerState extends DeviceChild {
     }
     return o;
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -939,7 +939,7 @@ class RenderTarget extends DeviceChild {
     if (stencilHandle != 0) {
       spectreLog.Error('No support for stencil buffers yet.');
     }
-    
+
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
     if (colorHandle != 0) {
@@ -965,7 +965,7 @@ class RenderTarget extends DeviceChild {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
     }
     device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
-    
+
     int fbStatus = device.gl.checkFramebufferStatus(_target);
     if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
       spectreLog.Error('RenderTarget $name incomplete status = $fbStatus');
@@ -1121,6 +1121,18 @@ class IndexedMesh extends DeviceChild {
           device.immediateContext.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
           indexOffset = 0;
           numIndices = mesh.numIndices;
+        }
+      }
+
+      o = props['UpdateFromMeshMap'];
+      if (o != null && o is Map) {
+        Map mesh = o['meshes'][0];
+        if (o != null && o is Map) {
+          var indices = new Uint16Array.fromList(mesh['indices']);
+          device.immediateContext.updateBuffer(vertexArrayHandle, new Float32Array.fromList(mesh['vertices']), WebGLRenderingContext.STATIC_DRAW);
+          device.immediateContext.updateBuffer(indexArrayHandle, indices, WebGLRenderingContext.STATIC_DRAW);
+          indexOffset = 0;
+          numIndices = indices.length;
         }
       }
 
