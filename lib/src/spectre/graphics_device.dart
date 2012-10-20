@@ -59,7 +59,7 @@ class _InputElementChecker {
   _InputElementChecker() {
     items = new List<_InputElementCheckerItem>();
   }
-  
+
   void add(InputElementDescription d) {
     _InputElementCheckerItem item = new _InputElementCheckerItem(d.name, d.vertexBufferSlot, d.vertexBufferOffset);
     for(_InputElementCheckerItem check in items) {
@@ -78,7 +78,7 @@ class _InputElementChecker {
 /// Each resource requires a unique name.
 
 /// An existing resource can be looked up using its name.
-class Device {
+class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
   static const DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
   static const DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
@@ -166,7 +166,7 @@ class Device {
     context.fillRect(0, 0, w, h);
     context.restore();
   }
-  
+
   void _drawGrid(CanvasRenderingContext2D context, int width, int height, int horizSlices, int vertSlices) {
     int sliceWidth = width ~/ horizSlices;
     int sliceHeight = height ~/ vertSlices;
@@ -181,9 +181,9 @@ class Device {
       }
     }
   }
-  
+
   /// Constructs a GPU device
-  Device(WebGLRenderingContext gl) {
+  GraphicsDevice(WebGLRenderingContext gl) {
     _gl = gl;
     _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
     _childrenObjects = new List(MaxDeviceChildren);
@@ -563,7 +563,7 @@ class Device {
   /// Create an [InputLayout] named [name]
   ///
   /// [props] is a JSONS tring or a [Map] containing a set of properties
-  /// describing the [InputLayout] being created. 
+  /// describing the [InputLayout] being created.
   int createInputLayout(String name, Object props, [int handle = Handle.BadHandle]) {
     handle = _registerHandle(name, InputLayoutHandleType, handle);
     if (handle == Handle.BadHandle) {

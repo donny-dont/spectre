@@ -3,8 +3,8 @@ class SpectrePostFragment extends SpectrePostPass {
   final int shaderProgram;
   final List<InputElementDescription> elements;
   int inputLayout;
-  SpectrePostFragment(Device device,
-                      String name, 
+  SpectrePostFragment(GraphicsDevice device,
+                      String name,
                       this.shaderProgram,
                       this.elements) : super() {
     inputLayout = device.createInputLayout('SpectrePost.InputLayout[$name]', {
@@ -12,13 +12,13 @@ class SpectrePostFragment extends SpectrePostPass {
       'elements': elements
     });
   }
-  
-  void cleanup(Device device) {
+
+  void cleanup(GraphicsDevice device) {
     device.deleteDeviceChild(shaderProgram);
     device.deleteDeviceChild(inputLayout);
   }
-  
-  void setup(Device device, Map<String, Dynamic> args) {
+
+  void setup(GraphicsDevice device, Map<String, Dynamic> args) {
     List<int> textures = args['textures'];
     List<int> samplers = args['samplers'];
     device.immediateContext.setTextures(0, textures);

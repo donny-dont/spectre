@@ -5,7 +5,7 @@ import 'package:vector_math/vector_math_browser.dart';
 
 final String _canvasId = '#backbuffer';
 
-Device _graphicsDevice;
+GraphicsDevice _graphicsDevice;
 ImmediateContext _graphicsContext;
 ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
@@ -83,7 +83,7 @@ main() {
   // Initialize Spectre
   initSpectre();
   // Create a GraphicsDevice
-  _graphicsDevice = new Device(gl);
+  _graphicsDevice = new GraphicsDevice(gl);
   // Get a reference to the GraphicsContext
   _graphicsContext = _graphicsDevice.immediateContext;
   // Create a resource manager and set it's base URL

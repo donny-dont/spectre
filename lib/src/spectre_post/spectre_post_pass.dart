@@ -1,11 +1,11 @@
-class SpectrePostPass {  
+class SpectrePostPass {
   SpectrePostPass() {
   }
-  
-  void cleanup(Device device) {
-    
+
+  void cleanup(GraphicsDevice device) {
+
   }
-  
-  void setup(Device device, Map<String, Dynamic> args) {
+
+  void setup(GraphicsDevice device, Map<String, Dynamic> args) {
   }
 }

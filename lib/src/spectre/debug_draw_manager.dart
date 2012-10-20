@@ -39,14 +39,14 @@ class _DebugDrawLineManager {
   int _vbo;
   int _vboLayout;
 
-  _DebugDrawLineManager(Device device, String name, int vboSize, int lineShaderHandle) {
+  _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
     _lines = new Set<_DebugLine>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
-    List inputElements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 7*4, 0, 0),
-                          new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
+    List inputElements = [new InputElementDescription('vPosition', GraphicsDevice.DeviceFormatFloat3, 7*4, 0, 0),
+                          new InputElementDescription('vColor', GraphicsDevice.DeviceFormatFloat4, 7*4, 0, 3*4)];
     _vboLayout = device.createInputLayout('$name Layout', {'shaderProgram': lineShaderHandle, 'elements':inputElements});
   }
 
@@ -181,7 +181,7 @@ class _DebugDrawSphereManager {
     }
   }
 
-  void _render(Device device, Float32Array cameraMatrix) {
+  void _render(GraphicsDevice device, Float32Array cameraMatrix) {
     Interpreter interpreter = new Interpreter();
     interpreter.run(_drawProgram, device, null, device.immediateContext);
   }
@@ -261,7 +261,7 @@ class DebugDrawManager {
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
 
-  Device _device;
+  GraphicsDevice _device;
   ImmediateContext _context;
 
   DebugDrawManager() {
@@ -276,7 +276,7 @@ class DebugDrawManager {
   // int sphereFSResourceHandle
   // int sphereMeshResourceHandle,
 
-  void init(Device device, [int vboSize=4096, int maxSpheres=1024]) {
+  void init(GraphicsDevice device, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
     _context = device.immediateContext;
 

@@ -56,7 +56,7 @@ class Interpreter {
     return Handle.getIndex(handle);
   }
 
-  void run(List program, Device device, ResourceManager rm, ImmediateContext im) {
+  void run(List program, GraphicsDevice device, ResourceManager rm, ImmediateContext im) {
     if (program == null) {
       return;
     }

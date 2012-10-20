@@ -47,16 +47,16 @@ class InputLayoutHelper {
     DeviceFormat format = null;
     if (type == 'float') {
       if (numElements == 1) {
-        format = Device.DeviceFormatFloat1;
+        format = GraphicsDevice.DeviceFormatFloat1;
       }
       if (numElements == 2) {
-        format = Device.DeviceFormatFloat2;
+        format = GraphicsDevice.DeviceFormatFloat2;
       }
       if (numElements == 3) {
-        format = Device.DeviceFormatFloat3;
+        format = GraphicsDevice.DeviceFormatFloat3;
       }
       if (numElements == 4) {
-        format = Device.DeviceFormatFloat4;
+        format = GraphicsDevice.DeviceFormatFloat4;
       }
     }
     if (format == null) {
@@ -94,16 +94,16 @@ class InputLayoutHelper {
     DeviceFormat format = null;
     if (type == 'float') {
       if (numElements == 1) {
-        format = Device.DeviceFormatFloat1;
+        format = GraphicsDevice.DeviceFormatFloat1;
       }
       if (numElements == 2) {
-        format = Device.DeviceFormatFloat2;
+        format = GraphicsDevice.DeviceFormatFloat2;
       }
       if (numElements == 3) {
-        format = Device.DeviceFormatFloat3;
+        format = GraphicsDevice.DeviceFormatFloat3;
       }
       if (numElements == 4) {
-        format = Device.DeviceFormatFloat4;
+        format = GraphicsDevice.DeviceFormatFloat4;
       }
     }
     if (format == null) {

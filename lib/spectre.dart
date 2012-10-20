@@ -30,7 +30,7 @@
 #import('package:marker_prof/profiler.dart');
 #source('src/spectre/logger.dart');
 #source('src/spectre/device_children.dart');
-#source('src/spectre/device.dart');
+#source('src/spectre/graphics_device.dart');
 #source('src/spectre/immediate_context.dart');
 #source('src/spectre/resource_loader.dart');
 #source('src/spectre/resource.dart');
