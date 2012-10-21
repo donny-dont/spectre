@@ -36,7 +36,8 @@ class DeviceFormat {
 /// Attribute [format] device format for attribute
 /// Attribute [elementStride] bytes between successive elements
 /// Attribute [vertexBufferSlot] the vertex buffer slot to pull elements from
-/// Attribute [vertexBufferOffset] the offset into the vertex buffer to pull the first element
+/// Attribute [vertexBufferOffset] the offset into the
+// vertex buffer to pull the first element
 class InputElementDescription {
   String name;
   DeviceFormat format;
@@ -44,14 +45,17 @@ class InputElementDescription {
   int vertexBufferSlot;
   int vertexBufferOffset;
 
-  InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
+  InputElementDescription(this.name, this.format,
+                          this.elementStride, this.vertexBufferSlot,
+                          this.vertexBufferOffset);
 }
 
 class _InputElementCheckerItem {
   String name;
   int vertexBufferSlot;
   int vertexBufferOffset;
-  _InputElementCheckerItem(this.name, this.vertexBufferSlot, this.vertexBufferOffset);
+  _InputElementCheckerItem(this.name, this.vertexBufferSlot,
+                           this.vertexBufferOffset);
 }
 
 class _InputElementChecker {
@@ -61,9 +65,13 @@ class _InputElementChecker {
   }
 
   void add(InputElementDescription d) {
-    _InputElementCheckerItem item = new _InputElementCheckerItem(d.name, d.vertexBufferSlot, d.vertexBufferOffset);
+    _InputElementCheckerItem item;
+    item = new _InputElementCheckerItem(d.name,
+                                        d.vertexBufferSlot,
+                                        d.vertexBufferOffset);
     for(_InputElementCheckerItem check in items) {
-      if (check.vertexBufferOffset == item.vertexBufferOffset && check.vertexBufferSlot == item.vertexBufferSlot) {
+      if (check.vertexBufferOffset == item.vertexBufferOffset &&
+          check.vertexBufferSlot == item.vertexBufferSlot) {
         spectreLog.Warning('Input elements -  ${check.name} and ${item.name} - share same offset. This is likely an error.');
       }
     }
@@ -79,10 +87,14 @@ class _InputElementChecker {
 
 /// An existing resource can be looked up using its name.
 class GraphicsDevice {
-  static const DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
-  static const DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
-  static const DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
-  static const DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
+  static const DeviceFormat DeviceFormatFloat1 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
+  static const DeviceFormat DeviceFormatFloat2 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
+  static const DeviceFormat DeviceFormatFloat3 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
+  static const DeviceFormat DeviceFormatFloat4 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
   static const int BufferHandleType = 1;
   static const int RenderBufferHandleType = 2;
@@ -154,7 +166,6 @@ class GraphicsDevice {
   Map<String, int> _nameMapping;
 
   static const int MaxDeviceChildren = 2048;
-  static const int MaxStaticDeviceChildren = 512;
 
   int _fallbackTextureID;
 
@@ -185,11 +196,15 @@ class GraphicsDevice {
   /// Constructs a GPU device
   GraphicsDevice(WebGLRenderingContext gl) {
     _gl = gl;
-    _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
+    _childrenHandles = new HandleSystem(MaxDeviceChildren, 0);
     _childrenObjects = new List(MaxDeviceChildren);
     _nameMapping = new Map<String, int>();
     _context = new GraphicsContext(this);
-    _fallbackTextureID = createTexture2D('Device.Fallback', {'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGBA, 'pixelFormat': Texture.PixelFormatUnsignedByte});
+    _fallbackTextureID = createTexture2D('Device.Fallback', {
+      'width': 512,
+      'height': 512,
+      'textureFormat' : Texture.TextureFormatRGBA,
+      'pixelFormat': Texture.PixelFormatUnsignedByte});
     {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;
