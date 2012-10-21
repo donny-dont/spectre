@@ -158,25 +158,25 @@ class GraphicsDevice {
 
   int _fallbackTextureID;
 
-  void _drawSquare(CanvasRenderingContext2D context, int x, int y, int w, int h) {
-    context.save();
-    context.beginPath();
-    context.translate(x, y);
-    context.fillStyle = "#656565";
-    context.fillRect(0, 0, w, h);
-    context.restore();
+  void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
+    context2d.save();
+    context2d.beginPath();
+    context2d.translate(x, y);
+    context2d.fillStyle = "#656565";
+    context2d.fillRect(0, 0, w, h);
+    context2d.restore();
   }
 
-  void _drawGrid(CanvasRenderingContext2D context, int width, int height, int horizSlices, int vertSlices) {
+  void _drawGrid(CanvasRenderingContext2D context2d, int width, int height, int horizSlices, int vertSlices) {
     int sliceWidth = width ~/ horizSlices;
     int sliceHeight = height ~/ vertSlices;
     int sliceHalfWidth = sliceWidth ~/ 2;
     for (int i = 0; i < horizSlices; i++) {
       for (int j = 0; j < vertSlices; j++) {
         if (j % 2 == 0) {
-          _drawSquare(context, i * sliceWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+          _drawSquare(context2d, i * sliceWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
         } else {
-          _drawSquare(context, i * sliceWidth + sliceHalfWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+          _drawSquare(context2d, i * sliceWidth + sliceHalfWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
         }
       }
     }
@@ -194,8 +194,8 @@ class GraphicsDevice {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;
       canvas.height = 512;
-      CanvasRenderingContext2D context = canvas.getContext('2d');
-      _drawGrid(context, 512, 512, 8, 8);
+      CanvasRenderingContext2D context2d = canvas.getContext('2d');
+      _drawGrid(context2d, 512, 512, 8, 8);
       configureDeviceChild(_fallbackTextureID, {'pixels': canvas});
       _context.generateMipmap(_fallbackTextureID);
     }
