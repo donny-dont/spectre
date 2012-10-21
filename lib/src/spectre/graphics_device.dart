@@ -335,8 +335,8 @@ class GraphicsDevice {
   /// describing the IndexBuffer being created. If [handle] is specified it must be a registered handle.
   ///
   /// Returns the handle to the IndexBuffer.
-  int createIndexBuffer(String name, Dynamic props, [int handle=Handle.BadHandle]) {
-    handle = _registerHandle(name, BufferHandleType, handle);
+  int createIndexBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, BufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -352,8 +352,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexBuffer] being created
-  int createVertexBuffer(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, BufferHandleType, handle);
+  int createVertexBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, BufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -369,8 +369,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderBuffer] being created
-  int createRenderBuffer(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RenderBufferHandleType, handle);
+  int createRenderBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, RenderBufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -386,8 +386,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderTarget] being created
-  int createRenderTarget(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RenderTargetHandleType, handle);
+  int createRenderTarget(String name, Dynamic props) {
+    int handle = _registerHandle(name, RenderTargetHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -403,8 +403,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Texture2D] being created
-  int createTexture2D(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, TextureHandleType, handle);
+  int createTexture2D(String name, Dynamic props) {
+    int handle = _registerHandle(name, TextureHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -425,8 +425,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
-  int createVertexShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderHandleType, handle);
+  int createVertexShader(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -442,8 +442,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
-  int createFragmentShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderHandleType, handle);
+  int createFragmentShader(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -459,8 +459,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
-  int createShaderProgram(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderProgramHandleType, handle);
+  int createShaderProgram(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderProgramHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -477,8 +477,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [SamplerState] being created
-  int createSamplerState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, SamplerStateHandleType, handle);
+  int createSamplerState(String name, Dynamic props) {
+    int handle = _registerHandle(name, SamplerStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -494,8 +494,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
-  int createViewport(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ViewportHandleType, handle);
+  int createViewport(String name, Dynamic props) {
+    int handle = _registerHandle(name, ViewportHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -511,8 +511,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
-  int createDepthState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, DepthStateHandleType, handle);
+  int createDepthState(String name, Dynamic props) {
+    int handle = _registerHandle(name, DepthStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -528,8 +528,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [BlendState] being created
-  int createBlendState(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, BlendStateHandleType, handle);
+  int createBlendState(String name, Object props) {
+    int handle = _registerHandle(name, BlendStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -546,8 +546,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RasterizerState] being created
-  int createRasterizerState(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RasterizerStateHandleType, handle);
+  int createRasterizerState(String name, Object props) {
+    int handle = _registerHandle(name, RasterizerStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -564,8 +564,8 @@ class GraphicsDevice {
   ///
   /// [props] is a JSONS tring or a [Map] containing a set of properties
   /// describing the [InputLayout] being created.
-  int createInputLayout(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, InputLayoutHandleType, handle);
+  int createInputLayout(String name, Object props) {
+    int handle = _registerHandle(name, InputLayoutHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -580,8 +580,8 @@ class GraphicsDevice {
 
   /// Create an [IndexedMesh] named [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createIndexedMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, MeshHandleType, handle);
+  int createIndexedMesh(String name, Dynamic props) {
+    int handle = _registerHandle(name, MeshHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -596,8 +596,8 @@ class GraphicsDevice {
 
   /// Create an [ArrayMesh] name [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createArrayMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, MeshHandleType, handle);
+  int createArrayMesh(String name, Dynamic props) {
+    int handle = _registerHandle(name, MeshHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }

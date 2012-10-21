@@ -20,13 +20,13 @@
 
 */
 
-class ProgramBuilder {
+class CommandListBuilder {
   List ops;
 
-  ProgramBuilder() {
+  CommandListBuilder() {
     ops = new List();
   }
-  ProgramBuilder.append(this.ops);
+  CommandListBuilder.append(this.ops);
 
   void setRegister(int register, Dynamic value) {
     ops.add(Ops.SetRegister);
@@ -89,7 +89,7 @@ class ProgramBuilder {
     ops.add(options);
     ops.add(output);
   }
-  
+
   void createInputLayoutForMesh(String name, int meshResourceHandle, int shaderProgramHandle, List<InputLayoutDescription> inputs, List output) {
     ops.add(Ops.CreateInputLayoutForMeshResource);
     ops.add(name);
@@ -170,25 +170,25 @@ class ProgramBuilder {
     ops.add(name);
     ops.add(buf);
   }
-  
+
   void setUniformVector4(String name, Float32Array buf) {
     ops.add(Ops.SetUniformVector4);
     ops.add(name);
     ops.add(buf);
   }
-  
+
   void setUniformVector3(String name, Float32Array buf) {
     ops.add(Ops.SetUniformVector3);
     ops.add(name);
     ops.add(buf);
   }
-  
+
   void setUniformInt(String name, int i) {
     ops.add(Ops.SetUniformInt);
     ops.add(name);
     ops.add(i);
   }
-  
+
   void setUniformVector2(String name, Float32Array buf) {
     ops.add(Ops.SetUniformVector2);
     ops.add(name);
@@ -199,7 +199,7 @@ class ProgramBuilder {
     ops.add(Ops.SetIndexedMesh);
     ops.add(indexedMeshHandle);
   }
-  
+
   void draw(int vertexCount, int vertexOffset) {
     ops.add(Ops.Draw);
     ops.add(vertexCount);
@@ -217,7 +217,7 @@ class ProgramBuilder {
     ops.add(numIndices);
     ops.add(indexOffset);
   }
-  
+
   void drawIndexedMesh(int indexedMeshHandle) {
     ops.add(Ops.DrawIndexedMesh);
     ops.add(indexedMeshHandle);

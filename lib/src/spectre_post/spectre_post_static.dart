@@ -167,7 +167,7 @@ void main() {
       return;
     }
     int fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
-    _device.immediateContext.compileShader(fragmentShader, fragmentSource);
+    _device.context.compileShader(fragmentShader, fragmentSource);
     int passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
       'VertexProgram': vertexShader,
       'FragmentProgram': fragmentShader

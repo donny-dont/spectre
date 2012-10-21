@@ -168,16 +168,16 @@ class _DebugDrawSphereManager {
   void _prepareForRender(GraphicsContext context, Float32Array cameraMatrix) {
     // Reset draw program
     _drawProgram.clear();
-    ProgramBuilder pb = new ProgramBuilder.append(_drawProgram);
-    pb.setShaderProgram(_sphereProgramHandle);
-    pb.setUniformMatrix4('cameraTransform', cameraMatrix);
-    pb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
-    pb.setIndexedMesh(_sphereIndexedMeshHandle);
-    pb.setInputLayout(_sphereInputLayout);
+    CommandListBuilder clb = new CommandListBuilder.append(_drawProgram);
+    clb.setShaderProgram(_sphereProgramHandle);
+    clb.setUniformMatrix4('cameraTransform', cameraMatrix);
+    clb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
+    clb.setIndexedMesh(_sphereIndexedMeshHandle);
+    clb.setInputLayout(_sphereInputLayout);
     for (final _DebugDrawSphere sphere in _spheres) {
-      pb.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
-      pb.setUniformVector4('debugSphereColor', sphere.sphereColor);
-      pb.drawIndexedMesh(_sphereIndexedMeshHandle);
+      clb.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
+      clb.setUniformVector4('debugSphereColor', sphere.sphereColor);
+      clb.drawIndexedMesh(_sphereIndexedMeshHandle);
     }
   }
 
@@ -339,30 +339,30 @@ class DebugDrawManager {
     _depthDisabledSpheres = new _DebugDrawSphereManager(_handles[_sphereShaderProgramHandleIndex], _handles[_sphereIndexedMeshHandleIndex], sphereInputLayout, maxSpheres);
 
     // Build the program
-    ProgramBuilder pb = new ProgramBuilder();
+    CommandListBuilder clb = new CommandListBuilder();
     // General
-    pb.setBlendState(_handles[_blendStateHandleIndex]);
-    pb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
-    pb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
-    pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
-    pb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
-    pb.setIndexBuffer(0);
+    clb.setBlendState(_handles[_blendStateHandleIndex]);
+    clb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
+    clb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
+    clb.setUniformMatrix4('cameraTransform', _cameraMatrix);
+    clb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
+    clb.setIndexBuffer(0);
     // Depth enabled lines
-    pb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
-    pb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
-    pb.setInputLayout(_depthEnabledLines._vboLayout);
+    clb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
+    clb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
+    clb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
-    pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    clb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
     // Depth disabled lines
-    pb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
-    pb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
-    pb.setInputLayout(_depthDisabledLines._vboLayout);
+    clb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
+    clb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
+    clb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
     // draw Indirect takes vertexOffset from register 3
-    pb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
+    clb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
     // Save built program
-    _drawCommands = pb.ops;
+    _drawCommands = clb.ops;
   }
 
   /// Add a line segment from [start] to [finish] with [color]

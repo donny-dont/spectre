@@ -35,8 +35,8 @@
 #source('src/spectre/resource_loader.dart');
 #source('src/spectre/resource.dart');
 #source('src/spectre/resource_manager.dart');
-#source('src/spectre/program.dart');
-#source('src/spectre/program_builder.dart');
+#source('src/spectre/command_list_operations.dart');
+#source('src/spectre/command_list_builder.dart');
 #source('src/spectre/interpreter.dart');
 #source('src/spectre/input_layout_helper.dart');
 #source('src/spectre/debug_draw_manager.dart');
