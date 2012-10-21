@@ -72,10 +72,10 @@ class SpectrePost {
       vertexBuffer = _device.createVertexBuffer('SpectrePost.VBO', {
         'usage': 'static'
       });
-      _device.immediateContext.updateBuffer(vertexBuffer, verts);
+      _device.context.updateBuffer(vertexBuffer, verts);
       vertexShader = _device.createVertexShader('SpectrePost.VS', {});
       VertexShader vs = _device.getDeviceChild(vertexShader);
-      _device.immediateContext.compileShader(vertexShader, '''
+      _device.context.compileShader(vertexShader, '''
 precision highp float;
 
 attribute vec3 vPosition;
