@@ -1,0 +1,4 @@
+
+class PlaneGenerator extends MeshGenerator {
+
+}
