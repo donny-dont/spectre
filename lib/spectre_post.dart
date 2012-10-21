@@ -20,11 +20,13 @@
 
 */
 
-/** Spectre Post Processing */
+/** Spectre Post Processing library */
 
-#library('spectre_post');
-#import('dart:html');
-#import('spectre.dart');
-#source('src/spectre_post/spectre_post_pass.dart');
-#source('src/spectre_post/spectre_post_fragment.dart');
-#source('src/spectre_post/spectre_post_static.dart');
+library spectre_post;
+
+import 'dart:html';
+import 'spectre.dart';
+
+part 'src/spectre_post/spectre_post_pass.dart';
+part 'src/spectre_post/spectre_post_fragment.dart';
+part 'src/spectre_post/spectre_post_static.dart';
