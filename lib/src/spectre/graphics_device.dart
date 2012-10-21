@@ -250,7 +250,7 @@ class GraphicsDevice {
 
   /// Registers a handle with the given [type] and [name]
   /// [handle] is an optional argument that, if provided, must be a statically reserved handle
-  int _registerHandle(String name, int type, [int handle=Handle.BadHandle]) {
+  int _registerHandle(String name, int type) {
     {
       // Check if name is already registered
       int existingHandle = getDeviceChildHandle(name);
@@ -262,25 +262,12 @@ class GraphicsDevice {
         return existingHandle;
       }
     }
-    if (handle != Handle.BadHandle) {
-      // Static handle
-      {
-        int handleType = Handle.getType(handle);
-        assert(handleType == type);
-      }
-      int r = _childrenHandles.setStaticHandle(handle);
-      if (r != handle) {
-        spectreLog.Error('Spectre.Device._registerHandle - Registering a static handle $handle failed.');
-        return Handle.BadHandle;
-      }
-    } else {
-      // Dynamic handle
-      handle = _childrenHandles.allocateHandle(type);
-      if (handle == Handle.BadHandle) {
-        spectreLog.Error('Spectre.Device._registerHandle - Registering dynamic handle failed.');
-        return Handle.BadHandle;
-      }
+    int handle = _childrenHandles.allocateHandle(type);
+    if (handle == Handle.BadHandle) {
+      spectreLog.Error('Spectre.Device._registerHandle - Registering dynamic handle failed.');
+      return Handle.BadHandle;
     }
+
     assert(_childrenHandles.validHandle(handle));
     int index = Handle.getIndex(handle);
     //print('$index - $name');
@@ -302,6 +289,8 @@ class GraphicsDevice {
       spectreLog.Warning('Deleting device child handle [$handle] is invalid.');
       return;
     }
+    // Free handle
+    _childrenHandles.freeHandle(handle);
     int index = Handle.getIndex(handle);
     DeviceChild dc = _childrenObjects[index];
     if (dc == null) {
@@ -311,7 +300,6 @@ class GraphicsDevice {
     dc._destroyDeviceState();
     _nameMapping.remove(dc.name);
     _childrenObjects[index] = null;
-    print('remove: $index - ${dc.name}');
   }
 
   void batchDeleteDeviceChildren(List<int> handles) {
