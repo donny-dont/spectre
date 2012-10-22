@@ -23,6 +23,7 @@
 class BoxGenerator extends MeshGenerator {
 
   vec3 _extents;
+  VertexData _vertexData;
 
   BoxGenerator(vec3 extents, [bool generateTextureCoords = false, bool generateNormals = false, bool generateTangents = false])
       : super(generateTextureCoords, generateNormals, generateTangents)
@@ -47,33 +48,91 @@ class BoxGenerator extends MeshGenerator {
   set extents(vec3 value) { _extents = value; }
 
 
-  void generate(Float32Array buffer, [int offset = 0]) {
-    _generatePositionData();
+  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]) {
+    _vertexData = new VertexData(vertexBuffer, elements);
+
+    _generatePositionData(vertexOffset);
 
     if (generateTextureCoords) {
-      _generateTextureCoordData();
+      _generateTextureCoordData(vertexOffset);
     }
 
     if (generateNormals) {
-      _generateNormalData();
+      _generateNormalData(vertexOffset);
     }
 
     if (generateTangents) {
 
     }
+
+    // Generate index data
+    indexBuffer[indexOffset++] =  0;  indexBuffer[indexOffset++] =  1;  indexBuffer[indexOffset++] =  2;
+    indexBuffer[indexOffset++] =  1;  indexBuffer[indexOffset++] =  3;  indexBuffer[indexOffset++] =  2;
+    indexBuffer[indexOffset++] = 10;  indexBuffer[indexOffset++] = 11;  indexBuffer[indexOffset++] =  4;
+    indexBuffer[indexOffset++] = 11;  indexBuffer[indexOffset++] =  5;  indexBuffer[indexOffset++] =  4;
+    indexBuffer[indexOffset++] = 12;  indexBuffer[indexOffset++] = 13;  indexBuffer[indexOffset++] =  6;
+    indexBuffer[indexOffset++] = 13;  indexBuffer[indexOffset++] =  7;  indexBuffer[indexOffset++] =  6;
+    indexBuffer[indexOffset++] = 14;  indexBuffer[indexOffset++] = 15;  indexBuffer[indexOffset++] =  8;
+    indexBuffer[indexOffset++] = 15;  indexBuffer[indexOffset++] =  9;  indexBuffer[indexOffset++] =  8;
+    indexBuffer[indexOffset++] = 22;  indexBuffer[indexOffset++] = 16;  indexBuffer[indexOffset++] = 20;
+    indexBuffer[indexOffset++] = 16;  indexBuffer[indexOffset++] = 18;  indexBuffer[indexOffset++] = 20;
+    indexBuffer[indexOffset++] = 17;  indexBuffer[indexOffset++] = 23;  indexBuffer[indexOffset++] = 19;
+    indexBuffer[indexOffset++] = 23;  indexBuffer[indexOffset++] = 21;  indexBuffer[indexOffset++] = 19;
   }
 
   /**
    * Generates positional data.
    */
-  void _generatePositionData() {
+  void _generatePositionData(int vertexOffset) {
+    double xExtent = 0.5;
+    double yExtent = 0.5;
+    double zExtent = 0.5;
 
+    List<vec3> positionValues = [
+      new vec3(-xExtent,  yExtent,  zExtent),
+      new vec3(-xExtent, -yExtent,  zExtent),
+      new vec3( xExtent,  yExtent,  zExtent),
+      new vec3( xExtent, -yExtent,  zExtent),
+      new vec3( xExtent,  yExtent, -zExtent),
+      new vec3( xExtent, -yExtent, -zExtent),
+      new vec3(-xExtent,  yExtent, -zExtent),
+      new vec3(-xExtent, -yExtent, -zExtent)
+    ];
+
+    Vector3Array positions = _vertexData.elements['vPosition'];
+
+    positions[vertexOffset++] = positionValues[0];
+    positions[vertexOffset++] = positionValues[1];
+    positions[vertexOffset++] = positionValues[2];
+    positions[vertexOffset++] = positionValues[3];
+    positions[vertexOffset++] = positionValues[4];
+    positions[vertexOffset++] = positionValues[5];
+    positions[vertexOffset++] = positionValues[6];
+    positions[vertexOffset++] = positionValues[7];
+
+    positions[vertexOffset++] = positionValues[0];
+    positions[vertexOffset++] = positionValues[1];
+    positions[vertexOffset++] = positionValues[2];
+    positions[vertexOffset++] = positionValues[3];
+    positions[vertexOffset++] = positionValues[4];
+    positions[vertexOffset++] = positionValues[5];
+    positions[vertexOffset++] = positionValues[6];
+    positions[vertexOffset++] = positionValues[7];
+
+    positions[vertexOffset++] = positionValues[0];
+    positions[vertexOffset++] = positionValues[1];
+    positions[vertexOffset++] = positionValues[2];
+    positions[vertexOffset++] = positionValues[3];
+    positions[vertexOffset++] = positionValues[4];
+    positions[vertexOffset++] = positionValues[5];
+    positions[vertexOffset++] = positionValues[6];
+    positions[vertexOffset++] = positionValues[7];
   }
 
   /**
    * Generates texture coordinate data.
    */
-  void _generateTextureCoordData() {
+  void _generateTextureCoordData(int vertexOffset) {
     List<vec2> textureCoordValues = [
       new vec2(0.0, 1.0),
       new vec2(0.0, 0.0),
@@ -81,7 +140,34 @@ class BoxGenerator extends MeshGenerator {
       new vec2(1.0, 0.0)
     ];
 
+    Vector2Array textureCoords = _vertexData.elements['vTexCoord'];
 
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[1];
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[1];
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[1];
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[1];
+
+    textureCoords[vertexOffset++] = textureCoordValues[1];
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[2];
+    textureCoords[vertexOffset++] = textureCoordValues[3];
+    textureCoords[vertexOffset++] = textureCoordValues[0];
+    textureCoords[vertexOffset++] = textureCoordValues[1];
   }
 
   /**
@@ -90,7 +176,43 @@ class BoxGenerator extends MeshGenerator {
    * With a box the normal data is well known,
    * so rather than computing it just assign it over.
    */
-  void _generateNormalData() {
+  void _generateNormalData(int vertexOffset) {
+    List<vec3> normalValues = [
+      new vec3( 0.0,  0.0,  1.0),
+      new vec3( 1.0,  0.0,  0.0),
+      new vec3( 0.0,  0.0, -1.0),
+      new vec3(-1.0,  0.0,  0.0),
+      new vec3( 0.0,  1.0,  0.0),
+      new vec3( 0.0, -1.0,  0.0)
+    ];
 
+    Vector3Array normals = _vertexData.elements['vNormal'];
+
+    normals[vertexOffset++] = normalValues[0];
+    normals[vertexOffset++] = normalValues[0];
+    normals[vertexOffset++] = normalValues[0];
+    normals[vertexOffset++] = normalValues[0];
+    normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[2];
+    normals[vertexOffset++] = normalValues[2];
+
+    normals[vertexOffset++] = normalValues[3];
+    normals[vertexOffset++] = normalValues[3];
+    normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[2];
+    normals[vertexOffset++] = normalValues[2];
+    normals[vertexOffset++] = normalValues[3];
+    normals[vertexOffset++] = normalValues[3];
+
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[5];
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[5];
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[5];
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[5];
   }
 }

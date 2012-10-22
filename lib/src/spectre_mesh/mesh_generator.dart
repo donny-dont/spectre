@@ -118,5 +118,5 @@ abstract class MeshGenerator {
   vec3 get center => _center;
   set center(vec3 value) { _center = value; }
 
-  abstract generate(Float32Array buffer, [int offset = 0]);
+  abstract void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]);
 }
