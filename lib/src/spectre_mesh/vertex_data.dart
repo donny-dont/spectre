@@ -23,6 +23,7 @@
 
 class VertexData {
   Map<String, VertexArray> _elements;
+  int _vertexCount;
 
   VertexData(Float32Array array, List<InputElementDescription> elements) {
     _elements = new Map<String, VertexArray>();
@@ -32,13 +33,15 @@ class VertexData {
       int offset = element.vertexBufferOffset;
       int stride = element.elementStride;
 
+      _vertexCount = array.length ~/ (element.elementStride >> 2);
+
       VertexArray vertexArray;
 
       switch (count) {
         case 1:  vertexArray = new Vector2Array.fromArray(array, offset, stride); break;
         case 2:  vertexArray = new Vector2Array.fromArray(array, offset, stride); break;
         case 3:  vertexArray = new Vector3Array.fromArray(array, offset, stride); break;
-        default: vertexArray = new Vector2Array.fromArray(array, offset, stride); break;
+        default: vertexArray = new Vector4Array.fromArray(array, offset, stride); break;
       }
 
       String elementName = element.name;
@@ -47,4 +50,6 @@ class VertexData {
   }
 
   Map<String, VertexArray> get elements => _elements;
+
+  int get vertexCount => _vertexCount;
 }

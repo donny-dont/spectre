@@ -29,5 +29,7 @@ import 'package:vector_math/vector_math_browser.dart';
 part 'src/spectre_mesh/arrays.dart';
 part 'src/spectre_mesh/box_generator.dart';
 part 'src/spectre_mesh/mesh_generator.dart';
+part 'src/spectre_mesh/normal_data_builder.dart';
 part 'src/spectre_mesh/plane_generator.dart';
+part 'src/spectre_mesh/tangent_space_builder.dart';
 part 'src/spectre_mesh/vertex_data.dart';
