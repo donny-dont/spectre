@@ -11,7 +11,7 @@ class NormalDataBuilder {
                     List<InputElementDescription> bufferLayout)
   {
     VertexData vertexData = new VertexData(vertexBuffer, bufferLayout);
-    Vector3Array normals = data.elements['vNormal'];
+    Vector3Array normals = vertexData.elements['vNormal'];
     assert(normals != null);
 
     // Compute normals for each triangle

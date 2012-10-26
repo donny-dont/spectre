@@ -291,7 +291,7 @@ class Vector4Array implements VertexArray<vec4> {
     double z = _array[arrayIndex++];
     double w = _array[arrayIndex];
 
-    return new vec4.raw(x, y, z);
+    return new vec4.raw(x, y, z, w);
   }
 
   void operator[]= (int index, vec4 value) {

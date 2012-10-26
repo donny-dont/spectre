@@ -18,8 +18,8 @@ class TangentSpaceBuilder {
     Vector3Array tan2 = new Vector3Array(vertexCount);
 
     {
-      Vector3Array positions = data.elements['vPosition'];
-      Vector2Array texCoords = data.elements['vTexCoords'];
+      Vector3Array positions = vertexData.elements['vPosition'];
+      Vector2Array texCoords = vertexData.elements['vTexCoords'];
 
       vec3 v0;
       vec3 v1;
@@ -59,7 +59,7 @@ class TangentSpaceBuilder {
         double t0 = w1.y - w0.y;
         double t1 = w2.y - w0.y;
 
-        float r = 1.0 / ((s0 * t1) - (s1 * t0));
+        double r = 1.0 / ((s0 * t1) - (s1 * t0));
 
         sdir.setComponents(
           ((t1 * x0) - (t0 * x1)) * r,
