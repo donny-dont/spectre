@@ -20,7 +20,7 @@
 
 */
 
-class _DebugLine implements Hashable {
+class _DebugLine {
   vec3 positionStart;
   vec3 positionEnd;
   vec4 colorStart;
@@ -30,7 +30,7 @@ class _DebugLine implements Hashable {
 
 class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
-  Set<_DebugLine> _lines;
+  List<_DebugLine> _lines;
 
   int _maxVertices;
   Float32Array _vboStorage;
@@ -41,7 +41,7 @@ class _DebugDrawLineManager {
 
   _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
-    _lines = new Set<_DebugLine>();
+    _lines = new List<_DebugLine>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
@@ -102,10 +102,16 @@ class _DebugDrawLineManager {
 
   void update(num dt) {
     Profiler.enter('update');
-    for (_DebugLine line in _lines) {
+    for (int i = _lines.length-1; i >= 0; i--) {
+      _DebugLine line = _lines[i];
       line.duration -= dt;
       if (line.duration < 0.0) {
-        _lines.remove(line);
+        // Swap the line with the end of the list
+        int last = _lines.length-1;
+        _lines[i] = _lines[last];
+        _lines[last] = line;
+        // Remove the line
+        _lines.removeLast();
       }
     }
     Profiler.exit();
@@ -601,7 +607,6 @@ class DebugDrawManager {
   /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
     Profiler.enter('DebugDrawManager.update');
-
     {
       Profiler.enter('lines');
       Profiler.enter('depth enabled');
