@@ -74,13 +74,13 @@ bool _ballIntersectsLineSegment(vec2 _a, vec2 _b) {
 
 void _updateBall(double dt) {
   assert(lineStart.length == lineEnd.length);
-  ballPosition.add(ballDirection * ballVelocity);
+  ballPosition.add(ballDirection.scaled(ballVelocity));
   for (int i = 0; i < lineStart.length; i++) {
     if (_ballIntersectsLineSegment(lineStart[i], lineEnd[i])) {
       vec2 n = lineNormals[i];
       // 2D reflection.
       double scalarProjection = 2.0 * n.dot(ballDirection);
-      vec2 vectorProjection = n * scalarProjection;
+      vec2 vectorProjection = n.scaled(scalarProjection);
       ballDirection = vectorProjection - ballDirection;
       // Make sure ballDirection is always unit length.
       ballDirection.normalize();
