@@ -20,17 +20,81 @@
 
 */
 
-class _DebugLine {
-  vec3 positionStart;
-  vec3 positionEnd;
-  vec4 colorStart;
-  vec4 colorEnd;
-  num duration;
+class _DebugLineVertex {
+  double x;
+  double y;
+  double z;
+  _DebugLineVertex next = null;
+}
+
+class _DebugLineObject {
+  double r;
+  double g;
+  double b;
+  double a;
+  double duration;
+  _DebugLineVertex vertexStream;
+}
+
+class _DebugLineCollection {
+  List<_DebugLineVertex> _freeLineVertices;
+  List<_DebugLineObject> _freeLineObjects;
+  List<_DebugLineObject> _lineObjects;
+
+  _DebugLineObject _lineObject;
+
+  _DebugLineCollection() {
+    _freeLineVertices = new List<_DebugLineVertex>();
+    _freeLineObjects = new List<_DebugLineObject>();
+    _lineObjects = new List<_DebugLineObject>();
+  }
+
+  void startLineObject(double r, double g, double b, double a, double duration){
+    if (_lineObject != null) {
+      _lineObjects.add(_lineObject);
+    }
+    if (_freeLineObjects.length > 0) {
+      _lineObject = _freeLineObjects.removeLast();
+    } else {
+      _lineObject = new _DebugLineObject();
+    }
+    _lineObject.r = r;
+    _lineObject.g = g;
+    _lineObject.b = b;
+    _lineObject.a = a;
+    _lineObject.duration = duration;
+  }
+
+  _DebugLineVertex getVertex() {
+    if (_freeLineVertices.length > 0) {
+      return _freeLineVertices.removeLast();
+    }
+    return new _DebugLineVertex();
+  }
+
+  void addVertex(double x, double y, double z) {
+    _DebugLineVertex v = getVertex();
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    v.next = _lineObject.vertexStream;
+    _lineObject.vertexStream = v;
+  }
+
+  void freeLineObject(_DebugLineObject lineObject) {
+    _DebugLineVertex v = lineObject.vertexStream;
+    while (v != null) {
+      _freeLineVertices.add(v);
+      v = v.next;
+    }
+    lineObject.vertexStream = null;
+    _freeLineObjects.add(lineObject);
+  }
 }
 
 class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
-  List<_DebugLine> _lines;
+  _DebugLineCollection _lines;
 
   int _maxVertices;
   Float32Array _vboStorage;
@@ -41,7 +105,7 @@ class _DebugDrawLineManager {
 
   _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
-    _lines = new List<_DebugLine>();
+    _lines = new _DebugLineCollection();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
@@ -50,49 +114,20 @@ class _DebugDrawLineManager {
     _vboLayout = device.createInputLayout('$name Layout', {'shaderProgram': lineShaderHandle, 'elements':inputElements});
   }
 
-  bool hasRoomFor(int lineCount) {
-    int current = _lines.length;
-    return current+(lineCount*2) < _maxVertices;
-  }
-
-  void add(_DebugLine line) {
-    _lines.add(line);
-  }
-
   void _prepareForRender(GraphicsContext context) {
     _vboUsed = 0;
-    for (_DebugLine line in _lines) {
-      _vboStorage[_vboUsed] = line.positionStart.x;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.positionStart.y;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.positionStart.z;
-      _vboUsed++;
-
-      _vboStorage[_vboUsed] = line.colorStart.x;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorStart.y;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorStart.z;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorStart.w;
-      _vboUsed++;
-
-      _vboStorage[_vboUsed] = line.positionEnd.x;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.positionEnd.y;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.positionEnd.z;
-      _vboUsed++;
-
-      _vboStorage[_vboUsed] = line.colorEnd.x;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorEnd.y;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorEnd.z;
-      _vboUsed++;
-      _vboStorage[_vboUsed] = line.colorEnd.w;
-      _vboUsed++;
+    for (_DebugLineObject line in _lines._lineObjects) {
+      _DebugLineVertex v = line.vertexStream;
+      while (v != null) {
+        _vboStorage[_vboUsed++] = v.x;
+        _vboStorage[_vboUsed++] = v.y;
+        _vboStorage[_vboUsed++] = v.z;
+        _vboStorage[_vboUsed++] = line.r;
+        _vboStorage[_vboUsed++] = line.g;
+        _vboStorage[_vboUsed++] = line.b;
+        _vboStorage[_vboUsed++] = line.a;
+        v = v.next;
+      }
     }
 
     context.updateBuffer(_vbo, _vboStorage);
@@ -102,16 +137,16 @@ class _DebugDrawLineManager {
 
   void update(num dt) {
     Profiler.enter('update');
-    for (int i = _lines.length-1; i >= 0; i--) {
-      _DebugLine line = _lines[i];
-      line.duration -= dt;
-      if (line.duration < 0.0) {
-        // Swap the line with the end of the list
-        int last = _lines.length-1;
-        _lines[i] = _lines[last];
-        _lines[last] = line;
-        // Remove the line
-        _lines.removeLast();
+    List<_DebugLineObject> lineObjects = _lines._lineObjects;
+    for (int i = lineObjects.length-1; i >= 0; i--) {
+      _DebugLineObject lineObject = lineObjects[i];
+      lineObject.duration -= dt;
+      if (lineObject.duration < 0.0) {
+        _lines.freeLineObject(lineObject);
+        int last = lineObjects.length-1;
+        // Copy last over
+        lineObjects[i] = lineObjects[last];
+        lineObjects.removeLast();
       }
     }
     Profiler.exit();
@@ -374,31 +409,44 @@ class DebugDrawManager {
   /// Add a line segment from [start] to [finish] with [color]
   ///
   /// Options: [duration] and [depthEnabled]
-  void addLine(vec3 start, vec3 finish, vec4 color, [num duration = 0.0, bool depthEnabled=true]) {
-    _DebugLine line = new _DebugLine();
-    line.colorStart = new vec4.copy(color);
-    line.colorEnd = line.colorStart;
-    line.positionStart = new vec3.copy(start);
-    line.positionEnd = new vec3.copy(finish);
-    line.duration = duration;
-    if (depthEnabled && _depthEnabledLines.hasRoomFor(1)) {
-      _depthEnabledLines.add(line);
-    } else if (depthEnabled == false && _depthDisabledLines.hasRoomFor(1)){
-      _depthDisabledLines.add(line);
+  void _addLine(vec3 start, vec3 finish, bool depthEnabled) {
+    if (depthEnabled) {
+      _depthEnabledLines._lines.addVertex(finish.x, finish.y, finish.z);
+      _depthEnabledLines._lines.addVertex(start.x, start.y, start.z);
+    } else {
+      _depthDisabledLines._lines.addVertex(finish.x, finish.y, finish.z);
+      _depthDisabledLines._lines.addVertex(start.x, start.y, start.z);
     }
+  }
+
+  /// Add a line segment from [start] to [finish] with [color]
+  ///
+  /// Options: [duration] and [depthEnabled]
+  void addLine(vec3 start, vec3 finish, vec4 color, [num duration = 0.0, bool depthEnabled=true]) {
+    if (depthEnabled) {
+      _depthEnabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    } else {
+      _depthDisabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    }
+    _addLine(start, finish, depthEnabled);
   }
 
   /// Add a cross at [point] with [color]
   ///
   /// Options: [size], [duration], and [depthEnabled]
   void addCross(vec3 point, vec4 color, [num size = 1.0, num duration = 0.0, bool depthEnabled=true]) {
+    if (depthEnabled) {
+      _depthEnabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    } else {
+      _depthDisabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    }
     num half_size = size * 0.5;
-    addLine(point, point + new vec3(half_size, 0.0, 0.0), color, duration, depthEnabled);
-    addLine(point, point + new vec3(-half_size, 0.0, 0.0), color, duration, depthEnabled);
-    addLine(point, point + new vec3(0.0, half_size, 0.0), color, duration, depthEnabled);
-    addLine(point, point + new vec3(0.0, -half_size, 0.0), color, duration, depthEnabled);
-    addLine(point, point + new vec3(0.0, 0.0, half_size), color, duration, depthEnabled);
-    addLine(point, point + new vec3(0.0, 0.0, -half_size), color, duration, depthEnabled);
+    _addLine(point, point + new vec3(half_size, 0.0, 0.0), depthEnabled);
+    _addLine(point, point + new vec3(-half_size, 0.0, 0.0), depthEnabled);
+    _addLine(point, point + new vec3(0.0, half_size, 0.0), depthEnabled);
+    _addLine(point, point + new vec3(0.0, -half_size, 0.0), depthEnabled);
+    _addLine(point, point + new vec3(0.0, 0.0, half_size), depthEnabled);
+    _addLine(point, point + new vec3(0.0, 0.0, -half_size), depthEnabled);
   }
 
   /// Add a sphere located at [center] with [radius] and [color]
@@ -414,25 +462,32 @@ class DebugDrawManager {
     }
   }
 
+  vec3 _circle_u = new vec3.zero();
+  vec3 _circle_v = new vec3.zero();
+
   /// Add a circle located at [center] perpindicular to [planeNormal] with [radius] and [color]
   ///
   /// Options: [duration] and [depthEnabled]
   void addCircle(vec3 center, vec3 planeNormal, num radius, vec4 color, [num duration = 0.0, bool depthEnabled = true, int numSegments = 12]) {
-    vec3 u = new vec3.zero();
-    vec3 v = new vec3.zero();
-    buildPlaneVectors(planeNormal, u, v);
+    buildPlaneVectors(planeNormal, _circle_u, _circle_v);
     num alpha = 0.0;
     num twoPi = (2.0 * 3.141592653589793238462643);
     num _step = twoPi/numSegments;
 
-    vec3 last = center + u * radius;
+    vec3 last = center + _circle_u * radius;
+
+    if (depthEnabled) {
+      _depthEnabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    } else {
+      _depthDisabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
+    }
 
     for (alpha = _step; alpha <= twoPi; alpha += _step) {
-      vec3 p = center + (u * (radius * cos(alpha))) + (v * (radius * sin(alpha)));
-      addLine(last, p, color, duration);
+      vec3 p = center + (_circle_u * (radius * cos(alpha))) + (_circle_v * (radius * sin(alpha)));
+      _addLine(last, p, depthEnabled);
       last = p;
     }
-    addLine(last, center + u * radius, color, duration);
+    _addLine(last, center + _circle_u * radius, depthEnabled);
   }
 
   /// Add a transformation (rotation & translation) from [xform]. Size is controlled with [size]
