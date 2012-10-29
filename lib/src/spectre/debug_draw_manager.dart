@@ -20,20 +20,17 @@
 
 */
 
-class _DebugLine implements Hashable {
+class _DebugLine {
   vec3 positionStart;
   vec3 positionEnd;
   vec4 colorStart;
   vec4 colorEnd;
   num duration;
-  int hashCode() {
-    return positionStart.x.hashCode();
-  }
 }
 
 class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
-  Set<_DebugLine> _lines;
+  List<_DebugLine> _lines;
 
   int _maxVertices;
   Float32Array _vboStorage;
@@ -42,14 +39,14 @@ class _DebugDrawLineManager {
   int _vbo;
   int _vboLayout;
 
-  _DebugDrawLineManager(Device device, String name, int vboSize, int lineShaderHandle) {
+  _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, int lineShaderHandle) {
     _maxVertices = vboSize;
-    _lines = new Set<_DebugLine>();
+    _lines = new List<_DebugLine>();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
-    List inputElements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 7*4, 0, 0),
-                          new InputElementDescription('vColor', Device.DeviceFormatFloat4, 7*4, 0, 3*4)];
+    List inputElements = [new InputElementDescription('vPosition', GraphicsDevice.DeviceFormatFloat3, 7*4, 0, 0),
+                          new InputElementDescription('vColor', GraphicsDevice.DeviceFormatFloat4, 7*4, 0, 3*4)];
     _vboLayout = device.createInputLayout('$name Layout', {'shaderProgram': lineShaderHandle, 'elements':inputElements});
   }
 
@@ -62,7 +59,7 @@ class _DebugDrawLineManager {
     _lines.add(line);
   }
 
-  void _prepareForRender(ImmediateContext context) {
+  void _prepareForRender(GraphicsContext context) {
     _vboUsed = 0;
     for (_DebugLine line in _lines) {
       _vboStorage[_vboUsed] = line.positionStart.x;
@@ -105,10 +102,16 @@ class _DebugDrawLineManager {
 
   void update(num dt) {
     Profiler.enter('update');
-    for (_DebugLine line in _lines) {
+    for (int i = _lines.length-1; i >= 0; i--) {
+      _DebugLine line = _lines[i];
       line.duration -= dt;
       if (line.duration < 0.0) {
-        _lines.remove(line);
+        // Swap the line with the end of the list
+        int last = _lines.length-1;
+        _lines[i] = _lines[last];
+        _lines[last] = line;
+        // Remove the line
+        _lines.removeLast();
       }
     }
     Profiler.exit();
@@ -168,25 +171,25 @@ class _DebugDrawSphereManager {
     return current+sphereCount < _maxSpheres;
   }
 
-  void _prepareForRender(ImmediateContext context, Float32Array cameraMatrix) {
+  void _prepareForRender(GraphicsContext context, Float32Array cameraMatrix) {
     // Reset draw program
     _drawProgram.clear();
-    ProgramBuilder pb = new ProgramBuilder.append(_drawProgram);
-    pb.setShaderProgram(_sphereProgramHandle);
-    pb.setUniformMatrix4('cameraTransform', cameraMatrix);
-    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
-    pb.setIndexedMesh(_sphereIndexedMeshHandle);
-    pb.setInputLayout(_sphereInputLayout);
+    CommandListBuilder clb = new CommandListBuilder.append(_drawProgram);
+    clb.setShaderProgram(_sphereProgramHandle);
+    clb.setUniformMatrix4('cameraTransform', cameraMatrix);
+    clb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
+    clb.setIndexedMesh(_sphereIndexedMeshHandle);
+    clb.setInputLayout(_sphereInputLayout);
     for (final _DebugDrawSphere sphere in _spheres) {
-      pb.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
-      pb.setUniformVector4('debugSphereColor', sphere.sphereColor);
-      pb.drawIndexedMesh(_sphereIndexedMeshHandle);
+      clb.setUniformVector4('debugSphereCenterAndRadius', sphere.sphereCenterAndRadius);
+      clb.setUniformVector4('debugSphereColor', sphere.sphereColor);
+      clb.drawIndexedMesh(_sphereIndexedMeshHandle);
     }
   }
 
-  void _render(Device device, Float32Array cameraMatrix) {
+  void _render(GraphicsDevice device, Float32Array cameraMatrix) {
     Interpreter interpreter = new Interpreter();
-    interpreter.run(_drawProgram, device, null, device.immediateContext);
+    interpreter.run(_drawProgram, device, null, device.context);
   }
 
   void add(_DebugDrawSphere sphere) {
@@ -264,65 +267,75 @@ class DebugDrawManager {
   _DebugDrawSphereManager _depthDisabledSpheres;
   Float32Array _cameraMatrix;
 
-  Device _device;
-  ImmediateContext _context;
+  GraphicsDevice _device;
+  GraphicsContext _context;
 
   DebugDrawManager() {
     _handles = new List<int>();
     _cameraMatrix = new Float32Array(16);
-
-    ProgramBuilder pb = new ProgramBuilder();
-    pb.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess}, _handles);
-    pb.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false}, _handles);
-    pb.createBlendState(_blendStateName, {}, _handles);
-    pb.createRasterizerState(_rasterizerStateName, {'cullEnabled': true, 'lineWidth': 1.0}, _handles);
-    pb.createVertexShader(_lineVertexShaderName, {}, _handles);
-    pb.createFragmentShader(_lineFragmentShaderName, {}, _handles);
-    pb.createShaderProgram(_lineShaderProgramName, {}, _handles);
-    pb.setRegisterFromList(0, _handles, _lineVertexShaderHandleIndex);
-    pb.setRegisterFromList(1, _handles, _lineFragmentShaderHandleIndex);
-    pb.setRegisterFromList(2, _handles, _lineShaderProgramHandleIndex);
-    // register 3 must have resource handle for line vertex shader
-    // register 4 must have resource handle for line fragment shader
-    pb.compileShaderFromResource(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(3));
-    pb.compileShaderFromResource(Handle.makeRegisterHandle(1), Handle.makeRegisterHandle(4));
-    pb.linkShaderProgram(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
-    pb.createVertexShader(_sphereVertexShaderName, {}, _handles);
-    pb.createFragmentShader(_sphereFragmentShaderName, {}, _handles);
-    pb.createShaderProgram(_sphereShaderProgramName, {}, _handles);
-    pb.setRegisterFromList(0, _handles, _sphereVertexShaderHandleIndex);
-    pb.setRegisterFromList(1, _handles, _sphereFragmentShaderHandleIndex);
-    pb.setRegisterFromList(2, _handles, _sphereShaderProgramHandleIndex);
-    // register 5 must have resource handle for sphere vertex shader
-    // register 6 must have resource handle for sphere fragment shader
-    pb.compileShaderFromResource(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(5));
-    pb.compileShaderFromResource(Handle.makeRegisterHandle(1), Handle.makeRegisterHandle(6));
-    pb.linkShaderProgram(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
-    _startupCommands = pb.ops;
   }
 
-  void init(Device device, ResourceManager rm, int lineVSResourceHandle, int lineFSResourceHandle, int sphereVSResourceHandle, int sphereFSResourceHandle, int sphereMeshResourceHandle, [int vboSize=4096, int maxSpheres=1024]) {
+  // ResourceManager rm
+  // int lineVSResourceHandle
+  // int lineFSResourceHandle
+  // int sphereVSResourceHandle
+  // int sphereFSResourceHandle
+  // int sphereMeshResourceHandle,
+
+  void init(GraphicsDevice device, [int vboSize=4096, int maxSpheres=1024]) {
     _device = device;
-    _context = device.immediateContext;
+    _context = device.context;
 
-    // Finish building startup command
-    ProgramBuilder pb;
+    int handle;
 
-    pb = new ProgramBuilder.append(_startupCommands);
-    pb.createIndexedMesh(_sphereIndexedMeshName, {'UpdateFromMeshResource':{'resourceManager': rm, 'meshResourceHandle': sphereMeshResourceHandle}}, _handles);
+    handle = _device.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
+    _handles.add(handle);
+    handle = _device.createDepthState(_depthStateDisabledName, {'depthTestEnabled': false, 'depthWriteEnabled': false});
+    _handles.add(handle);
+    handle = _device.createBlendState(_blendStateName, {});
+    _handles.add(handle);
+    handle = _device.createRasterizerState(_rasterizerStateName, {'cullEnabled': true, 'lineWidth': 1.0});
+    _handles.add(handle);
 
-    Interpreter interpreter = new Interpreter();
-    interpreter.setRegister(3, lineVSResourceHandle);
-    interpreter.setRegister(4, lineFSResourceHandle);
-    interpreter.setRegister(5, sphereVSResourceHandle);
-    interpreter.setRegister(6, sphereFSResourceHandle);
-    interpreter.run(_startupCommands, _device, rm, _context);
+    handle = _device.createVertexShader(_lineVertexShaderName, {});
+    _handles.add(handle);
+    handle = _device.createFragmentShader(_lineFragmentShaderName, {});
+    _handles.add(handle);
+    handle = _device.createShaderProgram(_lineShaderProgramName, {});
+    _handles.add(handle);
+
+    _context.compileShader(_handles[_lineVertexShaderHandleIndex],
+                           _debugLineVertexShader);
+    _context.compileShader(_handles[_lineFragmentShaderHandleIndex],
+                           _debugLineFragmentShader);
+    _context.linkShaderProgram(_handles[_lineShaderProgramHandleIndex],
+                               _handles[_lineVertexShaderHandleIndex],
+                               _handles[_lineFragmentShaderHandleIndex]);
+
+    handle = _device.createVertexShader(_sphereVertexShaderName, {});
+    _handles.add(handle);
+    handle = _device.createFragmentShader(_sphereFragmentShaderName, {});
+    _handles.add(handle);
+    handle = _device.createShaderProgram(_sphereShaderProgramName, {});
+    _handles.add(handle);
+
+    _context.compileShader(_handles[_sphereVertexShaderHandleIndex],
+                           _debugSphereVertexShader);
+    _context.compileShader(_handles[_sphereFragmentShaderHandleIndex],
+                           _debugSphereFragmentShader);
+    _context.linkShaderProgram(_handles[_sphereShaderProgramHandleIndex],
+                               _handles[_sphereVertexShaderHandleIndex],
+                               _handles[_sphereFragmentShaderHandleIndex]);
+
+    handle = device.createIndexedMesh(_sphereIndexedMeshName, {
+      'UpdateFromMeshMap': _debugSphereMesh
+    });
+    _handles.add(handle);
 
     // Sphere startup
     int sphereInputLayout;
     {
-      MeshResource sphere = rm.getResource(sphereMeshResourceHandle);
-      var elements = [InputLayoutHelper.inputElementDescriptionFromMesh(new InputLayoutDescription('vPosition', 0, 'POSITION'), sphere)];
+      var elements = [InputLayoutHelper.inputElementDescriptionFromMeshMap(new InputLayoutDescription('vPosition', 0, 'POSITION'), _debugSphereMesh)];
       sphereInputLayout = device.createInputLayout('Debug Sphere Input', {'elements':elements, 'shaderProgram':_handles[_sphereShaderProgramHandleIndex]});
     }
 
@@ -332,30 +345,30 @@ class DebugDrawManager {
     _depthDisabledSpheres = new _DebugDrawSphereManager(_handles[_sphereShaderProgramHandleIndex], _handles[_sphereIndexedMeshHandleIndex], sphereInputLayout, maxSpheres);
 
     // Build the program
-    pb = new ProgramBuilder();
+    CommandListBuilder clb = new CommandListBuilder();
     // General
-    pb.setBlendState(_handles[_blendStateHandleIndex]);
-    pb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
-    pb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
-    pb.setUniformMatrix4('cameraTransform', _cameraMatrix);
-    pb.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyLines);
-    pb.setIndexBuffer(0);
+    clb.setBlendState(_handles[_blendStateHandleIndex]);
+    clb.setRasterizerState(_handles[_rasterizerStateHandleIndex]);
+    clb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
+    clb.setUniformMatrix4('cameraTransform', _cameraMatrix);
+    clb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
+    clb.setIndexBuffer(0);
     // Depth enabled lines
-    pb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
-    pb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
-    pb.setInputLayout(_depthEnabledLines._vboLayout);
+    clb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
+    clb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
+    clb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
-    pb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    clb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
     // Depth disabled lines
-    pb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
-    pb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
-    pb.setInputLayout(_depthDisabledLines._vboLayout);
+    clb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
+    clb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
+    clb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
     // draw Indirect takes vertexOffset from register 3
-    pb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
+    clb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
     // Save built program
-    _drawCommands = pb.ops;
+    _drawCommands = clb.ops;
   }
 
   /// Add a line segment from [start] to [finish] with [color]
@@ -585,7 +598,7 @@ class DebugDrawManager {
       interpreter.setRegister(3, 0);
       interpreter.run(_drawCommands, _device, null, _context);
     }
-    _device.immediateContext.setDepthState(_handles[_depthEnabledStateHandleIndex]);
+    _device.context.setDepthState(_handles[_depthEnabledStateHandleIndex]);
     _depthEnabledSpheres._render(_device, _cameraMatrix);
     _depthDisabledSpheres._render(_device, _cameraMatrix);
     Profiler.exit();
@@ -594,7 +607,6 @@ class DebugDrawManager {
   /// Update time [seconds], removing any dead debug primitives
   void update(num seconds) {
     Profiler.enter('DebugDrawManager.update');
-    
     {
       Profiler.enter('lines');
       Profiler.enter('depth enabled');
@@ -603,11 +615,424 @@ class DebugDrawManager {
       Profiler.enter('depth disabled');
       _depthDisabledLines.update(seconds);
       Profiler.exit();
-      Profiler.exit();  
+      Profiler.exit();
     }
-    
+
     _depthEnabledSpheres.update(seconds);
     _depthDisabledSpheres.update(seconds);
     Profiler.exit();
   }
 }
+
+final String _debugLineVertexShader = '''
+precision highp float;
+
+// Input attributes
+attribute vec3 vPosition;
+attribute vec4 vColor;
+// Input uniforms
+uniform mat4 cameraTransform;
+// Varying outputs
+varying vec4 fColor;
+
+void main() {
+    fColor = vColor;
+    vec4 vPosition4 = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
+    gl_Position = cameraTransform*vPosition4;
+}
+''';
+
+final String _debugLineFragmentShader = '''
+precision mediump float;
+
+varying vec4 fColor;
+
+void main() {
+    gl_FragColor = fColor;
+}
+''';
+
+final String _debugSphereVertexShader = '''
+precision highp float;
+
+// Input attributes
+attribute vec3 vPosition;
+
+// Input uniforms
+uniform mat4 cameraTransform;
+uniform vec4 debugSphereCenterAndRadius;
+
+void main() {
+    vec3 center = debugSphereCenterAndRadius.xyz;
+    float scale = debugSphereCenterAndRadius.w;
+    vec4 vPosition4 = vec4((vPosition * scale) + center, 1.0);
+    gl_Position = cameraTransform*vPosition4;
+}
+''';
+
+final String _debugSphereFragmentShader = '''
+precision mediump float;
+
+uniform vec4 debugSphereColor;
+
+void main() {
+    gl_FragColor = debugSphereColor.rgba;
+}
+''';
+
+
+final Map _debugSphereMesh =
+{
+"header" : {
+"filename" : "debugsphere.obj"
+},
+"meshes" : [
+{
+"indexWidth" : 2,
+"attributes" : {
+"POSITION" : {
+"name" : "POSITION",
+"type" : "float",
+"numElements" : 3,
+"normalized" : false,
+"stride" : 24,
+"offset" : 0
+}
+,
+"NORMAL" : {
+"name" : "NORMAL",
+"type" : "float",
+"numElements" : 3,
+"normalized" : false,
+"stride" : 24,
+"offset" : 12
+}
+},
+"bounds" : [-0.475529, -0.500000, -0.500000, 0.475529, 0.500000, 0.500000],
+"indices" : [
+2, 1, 0,
+5, 4, 3,
+8, 7, 6,
+11, 10, 9,
+14, 13, 12,
+17, 16, 15,
+20, 19, 18,
+23, 22, 21,
+26, 25, 24,
+29, 28, 27,
+32, 31, 30,
+35, 34, 33,
+38, 37, 36,
+41, 40, 39,
+44, 43, 42,
+47, 46, 45,
+50, 49, 48,
+53, 52, 51,
+56, 55, 54,
+59, 58, 57,
+62, 61, 60,
+65, 64, 63,
+68, 67, 66,
+71, 70, 69,
+74, 73, 72,
+77, 76, 75,
+80, 79, 78,
+83, 82, 81,
+86, 85, 84,
+89, 88, 87,
+92, 91, 90,
+95, 94, 93,
+98, 97, 96,
+101, 100, 99,
+104, 103, 102,
+107, 106, 105,
+110, 109, 108,
+113, 112, 111,
+116, 115, 114,
+119, 118, 117,
+122, 121, 120,
+125, 124, 123,
+128, 127, 126,
+131, 130, 129,
+134, 133, 132,
+137, 136, 135,
+140, 139, 138,
+143, 142, 141,
+146, 145, 144,
+149, 148, 147,
+152, 151, 150,
+155, 154, 153,
+158, 157, 156,
+161, 160, 159,
+164, 163, 162,
+167, 166, 165,
+170, 169, 168,
+173, 172, 171,
+176, 175, 174,
+179, 178, 177,
+182, 181, 180,
+185, 184, 183,
+188, 187, 186,
+191, 190, 189,
+194, 193, 192,
+197, 196, 195,
+200, 199, 198,
+203, 202, 201,
+206, 205, 204,
+209, 208, 207,
+212, 211, 210,
+215, 214, 213,
+218, 217, 216,
+221, 220, 219,
+224, 223, 222,
+227, 226, 225,
+230, 229, 228,
+233, 232, 231,
+236, 235, 234,
+239, 238, 237
+],
+"vertices" : [
+0.000000, -0.500000, -0.000000, -0.000000, -1.000000, -0.000000,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+0.361804, -0.223610, -0.262863, 0.723607, -0.447217, -0.525727,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.000000, -0.500000, -0.000000, -0.000000, -1.000000, -0.000000,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+0.000000, -0.500000, -0.000000, -0.000000, -1.000000, -0.000000,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+0.000000, -0.500000, -0.000000, -0.000000, -1.000000, -0.000000,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+0.361804, -0.223610, -0.262863, 0.723607, -0.447217, -0.525727,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+-0.138194, -0.223610, -0.425325, -0.276391, -0.447218, -0.850649,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+-0.447213, -0.223608, -0.000000, -0.894426, -0.447215, -0.000000,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.138194, -0.223610, 0.425325, -0.276391, -0.447218, 0.850649,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+0.361804, -0.223610, 0.262863, 0.723607, -0.447217, 0.525727,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.361804, -0.223610, -0.262863, 0.723607, -0.447217, -0.525727,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+-0.138194, -0.223610, -0.425325, -0.276391, -0.447218, -0.850649,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+-0.447213, -0.223608, -0.000000, -0.894426, -0.447215, -0.000000,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+-0.138194, -0.223610, 0.425325, -0.276391, -0.447218, 0.850649,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+0.361804, -0.223610, 0.262863, 0.723607, -0.447217, 0.525727,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.138194, 0.223610, -0.425325, 0.276391, 0.447218, -0.850649,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+-0.361804, 0.223610, -0.262863, -0.723607, 0.447217, -0.525727,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+-0.361804, 0.223610, 0.262863, -0.723607, 0.447217, 0.525727,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+0.138194, 0.223610, 0.425325, 0.276391, 0.447218, 0.850649,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996,
+0.447213, 0.223608, -0.000000, 0.894426, 0.447215, -0.000000,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+-0.138194, -0.223610, -0.425325, -0.276391, -0.447218, -0.850649,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+0.361804, -0.223610, -0.262863, 0.723607, -0.447217, -0.525727,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+0.361804, -0.223610, 0.262863, 0.723607, -0.447217, 0.525727,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+0.212661, -0.425327, -0.154506, 0.425323, -0.850653, -0.309013,
+0.000000, -0.500000, -0.000000, -0.000000, -1.000000, -0.000000,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.447213, -0.223608, -0.000000, -0.894426, -0.447215, -0.000000,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.081228, -0.425327, -0.249998, -0.162458, -0.850654, -0.499996,
+-0.138194, -0.223610, -0.425325, -0.276391, -0.447218, -0.850649,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+-0.138194, -0.223610, 0.425325, -0.276391, -0.447218, 0.850649,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+-0.262865, -0.425326, -0.000000, -0.525729, -0.850652, -0.000000,
+-0.447213, -0.223608, -0.000000, -0.894426, -0.447215, -0.000000,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+0.361804, -0.223610, 0.262863, 0.723607, -0.447217, 0.525727,
+0.212661, -0.425327, 0.154506, 0.425323, -0.850653, 0.309013,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+-0.081228, -0.425327, 0.249998, -0.162458, -0.850654, 0.499996,
+-0.138194, -0.223610, 0.425325, -0.276391, -0.447218, 0.850649,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.447213, 0.223608, -0.000000, 0.894426, 0.447215, -0.000000,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.425324, -0.262868, -0.000000, 0.850649, -0.525734, -0.000000,
+0.361804, -0.223610, 0.262863, 0.723607, -0.447217, 0.525727,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+0.138194, 0.223610, -0.425325, 0.276391, 0.447218, -0.850649,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+0.131434, -0.262869, -0.404506, 0.262868, -0.525735, -0.809014,
+0.361804, -0.223610, -0.262863, 0.723607, -0.447217, -0.525727,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+-0.361804, 0.223610, -0.262863, -0.723607, 0.447217, -0.525727,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+-0.344095, -0.262868, -0.249998, -0.688190, -0.525734, -0.499998,
+-0.138194, -0.223610, -0.425325, -0.276391, -0.447218, -0.850649,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+-0.361804, 0.223610, 0.262863, -0.723607, 0.447217, 0.525727,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+-0.344095, -0.262868, 0.249998, -0.688190, -0.525734, 0.499998,
+-0.447213, -0.223608, -0.000000, -0.894426, -0.447215, -0.000000,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+0.138194, 0.223610, 0.425325, 0.276391, 0.447218, 0.850649,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+0.131434, -0.262869, 0.404506, 0.262868, -0.525735, 0.809014,
+-0.138194, -0.223610, 0.425325, -0.276391, -0.447218, 0.850649,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+0.138194, 0.223610, -0.425325, 0.276391, 0.447218, -0.850649,
+0.293893, 0.000000, -0.404508, 0.587787, 0.000000, -0.809016,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+0.475529, 0.000000, -0.154506, 0.951057, 0.000000, -0.309015,
+0.447213, 0.223608, -0.000000, 0.894426, 0.447215, -0.000000,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+-0.361804, 0.223610, -0.262863, -0.723607, 0.447217, -0.525727,
+-0.293893, 0.000000, -0.404508, -0.587787, -0.000000, -0.809016,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+0.000000, 0.000000, -0.500000, -0.000000, -0.000000, -1.000000,
+0.138194, 0.223610, -0.425325, 0.276391, 0.447218, -0.850649,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+-0.361804, 0.223610, 0.262863, -0.723607, 0.447217, 0.525727,
+-0.475529, 0.000000, 0.154506, -0.951057, -0.000000, 0.309015,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+-0.475529, 0.000000, -0.154506, -0.951057, -0.000000, -0.309015,
+-0.361804, 0.223610, -0.262863, -0.723607, 0.447217, -0.525727,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+0.138194, 0.223610, 0.425325, 0.276391, 0.447218, 0.850649,
+0.000000, 0.000000, 0.500000, -0.000000, -0.000000, 1.000000,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+-0.293893, 0.000000, 0.404508, -0.587787, -0.000000, 0.809016,
+-0.361804, 0.223610, 0.262863, -0.723607, 0.447217, 0.525727,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.447213, 0.223608, -0.000000, 0.894426, 0.447215, -0.000000,
+0.475529, 0.000000, 0.154506, 0.951057, 0.000000, 0.309015,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.293893, 0.000000, 0.404508, 0.587787, 0.000000, 0.809016,
+0.138194, 0.223610, 0.425325, 0.276391, 0.447218, 0.850649,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+0.000000, 0.500000, -0.000000, 0.000000, 1.000000, -0.000000,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+0.344095, 0.262868, -0.249998, 0.688190, 0.525734, -0.499998,
+0.447213, 0.223608, -0.000000, 0.894426, 0.447215, -0.000000,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+0.000000, 0.500000, -0.000000, 0.000000, 1.000000, -0.000000,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+-0.131434, 0.262869, -0.404506, -0.262868, 0.525735, -0.809014,
+0.138194, 0.223610, -0.425325, 0.276391, 0.447218, -0.850649,
+0.081228, 0.425327, -0.249998, 0.162458, 0.850654, -0.499996,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+0.000000, 0.500000, -0.000000, 0.000000, 1.000000, -0.000000,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+-0.425324, 0.262868, -0.000000, -0.850649, 0.525734, -0.000000,
+-0.361804, 0.223610, -0.262863, -0.723607, 0.447217, -0.525727,
+-0.212661, 0.425327, -0.154506, -0.425323, 0.850653, -0.309013,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+0.000000, 0.500000, -0.000000, 0.000000, 1.000000, -0.000000,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+-0.131434, 0.262869, 0.404506, -0.262868, 0.525735, 0.809014,
+-0.361804, 0.223610, 0.262863, -0.723607, 0.447217, 0.525727,
+-0.212661, 0.425327, 0.154506, -0.425323, 0.850653, 0.309013,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996,
+0.000000, 0.500000, -0.000000, 0.000000, 1.000000, -0.000000,
+0.262865, 0.425326, -0.000000, 0.525729, 0.850652, -0.000000,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996,
+0.344095, 0.262868, 0.249998, 0.688190, 0.525734, 0.499998,
+0.138194, 0.223610, 0.425325, 0.276391, 0.447218, 0.850649,
+0.081228, 0.425327, 0.249998, 0.162458, 0.850654, 0.499996
+]
+}
+]
+};

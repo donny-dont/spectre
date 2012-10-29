@@ -21,21 +21,21 @@
 */
 
 class Camera {
-  vec3 eyePosition;
+  vec3 position;
   vec3 upDirection;
-  vec3 lookAtPosition;
+  vec3 focusPosition;
   num zNear;
   num zFar;
   num aspectRatio;
   num FOV;
 
   String toString() {
-    return '$eyePosition -> $lookAtPosition';
+    return '$position -> $focusPosition';
   }
 
   Camera() {
-    eyePosition = new vec3.raw(0.0, 2.0, 2.0);
-    lookAtPosition = new vec3.raw(0.0, 2.0, 0.0);
+    position = new vec3.raw(0.0, 0.0, 0.0);
+    focusPosition = new vec3.raw(0.0, 0.0, -1.0);
     upDirection = new vec3.raw(0.0, 1.0, 0.0);
 
     FOV = 0.785398163; // 2*45 degrees
@@ -65,7 +65,7 @@ class Camera {
   }
 
   mat4 get lookAtMatrix() {
-    return makeLookAt(eyePosition, lookAtPosition, upDirection);
+    return makeLookAt(position, focusPosition, upDirection);
   }
 
   void copyProjectionMatrixIntoArray(Float32Array pm) {
@@ -74,12 +74,12 @@ class Camera {
   }
 
   void copyViewMatrixIntoArray(Float32Array vm) {
-    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(position, focusPosition, upDirection);
     m.copyIntoArray(vm);
   }
 
   void copyNormalMatrixIntoArray(Float32Array nm) {
-    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(position, focusPosition, upDirection);
     m.copyIntoArray(nm);
   }
 
@@ -89,22 +89,22 @@ class Camera {
   }
 
   void copyViewMatrix(mat4 vm) {
-    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(position, focusPosition, upDirection);
     m.copyInto(vm);
   }
 
   void copyNormalMatrix(mat4 nm) {
-    mat4 m = makeLookAt(eyePosition, lookAtPosition, upDirection);
+    mat4 m = makeLookAt(position, focusPosition, upDirection);
     m.copyInto(nm);
   }
 
   void copyEyePosition(vec3 ep) {
-    eyePosition.copyInto(ep);
+    position.copyInto(ep);
   }
 
   void copyLookAtPosition(vec3 lap) {
-    lookAtPosition.copyInto(lap);
+    focusPosition.copyInto(lap);
   }
 
-  vec3 get frontDirection() => lookAtPosition - eyePosition;
+  vec3 get frontDirection() =>  (focusPosition-position).normalize();
 }

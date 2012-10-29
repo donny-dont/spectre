@@ -20,15 +20,15 @@
 
 */
 
-/** The [ImmediateContext] configures the GPU pipeline and executes draw commands */
-class ImmediateContext {
+/** The [GraphicsContext] configures the GPU pipeline and executes draw commands */
+class GraphicsContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
   static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
   static final int numVertexBuffers = 2;
   static final int numTextures = 3;
 
-  Device _device;
+  GraphicsDevice _device;
   // Input Assembler
   int _primitiveTopology;
   int _indexBufferHandle;
@@ -92,7 +92,7 @@ class ImmediateContext {
     if (inputLayout._elements == null) {
       return;
     }
-    
+
     for (var element in inputLayout._elements) {
       VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
       if (vb == null) {
@@ -145,7 +145,7 @@ class ImmediateContext {
     }
   }
 
-  ImmediateContext(Device device) {
+  GraphicsContext(GraphicsDevice device) {
     _device = device;
     _vertexBufferHandles = new List<int>(numVertexBuffers);
     _samplerStateHandles = new List<int>(numTextures);
@@ -315,7 +315,7 @@ class ImmediateContext {
       _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
     } else {
       RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
-      _device.gl.bindFramebuffer(rt._target, rt._buffer);  
+      _device.gl.bindFramebuffer(rt._target, rt._buffer);
     }
   }
 
@@ -333,7 +333,7 @@ class ImmediateContext {
     }
     _device.gl.uniform2f(index,v0, v1);
   }
-  
+
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
@@ -363,7 +363,7 @@ class ImmediateContext {
     }
     _device.gl.uniform4f(index,v0, v1, v2, v3);
   }
-  
+
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
@@ -469,7 +469,7 @@ class ImmediateContext {
     _device.gl.uniform2fv(index, vector);
   }
 
-  
+
   void setUniformFloat4Array(String name, Float32Array array) {
     ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
     if (sp == null) {

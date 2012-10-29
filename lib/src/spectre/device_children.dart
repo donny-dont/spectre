@@ -3,16 +3,16 @@
 class DeviceChild implements Hashable {
   static final int StatusDirty = 0x1;
   static final int StatusReady = 0x2;
-  
+
   String name;
-  Device device;
+  GraphicsDevice device;
   int _status;
   int fallback;
-  
+
   void set dirty(bool r) {
     if (r) {
       _status |= StatusDirty;
-    } else { 
+    } else {
       _status &= ~StatusDirty;
     }
   }
@@ -20,12 +20,12 @@ class DeviceChild implements Hashable {
   void set ready(bool r) {
     if (r) {
       _status |= StatusReady;
-    } else { 
+    } else {
       _status &= ~StatusReady;
     }
   }
   bool get ready() => (_status & StatusReady) != 0;
-  
+
   DeviceChild(this.name, this.device) {
     _status = 0;
     fallback = 0;
@@ -36,7 +36,7 @@ class DeviceChild implements Hashable {
   int hashCode() {
     return name.hashCode();
   }
-  
+
   bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
@@ -67,8 +67,8 @@ class InputLayout extends DeviceChild {
   List<_InputLayoutElement> _elements;
   List<InputElementDescription> _elementDescription;
   int _shaderProgramHandle;
-  
-  InputLayout(String name, Device device) : super(name, device) {
+
+  InputLayout(String name, GraphicsDevice device) : super(name, device) {
     _maxAttributeIndex = 0;
     _elements = null;
     _shaderProgramHandle = 0;
@@ -77,15 +77,15 @@ class InputLayout extends DeviceChild {
 
   void _createDeviceState() {
   }
-  
+
   void _bind() {
     ShaderProgram sp = device.getDeviceChild(_shaderProgramHandle);
     if (_elementDescription == null || _elementDescription.length <= 0 || sp == null) {
       return;
     }
-    
+
     _InputElementChecker checker = new _InputElementChecker();
-    
+
     _maxAttributeIndex = -1;
     _elements = new List<_InputLayoutElement>();
     for (InputElementDescription e in _elementDescription) {
@@ -107,11 +107,11 @@ class InputLayout extends DeviceChild {
       _elements.add(el);
     }
   }
-  
+
   void _configDeviceState(Dynamic props) {
 
     Dynamic o;
-    
+
     o = props['shaderProgram'];
     if (o != null && o is int) {
       _shaderProgramHandle = o;
@@ -135,7 +135,7 @@ class Viewport extends DeviceChild {
   int width;
   int height;
 
-  Viewport(String name, Device device) : super(name, device) {
+  Viewport(String name, GraphicsDevice device) : super(name, device) {
     x = 0;
     y = 0;
     width = 640;
@@ -210,7 +210,7 @@ class BlendState extends DeviceChild {
   bool writeRenderTargetBlue;
   bool writeRenderTargetAlpha;
 
-  BlendState(String name, Device device) : super(name, device) {
+  BlendState(String name, GraphicsDevice device) : super(name, device) {
     // Default state
     blendColorRed = 1.0;
     blendColorGreen = 1.0;
@@ -327,7 +327,7 @@ class DepthState extends DeviceChild {
 
   int depthComparisonOp;
 
-  DepthState(String name, Device device) : super(name, device) {
+  DepthState(String name, GraphicsDevice device) : super(name, device) {
     depthTestEnabled = false;
     depthWriteEnabled = false;
     polygonOffsetEnabled = false;
@@ -391,7 +391,7 @@ class DepthState extends DeviceChild {
 
 class StencilState extends DeviceChild {
 
-  StencilState(String name, Device device) : super(name, device) {
+  StencilState(String name, GraphicsDevice device) : super(name, device) {
 
   }
 
@@ -424,7 +424,7 @@ class RasterizerState extends DeviceChild {
 
   num lineWidth;
 
-  RasterizerState(String name, Device device) : super(name, device) {
+  RasterizerState(String name, GraphicsDevice device) : super(name, device) {
     cullEnabled = false;
     cullMode = CullBack;
     cullFrontFace = FrontCCW;
@@ -472,8 +472,8 @@ class Shader extends DeviceChild {
   String _source;
   WebGLShader _shader;
   int _type;
-  
-  Shader(String name, Device device) : super(name, device) {
+
+  Shader(String name, GraphicsDevice device) : super(name, device) {
     _source = '';
     _shader = null;
   }
@@ -499,7 +499,7 @@ class Shader extends DeviceChild {
     }
     return false;
   }
-  
+
   void compile() {
     device.gl.compileShader(_shader);
   }
@@ -521,7 +521,7 @@ class Shader extends DeviceChild {
 /// Create using [Device.createVertexShader]
 /// Must be linked into a ShaderProgram before use
 class VertexShader extends Shader {
-  VertexShader(String name, Device device) : super(name, device) {
+  VertexShader(String name, GraphicsDevice device) : super(name, device) {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
 
@@ -544,7 +544,7 @@ class VertexShader extends Shader {
 /// Create using [Device.createFragmentShader]
 /// Must be linked into a ShaderProgram before use
 class FragmentShader extends Shader {
-  FragmentShader(String name, Device device) : super(name, device) {
+  FragmentShader(String name, GraphicsDevice device) : super(name, device) {
     _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
 
@@ -574,7 +574,7 @@ class ShaderProgram extends DeviceChild {
   int numAttributes;
   int numUniforms;
 
-  ShaderProgram(String name, Device device) : super(name, device) {
+  ShaderProgram(String name, GraphicsDevice device) : super(name, device) {
     vertexShaderHandle = 0;
     fragmentShaderHandle = 0;
     numUniforms = 0;
@@ -592,14 +592,14 @@ class ShaderProgram extends DeviceChild {
       device.gl.detachShader(_program, shader._shader);
     }
   }
-  
+
   void _attach(int shaderHandle) {
     Shader shader = device.getDeviceChild(shaderHandle);
     if (shader != null) {
       device.gl.attachShader(_program, shader._shader);
     }
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -609,14 +609,14 @@ class ShaderProgram extends DeviceChild {
         vertexShaderHandle = o;
         _attach(vertexShaderHandle);
       }
-      
+
       o = props['FragmentProgram'];
       if (o != null && o is int) {
         _detach(fragmentShaderHandle);
         fragmentShaderHandle = o;
         _attach(fragmentShaderHandle);
       }
-      
+
       VertexShader vertexShader = device.getDeviceChild(vertexShaderHandle);
       FragmentShader fragmentShader = device.getDeviceChild(fragmentShaderHandle);
       if (vertexShader != null && fragmentShader != null) {
@@ -685,7 +685,7 @@ class ShaderProgram extends DeviceChild {
     }
     return false;
   }
-  
+
   void refreshUniforms() {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     spectreLog.Info('$name has $numUniforms uniform variables');
@@ -703,7 +703,7 @@ class ShaderProgram extends DeviceChild {
       spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
     }
   }
-  
+
   void forEachUniforms(UniformCallback callback) {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     for (int i = 0; i < numUniforms; i++) {
@@ -721,7 +721,7 @@ class RenderBuffer extends DeviceChild {
   int _format;
   WebGLRenderbuffer _buffer;
 
-  RenderBuffer(String name, Device device) : super(name, device) {
+  RenderBuffer(String name, GraphicsDevice device) : super(name, device) {
 
   }
 
@@ -778,7 +778,7 @@ class Texture extends DeviceChild {
   int _pixelFormat;
   WebGLTexture _buffer;
 
-  Texture(String name, Device device) : super(name, device);
+  Texture(String name, GraphicsDevice device) : super(name, device);
 
   void _createDeviceState() {
     _buffer = device.gl.createTexture();
@@ -798,7 +798,7 @@ class Texture extends DeviceChild {
 /// Set using [immediateContext.setTextures]
 /// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
 class Texture2D extends Texture {
-  Texture2D(String name, Device device) : super(name, device) {
+  Texture2D(String name, GraphicsDevice device) : super(name, device) {
     _target = WebGLRenderingContext.TEXTURE_2D;
     _target_param = WebGLRenderingContext.TEXTURE_BINDING_2D;
     _width = 1;
@@ -865,7 +865,7 @@ class SamplerState extends DeviceChild {
   int _magFilter;
   int _minFilter;
 
-  SamplerState(String name, Device device) : super(name, device) {
+  SamplerState(String name, GraphicsDevice device) : super(name, device) {
     _wrapS = TextureWrapRepeat;
     _wrapT = TextureWrapRepeat;
     _minFilter = TextureMinFilterNearestMipmapLinear;
@@ -895,7 +895,7 @@ class SamplerState extends DeviceChild {
     }
     return o;
   }
-  
+
   void _configDeviceState(Dynamic props) {
     if (props != null) {
       Dynamic o;
@@ -920,7 +920,7 @@ class RenderTarget extends DeviceChild {
   int _target;
   int _target_param;
 
-  RenderTarget(String name, Device device) : super(name, device) {
+  RenderTarget(String name, GraphicsDevice device) : super(name, device) {
     _target = WebGLRenderingContext.FRAMEBUFFER;
     _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
   }
@@ -939,14 +939,14 @@ class RenderTarget extends DeviceChild {
     if (stencilHandle != 0) {
       spectreLog.Error('No support for stencil buffers yet.');
     }
-    
+
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
     if (colorHandle != 0) {
-      if (colorType == Device.RenderBufferHandleType) {
+      if (colorType == GraphicsDevice.RenderBufferHandleType) {
         RenderBuffer rb = device.getDeviceChild(colorHandle, true);
         device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
-      } else if (colorType == Device.TextureHandleType) {
+      } else if (colorType == GraphicsDevice.TextureHandleType) {
         Texture2D t2d = device.getDeviceChild(colorHandle, true);
         device.gl.framebufferTexture2D(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
       }
@@ -954,10 +954,10 @@ class RenderTarget extends DeviceChild {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.COLOR_ATTACHMENT0, WebGLRenderingContext.RENDERBUFFER, null);
     }
     if (depthHandle != 0) {
-      if (depthType == Device.RenderBufferHandleType) {
+      if (depthType == GraphicsDevice.RenderBufferHandleType) {
         RenderBuffer rb = device.getDeviceChild(depthHandle, true);
         device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, rb._buffer);
-      } else if (depthType == Device.TextureHandleType) {
+      } else if (depthType == GraphicsDevice.TextureHandleType) {
         Texture2D t2d = device.getDeviceChild(depthHandle, true);
         device.gl.framebufferTexture2D(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.TEXTURE_2D, t2d._buffer, 0);
       }
@@ -965,7 +965,7 @@ class RenderTarget extends DeviceChild {
       device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.DEPTH_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
     }
     device.gl.framebufferRenderbuffer(_target, WebGLRenderingContext.STENCIL_ATTACHMENT, WebGLRenderingContext.RENDERBUFFER, null);
-    
+
     int fbStatus = device.gl.checkFramebufferStatus(_target);
     if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
       spectreLog.Error('RenderTarget $name incomplete status = $fbStatus');
@@ -987,7 +987,7 @@ class SpectreBuffer extends DeviceChild {
   int _param_target;
   int _usage;
 
-  SpectreBuffer(String name, Device device) : super(name, device) {
+  SpectreBuffer(String name, GraphicsDevice device) : super(name, device) {
     _buffer = null;
   }
 
@@ -1040,7 +1040,7 @@ class SpectreBuffer extends DeviceChild {
 /// Set using [Device.setIndexBuffer]
 class IndexBuffer extends SpectreBuffer {
 
-  IndexBuffer(String name, Device device) : super(name, device) {
+  IndexBuffer(String name, GraphicsDevice device) : super(name, device) {
     _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
     _param_target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
   }
@@ -1062,7 +1062,7 @@ class IndexBuffer extends SpectreBuffer {
 /// Create using [Device.createVertexBuffer]
 /// Set using [Device.setVertexBuffers]
 class VertexBuffer extends SpectreBuffer {
-  VertexBuffer(String name, Device device) : super(name, device) {
+  VertexBuffer(String name, GraphicsDevice device) : super(name, device) {
     _target = WebGLRenderingContext.ARRAY_BUFFER;
     _param_target = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
   }
@@ -1087,7 +1087,7 @@ class IndexedMesh extends DeviceChild {
   int numIndices;
   int indexOffset;
 
-  IndexedMesh(String name, Device device) : super(name, device) {
+  IndexedMesh(String name, GraphicsDevice device) : super(name, device) {
     vertexArrayHandle = 0;
     indexArrayHandle = 0;
     numIndices = 0;
@@ -1117,10 +1117,22 @@ class IndexedMesh extends DeviceChild {
         }*/
         if (rm != null && rm is ResourceManager && meshResourceHandle != null) {
           MeshResource mesh = rm.getResource(meshResourceHandle);
-          device.immediateContext.updateBuffer(vertexArrayHandle, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
-          device.immediateContext.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(vertexArrayHandle, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(indexArrayHandle, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
           indexOffset = 0;
           numIndices = mesh.numIndices;
+        }
+      }
+
+      o = props['UpdateFromMeshMap'];
+      if (o != null && o is Map) {
+        Map mesh = o['meshes'][0];
+        if (o != null && o is Map) {
+          var indices = new Uint16Array.fromList(mesh['indices']);
+          device.context.updateBuffer(vertexArrayHandle, new Float32Array.fromList(mesh['vertices']), WebGLRenderingContext.STATIC_DRAW);
+          device.context.updateBuffer(indexArrayHandle, indices, WebGLRenderingContext.STATIC_DRAW);
+          indexOffset = 0;
+          numIndices = indices.length;
         }
       }
 
@@ -1155,7 +1167,7 @@ class ArrayMesh extends DeviceChild {
   int numVertices;
   int vertexOffset;
 
-  ArrayMesh(String name, Device device) : super(name, device) {
+  ArrayMesh(String name, GraphicsDevice device) : super(name, device) {
     vertexArrayHandle = 0;
     numVertices = 0;
     vertexOffset = 0;

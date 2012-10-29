@@ -30,7 +30,7 @@ class _ResourceLoaderResult {
   }
 }
 
-class _ResourceLoader {
+abstract class _ResourceLoader {
   bool canLoad(String URL, String extension) {
     return false;
   }
@@ -111,7 +111,7 @@ class _ShaderProgramResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'sp';
   }
-  
+
   ShaderProgramResource createResource(String url, ResourceManager rm) => new ShaderProgramResource(url, rm);
 }
 
@@ -119,7 +119,7 @@ class _PackResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'pack';
   }
-  
+
   PackResource createResource(String url, ResourceManager rm) => new PackResource(url, rm);
 }
 
@@ -127,7 +127,7 @@ class _RenderConfigResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'rc';
   }
-  
+
   RenderConfigResource createResource(String url, ResourceManager rm) => new RenderConfigResource(url, rm);
 }
 
@@ -135,7 +135,7 @@ class _SceneResourceLoader extends _HttpResourceLoader {
   bool canLoad(String URL, String extension) {
     return extension == 'scene';
   }
-  
+
   SceneResource createResource(String url, ResourceManager rm) => new SceneResource(url, rm);
 }
 

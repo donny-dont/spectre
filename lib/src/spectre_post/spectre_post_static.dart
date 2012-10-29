@@ -1,5 +1,5 @@
 class SpectrePost {
-  static Device _device = null;
+  static GraphicsDevice _device = null;
   static Map<String, SpectrePostPass> _passes = null;
   static int _rasterizerState = null;
   static int _depthState = null;
@@ -7,8 +7,8 @@ class SpectrePost {
   static int vertexBuffer = null;
   static int vertexShader = null;
   static List<InputElementDescription> elements  = null;
-  
-  static void init(Device device) {
+
+  static void init(GraphicsDevice device) {
     if (_device == null) {
       _device = device;
       _rasterizerState = _device.createRasterizerState('SpectrePost.RS', {'cullEnabled': false});
@@ -17,8 +17,8 @@ class SpectrePost {
       _passes = new Map<String, SpectrePostPass>();
       int numFloats = 6 * (3+2);
       Float32Array verts = new Float32Array(6*(3+2));
-      elements = [new InputElementDescription('vPosition', Device.DeviceFormatFloat3, 20, 0, 0),
-                  new InputElementDescription('vTexCoord', Device.DeviceFormatFloat2, 20, 0, 12)
+      elements = [new InputElementDescription('vPosition', GraphicsDevice.DeviceFormatFloat3, 20, 0, 0),
+                  new InputElementDescription('vTexCoord', GraphicsDevice.DeviceFormatFloat2, 20, 0, 12)
                   ];
       int index = 0;
       num depth = -1.0;
@@ -30,14 +30,14 @@ class SpectrePost {
         verts[index++] = depth;
         verts[index++] = 0.0;
         verts[index++] = 0.0;
-        
+
         // Vertex 2
         verts[index++] = 1.0;
         verts[index++] = -1.0;
         verts[index++] = depth;
         verts[index++] = 1.0;
         verts[index++] = 0.0;
-        
+
         // Vertex 3
         verts[index++] = 1.0;
         verts[index++] = 1.0;
@@ -53,14 +53,14 @@ class SpectrePost {
         verts[index++] = depth;
         verts[index++] = 0.0;
         verts[index++] = 0.0;
-        
+
         // Vertex 2
         verts[index++] = 1.0;
         verts[index++] = 1.0;
         verts[index++] = depth;
         verts[index++] = 1.0;
         verts[index++] = 1.0;
-        
+
         // Vertex 3
         verts[index++] = -1.0;
         verts[index++] = 1.0;
@@ -72,10 +72,10 @@ class SpectrePost {
       vertexBuffer = _device.createVertexBuffer('SpectrePost.VBO', {
         'usage': 'static'
       });
-      _device.immediateContext.updateBuffer(vertexBuffer, verts);
+      _device.context.updateBuffer(vertexBuffer, verts);
       vertexShader = _device.createVertexShader('SpectrePost.VS', {});
       VertexShader vs = _device.getDeviceChild(vertexShader);
-      _device.immediateContext.compileShader(vertexShader, '''
+      _device.context.compileShader(vertexShader, '''
 precision highp float;
 
 attribute vec3 vPosition;
@@ -110,7 +110,7 @@ uniform sampler2D blitSource;
 void main() {
     gl_FragColor = vec4(1.0, 0.5, 0.5, 1.0);
 }''');
-      
+
       addFragmentPass('blur', '''
           precision mediump float;
 
@@ -139,7 +139,7 @@ void main() {
       spectreLog.Error('Cannot initialize SpectrePost more than once.');
     }
   }
-  
+
   static void cleanup() {
     _passes.forEach((k,v) {
       spectreLog.Info('Cleaning up spectre post process $k');
@@ -152,7 +152,7 @@ void main() {
     _device.deleteDeviceChild(_blendState);
     _device.deleteDeviceChild(_depthState);
   }
-  
+
   static void addPass(String name, SpectrePostPass pass) {
     if (_passes[name] != null) {
       spectreLog.Error('Attempt to add pass that already exists- $name');
@@ -160,14 +160,14 @@ void main() {
     }
     _passes[name] = pass;
   }
-  
+
   static void addFragmentPass(String name, String fragmentSource) {
     if (_passes[name] != null) {
       spectreLog.Error('Attempt to add pass that already eists- $name');
       return;
     }
     int fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
-    _device.immediateContext.compileShader(fragmentShader, fragmentSource);
+    _device.context.compileShader(fragmentShader, fragmentSource);
     int passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
       'VertexProgram': vertexShader,
       'FragmentProgram': fragmentShader
@@ -175,7 +175,7 @@ void main() {
     SpectrePostFragment spf = new SpectrePostFragment(_device, name, passProgram, elements);
     _passes[name] = spf;
   }
-  
+
   static void removePass(String name) {
     SpectrePostPass pass = _passes[name];
     if (pass != null) {
@@ -183,7 +183,7 @@ void main() {
       pass.cleanup(_device);
     }
   }
-  
+
   static void pass(String name, int renderTargetHandle, Map<String, Dynamic> arguments) {
     SpectrePostPass pass = _passes[name];
     if (pass == null) {
@@ -191,15 +191,15 @@ void main() {
       return;
     }
     pass.setup(_device, arguments);
-    _device.immediateContext.setVertexBuffers(0, [vertexBuffer]);
-    _device.immediateContext.setIndexBuffer(0);
-    _device.immediateContext.setRasterizerState(_rasterizerState);
-    _device.immediateContext.setDepthState(_depthState);
-    _device.immediateContext.setBlendState(_blendState);
+    _device.context.setVertexBuffers(0, [vertexBuffer]);
+    _device.context.setIndexBuffer(0);
+    _device.context.setRasterizerState(_rasterizerState);
+    _device.context.setDepthState(_depthState);
+    _device.context.setBlendState(_blendState);
     // FIXME: Make the following dynamic:
-    _device.immediateContext.setUniform2f('texScale', 0.833, 0.46875);
-    _device.immediateContext.setPrimitiveTopology(ImmediateContext.PrimitiveTopologyTriangles);
-    _device.immediateContext.setRenderTarget(renderTargetHandle);
-    _device.immediateContext.draw(6, 0);
+    _device.context.setUniform2f('texScale', 0.833, 0.46875);
+    _device.context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+    _device.context.setRenderTarget(renderTargetHandle);
+    _device.context.draw(6, 0);
   }
 }

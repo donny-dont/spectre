@@ -1,16 +1,14 @@
 name: spectre
 description: Graphics Library
-version: 0.0.1
-authors: 
-- John McCutchan <john@johnmccutchan.com>
-- Adam Singer <financeCoding@gmail.com>
+version: 0.5.0
+author: John McCutchan <john@johnmccutchan.com>
 homepage: https://github.com/johnmccutchan/spectre
 dependencies:
   unittest:
     sdk: unittest
-  markerprof:
+  marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
-  handlesystem:
+  handle_system:
     git: https://github.com/johnmccutchan/handlesystem.git
-  dartvectormath:
+  vector_math:
     git: https://github.com/johnmccutchan/DartVectorMath.git

@@ -17,8 +17,8 @@ ResourceManager - Manage and load resources
 Spectre also includes a resource manager and a demo framework called 'Javeline'.
 
 
-## Status: Alpha ##
-Stuff works, not in release yet.
+## Status: Beta ##
+Stuff works but the API is not guaranteed yet.
 
 
 ## Getting Started ##
@@ -32,10 +32,8 @@ dependencies:
 and run **pub install** to install **spectre** (including its dependencies). Now add import
 
 ```
-#import('package:spectre/external/DartVectorMath/lib/vector_math_html.dart'); 
+#import('package:vector_math/vector_math_browser.dart'); 
 #import('package:spectre/spectre.dart');
 #import('package:spectre/spectre_scene.dart');
 #import('package:spectre/spectre_post.dart');
 ```
-
-

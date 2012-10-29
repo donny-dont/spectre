@@ -20,7 +20,7 @@
 
 */
 
-class MouseKeyboardCameraController implements CameraController {
+class MouseKeyboardCameraController extends CameraController {
   bool up;
   bool down;
   bool strafeLeft;
@@ -72,8 +72,8 @@ class MouseKeyboardCameraController implements CameraController {
     scale = scale * dt * floatVelocity;
     vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
     upDirection.scale(scale);
-    cam.lookAtPosition.add(upDirection);
-    cam.eyePosition.add(upDirection);
+    cam.focusPosition.add(upDirection);
+    cam.position.add(upDirection);
   }
 
   void _MoveStrafe(num dt, bool positive, bool negative, Camera cam) {
@@ -93,8 +93,8 @@ class MouseKeyboardCameraController implements CameraController {
     vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
     vec3 strafeDirection = frontDirection.cross(upDirection);
     strafeDirection.scale(scale);
-    cam.lookAtPosition.add(strafeDirection);
-    cam.eyePosition.add(strafeDirection);
+    cam.focusPosition.add(strafeDirection);
+    cam.position.add(strafeDirection);
   }
 
   void _MoveForward(num dt, bool positive, bool negative, Camera cam) {
@@ -114,8 +114,8 @@ class MouseKeyboardCameraController implements CameraController {
     //print('$frontDirection');
     frontDirection.normalize();
     frontDirection.scale(scale);
-    cam.lookAtPosition.add(frontDirection);
-    cam.eyePosition.add(frontDirection);
+    cam.focusPosition.add(frontDirection);
+    cam.position.add(frontDirection);
   }
 
   void _RotateView(num dt, Camera cam) {
@@ -130,33 +130,16 @@ class MouseKeyboardCameraController implements CameraController {
     accumDX = 0;
     accumDY = 0;
 
-    // pitch rotation
-    {
-      bool above = false;
-      if (frontDirection.y > 0.0) {
-        above = true;
-      }
-      num f_dot_up = frontDirection.dot(upDirection);
-      num pitchAngle = acos(f_dot_up);
-      num pitchDegrees = degrees(pitchAngle);
+    final num f_dot_up = frontDirection.dot(upDirection);
+    final num pitchAngle = acos(f_dot_up);
+    final num pitchDegrees = degrees(pitchAngle);
 
-      final num minPitchAngle = 0.785398163;
-      final num maxPitchAngle = 2.35619449;
-      final num minPitchDegrees = degrees(minPitchAngle);
-      final num maxPitchDegrees = degrees(maxPitchAngle);
+    final num minPitchAngle = 0.785398163;
+    final num maxPitchAngle = 2.35619449;
+    final num minPitchDegrees = degrees(minPitchAngle);
+    final num maxPitchDegrees = degrees(maxPitchAngle);
 
-      _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-
-      if (above) {
-        if (pitchAngle > minPitchAngle || (pitchAngle <= minPitchAngle && mousePitchDelta > 0.0)) {
-          _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-        }
-      } else {
-        if (pitchAngle < maxPitchAngle || (pitchAngle >= maxPitchAngle && mousePitchDelta < 0.0)) {
-          _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-        }
-      }
-    }
+    _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
 
     _RotateEyeAndLook(mouseYawDelta, upDirection, cam);
   }
@@ -167,6 +150,6 @@ class MouseKeyboardCameraController implements CameraController {
     frontDirection.normalize();
     q.rotate(frontDirection);
     frontDirection.normalize();
-    cam.lookAtPosition = cam.eyePosition + frontDirection;
+    cam.focusPosition = cam.position + frontDirection;
   }
 }

@@ -36,7 +36,8 @@ class DeviceFormat {
 /// Attribute [format] device format for attribute
 /// Attribute [elementStride] bytes between successive elements
 /// Attribute [vertexBufferSlot] the vertex buffer slot to pull elements from
-/// Attribute [vertexBufferOffset] the offset into the vertex buffer to pull the first element
+/// Attribute [vertexBufferOffset] the offset into the
+// vertex buffer to pull the first element
 class InputElementDescription {
   String name;
   DeviceFormat format;
@@ -44,14 +45,17 @@ class InputElementDescription {
   int vertexBufferSlot;
   int vertexBufferOffset;
 
-  InputElementDescription(this.name, this.format, this.elementStride, this.vertexBufferSlot, this.vertexBufferOffset);
+  InputElementDescription(this.name, this.format,
+                          this.elementStride, this.vertexBufferSlot,
+                          this.vertexBufferOffset);
 }
 
 class _InputElementCheckerItem {
   String name;
   int vertexBufferSlot;
   int vertexBufferOffset;
-  _InputElementCheckerItem(this.name, this.vertexBufferSlot, this.vertexBufferOffset);
+  _InputElementCheckerItem(this.name, this.vertexBufferSlot,
+                           this.vertexBufferOffset);
 }
 
 class _InputElementChecker {
@@ -59,11 +63,15 @@ class _InputElementChecker {
   _InputElementChecker() {
     items = new List<_InputElementCheckerItem>();
   }
-  
+
   void add(InputElementDescription d) {
-    _InputElementCheckerItem item = new _InputElementCheckerItem(d.name, d.vertexBufferSlot, d.vertexBufferOffset);
+    _InputElementCheckerItem item;
+    item = new _InputElementCheckerItem(d.name,
+                                        d.vertexBufferSlot,
+                                        d.vertexBufferOffset);
     for(_InputElementCheckerItem check in items) {
-      if (check.vertexBufferOffset == item.vertexBufferOffset && check.vertexBufferSlot == item.vertexBufferSlot) {
+      if (check.vertexBufferOffset == item.vertexBufferOffset &&
+          check.vertexBufferSlot == item.vertexBufferSlot) {
         spectreLog.Warning('Input elements -  ${check.name} and ${item.name} - share same offset. This is likely an error.');
       }
     }
@@ -78,11 +86,15 @@ class _InputElementChecker {
 /// Each resource requires a unique name.
 
 /// An existing resource can be looked up using its name.
-class Device {
-  static const DeviceFormat DeviceFormatFloat1 = const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
-  static const DeviceFormat DeviceFormatFloat2 = const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
-  static const DeviceFormat DeviceFormatFloat3 = const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
-  static const DeviceFormat DeviceFormatFloat4 = const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
+class GraphicsDevice {
+  static const DeviceFormat DeviceFormatFloat1 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
+  static const DeviceFormat DeviceFormatFloat2 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
+  static const DeviceFormat DeviceFormatFloat3 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
+  static const DeviceFormat DeviceFormatFloat4 =
+                    const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
   static const int BufferHandleType = 1;
   static const int RenderBufferHandleType = 2;
@@ -140,8 +152,8 @@ class Device {
     }
   }
 
-  ImmediateContext _immediateContext;
-  ImmediateContext get immediateContext() => _immediateContext;
+  GraphicsContext _context;
+  GraphicsContext get context() => _context;
 
   WebGLRenderingContext _gl;
   WebGLRenderingContext get gl() => _gl;
@@ -154,50 +166,53 @@ class Device {
   Map<String, int> _nameMapping;
 
   static const int MaxDeviceChildren = 2048;
-  static const int MaxStaticDeviceChildren = 512;
 
   int _fallbackTextureID;
 
-  void _drawSquare(CanvasRenderingContext2D context, int x, int y, int w, int h) {
-    context.save();
-    context.beginPath();
-    context.translate(x, y);
-    context.fillStyle = "#656565";
-    context.fillRect(0, 0, w, h);
-    context.restore();
+  void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
+    context2d.save();
+    context2d.beginPath();
+    context2d.translate(x, y);
+    context2d.fillStyle = "#656565";
+    context2d.fillRect(0, 0, w, h);
+    context2d.restore();
   }
-  
-  void _drawGrid(CanvasRenderingContext2D context, int width, int height, int horizSlices, int vertSlices) {
+
+  void _drawGrid(CanvasRenderingContext2D context2d, int width, int height, int horizSlices, int vertSlices) {
     int sliceWidth = width ~/ horizSlices;
     int sliceHeight = height ~/ vertSlices;
     int sliceHalfWidth = sliceWidth ~/ 2;
     for (int i = 0; i < horizSlices; i++) {
       for (int j = 0; j < vertSlices; j++) {
         if (j % 2 == 0) {
-          _drawSquare(context, i * sliceWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+          _drawSquare(context2d, i * sliceWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
         } else {
-          _drawSquare(context, i * sliceWidth + sliceHalfWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
+          _drawSquare(context2d, i * sliceWidth + sliceHalfWidth, j * sliceHeight, sliceHalfWidth, sliceHeight);
         }
       }
     }
   }
-  
+
   /// Constructs a GPU device
-  Device(WebGLRenderingContext gl) {
+  GraphicsDevice(WebGLRenderingContext gl) {
     _gl = gl;
-    _childrenHandles = new HandleSystem(MaxDeviceChildren, MaxStaticDeviceChildren);
+    _childrenHandles = new HandleSystem(MaxDeviceChildren, 0);
     _childrenObjects = new List(MaxDeviceChildren);
     _nameMapping = new Map<String, int>();
-    _immediateContext = new ImmediateContext(this);
-    _fallbackTextureID = createTexture2D('Device.Fallback', {'width': 512, 'height': 512, 'textureFormat' : Texture.TextureFormatRGBA, 'pixelFormat': Texture.PixelFormatUnsignedByte});
+    _context = new GraphicsContext(this);
+    _fallbackTextureID = createTexture2D('Device.Fallback', {
+      'width': 512,
+      'height': 512,
+      'textureFormat' : Texture.TextureFormatRGBA,
+      'pixelFormat': Texture.PixelFormatUnsignedByte});
     {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;
       canvas.height = 512;
-      CanvasRenderingContext2D context = canvas.getContext('2d');
-      _drawGrid(context, 512, 512, 8, 8);
+      CanvasRenderingContext2D context2d = canvas.getContext('2d');
+      _drawGrid(context2d, 512, 512, 8, 8);
       configureDeviceChild(_fallbackTextureID, {'pixels': canvas});
-      immediateContext.generateMipmap(_fallbackTextureID);
+      _context.generateMipmap(_fallbackTextureID);
     }
   }
 
@@ -250,7 +265,7 @@ class Device {
 
   /// Registers a handle with the given [type] and [name]
   /// [handle] is an optional argument that, if provided, must be a statically reserved handle
-  int _registerHandle(String name, int type, [int handle=Handle.BadHandle]) {
+  int _registerHandle(String name, int type) {
     {
       // Check if name is already registered
       int existingHandle = getDeviceChildHandle(name);
@@ -262,25 +277,12 @@ class Device {
         return existingHandle;
       }
     }
-    if (handle != Handle.BadHandle) {
-      // Static handle
-      {
-        int handleType = Handle.getType(handle);
-        assert(handleType == type);
-      }
-      int r = _childrenHandles.setStaticHandle(handle);
-      if (r != handle) {
-        spectreLog.Error('Spectre.Device._registerHandle - Registering a static handle $handle failed.');
-        return Handle.BadHandle;
-      }
-    } else {
-      // Dynamic handle
-      handle = _childrenHandles.allocateHandle(type);
-      if (handle == Handle.BadHandle) {
-        spectreLog.Error('Spectre.Device._registerHandle - Registering dynamic handle failed.');
-        return Handle.BadHandle;
-      }
+    int handle = _childrenHandles.allocateHandle(type);
+    if (handle == Handle.BadHandle) {
+      spectreLog.Error('Spectre.Device._registerHandle - Registering dynamic handle failed.');
+      return Handle.BadHandle;
     }
+
     assert(_childrenHandles.validHandle(handle));
     int index = Handle.getIndex(handle);
     //print('$index - $name');
@@ -302,6 +304,8 @@ class Device {
       spectreLog.Warning('Deleting device child handle [$handle] is invalid.');
       return;
     }
+    // Free handle
+    _childrenHandles.freeHandle(handle);
     int index = Handle.getIndex(handle);
     DeviceChild dc = _childrenObjects[index];
     if (dc == null) {
@@ -311,7 +315,6 @@ class Device {
     dc._destroyDeviceState();
     _nameMapping.remove(dc.name);
     _childrenObjects[index] = null;
-    print('remove: $index - ${dc.name}');
   }
 
   void batchDeleteDeviceChildren(List<int> handles) {
@@ -335,8 +338,8 @@ class Device {
   /// describing the IndexBuffer being created. If [handle] is specified it must be a registered handle.
   ///
   /// Returns the handle to the IndexBuffer.
-  int createIndexBuffer(String name, Dynamic props, [int handle=Handle.BadHandle]) {
-    handle = _registerHandle(name, BufferHandleType, handle);
+  int createIndexBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, BufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -352,8 +355,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexBuffer] being created
-  int createVertexBuffer(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, BufferHandleType, handle);
+  int createVertexBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, BufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -369,8 +372,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderBuffer] being created
-  int createRenderBuffer(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RenderBufferHandleType, handle);
+  int createRenderBuffer(String name, Dynamic props) {
+    int handle = _registerHandle(name, RenderBufferHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -386,8 +389,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RenderTarget] being created
-  int createRenderTarget(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RenderTargetHandleType, handle);
+  int createRenderTarget(String name, Dynamic props) {
+    int handle = _registerHandle(name, RenderTargetHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -403,8 +406,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Texture2D] being created
-  int createTexture2D(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, TextureHandleType, handle);
+  int createTexture2D(String name, Dynamic props) {
+    int handle = _registerHandle(name, TextureHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -425,8 +428,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
-  int createVertexShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderHandleType, handle);
+  int createVertexShader(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -442,8 +445,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
-  int createFragmentShader(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderHandleType, handle);
+  int createFragmentShader(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -459,8 +462,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
-  int createShaderProgram(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ShaderProgramHandleType, handle);
+  int createShaderProgram(String name, Dynamic props) {
+    int handle = _registerHandle(name, ShaderProgramHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -477,8 +480,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [SamplerState] being created
-  int createSamplerState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, SamplerStateHandleType, handle);
+  int createSamplerState(String name, Dynamic props) {
+    int handle = _registerHandle(name, SamplerStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -494,8 +497,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
-  int createViewport(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, ViewportHandleType, handle);
+  int createViewport(String name, Dynamic props) {
+    int handle = _registerHandle(name, ViewportHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -511,8 +514,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
-  int createDepthState(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, DepthStateHandleType, handle);
+  int createDepthState(String name, Dynamic props) {
+    int handle = _registerHandle(name, DepthStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -528,8 +531,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [BlendState] being created
-  int createBlendState(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, BlendStateHandleType, handle);
+  int createBlendState(String name, Object props) {
+    int handle = _registerHandle(name, BlendStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -546,8 +549,8 @@ class Device {
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RasterizerState] being created
-  int createRasterizerState(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, RasterizerStateHandleType, handle);
+  int createRasterizerState(String name, Object props) {
+    int handle = _registerHandle(name, RasterizerStateHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -563,9 +566,9 @@ class Device {
   /// Create an [InputLayout] named [name]
   ///
   /// [props] is a JSONS tring or a [Map] containing a set of properties
-  /// describing the [InputLayout] being created. 
-  int createInputLayout(String name, Object props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, InputLayoutHandleType, handle);
+  /// describing the [InputLayout] being created.
+  int createInputLayout(String name, Object props) {
+    int handle = _registerHandle(name, InputLayoutHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -580,8 +583,8 @@ class Device {
 
   /// Create an [IndexedMesh] named [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createIndexedMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, MeshHandleType, handle);
+  int createIndexedMesh(String name, Dynamic props) {
+    int handle = _registerHandle(name, MeshHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
@@ -596,8 +599,8 @@ class Device {
 
   /// Create an [ArrayMesh] name [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createArrayMesh(String name, Dynamic props, [int handle = Handle.BadHandle]) {
-    handle = _registerHandle(name, MeshHandleType, handle);
+  int createArrayMesh(String name, Dynamic props) {
+    int handle = _registerHandle(name, MeshHandleType);
     if (handle == Handle.BadHandle) {
       return handle;
     }
