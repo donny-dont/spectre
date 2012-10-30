@@ -44,7 +44,7 @@ class Camera {
     aspectRatio = 1.7777778;
   }
 
-  num get yaw() {
+  num get yaw {
     vec3 z = new vec3(0.0, 0.0, 1.0);
     vec3 forward = frontDirection;
     forward.normalize();
@@ -52,7 +52,7 @@ class Camera {
     return d;
   }
 
-  num get pitch() {
+  num get pitch {
     vec3 y = new vec3(0.0, 1.0, 0.0);
     vec3 forward = frontDirection;
     forward.normalize();
@@ -60,11 +60,11 @@ class Camera {
     return d;
   }
 
-  mat4 get projectionMatrix() {
+  mat4 get projectionMatrix {
     return makePerspective(FOV, aspectRatio, zNear, zFar);
   }
 
-  mat4 get lookAtMatrix() {
+  mat4 get lookAtMatrix {
     return makeLookAt(position, focusPosition, upDirection);
   }
 
@@ -106,5 +106,5 @@ class Camera {
     focusPosition.copyInto(lap);
   }
 
-  vec3 get frontDirection() =>  (focusPosition-position).normalize();
+  vec3 get frontDirection =>  (focusPosition-position).normalize();
 }

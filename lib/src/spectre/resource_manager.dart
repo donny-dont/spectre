@@ -45,7 +45,7 @@ class ResourceManager {
     _baseURL = baseURL;
   }
 
-  Map<String, int> get children() => _urlToHandle;
+  Map<String, int> get children => _urlToHandle;
 
   ResourceBase getResource(int handle) {
     if (handle == 0) {
@@ -175,7 +175,7 @@ class ResourceManager {
     _handleSystem.freeHandle(handle);
   }
 
-  void updateResource(int handle, Dynamic state) {
+  void updateResource(int handle, dynamic state) {
     if (handle == 0) {
       return;
     }
@@ -217,15 +217,15 @@ class ResourceManager {
         // The raw resource data has been loaded.
         // Set the resource handle
         // The resource class is responsible for completing the load
-        // 
+        //
         result.handle = handle;
         result.completer = completer;
         rb.load(result);
-      });      
+      });
     }
     return completer.future;
   }
-  
+
   Future<bool> loadResources(Collection<int> handles, [bool force=true]) {
     List<Future<int>> futures = new List<Future<int>>();
     handles.forEach((handle) {
@@ -235,7 +235,7 @@ class ResourceManager {
         print('Load resource invalid handle $handle $index');
         return;
       }
-      futures.add(r);  
+      futures.add(r);
     });
     Future<List> allFutures = Futures.wait(futures);
     Completer<bool> completer = new Completer<bool>();
