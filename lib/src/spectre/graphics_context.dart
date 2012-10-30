@@ -109,8 +109,9 @@ class GraphicsContext {
         element._vboOffset);
       // Remember that this was enabled.
       _enabledVertexAttributeArrays.add(element._attributeIndex);
-      if (debug)
+      if (debug) {
         _logVertexAttributes(element._attributeIndex);
+      }
       //_device.gl.bindBuffer(vb._target, null);
 
     }

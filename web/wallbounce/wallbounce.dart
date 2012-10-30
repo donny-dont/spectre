@@ -12,7 +12,7 @@ DebugDrawManager _debugDrawManager;
 
 int _viewport;
 Camera _camera;
-int _lastTime;
+double _lastTime;
 bool _circleDrawn = false;
 
 vec2 ballPosition = new vec2(0.1, 0.1);
@@ -89,16 +89,16 @@ void _updateBall(double dt) {
   }
 }
 
-void frame(int time) {
+void frame(double time) {
   Stopwatch sw = new Stopwatch();
   if (_lastTime == null) {
     _lastTime = time;
     window.requestAnimationFrame(frame);
     return;
   }
-  int dt = time - _lastTime;
+  double dt = time - _lastTime;
   _lastTime = time;
-  double seconds = dt.toDouble() * 0.001;
+  double seconds = dt * 0.001;
   // Update the debug draw manager state
   _debugDrawManager.update(seconds);
   // Clear the color buffer

@@ -28,7 +28,7 @@ class CommandListBuilder {
   }
   CommandListBuilder.append(this.ops);
 
-  void setRegister(int register, Dynamic value) {
+  void setRegister(int register, dynamic value) {
     ops.add(Ops.SetRegister);
     ops.add(register);
     ops.add(value);

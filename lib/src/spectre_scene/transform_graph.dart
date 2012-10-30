@@ -1,3 +1,25 @@
+/*
+
+  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+*/
+
 class _TransformGraphNode {
   int parentId;
   int childCount;
@@ -21,7 +43,7 @@ class TransformGraph {
   int _sortedNodesCursor;
   int _nodeCount;
   final int _maxNodes;
-  
+
   TransformGraph(this._maxNodes) {
     _handleSystem = new HandleSystem(_maxNodes, 0);
     _localTransforms = new List<mat4>(_maxNodes);
@@ -39,7 +61,7 @@ class TransformGraph {
       _nodes[i].reset();
     }
   }
-  
+
   /// Create a new transform node. The node has no parent and is the identity.
   int createNode() {
     int nodeHandle = _handleSystem.allocateHandle(0x1);
@@ -51,7 +73,7 @@ class TransformGraph {
     _nodeCount++;
     return nodeHandle;
   }
-  
+
   void _unparentChildren(int parentNode) {
     for (int i = 0; i < _maxNodes; i++) {
       if (_nodes[i].parentId == parentNode) {
@@ -59,7 +81,7 @@ class TransformGraph {
       }
     }
   }
-  
+
   /// Delete an existing transform node [nodeHandle]
   void deleteNode(int nodeHandle) {
     if (nodeHandle == 0) {
@@ -79,7 +101,7 @@ class TransformGraph {
     _nodeCount--;
     assert(_nodeCount >= 0);
   }
-  
+
   /// Makes [nodeHandle] a leaf node
   void unparent(int nodeHandle) {
     if (nodeHandle == 0) {
@@ -102,12 +124,12 @@ class TransformGraph {
     _nodes[parentIndex].childCount--;
     assert(_nodes[parentIndex].childCount >= 0);
   }
-  
-  /// Makes [nodeHandle] a child of [parentNodeHandle] 
+
+  /// Makes [nodeHandle] a child of [parentNodeHandle]
   void reparent(int nodeHandle, int parentNodeHandle) {
     // Unparent
     unparent(nodeHandle);
- 
+
     if (parentNodeHandle == 0) {
       return;
     }
@@ -122,11 +144,11 @@ class TransformGraph {
       return;
     }
     int parentIndex = Handle.getIndex(parentNodeHandle);
-    
+
     _nodes[index].parentId = parentNodeHandle;
     _nodes[parentIndex].childCount++;
   }
-  
+
   /// Must be called after modifying the transform graph
   void updateGraph() {
     _sortedNodesCursor = 0;
@@ -149,7 +171,7 @@ class TransformGraph {
       }
     }
   }
-  
+
   /// Get a copy of the world transform for [nodeHandle]
   void getWorldMatrix(int nodeHandle, mat4 out) {
     if (nodeHandle == 0) {
@@ -161,7 +183,7 @@ class TransformGraph {
     int index = Handle.getIndex(nodeHandle);
     _worldTransforms[index].copyInto(out);
   }
-  
+
   /// Get a reference to the world transform for [nodeHandle]
   mat4 refWorldMatrix(int nodeHandle) {
     if (nodeHandle == 0) {
@@ -173,7 +195,7 @@ class TransformGraph {
     int index = Handle.getIndex(nodeHandle);
     return _worldTransforms[index];
   }
-  
+
   Float32Array refWorldMatrixArray(int nodeHandle) {
     if (nodeHandle == 0) {
       return null;
@@ -184,7 +206,7 @@ class TransformGraph {
     int index = Handle.getIndex(nodeHandle);
     return _worldTransformArrays[index];
   }
-  
+
   /// Set the local transform for [nodeHandle]
   void setLocalMatrix(int nodeHandle, mat4 m) {
     if (nodeHandle == 0) {
@@ -196,7 +218,7 @@ class TransformGraph {
     int index = Handle.getIndex(nodeHandle);
     _localTransforms[index].copyFrom(m);
   }
-  
+
   /// Get a reference to the local transform for [nodeHandle]
   mat4 refLocalMatrix(int nodeHandle) {
     if (nodeHandle == 0) {
@@ -208,7 +230,7 @@ class TransformGraph {
     int index = Handle.getIndex(nodeHandle);
     return _localTransforms[index];
   }
-  
+
   /// Updates the world transformation matrices for all nodes in the graph
   void updateWorldMatrices() {
     //print('Updating world.');

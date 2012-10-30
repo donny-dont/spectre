@@ -42,11 +42,11 @@ class ResourceEvents {
     update[_idCounter] = cb;
     return _idCounter;
   }
-  
+
   void removeUpdate(int id) {
     update.remove(id);
   }
-  
+
   int addUnloaded(ResourceEventCallback cb) {
     _idCounter++;
     if (_idCounter == 0) {
@@ -55,7 +55,7 @@ class ResourceEvents {
     unloaded[_idCounter] = cb;
     return _idCounter;
   }
-  
+
   void removeUnloaded(int id) {
     unloaded.remove(id);
   }
@@ -63,10 +63,10 @@ class ResourceEvents {
 
 class ResourceBase {
   bool _isLoaded;
-  bool get isLoaded() => _isLoaded;
+  bool get isLoaded => _isLoaded;
 
   String _url;
-  String get url() => _url;
+  String get url => _url;
 
   ResourceEvents on;
   ResourceManager _rm;
@@ -80,20 +80,20 @@ class ResourceBase {
     _isLoaded = true;
     _fireUpdated();
   }
-  
+
   void update(Map state) {
     _isLoaded = true;
     _fireUpdated();
   }
-  
+
   void unload() {
     _isLoaded = false;
     _fireUnloaded();
   }
-  
+
   void deregister() {
   }
-  
+
   void notifyUpdate() {
     _fireUpdated();
   }
@@ -119,19 +119,19 @@ class Float32ArrayResource extends ResourceBase {
   Float32ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
-  Float32Array get array() => _array;
+  Float32Array get array => _array;
   set array(Float32Array array) {
     _array = array;
     _fireUpdated();
   }
-  
+
   void load(_ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
-  
+
   void update(Map state) {
-    Dynamic o;
+    dynamic o;
     o = state['array'];
     if (o != null && o is Float32Array) {
       _array = o;
@@ -156,14 +156,14 @@ class Uint16ArrayResource extends ResourceBase {
   Uint16ArrayResource(String url, ResourceManager rm) : super(url, rm) {
   }
 
-  Uint16Array get array() => _array;
+  Uint16Array get array => _array;
   set array(Uint16Array array) {
     _array = array;
     _fireUpdated();
   }
-  
+
   void update(Map state) {
-    Dynamic o;
+    dynamic o;
     o = state['array'];
     if (o != null && o is Uint16Array) {
       _array = o;
@@ -175,7 +175,7 @@ class Uint16ArrayResource extends ResourceBase {
       _fireUpdated();
     }
   }
-  
+
   void load(_ResourceLoaderResult result) {
     _fireUpdated();
     result.completer.complete(result.handle);
@@ -195,7 +195,7 @@ class MeshResource extends ResourceBase {
 
   }
 
-  int get numIndices() {
+  int get numIndices {
     return meshData['meshes'][0]['indices'].length;
   }
 
@@ -233,9 +233,9 @@ class ShaderResource extends ResourceBase {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
-  
+
   void update(Map state) {
-    Dynamic o = state['source'];
+    dynamic o = state['source'];
     if (o != null && o is String) {
       source = o;
       _fireUpdated();
@@ -251,7 +251,7 @@ class ShaderResource extends ResourceBase {
 class ShaderProgramResource extends ResourceBase {
   String vertexShaderSource;
   String fragmentShaderSource;
-  
+
   ShaderProgramResource(String url, ResourceManager rm) : super(url, rm) {
     vertexShaderSource = '';
     fragmentShaderSource = '';
@@ -283,7 +283,7 @@ class ShaderProgramResource extends ResourceBase {
       }
       if (fetchFragmentShader != null) {
         fetchedFragment = true;
-        futures.add(new _ShaderResourceLoader().load('${_rm._baseURL}${fetchFragmentShader}'));        
+        futures.add(new _ShaderResourceLoader().load('${_rm._baseURL}${fetchFragmentShader}'));
       }
     }
     if (futures.length > 0) {
@@ -306,17 +306,17 @@ class ShaderProgramResource extends ResourceBase {
         _fireUpdated();
         _isLoaded = true;
         result.completer.complete(result.handle);
-      });  
+      });
     } else {
-      
+
       _fireUpdated();
       _isLoaded = true;
       result.completer.complete(result.handle);
     }
   }
-  
+
   void update(Map state) {
-    Dynamic o = state['vertexShaderSource'];
+    dynamic o = state['vertexShaderSource'];
     if (o != null && o is String) {
       vertexShaderSource = o;
     }
@@ -340,8 +340,8 @@ class ImageResource extends ResourceBase {
   ImageResource(String url, ResourceManager rm) : super(url, rm) {
 
   }
-  
-  ImageElement get image() => _image;
+
+  ImageElement get image => _image;
 
   void load(_ResourceLoaderResult result) {
     _isLoaded = true;
@@ -352,9 +352,9 @@ class ImageResource extends ResourceBase {
     _fireUpdated();
     result.completer.complete(result.handle);
   }
-  
+
   void update(Map state) {
-    Dynamic o = state['image'];
+    dynamic o = state['image'];
     if (o != null && o is ImageElement) {
       _image = o;
       _fireUpdated();
@@ -372,7 +372,7 @@ class PackResource extends ResourceBase {
   PackResource(String url, ResourceManager rm) : super(url, rm) {
     childResources = new List<int>();
   }
-  
+
   void load(_ResourceLoaderResult result) {
     if (childResources.length > 0) {
       _rm.batchUnload(childResources);
@@ -399,11 +399,11 @@ class PackResource extends ResourceBase {
       });
     }
   }
-  
+
   void unload() {
     _rm.batchUnload(childResources);
   }
-  
+
   void deregister() {
     _rm.batchDeregister(childResources);
   }
@@ -414,42 +414,42 @@ class ProgramResource extends ResourceBase {
   ProgramResource(String url, ResourceManager rm) : super(url, rm) {
     _program = null;
   }
-  
+
   set program(List program) {
     _program = program;
     _fireUpdated();
   }
-  
+
   void update(Map state) {
-    Dynamic o = state['program'];
+    dynamic o = state['program'];
     if (o != null && o is List) {
       _program = o;
-      _fireUpdated();  
+      _fireUpdated();
     }
   }
-  
+
   void unload() {
     _fireUnloaded();
     _program = null;
   }
-  
+
   void deregister() {
   }
 }
 
 class RenderConfigResource extends ResourceBase {
   Map renderConfig;
-  
+
   RenderConfigResource(String url, ResourceManager rm) : super(url, rm) {
     renderConfig = null;
   }
-  
+
   void load(_ResourceLoaderResult result) {
     renderConfig = JSON.parse(result.data);
     _fireUpdated();
     result.completer.complete(result.handle);
   }
-  
+
   void unload() {
     _fireUnloaded();
     renderConfig = null;
@@ -458,17 +458,17 @@ class RenderConfigResource extends ResourceBase {
 
 class SceneResource extends ResourceBase {
   Map sceneDescription;
-  
+
   SceneResource(String url, ResourceManager rm) : super(url, rm) {
     sceneDescription = null;
   }
-  
+
   void load(_ResourceLoaderResult result) {
     sceneDescription = JSON.parse(result.data);
     _fireUpdated();
     result.completer.complete(result.handle);
   }
-  
+
   void unload() {
     _fireUnloaded();
     sceneDescription = null;

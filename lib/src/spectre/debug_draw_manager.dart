@@ -133,7 +133,7 @@ class _DebugDrawLineManager {
     context.updateBuffer(_vbo, _vboStorage);
   }
 
-  int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
+  int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;
 
   void update(num dt) {
     Profiler.enter('update');

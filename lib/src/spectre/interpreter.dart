@@ -34,7 +34,7 @@ class Interpreter {
     }
   }
 
-  void setRegister(int register, Dynamic value) {
+  void setRegister(int register, dynamic value) {
     registers[register] = value;
   }
 
@@ -76,7 +76,7 @@ class Interpreter {
           skip = 3;
           {
             final int regId = program[i+1];
-            final Dynamic val = program[i+2];
+            final dynamic val = program[i+2];
             registers[regId] = val;
           }
           break;

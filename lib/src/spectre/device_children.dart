@@ -1,5 +1,28 @@
+/*
+
+  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+*/
+
 /// A resource created by a device
 /// All resources have a [name]
+
 class DeviceChild implements Hashable {
   static final int StatusDirty = 0x1;
   static final int StatusReady = 0x2;
@@ -16,7 +39,7 @@ class DeviceChild implements Hashable {
       _status &= ~StatusDirty;
     }
   }
-  bool get dirty() => (_status & StatusDirty) != 0;
+  bool get dirty => (_status & StatusDirty) != 0;
   void set ready(bool r) {
     if (r) {
       _status |= StatusReady;
@@ -24,7 +47,7 @@ class DeviceChild implements Hashable {
       _status &= ~StatusReady;
     }
   }
-  bool get ready() => (_status & StatusReady) != 0;
+  bool get ready => (_status & StatusReady) != 0;
 
   DeviceChild(this.name, this.device) {
     _status = 0;
@@ -33,15 +56,15 @@ class DeviceChild implements Hashable {
     dirty = false;
   }
 
-  int hashCode() {
-    return name.hashCode();
+  int get hashCode {
+    return name.hashCode;
   }
 
   bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
   }
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
   }
   void _destroyDeviceState() {
   }
@@ -108,9 +131,9 @@ class InputLayout extends DeviceChild {
     }
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
 
-    Dynamic o;
+    dynamic o;
 
     o = props['shaderProgram'];
     if (o != null && o is int) {
@@ -145,9 +168,9 @@ class Viewport extends DeviceChild {
   void _createDeviceState() {
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
       o = props['x'];
       x = o != null ? o : x;
       o = props['y'];
@@ -233,7 +256,7 @@ class BlendState extends DeviceChild {
   void _createDeviceState() {
   }
 
-  Dynamic filter(Dynamic o) {
+  dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
        "BlendSourceZero": WebGLRenderingContext.ZERO,
@@ -258,9 +281,9 @@ class BlendState extends DeviceChild {
     }
     return o;
   }
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
       o = props['blendColorRed'];
       blendColorRed = o != null ? filter(o) : blendColorRed;
       o = props['blendColorGreen'];
@@ -343,7 +366,7 @@ class DepthState extends DeviceChild {
   void _createDeviceState() {
   }
 
-  Dynamic filter(Dynamic o) {
+  dynamic filter(dynamic o) {
     if (o is String) {
       Map table = {
         "DepthComparisonOpNever": WebGLRenderingContext.NEVER,
@@ -359,9 +382,9 @@ class DepthState extends DeviceChild {
     }
     return o;
   }
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
 
       o = props['depthTestEnabled'];
       depthTestEnabled = o != null ? filter(o) : depthTestEnabled;
@@ -435,7 +458,7 @@ class RasterizerState extends DeviceChild {
 
   }
 
-  Dynamic filter(Dynamic o) {
+  dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
        "CullFront": WebGLRenderingContext.FRONT,
@@ -448,9 +471,9 @@ class RasterizerState extends DeviceChild {
     }
     return o;
   }
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
 
       o = props['cullEnabled'];
       cullEnabled = o != null ? filter(o) : cullEnabled;
@@ -478,22 +501,22 @@ class Shader extends DeviceChild {
     _shader = null;
   }
 
-  String get log() {
+  String get log {
     return device.gl.getShaderInfoLog(_shader);
   }
 
-  WebGLShader get shader() => this._shader;
+  WebGLShader get shader => this._shader;
 
   void set source(String s) {
     _source = s;
     device.gl.shaderSource(_shader, _source);
   }
 
-  String get source() {
+  String get source {
     return _source;
   }
 
-  bool get compiled() {
+  bool get compiled {
     if (_shader != null) {
       return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
     }
@@ -509,7 +532,7 @@ class Shader extends DeviceChild {
   }
 
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
   }
 
   void _destroyDeviceState() {
@@ -531,7 +554,7 @@ class VertexShader extends Shader {
   }
 
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
    super._configDeviceState(props);
   }
 
@@ -553,7 +576,7 @@ class FragmentShader extends Shader {
   }
 
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
    super._configDeviceState(props);
   }
 
@@ -600,9 +623,9 @@ class ShaderProgram extends DeviceChild {
     }
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
       o = props['VertexProgram'];
       if (o != null && o is int) {
         _detach(vertexShaderHandle);
@@ -679,7 +702,7 @@ class ShaderProgram extends DeviceChild {
     }
   }
 
-  bool get linked() {
+  bool get linked {
     if (_program != null) {
       return device.gl.getProgramParameter(_program, WebGLRenderingContext.LINK_STATUS);
     }
@@ -733,7 +756,7 @@ class RenderBuffer extends DeviceChild {
     device.gl.deleteRenderbuffer(_buffer);
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     _target = WebGLRenderingContext.RENDERBUFFER;
     String format = props['format'];
     switch (format) {
@@ -784,7 +807,7 @@ class Texture extends DeviceChild {
     _buffer = device.gl.createTexture();
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
 
   }
 
@@ -811,7 +834,7 @@ class Texture2D extends Texture {
     super._createDeviceState();
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
 
     if (props != null && props['pixels'] != null) {
@@ -876,7 +899,7 @@ class SamplerState extends DeviceChild {
     super._createDeviceState();
   }
 
-  Dynamic filter(Dynamic o) {
+  dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
         "TextureWrapClampToEdge": WebGLRenderingContext.CLAMP_TO_EDGE,
@@ -896,9 +919,9 @@ class SamplerState extends DeviceChild {
     return o;
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     if (props != null) {
-      Dynamic o;
+      dynamic o;
       o = props['wrapS'];
       _wrapS = o != null ? filter(o) : _wrapS;
       o = props['wrapT'];
@@ -930,7 +953,7 @@ class RenderTarget extends DeviceChild {
     _buffer = device.gl.createFramebuffer();
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     int colorHandle = props['color0'] != null ? props['color0'] : 0;
     int colorType = Handle.getType(colorHandle);
     int depthHandle = props['depth'] != null ? props['depth'] : 0;
@@ -997,11 +1020,11 @@ class SpectreBuffer extends DeviceChild {
     _usage = WebGLRenderingContext.DYNAMIC_DRAW;
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
 
     if (props != null) {
-      Dynamic o;
+      dynamic o;
       o = props['usage'];
       if (o != null && o is String) {
         switch (o) {
@@ -1049,7 +1072,7 @@ class IndexBuffer extends SpectreBuffer {
     super._createDeviceState();
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
   }
 
@@ -1071,7 +1094,7 @@ class VertexBuffer extends SpectreBuffer {
     super._createDeviceState();
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
 
   }
@@ -1100,10 +1123,10 @@ class IndexedMesh extends DeviceChild {
     indexArrayHandle = device.createIndexBuffer('${name}.index', {});
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
     if (props != null) {
-      Dynamic o;
+      dynamic o;
 
       o = props['UpdateFromMeshResource'];
       if (o != null && o is Map) {
@@ -1178,10 +1201,10 @@ class ArrayMesh extends DeviceChild {
     vertexArrayHandle = device.createVertexBuffer('${name}.array', {});
   }
 
-  void _configDeviceState(Dynamic props) {
+  void _configDeviceState(dynamic props) {
     super._configDeviceState(props);
     if (props != null) {
-      Dynamic o;
+      dynamic o;
 
       /* TODO
       o = props['UpdateFromArray'];
