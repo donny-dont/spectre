@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -855,6 +857,7 @@ class Texture2D extends Texture {
       WebGLTexture oldBind = device.gl.getParameter(_target_param);
       device.gl.bindTexture(_target, _buffer);
       // Allocate memory for texture
+      device.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1);
       device.gl.texImage2D(_target, 0, _textureFormat, _width, _height, 0, _textureFormat, _pixelFormat, null);
       device.gl.bindTexture(_target, oldBind);
     }

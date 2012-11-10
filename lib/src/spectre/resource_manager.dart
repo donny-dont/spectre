@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -34,12 +36,12 @@ class ResourceManager {
 
   Map<String, int> _urlToHandle;
 
-  ResourceManager() {
-    _handleSystem = new HandleSystem(MaxResources, MaxStaticResources);
-    _resources = new List(MaxResources);
-    _urlToHandle = new Map<String, int>();
-    _loaders = new ResourceLoaders();
-  }
+  ResourceManager()
+    : _loaders = new ResourceLoaders()
+    , _handleSystem = new HandleSystem(MaxResources, MaxStaticResources)
+    , _resources = new List(MaxResources)
+    , _baseURL = ''
+    , _urlToHandle = new Map<String, int>();
 
   void setBaseURL(String baseURL) {
     _baseURL = baseURL;

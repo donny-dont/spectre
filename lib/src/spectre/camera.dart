@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
