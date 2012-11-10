@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -35,7 +37,7 @@ abstract class _ResourceLoader {
     return false;
   }
 
-  abstract Future<_ResourceLoaderResult> load(String url);
+  Future<_ResourceLoaderResult> load(String url);
 
   dynamic createResource(String URL, ResourceManager rm) {
     return null;
