@@ -23,100 +23,40 @@ part of spectre;
 */
 
 class ResourceManager {
-  static final int MaxResources = 2048;
-  static final int MaxStaticResources = 512;
-  static final int ResourceType = 0x1;
-
   ResourceLoaders _loaders;
 
-  HandleSystem _handleSystem;
-  List<ResourceBase> _resources;
+  Set<ResourceBase> _resources;
+  Map<String, ResourceBase> _urlToHandle;
 
   String _baseURL;
 
-  Map<String, int> _urlToHandle;
-
   ResourceManager()
     : _loaders = new ResourceLoaders()
-    , _handleSystem = new HandleSystem(MaxResources, MaxStaticResources)
-    , _resources = new List(MaxResources)
+    , _resources = new Set<ResourceBase>()
     , _baseURL = ''
-    , _urlToHandle = new Map<String, int>();
+    , _urlToHandle = new Map<String, ResourceBase>();
 
   void setBaseURL(String baseURL) {
     _baseURL = baseURL;
   }
 
-  Map<String, int> get children => _urlToHandle;
+  Map<String, ResourceBase> get children => _urlToHandle;
 
-  ResourceBase getResource(int handle) {
-    if (handle == 0) {
-      return null;
-    }
-    if (_handleSystem.validHandle(handle) == false) {
-      spectreLog.Warning('getResource - $handle is not a valid handle');
-      return null;
-    }
-    int index = Handle.getIndex(handle);
-    return _resources[index];
+  ResourceBase getResource(String url) {
+    return _urlToHandle[url];
   }
 
-  String getResourceURL(int handle) {
-    ResourceBase rb = getResource(handle);
-    if (rb != null) {
-      return rb.url;
-    }
-    return null;
+  bool registerDynamicResource(ResourceBase resource) {
+    _resources.add(resource);
+    _urlToHandle[resource.url] = resource;
+    return true;
   }
 
-  int getResourceHandle(String url) {
-    int handle = _urlToHandle[url];
-    if (handle == null) {
-      return Handle.BadHandle;
-    }
-    return handle;
-  }
-
-  int registerDynamicResource(ResourceBase resource, [int handle = Handle.BadHandle]) {
+  ResourceBase registerResource(String url) {
     {
       // Resource already exists
-      int existingHandle = getResourceHandle(resource.url);
-      if (existingHandle != Handle.BadHandle) {
-        return existingHandle;
-      }
-    }
-
-    if (handle != Handle.BadHandle) {
-      // Static handle
-      int r = _handleSystem.setStaticHandle(handle);
-      if (r != handle) {
-        spectreLog.Error('Registering a static handle $handle failed.');
-        return Handle.BadHandle;
-      }
-    } else {
-      // Dynamic handle
-      handle = _handleSystem.allocateHandle(ResourceType);
-      if (handle == Handle.BadHandle) {
-        spectreLog.Error('Registering dynamic handle failed.');
-        return Handle.BadHandle;
-      }
-    }
-    assert(_handleSystem.validHandle(handle));
-
-    int index = Handle.getIndex(handle);
-    // Nothing is at this index
-    assert(_resources[index] == null);
-
-    _resources[index] = resource;
-    _urlToHandle[resource.url] = handle;
-    return handle;
-  }
-
-  int registerResource(String url, [int handle = Handle.BadHandle]) {
-    {
-      // Resource already exists
-      int existingHandle = getResourceHandle(url);
-      if (existingHandle != Handle.BadHandle) {
+      ResourceBase existingHandle = getResource(url);
+      if (existingHandle != null) {
         print('RR: $url $existingHandle');
         return existingHandle;
       }
@@ -125,68 +65,30 @@ class ResourceManager {
     _ResourceLoader rl = _loaders.findResourceLoader(url);
     if (rl == null) {
       spectreLog.Error('Resource Manager cannot load $url.');
-      return Handle.BadHandle;
+      return null;
     }
 
     ResourceBase rb = rl.createResource(url, this);
 
-    if (handle != Handle.BadHandle) {
-      // Static handle
-      int r = _handleSystem.setStaticHandle(handle);
-      if (r != handle) {
-        spectreLog.Error('Registering a static handle $handle failed.');
-        return Handle.BadHandle;
-      }
-    } else {
-      // Dynamic handle
-      handle = _handleSystem.allocateHandle(ResourceType);
-      if (handle == Handle.BadHandle) {
-        spectreLog.Error('Registering dynamic handle failed.');
-        return Handle.BadHandle;
-      }
-    }
-    assert(_handleSystem.validHandle(handle));
-
-    int index = Handle.getIndex(handle);
-    // Nothing is at this index
-    assert(_resources[index] == null);
-
-    _resources[index] = rb;
-    _urlToHandle[url] = handle;
+    _resources.add(rb);
+    _urlToHandle[url] = rb;
     //print('RR: $url $handle');
-    return handle;
+    return rb;
   }
 
-  bool deregisterResource(int handle) {
-    if (handle == 0) {
-      return true;
-    }
-    if (_handleSystem.validHandle(handle) == false) {
-      spectreLog.Warning('deregisterResource - $handle is not a valid handle');
-      return false;
-    }
-    int index = Handle.getIndex(handle);
-    ResourceBase rb = _resources[index];
+  bool deregisterResource(ResourceBase rb) {
     if (rb != null) {
       _urlToHandle.remove(rb.url);
-      print('Removing ${rb.url} $handle');
+      print('Removing ${rb.url}');
       rb.unload();
       rb.deregister();
+      _resources.remove(rb);
+      return true;
     }
-    _resources[index] = null;
-    _handleSystem.freeHandle(handle);
+    return false;
   }
 
-  void updateResource(int handle, dynamic state) {
-    if (handle == 0) {
-      return;
-    }
-    if (_handleSystem.validHandle(handle) == false) {
-      spectreLog.Warning('updateResource - $handle is not a valid handle');
-      return;
-    }
-    int index = Handle.getIndex(handle);
-    ResourceBase rb = _resources[index];
+  void updateResource(ResourceBase rb, dynamic state) {
     if (state is String) {
       state = JSON.parse(state);
     }
@@ -199,9 +101,8 @@ class ResourceManager {
     }
   }
 
-  /// Load the resource [handle]. Can be called again to reload.
-  Future<int> loadResource(int handle, [bool force=true]) {
-    ResourceBase rb = getResource(handle);
+  /// Load the resource [rb]. Can be called again to reload.
+  Future<ResourceBase> loadResource(ResourceBase rb, [bool force=true]) {
     if (rb == null) {
       return null;
     }
@@ -209,10 +110,10 @@ class ResourceManager {
     if (rl == null) {
       return null;
     }
-    Completer<int> completer = new Completer<int>();
+    Completer<ResourceBase> completer = new Completer<ResourceBase>();
     if (rb.isLoaded && force == false) {
       // Skip load
-      completer.complete(handle);
+      completer.complete(rb);
     } else {
       // Start the load...
       rl.load('$_baseURL${rb.url}').then((result) {
@@ -220,7 +121,7 @@ class ResourceManager {
         // Set the resource handle
         // The resource class is responsible for completing the load
         //
-        result.handle = handle;
+        result.handle = rb;
         result.completer = completer;
         rb.load(result);
       });
@@ -228,15 +129,10 @@ class ResourceManager {
     return completer.future;
   }
 
-  Future<bool> loadResources(Collection<int> handles, [bool force=true]) {
+  Future<bool> loadResources(Collection<ResourceBase> handles, [bool force=true]) {
     List<Future<int>> futures = new List<Future<int>>();
     handles.forEach((handle) {
       var r = loadResource(handle, force);
-      if (r == null) {
-        int index = Handle.getIndex(handle);
-        print('Load resource invalid handle $handle $index');
-        return;
-      }
       futures.add(r);
     });
     Future<List> allFutures = Futures.wait(futures);
@@ -248,34 +144,23 @@ class ResourceManager {
   }
 
   /// Unload the resource [handle]. [handle] remains registered and can be reloaded.
-  void unloadResource(int handle) {
-    if (handle == 0) {
-      return;
-    }
-    if (_handleSystem.validHandle(handle) == false) {
-      spectreLog.Warning('deregisterHandle - $handle is not a valid handle');
-      return;
-    }
-    int index = Handle.getIndex(handle);
-    if (_resources[index] != null) {
-      _resources[index].unload();
-    }
+  void unloadResource(ResourceBase rb) {
+    rb.unload();
   }
 
-  void batchUnload(List<int> handles) {
-    for (int h in handles) {
+  void batchUnload(List<ResourceBase> handles) {
+    for (ResourceBase h in handles) {
       unloadResource(h);
     }
   }
 
-  void batchDeregister(List<int> handles) {
-    for (int h in handles) {
+  void batchDeregister(List<ResourceBase> handles) {
+    for (ResourceBase h in handles) {
       deregisterResource(h);
     }
   }
 
-  int addEventCallback(int resourceHandle, int eventType, ResourceEventCallback callback) {
-    ResourceBase rb = getResource(resourceHandle);
+  int addEventCallback(ResourceBase rb, int eventType, ResourceEventCallback callback) {
     if (rb == null) {
       return 0;
     }
@@ -287,8 +172,7 @@ class ResourceManager {
     return 0;
   }
 
-  void removeEventCallback(int resourceHandle, int eventType, int id) {
-    ResourceBase rb = getResource(resourceHandle);
+  void removeEventCallback(ResourceBase rb, int eventType, int id) {
     if (rb == null) {
       return;
     }

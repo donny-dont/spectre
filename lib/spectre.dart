@@ -27,7 +27,6 @@ library spectre;
 import 'dart:html';
 import 'dart:json';
 import 'package:vector_math/vector_math_browser.dart';
-import 'package:handle_system/handle_system.dart';
 import 'package:marker_prof/profiler.dart';
 
 part 'src/spectre/logger.dart';

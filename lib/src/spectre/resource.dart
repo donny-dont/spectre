@@ -370,9 +370,9 @@ class ImageResource extends ResourceBase {
 }
 
 class PackResource extends ResourceBase {
-  List<int> childResources;
+  List<ResourceBase> childResources;
   PackResource(String url, ResourceManager rm) : super(url, rm) {
-    childResources = new List<int>();
+    childResources = new List<ResourceBase>();
   }
 
   void load(_ResourceLoaderResult result) {
@@ -381,14 +381,14 @@ class PackResource extends ResourceBase {
       childResources.clear();
     }
     if (result.success) {
-      List<Future<int>> futures = new List<Future<int>>();
+      List<Future<ResourceBase>> futures = new List<Future<ResourceBase>>();
       if (result.data is String) {
         Map pack = JSON.parse(result.data);
         if (pack != null) {
           for (String url in pack['packContents']) {
-            int handle = _rm.registerResource(url);
+            ResourceBase handle = _rm.registerResource(url);
             childResources.add(handle);
-            if (handle != Handle.BadHandle) {
+            if (handle != null) {
               futures.add(_rm.loadResource(handle));
             }
           }

@@ -23,9 +23,9 @@ part of spectre_post;
 */
 
 class SpectrePostFragment extends SpectrePostPass {
-  final int shaderProgram;
+  final ShaderProgram shaderProgram;
   final List<InputElementDescription> elements;
-  int inputLayout;
+  InputLayout inputLayout;
   SpectrePostFragment(GraphicsDevice device,
                       String name,
                       this.shaderProgram,
@@ -42,8 +42,8 @@ class SpectrePostFragment extends SpectrePostPass {
   }
 
   void setup(GraphicsDevice device, Map<String, dynamic> args) {
-    List<int> textures = args['textures'];
-    List<int> samplers = args['samplers'];
+    List<Texture> textures = args['textures'];
+    List<SamplerState> samplers = args['samplers'];
     device.context.setTextures(0, textures);
     device.context.setSamplers(0, samplers);
     device.context.setShaderProgram(shaderProgram);

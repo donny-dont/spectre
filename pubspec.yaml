@@ -8,7 +8,5 @@ dependencies:
     sdk: unittest
   marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
-  handle_system:
-    git: https://github.com/johnmccutchan/handlesystem.git
   vector_math:
     git: https://github.com/johnmccutchan/DartVectorMath.git

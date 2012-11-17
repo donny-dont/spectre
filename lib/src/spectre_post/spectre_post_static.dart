@@ -25,11 +25,11 @@ part of spectre_post;
 class SpectrePost {
   static GraphicsDevice _device = null;
   static Map<String, SpectrePostPass> _passes = null;
-  static int _rasterizerState = null;
-  static int _depthState = null;
-  static int _blendState = null;
-  static int vertexBuffer = null;
-  static int vertexShader = null;
+  static RasterizerState _rasterizerState = null;
+  static DepthState _depthState = null;
+  static BlendState _blendState = null;
+  static VertexBuffer vertexBuffer = null;
+  static VertexShader vertexShader = null;
   static List<InputElementDescription> elements  = null;
 
   static void init(GraphicsDevice device) {
@@ -97,8 +97,7 @@ class SpectrePost {
         'usage': 'static'
       });
       _device.context.updateBuffer(vertexBuffer, verts);
-      vertexShader = _device.createVertexShader('SpectrePost.VS', {});
-      VertexShader vs = _device.getDeviceChild(vertexShader);
+      VertexShader vs = _device.createVertexShader('SpectrePost.VS', {});
       _device.context.compileShader(vertexShader, '''
 precision highp float;
 
@@ -190,9 +189,9 @@ void main() {
       spectreLog.Error('Attempt to add pass that already eists- $name');
       return;
     }
-    int fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
+    FragmentShader fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
     _device.context.compileShader(fragmentShader, fragmentSource);
-    int passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
+    ShaderProgram passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
       'VertexProgram': vertexShader,
       'FragmentProgram': fragmentShader
     });
@@ -208,7 +207,7 @@ void main() {
     }
   }
 
-  static void pass(String name, int renderTargetHandle, Map<String, dynamic> arguments) {
+  static void pass(String name, RenderTarget renderTargetHandle, Map<String, dynamic> arguments) {
     SpectrePostPass pass = _passes[name];
     if (pass == null) {
       spectreLog.Error('Post process $name does not exist. Cannot do pass.');
@@ -216,7 +215,7 @@ void main() {
     }
     pass.setup(_device, arguments);
     _device.context.setVertexBuffers(0, [vertexBuffer]);
-    _device.context.setIndexBuffer(0);
+    _device.context.setIndexBuffer(null);
     _device.context.setRasterizerState(_rasterizerState);
     _device.context.setDepthState(_depthState);
     _device.context.setBlendState(_blendState);

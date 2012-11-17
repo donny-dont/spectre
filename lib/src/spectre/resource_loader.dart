@@ -25,10 +25,10 @@ part of spectre;
 class _ResourceLoaderResult {
   bool success;
   dynamic data;
-  int handle;
-  Completer<int> completer;
+  ResourceBase handle;
+  Completer<ResourceBase> completer;
   _ResourceLoaderResult(this.success, this.data) {
-    handle = 0;
+    handle = null;
   }
 }
 

@@ -10,7 +10,7 @@ GraphicsContext _graphicsContext;
 ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
 
-int _viewport;
+Viewport _viewport;
 Camera _camera;
 double _lastTime;
 bool _circleDrawn = false;
@@ -64,7 +64,7 @@ void resizeFrame(Event event) {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   // Adjust the viewport dimensions
-  Viewport vp = _graphicsDevice.getDeviceChild(_viewport);
+  Viewport vp = _viewport;
   vp.width = canvas.width;
   vp.height = canvas.height;
   // Fix the camera's aspect ratio

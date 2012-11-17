@@ -33,23 +33,23 @@ class GraphicsContext {
   GraphicsDevice _device;
   // Input Assembler
   int _primitiveTopology;
-  int _indexBufferHandle;
-  List<int> _vertexBufferHandles;
+  IndexBuffer _indexBufferHandle;
+  List<VertexBuffer> _vertexBufferHandles;
   List<int> _enabledVertexAttributeArrays;
-  int _inputLayoutHandle;
-  int _preparedInputLayoutHandle;
+  InputLayout _inputLayoutHandle;
+  InputLayout _preparedInputLayoutHandle;
   // VS and PS stages
-  int _shaderProgramHandle;
-  List<int> _samplerStateHandles;
-  List<int> _textureHandles;
+  ShaderProgram _shaderProgramHandle;
+  List<SamplerState> _samplerStateHandles;
+  List<Texture> _textureHandles;
   // Rasterizer
-  int _rasterizerStateHandle;
-  int _viewportHandle;
+  RasterizerState _rasterizerStateHandle;
+  Viewport _viewportHandle;
   // Output-Merger
-  int _blendStateHandle;
-  int _depthStateHandle;
-  int _stencilStateHandle;
-  int _renderTargetHandle;
+  BlendState _blendStateHandle;
+  DepthState _depthStateHandle;
+  StencilState _stencilStateHandle;
+  RenderTarget _renderTargetHandle;
 
   void _PrepareTextures() {
   }
@@ -70,7 +70,7 @@ class GraphicsContext {
       return;
     }
 
-    InputLayout inputLayout = _device.getDeviceChild(_inputLayoutHandle);
+    InputLayout inputLayout = _inputLayoutHandle;
     if (inputLayout == null) {
       spectreLog.Error('Prepare for draw no input layout.');
       return;
@@ -96,7 +96,7 @@ class GraphicsContext {
     }
 
     for (var element in inputLayout._elements) {
-      VertexBuffer vb = _device.getDeviceChild(_vertexBufferHandles[element._vboSlot]);
+      VertexBuffer vb = _vertexBufferHandles[element._vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
         continue;
@@ -117,8 +117,8 @@ class GraphicsContext {
       //_device.gl.bindBuffer(vb._target, null);
 
     }
-    if (_indexBufferHandle != 0) {
-      IndexBuffer indexBuffer = _device.getDeviceChild(_indexBufferHandle);
+    if (_indexBufferHandle != null) {
+      IndexBuffer indexBuffer = _indexBufferHandle;
       _device.gl.bindBuffer(indexBuffer._target, indexBuffer._buffer);
       if (debug) {
         print('Binding index buffer');
@@ -134,8 +134,8 @@ class GraphicsContext {
   void _prepareTextures() {
     // TODO: Need to unbind unused texture channels
     for (int i = 0; i < numTextures; i++) {
-      SamplerState s = _device.getDeviceChild(_samplerStateHandles[i]);
-      Texture t = _device.getDeviceChild(_textureHandles[i]);
+      SamplerState s = _samplerStateHandles[i];
+      Texture t = _textureHandles[i];
       if (s == null || t == null) {
         continue;
       }
@@ -150,9 +150,9 @@ class GraphicsContext {
 
   GraphicsContext(GraphicsDevice device) {
     _device = device;
-    _vertexBufferHandles = new List<int>(numVertexBuffers);
-    _samplerStateHandles = new List<int>(numTextures);
-    _textureHandles = new List<int>(numTextures);
+    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
+    _samplerStateHandles = new List<SamplerState>(numTextures);
+    _textureHandles = new List<Texture>(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
   }
 
@@ -166,24 +166,24 @@ class GraphicsContext {
       }
       _device.gl.disableVertexAttribArray(index);
     }
-    _preparedInputLayoutHandle = 0;
+    _preparedInputLayoutHandle = null;
     _enabledVertexAttributeArrays.clear();
-    _indexBufferHandle = 0;
+    _indexBufferHandle = null;
     for (int i = 0; i < numVertexBuffers; i++) {
-      _vertexBufferHandles[i] = 0;
+      _vertexBufferHandles[i] = null;
     }
-    _inputLayoutHandle = 0;
-    _shaderProgramHandle = 0;
+    _inputLayoutHandle = null;
+    _shaderProgramHandle = null;
     for (int i = 0; i < numTextures; i++) {
-      _samplerStateHandles[i] = 0;
-      _textureHandles[i] = 0;
+      _samplerStateHandles[i] = null;
+      _textureHandles[i] = null;
     }
-    _rasterizerStateHandle = 0;
-    _viewportHandle = 0;
-    _blendStateHandle = 0;
-    _depthStateHandle = 0;
-    _stencilStateHandle = 0;
-    _renderTargetHandle = 0;
+    _rasterizerStateHandle = null;
+    _viewportHandle = null;
+    _blendStateHandle = null;
+    _depthStateHandle = null;
+    _stencilStateHandle = null;
+    _renderTargetHandle = null;
   }
 
   /// Configure the primitive topology
@@ -192,12 +192,12 @@ class GraphicsContext {
   }
 
   /// Set the IndexBuffer to [indexBufferHandle]
-  void setIndexBuffer(int indexBufferHandle) {
+  void setIndexBuffer(IndexBuffer indexBufferHandle) {
     _indexBufferHandle = indexBufferHandle;
   }
 
   /// Set multiple VertexBuffers in [vertexBufferHandles] starting at [startSlot]
-  void setVertexBuffers(int startSlot, List<int> vertexBufferHandles) {
+  void setVertexBuffers(int startSlot, List<VertexBuffer> vertexBufferHandles) {
     int limit = vertexBufferHandles.length + startSlot;
     for (int i = startSlot; i < limit; i++) {
       _vertexBufferHandles[i] = vertexBufferHandles[i-startSlot];
@@ -205,36 +205,35 @@ class GraphicsContext {
   }
 
   /// Set InputLayout to [inputLayoutHandle]
-  void setInputLayout(int inputLayoutHandle) {
+  void setInputLayout(InputLayout inputLayoutHandle) {
     _inputLayoutHandle = inputLayoutHandle;
   }
 
-  void setIndexedMesh(int indexedMeshHandle) {
-    IndexedMesh im = _device.getDeviceChild(indexedMeshHandle);
+  void setIndexedMesh(IndexedMesh im) {
     if (im == null) {
       return;
     }
-    setIndexBuffer(im.indexArrayHandle);
-    setVertexBuffers(0, [im.vertexArrayHandle]);
+    setIndexBuffer(im.indexArray);
+    setVertexBuffers(0, [im.vertexArray]);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
-  void setShaderProgram(int shaderProgramHandle) {
+  void setShaderProgram(ShaderProgram shaderProgramHandle) {
     if (_shaderProgramHandle == shaderProgramHandle) {
       return;
     }
     _shaderProgramHandle = shaderProgramHandle;
-    ShaderProgram sp = _device.getDeviceChild(shaderProgramHandle);
+    ShaderProgram sp = shaderProgramHandle;
     _device.gl.useProgram(sp._program);
   }
 
   /// Set RasterizerState to [rasterizerStateHandle]
-  void setRasterizerState(int rasterizerStateHandle) {
+  void setRasterizerState(RasterizerState rasterizerStateHandle) {
     if (_rasterizerStateHandle == rasterizerStateHandle) {
       return;
     }
     _rasterizerStateHandle = rasterizerStateHandle;
-    RasterizerState rs = _device.getDeviceChild(rasterizerStateHandle);
+    RasterizerState rs = rasterizerStateHandle;
     if (rs == null) {
       return;
     }
@@ -249,11 +248,11 @@ class GraphicsContext {
   }
 
   /// Set Viewport to [viewportHandle]
-  void setViewport(int viewportHandle) {
-    if (_viewportHandle == viewportHandle) {
+  void setViewport(Viewport vp) {
+    if (_viewportHandle == _viewportHandle) {
       return;
     }
-    Viewport vp = _device.getDeviceChild(viewportHandle);
+    _viewportHandle = _viewportHandle;
     if (vp == null) {
       return;
     }
@@ -261,11 +260,11 @@ class GraphicsContext {
   }
 
   /// Set BlendState to [blendStateHandle]
-  void setBlendState(int blendStateHandle) {
-    if (_blendStateHandle == blendStateHandle) {
+  void setBlendState(BlendState bs) {
+    if (_blendStateHandle == bs) {
       return;
     }
-    BlendState bs = _device.getDeviceChild(blendStateHandle);
+    _blendStateHandle = bs;
     if (bs == null) {
       return;
     }
@@ -282,11 +281,10 @@ class GraphicsContext {
   }
 
   /// Set DepthState to [depthStateHandle]
-  void setDepthState(int depthStateHandle) {
-    if (_depthStateHandle == depthStateHandle) {
+  void setDepthState(DepthState ds) {
+    if (_depthStateHandle == ds) {
       return;
     }
-    DepthState ds = _device.getDeviceChild(depthStateHandle);
     if (ds == null) {
       return;
     }
@@ -309,22 +307,22 @@ class GraphicsContext {
   }
 
   /// Set RenderTarget to [renderTargetHandle]
-  void setRenderTarget(int renderTargetHandle) {
+  void setRenderTarget(RenderTarget renderTargetHandle) {
     if (_renderTargetHandle == renderTargetHandle) {
       return;
     }
     _renderTargetHandle = renderTargetHandle;
-    if (_renderTargetHandle == 0) {
+    if (_renderTargetHandle == null) {
       _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
     } else {
-      RenderTarget rt = _device.getDeviceChild(renderTargetHandle);
+      RenderTarget rt = renderTargetHandle;
       _device.gl.bindFramebuffer(rt._target, rt._buffer);
     }
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform2f(String name, num v0, num v1) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -339,7 +337,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -354,7 +352,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform4f(String name, num v0, num v1, num v2, num v3) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -369,7 +367,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -384,7 +382,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformInt(String name, int i) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -399,7 +397,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformNum(String name, num i) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -414,7 +412,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -429,7 +427,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector4(String name, Float32Array vector) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -444,7 +442,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector3(String name, Float32Array vector) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -459,7 +457,7 @@ class GraphicsContext {
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector2(String name, Float32Array vector) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -474,7 +472,7 @@ class GraphicsContext {
 
 
   void setUniformFloat4Array(String name, Float32Array array) {
-    ShaderProgram sp = _device.getDeviceChild(_shaderProgramHandle);
+    ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
       spectreLog.Error('Attempting to set uniform with invalid program bound.');
       return;
@@ -488,10 +486,8 @@ class GraphicsContext {
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data]
-  void updateBuffer(int bufferHandle, ArrayBufferView data, [int usage = null]) {
-    SpectreBuffer buffer = _device.getDeviceChild(bufferHandle);
-    var correctType = buffer is SpectreBuffer;
-    if (correctType == false) {
+  void updateBuffer(SpectreBuffer buffer, ArrayBufferView data, [int usage = null]) {
+    if (buffer == null) {
       return;
     }
     var target = buffer._target;
@@ -502,10 +498,8 @@ class GraphicsContext {
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
-  void updateSubBuffer(int bufferHandle, ArrayBufferView data, num offset) {
-    SpectreBuffer buffer = _device.getDeviceChild(bufferHandle);
-    var correctType = buffer is SpectreBuffer;
-    if (correctType == false) {
+  void updateSubBuffer(SpectreBuffer buffer, ArrayBufferView data, num offset) {
+    if (buffer == null) {
       return;
     }
     var target = buffer._target;
@@ -518,12 +512,10 @@ class GraphicsContext {
   /// Update the pixels of [textureHandle] from the [imageResourceHandle]
   ///
   /// Only updates the top level mip map
-  void updateTexture2DFromResource(int textureHandle, int imageResourceHandle, ResourceManager rm) {
-    ImageResource ir = rm.getResource(imageResourceHandle);
+  void updateTexture2DFromResource(Texture2D tex, ImageResource ir, ResourceManager rm) {
     if (ir == null) {
       return;
     }
-    Texture2D tex = _device.getDeviceChild(textureHandle, true);
     if (tex == null) {
       return;
     }
@@ -535,8 +527,7 @@ class GraphicsContext {
   }
 
   /// Generate the full mipmap pyramid for [textureHandle]
-  void generateMipmap(int textureHandle) {
-    Texture2D tex = _device.getDeviceChild(textureHandle, true);
+  void generateMipmap(Texture2D tex) {
     if (tex == null) {
       return;
     }
@@ -548,8 +539,10 @@ class GraphicsContext {
     tex.ready = true;
   }
 
-  void compileShader(int shaderHandle, String source) {
-    Shader shader = _device.getDeviceChild(shaderHandle);
+  void compileShader(Shader shader, String source) {
+    if (shader == null) {
+      return;
+    }
     shader.source = source;
     shader.compile();
     String shaderCompileLog = _device.gl.getShaderInfoLog(shader._shader);
@@ -571,32 +564,28 @@ class GraphicsContext {
     _device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
   }
 
-  void compileShaderFromResource(int shaderHandle, int shaderSourceHandle, ResourceManager rm) {
-    ShaderResource sr = rm.getResource(shaderSourceHandle);
+  void compileShaderFromResource(Shader shader, ShaderResource sr, ResourceManager rm) {
     if (sr == null) {
       return;
     }
-    compileShader(shaderHandle, sr.source);
+    compileShader(shader, sr.source);
   }
 
-  void linkShaderProgram(int shaderProgramHandle, int vertexShaderHandle, int fragmentShaderHandle) {
-    ShaderProgram sp = _device.getDeviceChild(shaderProgramHandle);
-    VertexShader vs = _device.getDeviceChild(vertexShaderHandle);
-    FragmentShader fs = _device.getDeviceChild(fragmentShaderHandle);
+  void linkShaderProgram(ShaderProgram sp, VertexShader vs, FragmentShader fs) {
     _device.gl.attachShader(sp._program, vs._shader);
     _device.gl.attachShader(sp._program, fs._shader);
     sp.link();
   }
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
-  void setTextures(int texUnitOffset, List<int> textureHandles) {
+  void setTextures(int texUnitOffset, List<Texture> textureHandles) {
     for (int i = texUnitOffset; i < textureHandles.length; i++) {
       _textureHandles[i] = textureHandles[i-texUnitOffset];
     }
   }
 
   /// Sets a list of [samplerHandles] starting at [texUnitOffset]
-  void setSamplers(int texUnitOffset, List<int> samplerHandles) {
+  void setSamplers(int texUnitOffset, List<SamplerState> samplerHandles) {
     for (int i = texUnitOffset; i < samplerHandles.length; i++) {
       _samplerStateHandles[i] = samplerHandles[i-texUnitOffset];
     }
@@ -612,8 +601,7 @@ class GraphicsContext {
     _device.gl.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
   }
 
-  void drawIndexedMesh(int indexedMeshHandle) {
-    IndexedMesh im = _device.getDeviceChild(indexedMeshHandle);
+  void drawIndexedMesh(IndexedMesh im) {
     if (im == null) {
       return;
     }
