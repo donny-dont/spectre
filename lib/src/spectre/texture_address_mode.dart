@@ -21,7 +21,7 @@ class TextureAddressMode
   ///
   /// For example, for u values between 0 and 3, the texture is repeated three times;
   /// no mirroring is performed.
-  static const int wrap = WebGLRenderingContext.WRAP;
+  static const int wrap = WebGLRenderingContext.REPEAT;
   /// String representation of [wrap'.
   static const String wrapName = 'TextureAddressMode.wrap';
 
