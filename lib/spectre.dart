@@ -45,6 +45,7 @@ part 'src/spectre/debug_draw_manager.dart';
 part 'src/spectre/camera.dart';
 part 'src/spectre/camera_controller.dart';
 part 'src/spectre/mouse_keyboard_camera_controller.dart';
+part 'src/spectre/texture_address_mode.dart';
 
 // We have a single logger
 Logger spectreLog;
