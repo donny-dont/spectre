@@ -152,6 +152,27 @@ class GraphicsDeviceCapabilities {
     }
   }
 
+  /// The graphics card vendor
+  String get vendor => _vendor;
+  /// The renderer
+  String get renderer => _renderer;
+  /// The number of texture units available.
+  int get textureUnits => _textureUnits;
+  /// The number of texture units available in the vertex shader
+  int get vertexShaderTextureUnits => _vertexShaderTextureUnits;
+  /// The largest texture size available.
+  int get maxTextureSize => _maxTextureSize;
+  /// The largest cube map texture size available.
+  int get maxCubeMapTextureSize => _maxCubeMapTextureSize;
+  /// Maximum number of vertex attributes available.
+  int get maxVertexAttribs => _maxVertexAttribs;
+  /// Maximum number of varying vectors available in the shader program.
+  int get maxVaryingVectors => _maxVaryingVectors;
+  /// Maximum number of uniforms available in the vertex shader.
+  int get maxVertexShaderUniforms => _maxVertexShaderUniforms;
+  /// Maximum number of uniforms available in the fragment shader.
+  int get maxFragmentShaderUniforms => _maxFragmentShaderUniforms;
+
   /// Whether floating point textures are available.
   bool get hasFloatTextures => _floatTextures;
   /// Whether half-floating point textures are available.
