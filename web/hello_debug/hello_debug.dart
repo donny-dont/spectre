@@ -84,6 +84,8 @@ main() {
   initSpectre();
   // Create a GraphicsDevice
   _graphicsDevice = new GraphicsDevice(gl);
+  // Print out GraphicsDeviceCapabilities
+  print(_graphicsDevice.capabilities);
   // Get a reference to the GraphicsContext
   _graphicsContext = _graphicsDevice.context;
   // Create a resource manager and set it's base URL
