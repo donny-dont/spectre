@@ -90,6 +90,22 @@ class _DebugLineCollection {
     lineObject.vertexStream = null;
     _freeLineObjects.add(lineObject);
   }
+
+  void update(num dt) {
+    Profiler.enter('update');
+    for (int i = _lineObjects.length-1; i >= 0; i--) {
+      _DebugLineObject lineObject = _lineObjects[i];
+      lineObject.duration -= dt;
+      if (lineObject.duration < 0.0) {
+        freeLineObject(lineObject);
+        int last = _lineObjects.length-1;
+        // Copy last over
+        _lineObjects[i] = _lineObjects[last];
+        _lineObjects.removeLast();
+      }
+    }
+    Profiler.exit();
+  }
 }
 
 class _DebugDrawLineManager {
@@ -134,23 +150,6 @@ class _DebugDrawLineManager {
   }
 
   int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
-
-  void update(num dt) {
-    Profiler.enter('update');
-    List<_DebugLineObject> lineObjects = _lines._lineObjects;
-    for (int i = lineObjects.length-1; i >= 0; i--) {
-      _DebugLineObject lineObject = lineObjects[i];
-      lineObject.duration -= dt;
-      if (lineObject.duration < 0.0) {
-        _lines.freeLineObject(lineObject);
-        int last = lineObjects.length-1;
-        // Copy last over
-        lineObjects[i] = lineObjects[last];
-        lineObjects.removeLast();
-      }
-    }
-    Profiler.exit();
-  }
 }
 
 class _DebugDrawSphere {
@@ -419,6 +418,17 @@ class DebugDrawManager {
     }
   }
 
+  void _addLineRaw(double sx, double sy, double sz,
+                   double fx, double fy, double fz, bool depthEnabled) {
+    if (depthEnabled) {
+      _depthEnabledLines._lines.addVertex(fx, fy, fz);
+      _depthEnabledLines._lines.addVertex(sx, sy, sz);
+    } else {
+      _depthDisabledLines._lines.addVertex(fx, fy, fz);
+      _depthDisabledLines._lines.addVertex(sx, sy, sz);
+    }
+  }
+
   /// Add a line segment from [start] to [finish] with [color]
   ///
   /// Options: [duration] and [depthEnabled]
@@ -474,7 +484,9 @@ class DebugDrawManager {
     num twoPi = (2.0 * 3.141592653589793238462643);
     num _step = twoPi/numSegments;
 
-    vec3 last = center + _circle_u * radius;
+    double lastX = center.x + _circle_u.x * radius;
+    double lastY = center.y + _circle_u.y * radius;
+    double lastZ = center.z + _circle_u.z * radius;
 
     if (depthEnabled) {
       _depthEnabledLines._lines.startLineObject(color.r, color.g, color.b, color.a, duration);
@@ -483,11 +495,20 @@ class DebugDrawManager {
     }
 
     for (alpha = _step; alpha <= twoPi; alpha += _step) {
-      vec3 p = center + (_circle_u * (radius * cos(alpha))) + (_circle_v * (radius * sin(alpha)));
-      _addLine(last, p, depthEnabled);
-      last = p;
+      double cosScale = cos(alpha) * radius;
+      double sinScale = sin(alpha) * radius;
+      double pX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
+      double pY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
+      double pZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
+      _addLineRaw(lastX, lastY, lastZ, pX, pY, pZ, depthEnabled);
+      lastX = pX;
+      lastY = pY;
+      lastZ = pZ;
     }
-    _addLine(last, center + _circle_u * radius, depthEnabled);
+    _addLineRaw(lastX, lastY, lastZ,
+                _circle_u.x * radius,
+                _circle_u.y * radius,
+                _circle_u.z * radius, depthEnabled);
   }
 
   /// Add a transformation (rotation & translation) from [xform]. Size is controlled with [size]
@@ -665,10 +686,10 @@ class DebugDrawManager {
     {
       Profiler.enter('lines');
       Profiler.enter('depth enabled');
-      _depthEnabledLines.update(seconds);
+      _depthEnabledLines._lines.update(seconds);
       Profiler.exit();
       Profiler.enter('depth disabled');
-      _depthDisabledLines.update(seconds);
+      _depthDisabledLines._lines.update(seconds);
       Profiler.exit();
       Profiler.exit();
     }
