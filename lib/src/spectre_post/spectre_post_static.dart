@@ -97,7 +97,7 @@ class SpectrePost {
         'usage': 'static'
       });
       _device.context.updateBuffer(vertexBuffer, verts);
-      VertexShader vs = _device.createVertexShader('SpectrePost.VS', {});
+      vertexShader = _device.createVertexShader('SpectrePost.VS', {});
       _device.context.compileShader(vertexShader, '''
 precision highp float;
 
