@@ -415,7 +415,7 @@ class GraphicsDevice {
   /// describing the IndexBuffer being created.
   ///
   IndexBuffer createIndexBuffer(String name, Map props) {
-    IndexBuffer ib = new IndexBuffer(name, this);
+    IndexBuffer ib = new IndexBuffer._internal(name, this);
     if (_addChildObject(ib) == false) {
       return null;
     }
@@ -429,7 +429,7 @@ class GraphicsDevice {
   /// [props] is a [Map]
   /// describing the [VertexBuffer] being created
   VertexBuffer createVertexBuffer(String name, Map props) {
-    VertexBuffer vb = new VertexBuffer(name, this);
+    VertexBuffer vb = new VertexBuffer._internal(name, this);
     if (_addChildObject(vb) == false) {
       return null;
     }
@@ -443,7 +443,7 @@ class GraphicsDevice {
   /// [props] is a [Map]
   /// describing the [RenderBuffer] being created
   RenderBuffer createRenderBuffer(String name, Map props) {
-    RenderBuffer rb = new RenderBuffer(name, this);
+    RenderBuffer rb = new RenderBuffer._internal(name, this);
     if (_addChildObject(rb) == false) {
       return null;
     }
@@ -457,7 +457,7 @@ class GraphicsDevice {
   /// [props] a [Map]
   /// describing the [RenderTarget] being created
   RenderTarget createRenderTarget(String name, Map props) {
-    RenderTarget rt = new RenderTarget(name, this);
+    RenderTarget rt = new RenderTarget._internal(name, this);
     if (_addChildObject(rt) == false) {
       return null;
     }
@@ -471,7 +471,7 @@ class GraphicsDevice {
   /// [props] is a [Map]
   /// describing the [Texture2D] being created
   Texture2D createTexture2D(String name, Map props) {
-    Texture2D tex = new Texture2D(name, this);
+    Texture2D tex = new Texture2D._internal(name, this);
     if (_addChildObject(tex) == false) {
       return null;
     }
@@ -490,7 +490,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
   VertexShader createVertexShader(String name, Map props) {
-    VertexShader vertexShader = new VertexShader(name, this);
+    VertexShader vertexShader = new VertexShader._internal(name, this);
     if (_addChildObject(vertexShader) == false) {
       return null;
     }
@@ -504,7 +504,7 @@ class GraphicsDevice {
   /// [props] is a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
   FragmentShader createFragmentShader(String name, Map props) {
-    FragmentShader fragmentShader = new FragmentShader(name, this);
+    FragmentShader fragmentShader = new FragmentShader._internal(name, this);
     if (_addChildObject(fragmentShader) == false) {
       return null;
     }
@@ -518,7 +518,7 @@ class GraphicsDevice {
   /// [props] is a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
   ShaderProgram createShaderProgram(String name, Map props) {
-    ShaderProgram shaderProgram = new ShaderProgram(name, this);
+    ShaderProgram shaderProgram = new ShaderProgram._internal(name, this);
     if (_addChildObject(shaderProgram) == false) {
       return null;
     }
@@ -533,7 +533,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [SamplerState] being created
   SamplerState createSamplerState(String name, dynamic props) {
-    SamplerState sampler = new SamplerState(name, this);
+    SamplerState sampler = new SamplerState._internal(name, this);
     if (_addChildObject(sampler) == false) {
       return null;
     }
@@ -547,7 +547,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
   Viewport createViewport(String name, Map props) {
-    Viewport viewport = new Viewport(name, this);
+    Viewport viewport = new Viewport._internal(name, this);
     if (_addChildObject(viewport) == false) {
       return null;
     }
@@ -561,7 +561,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
   DepthState createDepthState(String name, Map props) {
-    DepthState depthState = new DepthState(name, this);
+    DepthState depthState = new DepthState._internal(name, this);
     if (_addChildObject(depthState) == false) {
       return null;
     }
@@ -575,7 +575,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [BlendState] being created
   BlendState createBlendState(String name, Map props) {
-    BlendState blendState = new BlendState(name, this);
+    BlendState blendState = new BlendState._internal(name, this);
     if (_addChildObject(blendState) == false) {
       return null;
     }
@@ -589,7 +589,7 @@ class GraphicsDevice {
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RasterizerState] being created
   RasterizerState createRasterizerState(String name, Object props) {
-    RasterizerState rasterizerState = new RasterizerState(name, this);
+    RasterizerState rasterizerState = new RasterizerState._internal(name, this);
     if (_addChildObject(rasterizerState) == false) {
       return null;
     }
@@ -603,7 +603,7 @@ class GraphicsDevice {
   /// [props] is a JSONS tring or a [Map] containing a set of properties
   /// describing the [InputLayout] being created.
   InputLayout createInputLayout(String name, Map props) {
-    InputLayout il = new InputLayout(name, this);
+    InputLayout il = new InputLayout._internal(name, this);
     if (_addChildObject(il) == false) {
       return null;
     }
@@ -615,7 +615,7 @@ class GraphicsDevice {
   /// Create an [IndexedMesh] named [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
   IndexedMesh createIndexedMesh(String name, Map props) {
-    IndexedMesh indexedMesh = new IndexedMesh(name, this);
+    IndexedMesh indexedMesh = new IndexedMesh._internal(name, this);
     if (_addChildObject(indexedMesh) == false) {
       return null;
     }
@@ -627,7 +627,7 @@ class GraphicsDevice {
   /// Create an [ArrayMesh] name [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
   ArrayMesh createArrayMesh(String name, Map props) {
-    ArrayMesh arrayMesh = new ArrayMesh(name, this);
+    ArrayMesh arrayMesh = new ArrayMesh._internal(name, this);
     if (_addChildObject(arrayMesh) == false) {
       return null;
     }
