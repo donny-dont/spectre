@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -22,11 +24,11 @@
 
 class _ResourceLoaderResult {
   bool success;
-  Dynamic data;
-  int handle;
-  Completer<int> completer;
+  dynamic data;
+  ResourceBase handle;
+  Completer<ResourceBase> completer;
   _ResourceLoaderResult(this.success, this.data) {
-    handle = 0;
+    handle = null;
   }
 }
 
@@ -35,9 +37,9 @@ abstract class _ResourceLoader {
     return false;
   }
 
-  abstract Future<_ResourceLoaderResult> load(String url);
+  Future<_ResourceLoaderResult> load(String url);
 
-  Dynamic createResource(String URL, ResourceManager rm) {
+  dynamic createResource(String URL, ResourceManager rm) {
     return null;
   }
 }
@@ -143,7 +145,7 @@ class ResourceLoaders {
   static String urlExtension(String URL) {
     List<String> chunks = URL.split('.');
     if (chunks.length > 0) {
-      return chunks.last();
+      return chunks.last;
     }
     return '';
   }

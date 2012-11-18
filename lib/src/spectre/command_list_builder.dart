@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -28,7 +30,7 @@ class CommandListBuilder {
   }
   CommandListBuilder.append(this.ops);
 
-  void setRegister(int register, Dynamic value) {
+  void setRegister(int register, dynamic value) {
     ops.add(Ops.SetRegister);
     ops.add(register);
     ops.add(value);
@@ -117,49 +119,49 @@ class CommandListBuilder {
     ops.add(topology);
   }
 
-  void setIndexBuffer(int handle) {
+  void setIndexBuffer(IndexBuffer handle) {
     ops.add(Ops.SetIndexBuffer);
     ops.add(handle);
   }
 
-  void setBlendState(int handle) {
+  void setBlendState(BlendState handle) {
     ops.add(Ops.SetBlendState);
     ops.add(handle);
   }
 
-  void setRasterizerState(int handle) {
+  void setRasterizerState(RasterizerState handle) {
     ops.add(Ops.SetRasterizerState);
     ops.add(handle);
   }
 
-  void setDepthState(int handle) {
+  void setDepthState(DepthState handle) {
     ops.add(Ops.SetDepthState);
     ops.add(handle);
   }
 
-  void setShaderProgram(int handle) {
+  void setShaderProgram(ShaderProgram handle) {
     ops.add(Ops.SetShaderProgram);
     ops.add(handle);
   }
 
-  void setVertexBuffers(int offset, List handles) {
+  void setVertexBuffers(int offset, List<VertexBuffer> handles) {
     ops.add(Ops.SetVertexBuffers);
     ops.add(offset);
     ops.add(handles);
   }
 
-  void setInputLayout(int handle) {
+  void setInputLayout(InputLayout handle) {
     ops.add(Ops.SetInputLayout);
     ops.add(handle);
   }
 
-  void setTextures(int textureUnitOffset, List<int> handles) {
+  void setTextures(int textureUnitOffset, List<Texture> handles) {
     ops.add(Ops.SetTextures);
     ops.add(textureUnitOffset);
     ops.add(handles);
   }
 
-  void setSamplers(int textureUnitOffset, List<int> handles) {
+  void setSamplers(int textureUnitOffset, List<SamplerState> handles) {
     ops.add(Ops.SetSamplers);
     ops.add(textureUnitOffset);
     ops.add(handles);
@@ -195,7 +197,7 @@ class CommandListBuilder {
     ops.add(buf);
   }
 
-  void setIndexedMesh(int indexedMeshHandle) {
+  void setIndexedMesh(IndexedMesh indexedMeshHandle) {
     ops.add(Ops.SetIndexedMesh);
     ops.add(indexedMeshHandle);
   }
@@ -218,7 +220,7 @@ class CommandListBuilder {
     ops.add(indexOffset);
   }
 
-  void drawIndexedMesh(int indexedMeshHandle) {
+  void drawIndexedMesh(IndexedMesh indexedMeshHandle) {
     ops.add(Ops.DrawIndexedMesh);
     ops.add(indexedMeshHandle);
   }

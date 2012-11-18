@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -79,6 +81,196 @@ class _InputElementChecker {
   }
 }
 
+/// Allows the querying of the capabilities of the [GraphicsDevice].
+///
+/// Can be used to get maximum values for the underlying WebGL implementation as
+/// well as access what WebGL extensions are available.
+class GraphicsDeviceCapabilities {
+  // Device info
+  /// The graphics card vendor
+  String _vendor;
+  /// The renderer
+  String _renderer;
+  /// The number of texture units available.
+  int _textureUnits;
+  /// The number of texture units available in the vertex shader
+  int _vertexShaderTextureUnits;
+  /// The largest texture size available.
+  int _maxTextureSize;
+  /// The largest cube map texture size available.
+  int _maxCubeMapTextureSize;
+  /// Maximum number of vertex attributes available.
+  int _maxVertexAttribs;
+  /// Maximum number of varying vectors available in the shader program.
+  int _maxVaryingVectors;
+  /// Maximum number of uniforms available in the vertex shader.
+  int _maxVertexShaderUniforms;
+  /// Maximum number of uniforms available in the fragment shader.
+  int _maxFragmentShaderUniforms;
+
+  // Extensions
+
+  /// Whether floating point textures are available.
+  bool _floatTextures;
+  /// Whether half-floating point textures are available.
+  bool _halfFloatTextures;
+  /// Whether standard derivatives (dFdx, dFdy, fwidth) are available in the fragment shader.
+  bool _standardDerivatives;
+  /// Whether vertex array objects are available.
+  bool _vertexArrayObjects;
+  /// Whether the renderer and vendor can be queried for debug purposes.
+  bool _debugRendererInfo;
+  /// Whether the translated shader source can be viewed.
+  bool _debugShaders;
+  /// Whether unsigned int can be used as an index.
+  bool _unsignedIntIndices;
+  /// Whether anisotropic filtering is available.
+  bool _anisotropicFiltering;
+  /// Whether context losing/restoring can be simulated.
+  bool _loseContext;
+  /// Whether S3TC compressed textures can be used.
+  bool _compressedTextureS3TC;
+  /// Whether depth textures can be used.
+  bool _depthTextures;
+  /// Whether ATC compressed textures can be used.
+  bool _compressedTextureATC;
+  /// Whether PVRTC compressed textures can be used.
+  bool _compressedTexturePVRTC;
+
+  GraphicsDeviceCapabilities._fromContext(WebGLRenderingContext gl) {
+    _queryDeviceInfo(gl);
+    _queryExtensionInfo(gl);
+
+    if (_debugRendererInfo) {
+      // \todo Add query using UNMASKED_{VENDOR|RENDERER}_WEBGL
+      // Enum to query is not exposed currently
+      _vendor = gl.getParameter(0x9245);
+      _renderer = gl.getParameter(0x9246);
+    } else {
+      _vendor = '';
+      _renderer = '';
+    }
+  }
+
+  /// The graphics card vendor
+  String get vendor => _vendor;
+  /// The renderer
+  String get renderer => _renderer;
+  /// The number of texture units available.
+  int get textureUnits => _textureUnits;
+  /// The number of texture units available in the vertex shader
+  int get vertexShaderTextureUnits => _vertexShaderTextureUnits;
+  /// The largest texture size available.
+  int get maxTextureSize => _maxTextureSize;
+  /// The largest cube map texture size available.
+  int get maxCubeMapTextureSize => _maxCubeMapTextureSize;
+  /// Maximum number of vertex attributes available.
+  int get maxVertexAttribs => _maxVertexAttribs;
+  /// Maximum number of varying vectors available in the shader program.
+  int get maxVaryingVectors => _maxVaryingVectors;
+  /// Maximum number of uniforms available in the vertex shader.
+  int get maxVertexShaderUniforms => _maxVertexShaderUniforms;
+  /// Maximum number of uniforms available in the fragment shader.
+  int get maxFragmentShaderUniforms => _maxFragmentShaderUniforms;
+
+  /// Whether floating point textures are available.
+  bool get hasFloatTextures => _floatTextures;
+  /// Whether half-floating point textures are available.
+  bool get hasHalfFloatTextures => _halfFloatTextures;
+  /// Whether standard derivatives (dFdx, dFdy, fwidth) are available in the fragment shader.
+  bool get hasStandardDerivatives => _standardDerivatives;
+  /// Whether vertex array objects are available.
+  bool get hasVertexArrayObjects => _vertexArrayObjects;
+  /// Whether the renderer and vendor can be queried for debug purposes.
+  bool get hasDebugRendererInfo => _debugRendererInfo;
+  /// Whether the translated shader source can be viewed.
+  bool get hasDebugShaders => _debugShaders;
+  /// Whether unsigned int can be used as an index.
+  bool get hasUnsignedIntIndices => _unsignedIntIndices;
+  /// Whether anisotropic filtering is available.
+  bool get hasAnisotropicFiltering => _anisotropicFiltering;
+  /// Whether context losing/restoring can be simulated.
+  bool get canLoseContext => _loseContext;
+  /// Whether S3TC compressed textures can be used.
+  bool get hasCompressedTextureS3TC => _compressedTextureS3TC;
+  /// Whether depth textures can be used.
+  bool get hasDepthTextures => _depthTextures;
+  /// Whether ATC compressed textures can be used.
+  bool get hasCompressedTextureATC => _compressedTextureATC;
+  /// Whether PVRTC compressed textures can be used.
+  bool get hasCompressedTexturePVRTC => _compressedTexturePVRTC;
+
+  String toString() {
+    String vendorString = _vendor.isEmpty ? 'Unknown' : _vendor;
+    String rendererString = _renderer.isEmpty ? 'Unknown' : _renderer;
+    return
+        '''
+Vendor: $vendorString
+Renderer: $rendererString
+
+Device stats
+Texture Units: $_textureUnits
+Vertex Texture Units: $_vertexShaderTextureUnits
+Max Texture Size: ${_maxTextureSize}x${_maxTextureSize}
+Max Cube Map Size: ${_maxCubeMapTextureSize}x${_maxCubeMapTextureSize}
+Max Vertex Attributes: ${_maxVertexAttribs}
+Max Varying Vectors: $_maxVaryingVectors
+Max Vertex Shader Uniforms: $_maxVertexShaderUniforms
+Max Fragment Shader Uniforms: $_maxFragmentShaderUniforms
+
+Extensions
+OES_texture_float: $_floatTextures
+OES_texture_half_float: $_halfFloatTextures
+OES_standard_derivatives: $_standardDerivatives
+OES_vertex_array_object: $_vertexArrayObjects
+WEBGL_debug_renderer_info: $_debugRendererInfo
+WEBGL_debug_shaders: $_debugShaders
+OES_element_index_uint: $_unsignedIntIndices
+EXT_texture_filter_anisotropic: $_anisotropicFiltering
+WEBGL_lose_context: $_loseContext
+WEBGL_compressed_texture_s3tc: $_compressedTextureS3TC
+WEBGL_depth_texture: $_depthTextures
+WEBGL_compressed_texture_atc: $_compressedTextureATC
+WEBGL_compressed_texture_pvrtc: $_compressedTexturePVRTC
+        ''';
+  }
+
+  void _queryDeviceInfo(WebGLRenderingContext gl) {
+    _textureUnits = gl.getParameter(WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS);
+    _vertexShaderTextureUnits = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+    _maxTextureSize = gl.getParameter(WebGLRenderingContext.MAX_TEXTURE_SIZE);
+    _maxCubeMapTextureSize = gl.getParameter(WebGLRenderingContext.MAX_CUBE_MAP_TEXTURE_SIZE);
+    _maxVertexAttribs = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_ATTRIBS);
+    _maxVaryingVectors = gl.getParameter(WebGLRenderingContext.MAX_VARYING_VECTORS);
+    _maxVertexShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS);
+    _maxFragmentShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS);
+  }
+
+  void _queryExtensionInfo(WebGLRenderingContext gl) {
+    // Approved
+    _floatTextures = _hasExtension(gl, 'OES_texture_float');
+    _halfFloatTextures = _hasExtension(gl, 'OES_texture_half_float');
+    _standardDerivatives = _hasExtension(gl, 'OES_standard_derivatives');
+    _vertexArrayObjects = _hasExtension(gl, 'OES_vertex_array_object');
+    _debugRendererInfo = _hasExtension(gl, 'WEBGL_debug_renderer_info');
+    _debugShaders = _hasExtension(gl, 'WEBGL_debug_shaders');
+    // \todo This call is crashing on me. See if its just my machine.
+    _unsignedIntIndices = false; // _hasExtension(gl, 'OES_element_index_uint');
+    _anisotropicFiltering = _hasExtension(gl, 'EXT_texture_filter_anisotropic');
+
+    // Draft
+    _loseContext = _hasExtension(gl, 'WEBGL_lose_context');
+    _compressedTextureS3TC = _hasExtension(gl, 'WEBGL_compressed_texture_s3tc');
+    _depthTextures = _hasExtension(gl, 'WEBGL_depth_texture');
+    _compressedTextureATC = _hasExtension(gl, 'WEBGL_compressed_texture_atc');
+    _compressedTexturePVRTC = _hasExtension(gl, 'WEBGL_compressed_texture_pvrtc');
+  }
+
+  static bool _hasExtension(WebGLRenderingContext gl, String name) {
+    return gl.getExtension(name) != null;
+  }
+}
+
 /// Spectre GPU Device
 
 /// All GPU resources are created and destroyed through a Device.
@@ -110,7 +302,7 @@ class GraphicsDevice {
   static const int InputLayoutHandleType = 12;
   static const int MeshHandleType = 13;
 
-  Map _getPropertyMap(Dynamic props) {
+  Map _getPropertyMap(dynamic props) {
     if (props is String) {
       props = JSON.parse(props);
     }
@@ -120,54 +312,23 @@ class GraphicsDevice {
     return props;
   }
 
-  String getHandleType(int handle) {
-    int type = Handle.getType(handle);
-    switch (type) {
-      case BufferHandleType:
-        return 'Buffer';
-      case RenderBufferHandleType:
-        return 'RenderBuffer';
-      case RenderTargetHandleType:
-        return 'RenderTarget';
-      case TextureHandleType:
-        return 'Texture';
-      case SamplerStateHandleType:
-        return 'SamplerState';
-      case ShaderHandleType:
-        return 'Shader';
-      case ShaderProgramHandleType:
-        return 'ShaderProgram';
-      case ViewportHandleType:
-        return 'Viewport';
-      case DepthStateHandleType:
-        return 'DepthState';
-      case BlendStateHandleType:
-        return 'BlendState';
-      case RasterizerStateHandleType:
-        return 'RasterizerState';
-      case InputLayoutHandleType:
-        return 'Input Layout';
-      default:
-        return 'Unknown handle type';
-    }
-  }
-
   GraphicsContext _context;
-  GraphicsContext get context() => _context;
+  GraphicsContext get context => _context;
+
+  GraphicsDeviceCapabilities _capabilities;
+  GraphicsDeviceCapabilities get capabilities => _capabilities;
 
   WebGLRenderingContext _gl;
-  WebGLRenderingContext get gl() => _gl;
+  WebGLRenderingContext get gl => _gl;
 
-  // There is a 1:1 mapping between _childrenHandles and _childrenObjects
-  HandleSystem _childrenHandles;
-  List<DeviceChild> _childrenObjects;
+  Set<DeviceChild> _childrenObjects;
 
   // Maps from child object name to handle
-  Map<String, int> _nameMapping;
+  Map<String, DeviceChild> _nameMapping;
 
   static const int MaxDeviceChildren = 2048;
 
-  int _fallbackTextureID;
+  Texture2D _fallbackTexture;
 
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
     context2d.save();
@@ -196,11 +357,11 @@ class GraphicsDevice {
   /// Constructs a GPU device
   GraphicsDevice(WebGLRenderingContext gl) {
     _gl = gl;
-    _childrenHandles = new HandleSystem(MaxDeviceChildren, 0);
-    _childrenObjects = new List(MaxDeviceChildren);
-    _nameMapping = new Map<String, int>();
+    _childrenObjects = new Set<DeviceChild>();
+    _nameMapping = new Map<String, DeviceChild>();
     _context = new GraphicsContext(this);
-    _fallbackTextureID = createTexture2D('Device.Fallback', {
+    _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
+    _fallbackTexture = createTexture2D('Device.Fallback', {
       'width': 512,
       'height': 512,
       'textureFormat' : Texture.TextureFormatRGBA,
@@ -211,404 +372,267 @@ class GraphicsDevice {
       canvas.height = 512;
       CanvasRenderingContext2D context2d = canvas.getContext('2d');
       _drawGrid(context2d, 512, 512, 8, 8);
-      configureDeviceChild(_fallbackTextureID, {'pixels': canvas});
-      _context.generateMipmap(_fallbackTextureID);
+      configureDeviceChild(_fallbackTexture, {'pixels': canvas});
+      _context.generateMipmap(_fallbackTexture);
     }
   }
 
-  /// Returns the handle to the device child named [name]
-  int getDeviceChildHandle(String name) {
-    int h = _nameMapping[name];
-    if (h == null) {
-      return Handle.BadHandle;
-    }
-    return h;
+  /// Returns the [DeviceChild] with [name].
+  DeviceChild getDeviceChild(String name) {
+    return _nameMapping[name];
   }
 
-  Map<String, int> get children() => _nameMapping;
-
-  /// Lookup the actual device child object given the [handle]
-  Dynamic getDeviceChild(int handle, [bool noFallback=false]) {
-    if (handle == 0) {
-      return null;
+  bool _addChildObject(DeviceChild child) {
+    if (_nameMapping.containsKey(child.name)) {
+      return false;
     }
-    if (_childrenHandles.validHandle(handle) == false) {
-      spectreLog.Warning('$handle is not a valid handle');
-      return null;
-    }
-    int index = Handle.getIndex(handle);
-    DeviceChild dc = _childrenObjects[index];
-    if (dc == null) {
-      spectreLog.Warning('$handle is not a valid handle [2]');
-      return null;
-    }
-    if (noFallback == false && dc.ready == false && dc.fallback != 0) {
-      // Recurse
-      //print('Fetching fallback: ${_childrenObjects[index].fallback}');
-      return getDeviceChild(_childrenObjects[index].fallback);
-    }
-    return dc;
+    _nameMapping[child.name] = child;
   }
 
-  String getDeviceChildName(int handle) {
-    Dynamic dc = getDeviceChild(handle);
-    if (dc != null) {
-      return dc.name;
-    }
-    return 'Unknown handle: $handle';
-  }
-
-  void _setChildObject(int handle, DeviceChild o) {
-    int index = Handle.getIndex(handle);
-    _childrenObjects[index] = o;
-  }
-
-  /// Registers a handle with the given [type] and [name]
-  /// [handle] is an optional argument that, if provided, must be a statically reserved handle
-  int _registerHandle(String name, int type) {
-    {
-      // Check if name is already registered
-      int existingHandle = getDeviceChildHandle(name);
-      if (existingHandle != Handle.BadHandle) {
-        int handleType = Handle.getType(existingHandle);
-        if (handleType != type) {
-          spectreLog.Error('Returning existing handle for $name but types do not match. Requested type = $type found type = $handleType');
-        }
-        return existingHandle;
-      }
-    }
-    int handle = _childrenHandles.allocateHandle(type);
-    if (handle == Handle.BadHandle) {
-      spectreLog.Error('Spectre.Device._registerHandle - Registering dynamic handle failed.');
-      return Handle.BadHandle;
-    }
-
-    assert(_childrenHandles.validHandle(handle));
-    int index = Handle.getIndex(handle);
-    //print('$index - $name');
-    // Nothing is at this index
-    assert(_childrenObjects[index] == null);
-
-    // Register name
-    _nameMapping[name] = handle;
-
-    return handle;
-  }
+  Map<String, DeviceChild> get children => _nameMapping;
 
   /// Deletes the device child [handle]
-  void deleteDeviceChild(int handle) {
-    if (handle == 0) {
-      return;
-    }
-    if (_childrenHandles.validHandle(handle) == false) {
-      spectreLog.Warning('Deleting device child handle [$handle] is invalid.');
-      return;
-    }
-    // Free handle
-    _childrenHandles.freeHandle(handle);
-    int index = Handle.getIndex(handle);
-    DeviceChild dc = _childrenObjects[index];
-    if (dc == null) {
-      spectreLog.Error('deleteDeviceChild unable to find device child for [$handle]');
-      return;
-    }
-    dc._destroyDeviceState();
-    _nameMapping.remove(dc.name);
-    _childrenObjects[index] = null;
+  void deleteDeviceChild(DeviceChild child) {
+    child._destroyDeviceState();
+    _nameMapping.remove(child.name);
+    _childrenObjects.remove(child);
   }
 
-  void batchDeleteDeviceChildren(List<int> handles) {
-    for (int h in handles) {
-      deleteDeviceChild(h);
+  void batchDeleteDeviceChildren(List<DeviceChild> children) {
+    for (DeviceChild dc in children) {
+      deleteDeviceChild(dc);
     }
   }
 
-  void configureDeviceChild(int handle, Dynamic props) {
-    Dynamic deviceChild = getDeviceChild(handle);
-    if (deviceChild == null) {
-      return;
-    }
+  void configureDeviceChild(DeviceChild child, Map props) {
     props = _getPropertyMap(props);
-    deviceChild._configDeviceState(props);
+    child._configDeviceState(props);
   }
 
-  /// Create a IndexBuffer named [name]
+  /// Create a [IndexBuffer] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the IndexBuffer being created. If [handle] is specified it must be a registered handle.
+  /// [props] is a [Map]
+  /// describing the IndexBuffer being created.
   ///
-  /// Returns the handle to the IndexBuffer.
-  int createIndexBuffer(String name, Dynamic props) {
-    int handle = _registerHandle(name, BufferHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  IndexBuffer createIndexBuffer(String name, Map props) {
+    IndexBuffer ib = new IndexBuffer._internal(name, this);
+    if (_addChildObject(ib) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    IndexBuffer ib = new IndexBuffer(name, this);
-    _setChildObject(handle, ib);
     ib._createDeviceState();
     ib._configDeviceState(props);
-    return handle;
+    return ib;
   }
 
   /// Create a [VertexBuffer] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] is a [Map]
   /// describing the [VertexBuffer] being created
-  int createVertexBuffer(String name, Dynamic props) {
-    int handle = _registerHandle(name, BufferHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  VertexBuffer createVertexBuffer(String name, Map props) {
+    VertexBuffer vb = new VertexBuffer._internal(name, this);
+    if (_addChildObject(vb) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    VertexBuffer vb = new VertexBuffer(name, this);
-    _setChildObject(handle, vb);
     vb._createDeviceState();
     vb._configDeviceState(props);
-    return handle;
+    return vb;
   }
 
   /// Create a [RenderBuffer] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] is a [Map]
   /// describing the [RenderBuffer] being created
-  int createRenderBuffer(String name, Dynamic props) {
-    int handle = _registerHandle(name, RenderBufferHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  RenderBuffer createRenderBuffer(String name, Map props) {
+    RenderBuffer rb = new RenderBuffer._internal(name, this);
+    if (_addChildObject(rb) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    RenderBuffer rb = new RenderBuffer(name, this);
-    _setChildObject(handle, rb);
     rb._createDeviceState();
     rb._configDeviceState(props);
-    return handle;
+    return rb;
   }
 
   /// Create a [RenderTarget] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] a [Map]
   /// describing the [RenderTarget] being created
-  int createRenderTarget(String name, Dynamic props) {
-    int handle = _registerHandle(name, RenderTargetHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  RenderTarget createRenderTarget(String name, Map props) {
+    RenderTarget rt = new RenderTarget._internal(name, this);
+    if (_addChildObject(rt) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    RenderTarget rt = new RenderTarget(name, this);
-    _setChildObject(handle, rt);
     rt._createDeviceState();
     rt._configDeviceState(props);
-    return handle;
+    return rt;
   }
 
   /// Create a [Texture2D] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] is a [Map]
   /// describing the [Texture2D] being created
-  int createTexture2D(String name, Dynamic props) {
-    int handle = _registerHandle(name, TextureHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  Texture2D createTexture2D(String name, Map props) {
+    Texture2D tex = new Texture2D._internal(name, this);
+    if (_addChildObject(tex) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    Texture2D tex = new Texture2D(name, this);
-    _setChildObject(handle, tex);
     tex._createDeviceState();
     tex._configDeviceState(props);
-    if (_fallbackTextureID != null) {
-      // After the fallback texture is ready we mark all textures unready.
+    if (_fallbackTexture != null) {
+      // If the fallback texture is ready we mark all textures unready.
       tex.ready = false;
-      tex.fallback = _fallbackTextureID;
+      tex.fallback = _fallbackTexture;
     }
-    return handle;
+    return tex;
   }
 
   /// Create a [VertexShader] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [VertexShader] being created
-  int createVertexShader(String name, Dynamic props) {
-    int handle = _registerHandle(name, ShaderHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  VertexShader createVertexShader(String name, Map props) {
+    VertexShader vertexShader = new VertexShader._internal(name, this);
+    if (_addChildObject(vertexShader) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    VertexShader vertexShader = new VertexShader(name, this);
-    _setChildObject(handle, vertexShader);
     vertexShader._createDeviceState();
     vertexShader._configDeviceState(props);
-    return handle;
+    return vertexShader;
   }
 
   /// Create a [FragmentShader] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] is a [Map] containing a set of properties
   /// describing the [FragmentShader] being created
-  int createFragmentShader(String name, Dynamic props) {
-    int handle = _registerHandle(name, ShaderHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  FragmentShader createFragmentShader(String name, Map props) {
+    FragmentShader fragmentShader = new FragmentShader._internal(name, this);
+    if (_addChildObject(fragmentShader) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    FragmentShader fragmentShader = new FragmentShader(name, this);
-    _setChildObject(handle, fragmentShader);
     fragmentShader._createDeviceState();
     fragmentShader._configDeviceState(props);
-    return handle;
+    return fragmentShader;
   }
 
   /// Create a [ShaderProgram] named [name]
   ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
+  /// [props] is a [Map] containing a set of properties
   /// describing the [ShaderProgram] being created
-  int createShaderProgram(String name, Dynamic props) {
-    int handle = _registerHandle(name, ShaderProgramHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  ShaderProgram createShaderProgram(String name, Map props) {
+    ShaderProgram shaderProgram = new ShaderProgram._internal(name, this);
+    if (_addChildObject(shaderProgram) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    ShaderProgram shaderProgram = new ShaderProgram(name, this);
-    _setChildObject(handle, shaderProgram);
     shaderProgram._createDeviceState();
     shaderProgram._configDeviceState(props);
 
-    return handle;
+    return shaderProgram;
   }
 
   /// Create a [SamplerState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [SamplerState] being created
-  int createSamplerState(String name, Dynamic props) {
-    int handle = _registerHandle(name, SamplerStateHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  SamplerState createSamplerState(String name, dynamic props) {
+    SamplerState sampler = new SamplerState._internal(name, this);
+    if (_addChildObject(sampler) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    SamplerState sampler = new SamplerState(name, this);
-    _setChildObject(handle, sampler);
     sampler._createDeviceState();
     sampler._configDeviceState(props);
-    return handle;
+    return sampler;
   }
 
   /// Create a [Viewport] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [Viewport] being created
-  int createViewport(String name, Dynamic props) {
-    int handle = _registerHandle(name, ViewportHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  Viewport createViewport(String name, Map props) {
+    Viewport viewport = new Viewport._internal(name, this);
+    if (_addChildObject(viewport) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    Viewport viewport = new Viewport(name, this);
-    _setChildObject(handle, viewport);
     viewport._createDeviceState();
     viewport._configDeviceState(props);
-    return handle;
+    return viewport;
   }
 
   /// Create a [DepthState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [DepthState] being created
-  int createDepthState(String name, Dynamic props) {
-    int handle = _registerHandle(name, DepthStateHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  DepthState createDepthState(String name, Map props) {
+    DepthState depthState = new DepthState._internal(name, this);
+    if (_addChildObject(depthState) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    DepthState depthState = new DepthState(name, this);
-    _setChildObject(handle, depthState);
     depthState._createDeviceState();
     depthState._configDeviceState(props);
-    return handle;
+    return depthState;
   }
 
   /// Create a [BlendState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [BlendState] being created
-  int createBlendState(String name, Object props) {
-    int handle = _registerHandle(name, BlendStateHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  BlendState createBlendState(String name, Map props) {
+    BlendState blendState = new BlendState._internal(name, this);
+    if (_addChildObject(blendState) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-
-    BlendState blendState = new BlendState(name, this);
-    _setChildObject(handle, blendState);
     blendState._createDeviceState();
     blendState._configDeviceState(props);
-    return handle;
+    return blendState;
   }
 
   /// Create a [RasterizerState] named [name]
   ///
   /// [props] is a JSON String or a [Map] containing a set of properties
   /// describing the [RasterizerState] being created
-  int createRasterizerState(String name, Object props) {
-    int handle = _registerHandle(name, RasterizerStateHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  RasterizerState createRasterizerState(String name, Object props) {
+    RasterizerState rasterizerState = new RasterizerState._internal(name, this);
+    if (_addChildObject(rasterizerState) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-
-    RasterizerState rasterizerState = new RasterizerState(name, this);
-    _setChildObject(handle, rasterizerState);
     rasterizerState._createDeviceState();
     rasterizerState._configDeviceState(props);
-    return handle;
+    return rasterizerState;
   }
 
   /// Create an [InputLayout] named [name]
   ///
   /// [props] is a JSONS tring or a [Map] containing a set of properties
   /// describing the [InputLayout] being created.
-  int createInputLayout(String name, Object props) {
-    int handle = _registerHandle(name, InputLayoutHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  InputLayout createInputLayout(String name, Map props) {
+    InputLayout il = new InputLayout._internal(name, this);
+    if (_addChildObject(il) == false) {
+      return null;
     }
-
-    props = _getPropertyMap(props);
-    InputLayout il = new InputLayout(name, this);
-    _setChildObject(handle, il);
     il._createDeviceState();
     il._configDeviceState(props);
-    return handle;
+    return il;
   }
 
   /// Create an [IndexedMesh] named [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createIndexedMesh(String name, Dynamic props) {
-    int handle = _registerHandle(name, MeshHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  IndexedMesh createIndexedMesh(String name, Map props) {
+    IndexedMesh indexedMesh = new IndexedMesh._internal(name, this);
+    if (_addChildObject(indexedMesh) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-
-    IndexedMesh indexedMesh = new IndexedMesh(name, this);
-    _setChildObject(handle, indexedMesh);
     indexedMesh._createDeviceState();
     indexedMesh._configDeviceState(props);
-    return handle;
+    return indexedMesh;
   }
 
   /// Create an [ArrayMesh] name [name]
   /// [props] is a JSON String or a [Map] containing a set of properties
-  int createArrayMesh(String name, Dynamic props) {
-    int handle = _registerHandle(name, MeshHandleType);
-    if (handle == Handle.BadHandle) {
-      return handle;
+  ArrayMesh createArrayMesh(String name, Map props) {
+    ArrayMesh arrayMesh = new ArrayMesh._internal(name, this);
+    if (_addChildObject(arrayMesh) == false) {
+      return null;
     }
-    props = _getPropertyMap(props);
-    ArrayMesh arrayMesh = new ArrayMesh(name, this);
-    _setChildObject(handle, arrayMesh);
     arrayMesh._createDeviceState();
     arrayMesh._configDeviceState(props);
-    return handle;
+    return arrayMesh;
   }
 }

@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -21,7 +23,7 @@
 */
 
 /// Spectre Logging interface
-interface Logger {
+abstract class Logger {
   // Report an error
   void Error(String e);
   // Report a warning

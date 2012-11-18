@@ -1,11 +1,35 @@
+part of spectre_post;
+
+/*
+
+  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+*/
+
 class SpectrePost {
   static GraphicsDevice _device = null;
   static Map<String, SpectrePostPass> _passes = null;
-  static int _rasterizerState = null;
-  static int _depthState = null;
-  static int _blendState = null;
-  static int vertexBuffer = null;
-  static int vertexShader = null;
+  static RasterizerState _rasterizerState = null;
+  static DepthState _depthState = null;
+  static BlendState _blendState = null;
+  static VertexBuffer vertexBuffer = null;
+  static VertexShader vertexShader = null;
   static List<InputElementDescription> elements  = null;
 
   static void init(GraphicsDevice device) {
@@ -74,7 +98,6 @@ class SpectrePost {
       });
       _device.context.updateBuffer(vertexBuffer, verts);
       vertexShader = _device.createVertexShader('SpectrePost.VS', {});
-      VertexShader vs = _device.getDeviceChild(vertexShader);
       _device.context.compileShader(vertexShader, '''
 precision highp float;
 
@@ -115,7 +138,7 @@ void main() {
           precision mediump float;
 
           const float blurSize = 1.0/512.0;
- 
+
           varying vec2 samplePoint;
           uniform sampler2D RTScene;
 
@@ -130,9 +153,9 @@ void main() {
    sum += texture2D(RTScene, vec2(vTexCoord.x + 2.0*blurSize, vTexCoord.y)) * 0.12;
    sum += texture2D(RTScene, vec2(vTexCoord.x + 3.0*blurSize, vTexCoord.y)) * 0.09;
    sum += texture2D(RTScene, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
- 
+
    gl_FragColor = sum;
-          
+
       }''');
     } else {
       // already initialized...
@@ -166,9 +189,9 @@ void main() {
       spectreLog.Error('Attempt to add pass that already eists- $name');
       return;
     }
-    int fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
+    FragmentShader fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
     _device.context.compileShader(fragmentShader, fragmentSource);
-    int passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
+    ShaderProgram passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {
       'VertexProgram': vertexShader,
       'FragmentProgram': fragmentShader
     });
@@ -184,7 +207,7 @@ void main() {
     }
   }
 
-  static void pass(String name, int renderTargetHandle, Map<String, Dynamic> arguments) {
+  static void pass(String name, RenderTarget renderTargetHandle, Map<String, dynamic> arguments) {
     SpectrePostPass pass = _passes[name];
     if (pass == null) {
       spectreLog.Error('Post process $name does not exist. Cannot do pass.');
@@ -192,7 +215,7 @@ void main() {
     }
     pass.setup(_device, arguments);
     _device.context.setVertexBuffers(0, [vertexBuffer]);
-    _device.context.setIndexBuffer(0);
+    _device.context.setIndexBuffer(null);
     _device.context.setRasterizerState(_rasterizerState);
     _device.context.setDepthState(_depthState);
     _device.context.setBlendState(_blendState);

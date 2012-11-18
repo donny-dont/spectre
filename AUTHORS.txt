@@ -5,3 +5,4 @@ John McCutchan <john@johnmccutchan.com>
 Contributors:
 
 Adam Singer <financeCoding@gmail.com>
+Don Olmstead <don.j.olmstead@gmail.com>

@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -34,26 +36,8 @@ class Interpreter {
     }
   }
 
-  void setRegister(int register, Dynamic value) {
+  void setRegister(int register, dynamic value) {
     registers[register] = value;
-  }
-
-  int getHandle(int handle) {
-    if (Handle.isRegisterHandle(handle) == false ) {
-      // Not a register handle, return it
-      return handle;
-    }
-    // handle is a register handle
-    // dereference and return contents of register
-    return registers[Handle.getIndex(handle)];
-  }
-
-  int getRegisterIndex(int handle) {
-    if (Handle.isRegisterHandle(handle) == false ) {
-      // Not a register handle
-      return -1;
-    }
-    return Handle.getIndex(handle);
   }
 
   void run(List program, GraphicsDevice device, ResourceManager rm, GraphicsContext im) {
@@ -76,7 +60,7 @@ class Interpreter {
           skip = 3;
           {
             final int regId = program[i+1];
-            final Dynamic val = program[i+2];
+            final dynamic val = program[i+2];
             registers[regId] = val;
           }
           break;
@@ -95,7 +79,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createBlendState(name, options);
+          DeviceChild handle = device.createBlendState(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -107,7 +91,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createRasterizerState(name, options);
+          DeviceChild handle = device.createRasterizerState(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -119,7 +103,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createDepthState(name, options);
+          DeviceChild handle = device.createDepthState(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -131,7 +115,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createVertexShader(name, options);
+          DeviceChild handle = device.createVertexShader(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -143,7 +127,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createFragmentShader(name, options);
+          DeviceChild handle = device.createFragmentShader(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -155,7 +139,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createShaderProgram(name, options);
+          DeviceChild handle = device.createShaderProgram(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -167,7 +151,7 @@ class Interpreter {
           final String name = program[i+1];
           final Map options = program[i+2];
           final List output = program[i+3];
-          int handle = device.createIndexedMesh(name, options);
+          DeviceChild handle = device.createIndexedMesh(name, options);
           if (output != null) {
             output.add(handle);
           }
@@ -176,8 +160,8 @@ class Interpreter {
         case Ops.CompileShaderFromResource:
           skip = 3;
         {
-          final int shaderHandle = getHandle(program[i+1]);
-          final int resourceHandle = getHandle(program[i+2]);
+          final Shader shaderHandle = program[i+1];
+          final ShaderResource resourceHandle = program[i+2];
           im.compileShaderFromResource(shaderHandle, resourceHandle, rm);
         }
         break;
@@ -185,16 +169,15 @@ class Interpreter {
           skip = 5;
         {
           final String name = program[i+1];
-          final int meshResourceHandle = getHandle(program[i+2]);
-          final int shaderProgramHandle = getHandle(program[i+3]);
+          final MeshResource mr = program[i+2];
+          final ShaderProgram shaderProgramHandle = program[i+3];
           final List<InputLayoutDescription> inputs = program[i+4];
           final List output = program[i+5];
-          MeshResource mr = rm.getResource(meshResourceHandle);
           List<InputElementDescription> elements = new List<InputElementDescription>(inputs.length);
           for (int j = 0; j < inputs.length; j++) {
             elements[j] = InputLayoutHelper.inputElementDescriptionFromMesh(inputs[j], mr);
           }
-          int handle = device.createInputLayout(name, {'elements':elements, 'shaderProgram':shaderProgramHandle});
+          DeviceChild handle = device.createInputLayout(name, {'elements':elements, 'shaderProgram':shaderProgramHandle});
           if (output != null) {
             output.add(handle);
           }
@@ -203,37 +186,37 @@ class Interpreter {
         case Ops.LinkShaderProgram:
           skip = 4;
         {
-          final int shaderProgramHandle = getHandle(program[i+1]);
-          final int vertexShaderHandle = getHandle(program[i+2]);
-          final int fragmentShaderHandle = getHandle(program[i+3]);
+          final ShaderProgram shaderProgramHandle = program[i+1];
+          final VertexShader vertexShaderHandle = program[i+2];
+          final FragmentShader fragmentShaderHandle = program[i+3];
           im.linkShaderProgram(shaderProgramHandle, vertexShaderHandle, fragmentShaderHandle);
         }
         break;
         case Ops.SetBlendState:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final BlendState handle = program[i+1];
             im.setBlendState(handle);
           }
           break;
         case Ops.SetRasterizerState:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final RasterizerState handle = program[i+1];
             im.setRasterizerState(handle);
           }
           break;
         case Ops.SetDepthState:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final DepthState handle = program[i+1];
             im.setDepthState(handle);
           }
           break;
         case Ops.SetShaderProgram:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final ShaderProgram handle = program[i+1];
             im.setShaderProgram(handle);
           }
           break;
@@ -255,14 +238,14 @@ class Interpreter {
         case Ops.SetIndexBuffer:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final IndexBuffer handle = program[i+1];
             im.setIndexBuffer(handle);
           }
           break;
         case Ops.SetInputLayout:
           skip = 2;
           {
-            final int handle = getHandle(program[i+1]);
+            final InputLayout handle = program[i+1];
             im.setInputLayout(handle);
           }
           break;
@@ -270,7 +253,7 @@ class Interpreter {
           skip = 3;
         {
           final int textureUnitOffset = program[i+1];
-          final List<int> handles = program[i+2];
+          final List<Texture> handles = program[i+2];
           im.setTextures(textureUnitOffset, handles);
         }
         break;
@@ -278,14 +261,14 @@ class Interpreter {
           skip = 3;
         {
           final int textureUnitOffset = program[i+1];
-          final List<int> handles = program[i+2];
+          final List<SamplerState> handles = program[i+2];
           im.setSamplers(textureUnitOffset, handles);
         }
         break;
         case Ops.SetIndexedMesh:
           skip = 2;
         {
-          final int indexedMeshHandle = program[i+1];
+          final IndexedMesh indexedMeshHandle = program[i+1];
           im.setIndexedMesh(indexedMeshHandle);
         }
         break;
@@ -340,8 +323,8 @@ class Interpreter {
         case Ops.DrawIndirect:
           skip = 3;
           {
-            final int vertexCount = registers[getRegisterIndex(program[i+1])];
-            final int vertexOffset = registers[getRegisterIndex(program[i+2])];
+            final int vertexCount = registers[program[i+1]];
+            final int vertexOffset = registers[program[i+2]];
             im.draw(vertexCount, vertexOffset);
           }
           break;
@@ -356,21 +339,21 @@ class Interpreter {
         case Ops.DrawIndexedMesh:
           skip = 2;
           {
-            final int indexedMeshHandle = program[i+1];
+            final IndexedMesh indexedMeshHandle = program[i+1];
             im.drawIndexedMesh(indexedMeshHandle);
           }
           break;
         case Ops.DeregisterResources:
           skip = 2;
         {
-          final List<int> handles = program[i+1];
+          final List<ResourceBase> handles = program[i+1];
           rm.batchDeregister(handles);
         }
         break;
         case Ops.DeleteDeviceChildren:
           skip = 2;
         {
-          final List<int> handles = program[i+1];
+          final List<DeviceChild> handles = program[i+1];
           device.batchDeleteDeviceChildren(handles);
         }
         break;

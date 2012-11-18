@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -81,7 +83,7 @@ class Ops {
   /// Arg3 - List of inputs descriptions (InputLayoutDescription)
   /// Arg4 - List to store handle in (can be null)
   static const int CreateInputLayoutForMeshResource = 0x27;
-  
+
   /// Compile a shader from a shader resource
   /// Arg0 - Handle to shader
   /// Arg1 - Handle to resource
@@ -125,16 +127,16 @@ class Ops {
   /// Arg0 - texture unit offset
   /// Arg1 - List of sampler handles
   static const int SetSamplers = 0xA9;
-  
+
   /// Set the index buffer and vertex buffer units
   /// Arg0 - Handle to indexed mesh
   static const int SetIndexedMesh = 0xA10;
-  
+
   /// Set a uniform variable
   /// Arg0 - Uniform name
   /// Arg1 - Float32Array
   static const int SetUniformMatrix4 = 0xB0;
-  
+
   /// Set a uniform variable
   /// Arg0 - Uniform name
   /// Arg1 - Float32Array
@@ -154,7 +156,7 @@ class Ops {
   /// Arg0 - Uniform name
   /// Arg1 - Int
   static const int SetUniformInt = 0xB4;
-  
+
   /// Draw vertices
   /// Arg0 - Vertex Count
   /// Arg1 - Vertex Buffer Offset

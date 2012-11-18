@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -116,10 +118,10 @@ class _DebugDrawLineManager {
   Float32Array _vboStorage;
 
   int _vboUsed;
-  int _vbo;
-  int _vboLayout;
+  VertexBuffer _vbo;
+  InputLayout _vboLayout;
 
-  _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, int lineShaderHandle) {
+  _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, ShaderProgram lineShaderHandle) {
     _maxVertices = vboSize;
     _lines = new _DebugLineCollection();
     _vboUsed = 0;
@@ -149,7 +151,24 @@ class _DebugDrawLineManager {
     context.updateBuffer(_vbo, _vboStorage);
   }
 
-  int get vertexCount() => _vboUsed ~/ DebugDrawVertexSize;
+  int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;
+
+  void update(num dt) {
+    Profiler.enter('update');
+    List<_DebugLineObject> lineObjects = _lines._lineObjects;
+    for (int i = lineObjects.length-1; i >= 0; i--) {
+      _DebugLineObject lineObject = lineObjects[i];
+      lineObject.duration -= dt;
+      if (lineObject.duration < 0.0) {
+        _lines.freeLineObject(lineObject);
+        int last = lineObjects.length-1;
+        // Copy last over
+        lineObjects[i] = lineObjects[last];
+        lineObjects.removeLast();
+      }
+    }
+    Profiler.exit();
+  }
 }
 
 class _DebugDrawSphere {
@@ -185,13 +204,13 @@ class _DebugDrawSphereManager {
 
   List _drawProgram;
 
-  int _sphereProgramHandle;
-  int _sphereIndexedMeshHandle;
-  int _sphereVertexBuffer;
-  int _sphereIndexBuffer;
+  ShaderProgram _sphereProgramHandle;
+  IndexedMesh _sphereIndexedMeshHandle;
+  VertexBuffer _sphereVertexBuffer;
+  IndexBuffer _sphereIndexBuffer;
   int _sphereNumIndices;
-  int _sphereInputLayout;
-  _DebugDrawSphereManager(int sphereProgramHandle, int sphereIndexedMeshHandle, int sphereInputLayout, int maxSpheres) {
+  InputLayout _sphereInputLayout;
+  _DebugDrawSphereManager(ShaderProgram sphereProgramHandle, IndexedMesh sphereIndexedMeshHandle, InputLayout sphereInputLayout, int maxSpheres) {
     _sphereInputLayout = sphereInputLayout;
     _sphereProgramHandle = sphereProgramHandle;
     _sphereIndexedMeshHandle = sphereIndexedMeshHandle;
@@ -290,7 +309,7 @@ class DebugDrawManager {
   static final String _sphereShaderProgramName = 'Debug Sphere Shader Program';
   static final String _sphereIndexedMeshName = 'Debug Sphere Indexed Mesh';
 
-  List<int> _handles;
+  List<DeviceChild> _handles;
 
   List _startupCommands;
   List _drawCommands;
@@ -305,7 +324,7 @@ class DebugDrawManager {
   GraphicsContext _context;
 
   DebugDrawManager() {
-    _handles = new List<int>();
+    _handles = new List<DeviceChild>();
     _cameraMatrix = new Float32Array(16);
   }
 
@@ -320,7 +339,7 @@ class DebugDrawManager {
     _device = device;
     _context = device.context;
 
-    int handle;
+    DeviceChild handle;
 
     handle = _device.createDepthState(_depthStateEnabledName, {'depthTestEnabled': true, 'depthWriteEnabled': true, 'depthComparisonOp': DepthState.DepthComparisonOpLess});
     _handles.add(handle);
@@ -367,7 +386,7 @@ class DebugDrawManager {
     _handles.add(handle);
 
     // Sphere startup
-    int sphereInputLayout;
+    InputLayout sphereInputLayout;
     {
       var elements = [InputLayoutHelper.inputElementDescriptionFromMeshMap(new InputLayoutDescription('vPosition', 0, 'POSITION'), _debugSphereMesh)];
       sphereInputLayout = device.createInputLayout('Debug Sphere Input', {'elements':elements, 'shaderProgram':_handles[_sphereShaderProgramHandleIndex]});
@@ -386,21 +405,21 @@ class DebugDrawManager {
     clb.setShaderProgram(_handles[_lineShaderProgramHandleIndex]);
     clb.setUniformMatrix4('cameraTransform', _cameraMatrix);
     clb.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
-    clb.setIndexBuffer(0);
+    clb.setIndexBuffer(null);
     // Depth enabled lines
     clb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
     clb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
     clb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
-    clb.drawIndirect(Handle.makeRegisterHandle(0), Handle.makeRegisterHandle(1));
+    clb.drawIndirect(0, 1);
     // Depth disabled lines
     clb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
     clb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
     clb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
     // draw Indirect takes vertexOffset from register 3
-    clb.drawIndirect(Handle.makeRegisterHandle(2), Handle.makeRegisterHandle(3));
+    clb.drawIndirect(2, 3);
     // Save built program
     _drawCommands = clb.ops;
   }
