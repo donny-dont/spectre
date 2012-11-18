@@ -26,60 +26,60 @@ part of spectre;
 class TextureAddressMode
 {
   /// Clamp Texture coordinates outside the range [0.0, 1.0] are set to the texture color at 0.0 or 1.0, respectively.
-  static const int clamp = WebGLRenderingContext.CLAMP_TO_EDGE;
-  /// String representation of [clamp].
-  static const String clampName = 'TextureAddressMode.clamp';
-  /// Similar to [wrap], except that the texture is flipped at every integer junction.
+  static const int Clamp = WebGLRenderingContext.CLAMP_TO_EDGE;
+  /// String representation of [Clamp].
+  static const String ClampName = 'TextureAddressMode.Clamp';
+  /// Similar to [Wrap], except that the texture is flipped at every integer junction.
   ///
   /// For u values between 0 and 1, for example, the texture is addressed normally;
   /// between 1 and 2, the texture is flipped (mirrored); between 2 and 3, the
   /// texture is normal again, and so on.
-  static const int mirror = WebGLRenderingContext.MIRRORED_REPEAT;
-  /// String representation of [mirror].
-  static const String mirrorName = 'TextureAddressMode.mirror';
+  static const int Mirror = WebGLRenderingContext.MIRRORED_REPEAT;
+  /// String representation of [Mirror].
+  static const String MirrorName = 'TextureAddressMode.Mirror';
   /// Tile the texture at every integer junction.
   ///
   /// For example, for u values between 0 and 3, the texture is repeated three times;
   /// no mirroring is performed.
-  static const int wrap = WebGLRenderingContext.REPEAT;
-  /// String representation of [wrap'.
-  static const String wrapName = 'TextureAddressMode.wrap';
+  static const int Wrap = WebGLRenderingContext.REPEAT;
+  /// String representation of [Wrap'.
+  static const String WrapName = 'TextureAddressMode.Wrap';
 
   /// Deserializes the [TextureAddressMode].
   static int deserialize(String name) {
-    if (name == clampName) {
-      return clamp;
-    } else if (name == mirrorName) {
-      return mirror;
-    } else if (name == wrapName) {
-      return wrap;
+    if (name == ClampName) {
+      return Clamp;
+    } else if (name == MirrorName) {
+      return Mirror;
+    } else if (name == WrapName) {
+      return Wrap;
     }
 
     assert(false);
-    return wrap;
+    return Wrap;
   }
 
   /// Serialize the [TextureAddressMode].
   static String serialize(int value) {
-    if (value == clamp) {
-      return clampName;
-    } else if (value == mirror) {
-      return mirrorName;
-    } else if (value == wrap) {
-      return wrapName;
+    if (value == Clamp) {
+      return ClampName;
+    } else if (value == Mirror) {
+      return MirrorName;
+    } else if (value == Wrap) {
+      return WrapName;
     }
 
     assert(false);
-    return wrapName;
+    return WrapName;
   }
 
   /// Gets a map containing a name value mapping of the [TextureAddressMode] enumerations.
   static Map<String, int> get mappings {
     Map<String, int> map = new Map<String, int>();
 
-    map[clampName] = clamp;
-    map[mirrorName] = mirror;
-    map[wrapName] = wrap;
+    map[ClampName] = Clamp;
+    map[MirrorName] = Mirror;
+    map[WrapName] = Wrap;
 
     return map;
   }

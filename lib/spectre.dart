@@ -30,6 +30,7 @@ import 'package:vector_math/vector_math_browser.dart';
 import 'package:handle_system/handle_system.dart';
 import 'package:marker_prof/profiler.dart';
 
+part 'src/spectre/blend_function.dart';
 part 'src/spectre/logger.dart';
 part 'src/spectre/device_children.dart';
 part 'src/spectre/graphics_device.dart';
@@ -46,6 +47,7 @@ part 'src/spectre/camera.dart';
 part 'src/spectre/camera_controller.dart';
 part 'src/spectre/mouse_keyboard_camera_controller.dart';
 part 'src/spectre/texture_address_mode.dart';
+part 'src/spectre/graphics_device_capabilities.dart';
 
 // We have a single logger
 Logger spectreLog;
