@@ -28,7 +28,7 @@ class GraphicsContext {
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
   static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
   static final int numVertexBuffers = 2;
-  static final int numTextures = 3;
+  static final int numTextures = 16;
 
   GraphicsDevice _device;
   // Input Assembler
