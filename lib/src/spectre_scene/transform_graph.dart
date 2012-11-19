@@ -22,154 +22,111 @@ part of spectre_scene;
 
 */
 
-class _TransformGraphNode {
-  int parentId;
+class TransformGraphNode {
+  TransformGraphNode parent;
   int childCount;
   int childCountSort;
-  int selfId;
+  mat4 localTransform;
+  mat4 worldTransform;
+  Float32Array worldTransformArray;
+  TransformGraphNode._internal() {
+    localTransform = new mat4.identity();
+    worldTransform = new mat4.identity();
+    worldTransformArray = new Float32Array(16);
+    reset();
+  }
   void reset() {
-    parentId = 0;
+    parent = null;
     childCount = 0;
     childCountSort = 0;
-    selfId = 0;
   }
 }
 
 class TransformGraph {
-  HandleSystem _handleSystem;
-  List<mat4> _localTransforms;
-  List<mat4> _worldTransforms;
-  List<Float32Array> _worldTransformArrays;
-  List<_TransformGraphNode> _nodes;
-  List<int> _sortedNodes;
-  int _sortedNodesCursor;
-  int _nodeCount;
-  final int _maxNodes;
+  List<TransformGraphNode> _nodes;
+  List<TransformGraphNode> _sortedNodes;
 
-  TransformGraph(this._maxNodes) {
-    _handleSystem = new HandleSystem(_maxNodes, 0);
-    _localTransforms = new List<mat4>(_maxNodes);
-    _worldTransforms = new List<mat4>(_maxNodes);
-    _worldTransformArrays = new List<Float32Array>(_maxNodes);
-    _nodes = new List<_TransformGraphNode>(_maxNodes);
-    _sortedNodes = new List<int>(_maxNodes);
-    _sortedNodesCursor = 0;
-    _nodeCount = 0;
-    for (int i = 0; i < _maxNodes; i++) {
-      _localTransforms[i] = new mat4.identity();
-      _worldTransforms[i] = new mat4.identity();
-      _worldTransformArrays[i] = new Float32Array(16);
-      _nodes[i] = new _TransformGraphNode();
-      _nodes[i].reset();
-    }
+  TransformGraph() {
+    _nodes = new List<TransformGraphNode>();
+    _sortedNodes = new List<TransformGraphNode>();
   }
 
   /// Create a new transform node. The node has no parent and is the identity.
-  int createNode() {
-    int nodeHandle = _handleSystem.allocateHandle(0x1);
-    if (nodeHandle == Handle.BadHandle) {
-      return 0;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    _nodes[index].selfId = nodeHandle;
-    _nodeCount++;
-    return nodeHandle;
+  TransformGraphNode createNode() {
+    TransformGraphNode node = new TransformGraphNode._internal();
+    _nodes.add(node);
+    return node;
   }
 
-  void _unparentChildren(int parentNode) {
-    for (int i = 0; i < _maxNodes; i++) {
-      if (_nodes[i].parentId == parentNode) {
-        unparent(_nodes[i].selfId);
+  void _unparentChildren(TransformGraphNode parent) {
+    for (int i = 0; i < _nodes.length; i++) {
+      if (_nodes[i].parent == parent) {
+        unparent(_nodes[i]);
       }
     }
   }
 
-  /// Delete an existing transform node [nodeHandle]
-  void deleteNode(int nodeHandle) {
-    if (nodeHandle == 0) {
-      return;
-    }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    if (_nodes[index].childCount > 0) {
-      _unparentChildren(nodeHandle);
-    }
-    _handleSystem.freeHandle(nodeHandle);
-    _localTransforms[index].setIdentity();
-    assert(_nodes[index].childCount == 0);
-    _nodes[index].reset();
-    _nodeCount--;
-    assert(_nodeCount >= 0);
+  void _swapAndPop(int index) {
+    // Move end of list into index we are removing.
+    TransformGraphNode last = _nodes.last();
+    _nodes[index] = last;
+    // Remove last node.
+    _nodes.removeLast();
   }
 
-  /// Makes [nodeHandle] a leaf node
-  void unparent(int nodeHandle) {
-    if (nodeHandle == 0) {
+  /// Delete an existing transform node [node]
+  void deleteNode(TransformGraphNode node) {
+    if (node == null) {
       return;
     }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    int parentNodeHandle = _nodes[index].parentId;
-    _nodes[index].parentId = 0;
+    int index = _nodes.indexOf(node, 0);
+    assert(index >= 0);
+    _swapAndPop(index);
+  }
+
+  /// Make [node] a leaf node
+  void unparent(TransformGraphNode node) {
+    TransformGraphNode parent = node.parent;
     // Cleanup parent
-    if (parentNodeHandle == 0) {
+    if (parent == null) {
       return;
     }
-    if (_handleSystem.validHandle(parentNodeHandle) == false) {
-      return;
-    }
-    int parentIndex = Handle.getIndex(parentNodeHandle);
-    _nodes[parentIndex].childCount--;
-    assert(_nodes[parentIndex].childCount >= 0);
+    parent.childCount--;
+    assert(parent.childCount >= 0);
   }
 
-  /// Makes [nodeHandle] a child of [parentNodeHandle]
-  void reparent(int nodeHandle, int parentNodeHandle) {
+  /// Make [node] a child of [parent]
+  void reparent(TransformGraphNode node, TransformGraphNode parent) {
+    if (node == null) {
+      return;
+    }
     // Unparent
-    unparent(nodeHandle);
-
-    if (parentNodeHandle == 0) {
+    unparent(node);
+    if (parent == null) {
       return;
     }
-    if (nodeHandle == 0) {
-      return;
-    }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    if (_handleSystem.validHandle(parentNodeHandle) == false) {
-      return;
-    }
-    int parentIndex = Handle.getIndex(parentNodeHandle);
-
-    _nodes[index].parentId = parentNodeHandle;
-    _nodes[parentIndex].childCount++;
+    node.parent = parent;
+    parent.childCount++;
   }
 
   /// Must be called after modifying the transform graph
   void updateGraph() {
-    _sortedNodesCursor = 0;
     // Find leafs
-    Queue<int> leafs = new Queue<int>();
-    for (int i = 0; i < _maxNodes; i++) {
+    Queue<TransformGraphNode> leafs = new Queue<TransformGraphNode>();
+    for (int i = 0; i < _nodes.length; i++) {
       _nodes[i].childCountSort = _nodes[i].childCount;
-      if (_nodes[i].selfId != 0 && _nodes[i].childCount == 0) {
-        leafs.add(_nodes[i].selfId);
+      if (_nodes[i].childCount == 0) {
+        leafs.add(_nodes[i]);
       }
     }
     while (leafs.length > 0) {
-      int id = leafs.removeLast();
-      _sortedNodes[_sortedNodesCursor++] = id;
-      int parentId = _nodes[Handle.getIndex(id)].parentId;
-      int parentIndex = Handle.getIndex(parentId);
-      _nodes[parentIndex].childCountSort--;
-      if (_nodes[parentIndex].childCountSort == 0) {
-        leafs.add(parentId);
+      TransformGraphNode leaf = leafs.removeLast();
+      _sortedNodes.add(leaf);
+      if (leaf.parent != null) {
+        leaf.parent.childCountSort--;
+        if (leaf.parent.childCountSort == 0) {
+          leafs.add(leaf.parent);
+        }
       }
     }
   }
@@ -186,73 +143,48 @@ class TransformGraph {
     _worldTransforms[index].copyInto(out);
   }
 
-  /// Get a reference to the world transform for [nodeHandle]
-  mat4 refWorldMatrix(int nodeHandle) {
-    if (nodeHandle == 0) {
+  /// Get a reference to the world transform for [node]
+  mat4 refWorldMatrix(TransformGraphNode node) {
+    if (node == null) {
       return null;
     }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return null;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    return _worldTransforms[index];
+    return node.worldTransform;
   }
 
-  Float32Array refWorldMatrixArray(int nodeHandle) {
-    if (nodeHandle == 0) {
+  Float32Array refWorldMatrixArray(TransformGraphNode node) {
+    if (node == null) {
       return null;
     }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return null;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    return _worldTransformArrays[index];
+    return node.worldTransformArray;
   }
 
-  /// Set the local transform for [nodeHandle]
-  void setLocalMatrix(int nodeHandle, mat4 m) {
-    if (nodeHandle == 0) {
-      return;
+  /// Set the local transform for [node]
+  void setLocalMatrix(TransformGraphNode node, mat4 m) {
+    if (node == null) {
+      return null;
     }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    _localTransforms[index].copyFrom(m);
+    node.localTransform.copyFrom(m);
   }
 
-  /// Get a reference to the local transform for [nodeHandle]
-  mat4 refLocalMatrix(int nodeHandle) {
-    if (nodeHandle == 0) {
+  /// Get a reference to the local transform for [node]
+  mat4 refLocalMatrix(TransformGraphNode node) {
+    if (node == null) {
       return null;
     }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return null;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    return _localTransforms[index];
+    return node.localTransform;
   }
 
   /// Updates the world transformation matrices for all nodes in the graph
   void updateWorldMatrices() {
-    //print('Updating world.');
-    for (int i = _sortedNodesCursor-1; i >= 0 ; i--) {
-      int nodeIndex = Handle.getIndex(_sortedNodes[i]);
-      _TransformGraphNode node = _nodes[nodeIndex];
-      if (_sortedNodes[i] == 286261249) {
-        //print('updating cone world.');
-        //print('${node.parentId}');
-        //print('${node.selfId}');
-        //print('$nodeIndex');
-      }
-      if (node.parentId != 0) {
-        int parentNodeIndex = Handle.getIndex(node.parentId);
-        _worldTransforms[nodeIndex].copyFrom(_worldTransforms[parentNodeIndex]);
-        _worldTransforms[nodeIndex].multiply(_localTransforms[nodeIndex]);
+    for (int i = _sortedNodes.length-1; i >= 0 ; i--) {
+      TransformGraphNode node = _sortedNodes[i];
+      if (node.parent != null) {
+        node.worldTransform.copyFrom(node.parent.worldTransform);
+        node.worldTransform.multiply(node.localTransform);
       } else {
-        _worldTransforms[nodeIndex].copyFrom(_localTransforms[nodeIndex]);
+        node.worldTransform.copyFrom(node.localTransform);
       }
-      _worldTransforms[nodeIndex].copyIntoArray(_worldTransformArrays[nodeIndex], 0);
+      node.worldTransform.copyIntoArray(node.worldTransformArray, 0);
     }
   }
 }

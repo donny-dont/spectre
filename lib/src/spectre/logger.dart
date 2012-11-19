@@ -71,12 +71,15 @@ class HtmlLogger implements Logger {
     _line_num++;
   }
   void Error(String e) {
+    print('Error: $e');
     _Append('<p style=\"color:red\">${_line_num}: $e</p>');
   }
   void Warning(String w) {
+    print('Warning: $w');
     _Append('<p style=\"color:orange\">${_line_num}: $w</p>');
   }
   void Info(String i) {
+    print('Info: $i');
     _Append('<p style=\"color:black\">${_line_num}: $i</p>');
   }
   void Log(String i) => Info(i);
