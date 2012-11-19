@@ -587,7 +587,7 @@ class FragmentShader extends Shader {
   }
 }
 
-typedef void UniformCallback(String name, int index, String type, int size, int location);
+typedef void UniformCallback(String name, int index, String type, int size, WebGLUniformLocation location);
 
 /// A shader program defines how the programmable units of the GPU pipeline function
 /// Create using [Device.createShaderProgram]
@@ -733,7 +733,7 @@ class ShaderProgram extends DeviceChild {
     numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
-      var location = device.gl.getUniformLocation(_program, activeUniform.name);
+      WebGLUniformLocation location = device.gl.getUniformLocation(_program, activeUniform.name);
       callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size, location);
     }
   }

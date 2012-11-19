@@ -22,7 +22,6 @@ part of spectre;
 
 */
 
-
 class BlendFunction {
   /// The result is the destination added to the source.
   ///
