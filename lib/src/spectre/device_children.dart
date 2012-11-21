@@ -665,45 +665,6 @@ class ShaderProgram extends DeviceChild {
     refreshAttributes();
   }
 
-  String _convertType(int type) {
-    switch (type) {
-      case WebGLRenderingContext.FLOAT:
-        return 'float';
-      case WebGLRenderingContext.FLOAT_VEC2:
-        return 'vec2';
-      case WebGLRenderingContext.FLOAT_VEC3:
-        return 'vec3';
-      case WebGLRenderingContext.FLOAT_VEC4:
-        return 'vec4';
-      case WebGLRenderingContext.FLOAT_MAT2:
-        return 'mat2';
-      case WebGLRenderingContext.FLOAT_MAT3:
-        return 'mat3';
-      case WebGLRenderingContext.FLOAT_MAT4:
-        return 'mat4';
-      case WebGLRenderingContext.BOOL:
-        return 'bool';
-      case WebGLRenderingContext.BOOL_VEC2:
-        return 'bvec2';
-      case WebGLRenderingContext.BOOL_VEC3:
-        return 'bvec3';
-      case WebGLRenderingContext.BOOL_VEC4:
-        return 'bvec4';
-      case WebGLRenderingContext.INT:
-        return 'int';
-      case WebGLRenderingContext.INT_VEC2:
-        return 'ivec2';
-      case WebGLRenderingContext.INT_VEC3:
-        return 'ivec3';
-      case WebGLRenderingContext.INT_VEC4:
-        return 'ivec4';
-      case WebGLRenderingContext.SAMPLER_2D:
-        return 'sampler2D';
-      default:
-        return 'unknown code: $type';
-    }
-  }
-
   bool get linked {
     if (_program != null) {
       return device.gl.getProgramParameter(_program, WebGLRenderingContext.LINK_STATUS);
@@ -716,7 +677,7 @@ class ShaderProgram extends DeviceChild {
     spectreLog.Info('$name has $numUniforms uniform variables');
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
-      spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+      spectreLog.Info('$i - ${UniformType.serialize(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
     }
   }
 
@@ -725,7 +686,7 @@ class ShaderProgram extends DeviceChild {
     spectreLog.Info('$name has $numAttributes attributes');
     for (int i = 0; i < numAttributes; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveAttrib(_program, i);
-      spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+      spectreLog.Info('$i - ${UniformType.serialize(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
     }
   }
 
@@ -734,7 +695,7 @@ class ShaderProgram extends DeviceChild {
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
       WebGLUniformLocation location = device.gl.getUniformLocation(_program, activeUniform.name);
-      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size, location);
+      callback(activeUniform.name, i, UniformType.serialize(activeUniform.type), activeUniform.size, location);
     }
   }
 }

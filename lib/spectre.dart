@@ -51,6 +51,7 @@ part 'src/spectre/resource.dart';
 part 'src/spectre/resource_loader.dart';
 part 'src/spectre/resource_manager.dart';
 part 'src/spectre/texture_address_mode.dart';
+part 'src/spectre/uniform_type.dart';
 
 // We have a single logger
 Logger spectreLog;
