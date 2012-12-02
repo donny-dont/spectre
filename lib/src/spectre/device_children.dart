@@ -587,38 +587,52 @@ class FragmentShader extends Shader {
   }
 }
 
-typedef void UniformCallback(String name, int index, String type, int size, int location);
+/** A shader program uniform input */
+class ShaderProgramUniform {
+  final String name;
+  final int index;
+  final String type;
+  final int size;
+  final location;
+  ShaderProgramUniform(this.name, this.index, this.type, this.size,
+                       this.location);
+}
+
+/** A shader program attribute input */
+class ShaderProgramAttribute {
+  final String name;
+  final int index;
+  final String type;
+  final int size;
+  final location;
+  ShaderProgramAttribute(this.name, this.index, this.type, this.size,
+                         this.location);
+}
+
+typedef void UniformCallback(ShaderProgramUniform uniform);
+typedef void AttributeCallback(ShaderProgramAttribute attribute);
 
 /// A shader program defines how the programmable units of the GPU pipeline function
 /// Create using [Device.createShaderProgram]
 /// Set using [ImmediateContext.setShaderProgram]
 class ShaderProgram extends DeviceChild {
+  final List<ShaderProgramUniform> uniforms = new List<ShaderProgramUniform>();
+  final List<ShaderProgramAttribute> attributes =
+      new List<ShaderProgramAttribute>();
+
+  bool _isLinked = false;
+  String _linkLog = '';
+
   VertexShader vertexShader;
   FragmentShader fragmentShader;
   WebGLProgram _program;
-  int numAttributes;
-  int numUniforms;
 
-  ShaderProgram(String name, GraphicsDevice device) : super._internal(name, device) {
-    numUniforms = 0;
-    numAttributes = 0;
-    _program = null;
+  ShaderProgram(String name, GraphicsDevice device) :
+    super._internal(name, device) {
   }
 
   void _createDeviceState() {
     _program = device.gl.createProgram();
-  }
-
-  void _detach(Shader shader) {
-    if (shader != null) {
-      device.gl.detachShader(_program, shader._shader);
-    }
-  }
-
-  void _attach(Shader shader) {
-    if (shader != null) {
-      device.gl.attachShader(_program, shader._shader);
-    }
   }
 
   void _configDeviceState(Map props) {
@@ -626,15 +640,15 @@ class ShaderProgram extends DeviceChild {
       dynamic o;
       o = props['VertexProgram'];
       if (o != null && o is VertexShader) {
-        _detach(vertexShader);
+        detach(vertexShader);
         vertexShader = o;
-        _attach(vertexShader);
+        attach(vertexShader);
       }
       o = props['FragmentProgram'];
       if (o != null && o is FragmentShader) {
-        _detach(fragmentShader);
+        detach(fragmentShader);
         fragmentShader = o;
-        _attach(fragmentShader);
+        attach(fragmentShader);
       }
       if (vertexShader != null && fragmentShader != null) {
         // relink
@@ -649,12 +663,43 @@ class ShaderProgram extends DeviceChild {
     device.gl.deleteProgram(_program);
   }
 
+  /** Detach [shader] from ShaderProgram. */
+  void detach(Shader shader) {
+    if (shader != null) {
+      device.gl.detachShader(_program, shader._shader);
+    }
+  }
+
+  /** Attach [shader] from ShaderProgram. See also: [link] */
+  void attach(Shader shader) {
+    if (shader != null) {
+      device.gl.attachShader(_program, shader._shader);
+    }
+  }
+
+  /**
+   * Link attached shaders together forming a shader program.
+   */
   void link() {
+    // Attempt the link.
     device.gl.linkProgram(_program);
-    String linkLog = device.gl.getProgramInfoLog(_program);
-    spectreLog.Info('Linked $name - $linkLog');
+    // Grab the log.
+    _linkLog = device.gl.getProgramInfoLog(_program);
+    // Update the flag.
+    _isLinked = device.gl.getProgramParameter(
+        _program,
+        WebGLRenderingContext.LINK_STATUS);
+    if (_linkLog == '') {
+      spectreLog.Info('ShaderProgram.Link($name): OKAY.');
+    } else {
+      spectreLog.Info('''ShaderProgram.Link($name):
+$_linkLog''');
+    }
+
     refreshUniforms();
     refreshAttributes();
+    logUniforms();
+    logAttributes();
   }
 
   String _convertType(int type) {
@@ -696,38 +741,85 @@ class ShaderProgram extends DeviceChild {
     }
   }
 
-  bool get linked {
-    if (_program != null) {
-      return device.gl.getProgramParameter(_program, WebGLRenderingContext.LINK_STATUS);
-    }
-    return false;
-  }
+  /** Is the shader program linked? */
+  bool get linked => _isLinked;
+
+  /** Output from most recent linking. Can be [null] */
+  String get linkLog => _linkLog;
 
   void refreshUniforms() {
-    numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
-    spectreLog.Info('$name has $numUniforms uniform variables');
+    var numUniforms = device.gl.getProgramParameter(
+        _program,
+        WebGLRenderingContext.ACTIVE_UNIFORMS);
+    uniforms.clear();
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
-      spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+      var location = device.gl.getUniformLocation(_program, activeUniform.name);
+      ShaderProgramUniform uniform = new ShaderProgramUniform(
+          activeUniform.name,
+          i,
+          _convertType(activeUniform.type),
+          activeUniform.size,
+          location);
+      uniforms.add(uniform);
     }
   }
 
   void refreshAttributes() {
-    numAttributes = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_ATTRIBUTES);
-    spectreLog.Info('$name has $numAttributes attributes');
+    var numAttributes = device.gl.getProgramParameter(
+        _program,
+        WebGLRenderingContext.ACTIVE_ATTRIBUTES);
+    attributes.clear();
     for (int i = 0; i < numAttributes; i++) {
-      WebGLActiveInfo activeUniform = device.gl.getActiveAttrib(_program, i);
-      spectreLog.Info('$i - ${_convertType(activeUniform.type)} ${activeUniform.name} (${activeUniform.size})');
+      WebGLActiveInfo activeAttribute = device.gl.getActiveAttrib(_program, i);
+      var location = device.gl.getAttribLocation(_program,
+                                                 activeAttribute.name);
+      ShaderProgramAttribute attribute = new ShaderProgramAttribute(
+          activeAttribute.name,
+          i,
+          _convertType(activeAttribute.type),
+          activeAttribute.size,
+          location);
+      attributes.add(attribute);
     }
   }
 
+
+  void logUniforms() {
+    uniforms.forEach((uniform) {
+      spectreLog.Info('Uniforms[${uniform.index}] ${uniform.type}'
+                      ' ${uniform.name} (${uniform.size})');
+    });
+  }
+
+  void logAttributes() {
+    attributes.forEach((attribute) {
+      spectreLog.Info('Attributes[${attribute.index}] ${attribute.type}'
+                      ' ${attribute.name} (${attribute.size})');
+    });
+  }
+
+
+  /**
+   * Iterate over all active uniform inputs and call [callback] for each one.
+   *
+   * See [UniformCallback].
+   */
   void forEachUniforms(UniformCallback callback) {
-    numUniforms = device.gl.getProgramParameter(_program, WebGLRenderingContext.ACTIVE_UNIFORMS);
-    for (int i = 0; i < numUniforms; i++) {
-      WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
-      var location = device.gl.getUniformLocation(_program, activeUniform.name);
-      callback(activeUniform.name, i, _convertType(activeUniform.type), activeUniform.size, location);
-    }
+    uniforms.forEach((uniform) {
+      callback(uniform);
+    });
+  }
+
+  /**
+   * Iterate over all active attribute inputs and call [callback] for each one.
+   *
+   * See [AttributeCallback].
+   */
+  void forEachAttribute(AttributeCallback callback) {
+    attributes.forEach((attribute) {
+      callback(attribute);
+    });
   }
 }
 
