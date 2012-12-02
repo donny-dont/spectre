@@ -27,39 +27,27 @@ typedef void ResourceEventCallback(int type, ResourceBase resource);
 class ResourceEvents {
   static final int TypeUpdate = 0x1;
   static final int TypeUnloaded = 0x2;
-  Map<int, ResourceEventCallback> update;
-  Map<int, ResourceEventCallback> unloaded;
-  int _idCounter;
+  Set<ResourceEventCallback> updated;
+  Set<ResourceEventCallback> unloaded;
   ResourceEvents() {
-    update = new HashMap();
-    unloaded = new HashMap();
-    _idCounter = 0;
+    updated = new Set<ResourceEventCallback>();
+    unloaded = new Set<ResourceEventCallback>();
   }
 
-  int addUpdate(ResourceEventCallback cb) {
-    _idCounter++;
-    if (_idCounter == 0) {
-      _idCounter++;
-    }
-    update[_idCounter] = cb;
-    return _idCounter;
+  void addUpdate(ResourceEventCallback cb) {
+    updated.add(cb);
   }
 
-  void removeUpdate(int id) {
-    update.remove(id);
+  void removeUpdate(ResourceEventCallback cb) {
+    updated.remove(cb);
   }
 
   int addUnloaded(ResourceEventCallback cb) {
-    _idCounter++;
-    if (_idCounter == 0) {
-      _idCounter++;
-    }
-    unloaded[_idCounter] = cb;
-    return _idCounter;
+    unloaded.add(cb);
   }
 
-  void removeUnloaded(int id) {
-    unloaded.remove(id);
+  void removeUnloaded(ResourceEventCallback cb) {
+    unloaded.remove(cb);
   }
 }
 
@@ -102,15 +90,15 @@ class ResourceBase {
 
   // Call after the data is updated
   void _fireUpdated() {
-    on.update.forEach((key, value) {
-      value(ResourceEvents.TypeUpdate, this);
+    on.updated.forEach((cb) {
+      cb(ResourceEvents.TypeUpdate, this);
     });
   }
 
   // Call before the data is gone
   void _fireUnloaded() {
-    on.unloaded.forEach((key, value) {
-      value(ResourceEvents.TypeUpdate, this);
+    on.unloaded.forEach((cb) {
+      cb(ResourceEvents.TypeUpdate, this);
     });
   }
 }

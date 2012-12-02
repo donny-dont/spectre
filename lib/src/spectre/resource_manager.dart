@@ -160,26 +160,26 @@ class ResourceManager {
     }
   }
 
-  int addEventCallback(ResourceBase rb, int eventType, ResourceEventCallback callback) {
-    if (rb == null) {
-      return 0;
-    }
-    if (eventType == ResourceEvents.TypeUpdate) {
-      return rb.on.addUpdate(callback);
-    } else if (eventType == ResourceEvents.TypeUnloaded) {
-      return rb.on.addUnloaded(callback);
-    }
-    return 0;
-  }
-
-  void removeEventCallback(ResourceBase rb, int eventType, int id) {
+  void addEventCallback(ResourceBase rb, int eventType, ResourceEventCallback callback) {
     if (rb == null) {
       return;
     }
     if (eventType == ResourceEvents.TypeUpdate) {
-      rb.on.removeUpdate(id);
+      rb.on.addUpdate(callback);
     } else if (eventType == ResourceEvents.TypeUnloaded) {
-      rb.on.removeUnloaded(id);
+      rb.on.addUnloaded(callback);
+    }
+    return;
+  }
+
+  void removeEventCallback(ResourceBase rb, int eventType, ResourceEventCallback callback) {
+    if (rb == null) {
+      return;
+    }
+    if (eventType == ResourceEvents.TypeUpdate) {
+      rb.on.removeUpdate(callback);
+    } else if (eventType == ResourceEvents.TypeUnloaded) {
+      rb.on.removeUnloaded(callback);
     }
   }
 }
