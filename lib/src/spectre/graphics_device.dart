@@ -363,6 +363,7 @@ class GraphicsDevice {
     _nameMapping = new Map<String, DeviceChild>();
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
+    print(_capabilities);
     _fallbackTexture = createTexture2D('Device.Fallback', {
       'width': 512,
       'height': 512,
