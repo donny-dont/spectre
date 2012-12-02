@@ -249,10 +249,10 @@ class GraphicsContext {
 
   /// Set Viewport to [viewportHandle]
   void setViewport(Viewport vp) {
-    if (_viewportHandle == _viewportHandle) {
+    if (vp == _viewportHandle) {
       return;
     }
-    _viewportHandle = _viewportHandle;
+    _viewportHandle = vp;
     if (vp == null) {
       return;
     }

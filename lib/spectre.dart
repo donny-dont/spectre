@@ -46,11 +46,4 @@ part 'src/spectre/camera_controller.dart';
 part 'src/spectre/mouse_keyboard_camera_controller.dart';
 
 // We have a single logger
-Logger spectreLog;
-
-Future<bool> initSpectre() {
-  if (spectreLog == null) {
-    spectreLog = new PrintLogger();
-  }
-  return new Future.immediate(true);
-}
+Logger spectreLog = new PrintLogger();
