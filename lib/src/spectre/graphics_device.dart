@@ -366,8 +366,9 @@ class GraphicsDevice {
     _fallbackTexture = createTexture2D('Device.Fallback', {
       'width': 512,
       'height': 512,
-      'textureFormat' : Texture.TextureFormatRGBA,
-      'pixelFormat': Texture.PixelFormatUnsignedByte});
+      'textureFormat' : Texture.FormatRGBA,
+      'pixelFormat' : Texture.FormatRGBA,
+      'pixelType': Texture.PixelTypeU8});
     {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;

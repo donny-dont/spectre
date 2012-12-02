@@ -868,23 +868,28 @@ class RenderBuffer extends DeviceChild {
 }
 
 class Texture extends DeviceChild {
-  static final int TextureFormatAlpha = WebGLRenderingContext.ALPHA;
-  static final int TextureFormatRGB = WebGLRenderingContext.RGB;
-  static final int TextureFormatRGBA = WebGLRenderingContext.RGBA;
-  static final int TextureFormatLuminance = WebGLRenderingContext.LUMINANCE;
-  static final int TextureFormatLuminanceAlpha = WebGLRenderingContext.LUMINANCE_ALPHA;
+  static final int FormatR = WebGLRenderingContext.RED;
+  static final int FormatRG = WebGLRenderingContext.RG;
+  static final int FormatRGB = WebGLRenderingContext.RGB;
+  static final int FormatRGBA = WebGLRenderingContext.RGBA;
+  static final int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT;
 
-  static final int PixelFormatUnsignedByte = WebGLRenderingContext.UNSIGNED_BYTE;
-  static final int PixelFormatUnsignedShort_4_4_4_4 = WebGLRenderingContext.UNSIGNED_SHORT_4_4_4_4;
-  static final int PixelFormatUnsignedShort_5_5_5_1 = WebGLRenderingContext.UNSIGNED_SHORT_5_5_5_1;
-  static final int PixelFormatUnsignedShort_5_6_5 = WebGLRenderingContext.UNSIGNED_SHORT_5_6_5;
+  static final int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
+  static final int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
+  static final int PixelTypeU32 = WebGLRenderingContext.UNSIGNED_INT;
+  static final int PixelTypeS8 = WebGLRenderingContext.BYTE;
+  static final int PixelTypeS16 = WebGLRenderingContext.SHORT;
+  static final int PixelTypeS32 = WebGLRenderingContext.INT;
+  static final int PixelTypeFloat = WebGLRenderingContext.FLOAT;
 
-  int _target;
-  int _target_param;
   int _width;
   int _height;
   int _textureFormat;
   int _pixelFormat;
+  int _pixelType;
+
+  int _target;
+  int _target_param;
   WebGLTexture _buffer;
 
   Texture(String name, GraphicsDevice device) : super._internal(name, device);
@@ -912,8 +917,9 @@ class Texture2D extends Texture {
     _target_param = WebGLRenderingContext.TEXTURE_BINDING_2D;
     _width = 1;
     _height = 1;
-    _textureFormat = Texture.TextureFormatRGBA;
-    _pixelFormat = Texture.PixelFormatUnsignedByte;
+    _textureFormat = Texture.FormatRGBA;
+    _pixelFormat = Texture.FormatRGBA;
+    _pixelType = Texture.PixelTypeU8;
   }
 
   void _createDeviceState() {
@@ -925,26 +931,39 @@ class Texture2D extends Texture {
 
     if (props != null && props['pixels'] != null) {
       var pixels = props['pixels'];
-      if ((pixels is CanvasElement)) {
-        WebGLTexture oldBind = device.gl.getParameter(_target_param);
-        device.gl.bindTexture(_target, _buffer);
-        device.gl.texImage2D(WebGLRenderingContext.TEXTURE_2D, 0, _textureFormat, _textureFormat, _pixelFormat, pixels);
-        device.gl.bindTexture(_target, oldBind);
-      }
+      uploadPixelData(pixels);
     } else {
       if (props != null) {
         _width = props['width'] != null ? props['width'] : _width;
         _height = props['height'] != null ? props['height'] : _height;
         _textureFormat = props['textureFormat'] != null ? props['textureFormat'] : _textureFormat;
         _pixelFormat = props['pixelFormat'] != null ? props['pixelFormat'] : _pixelFormat;
+        _pixelType = props['pixelType'] != null ? props['pixelType'] : _pixelType;
       }
-      WebGLTexture oldBind = device.gl.getParameter(_target_param);
-      device.gl.bindTexture(_target, _buffer);
-      // Allocate memory for texture
+      // TODO(johnmccutchan): Kill this hack.
+      // TODO(johnmccutchan): Support texture properties.
       device.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1);
-      device.gl.texImage2D(_target, 0, _textureFormat, _width, _height, 0, _textureFormat, _pixelFormat, null);
-      device.gl.bindTexture(_target, oldBind);
+      allocatePixelSpace(_width, _height);
     }
+  }
+
+  void allocatePixelSpace(int width, int height, [int level=0]) {
+    _width = width;
+    _height = height;
+    WebGLTexture oldBind = device.gl.getParameter(_target_param);
+    device.gl.bindTexture(_target, _buffer);
+    device.gl.texImage2D(_target, level, _textureFormat, _width, _height,
+                         0, _pixelFormat, _pixelType, null);
+    device.gl.bindTexture(_target, oldBind);
+  }
+
+  void uploadPixelData(dynamic pixels, [int level=0]) {
+    WebGLTexture oldBind = device.gl.getParameter(_target_param);
+    device.gl.bindTexture(_target, _buffer);
+    device.gl.texImage2D(_target, level, _textureFormat, _pixelFormat,
+                         _pixelType, pixels);
+    // TODO(johmccutchan): Update _width and _height based on pixels.
+    device.gl.bindTexture(_target, oldBind);
   }
 
   void _destroyDeviceState() {

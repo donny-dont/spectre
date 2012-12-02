@@ -522,7 +522,8 @@ class GraphicsContext {
     _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
     var oldBind = _device.gl.getParameter(tex._target_param);
     _device.gl.bindTexture(tex._target, tex._buffer);
-    _device.gl.texImage2D(tex._target, 0, tex._textureFormat, tex._textureFormat, tex._pixelFormat, ir.image);
+    _device.gl.texImage2D(tex._target, 0, tex._textureFormat, tex._pixelFormat,
+                          tex._pixelType, ir.image);
     _device.gl.bindTexture(tex._target, oldBind);
   }
 
