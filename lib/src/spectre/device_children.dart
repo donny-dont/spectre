@@ -1072,16 +1072,16 @@ class SamplerState extends DeviceChild {
   static final int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
   static final int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
 
-  int _wrapS;
-  int _wrapT;
-  int _magFilter;
-  int _minFilter;
+  int wrapS;
+  int wrapT;
+  int magFilter;
+  int minFilter;
 
   SamplerState(String name, GraphicsDevice device) : super._internal(name, device) {
-    _wrapS = TextureWrapRepeat;
-    _wrapT = TextureWrapRepeat;
-    _minFilter = TextureMinFilterNearestMipmapLinear;
-    _magFilter = TextureMagFilterLinear;
+    wrapS = TextureWrapRepeat;
+    wrapT = TextureWrapRepeat;
+    minFilter = TextureMinFilterNearestMipmapLinear;
+    magFilter = TextureMagFilterLinear;
   }
 
   void _createDeviceState() {
@@ -1112,13 +1112,13 @@ class SamplerState extends DeviceChild {
     if (props != null) {
       dynamic o;
       o = props['wrapS'];
-      _wrapS = o != null ? filter(o) : _wrapS;
+      wrapS = o != null ? filter(o) : wrapS;
       o = props['wrapT'];
-      _wrapT = o != null ? filter(o) : _wrapT;
+      wrapT = o != null ? filter(o) : wrapT;
       o = props['minFilter'];
-      _minFilter = o != null ? filter(o) : _minFilter;
+      minFilter = o != null ? filter(o) : minFilter;
       o = props['magFilter'];
-      _magFilter = o != null ? filter(o) : _magFilter;
+      magFilter = o != null ? filter(o) : magFilter;
     }
 
   }
