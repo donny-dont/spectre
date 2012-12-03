@@ -493,12 +493,13 @@ class RasterizerState extends DeviceChild {
   }
 }
 
-class Shader extends DeviceChild {
+class SpectreShader extends DeviceChild {
   String _source;
   WebGLShader _shader;
   int _type;
 
-  Shader(String name, GraphicsDevice device) : super._internal(name, device) {
+  SpectreShader(String name, GraphicsDevice device) :
+      super._internal(name, device) {
     _source = '';
     _shader = null;
   }
@@ -545,7 +546,7 @@ class Shader extends DeviceChild {
 /// A vertex shader
 /// Create using [Device.createVertexShader]
 /// Must be linked into a ShaderProgram before use
-class VertexShader extends Shader {
+class VertexShader extends SpectreShader {
   VertexShader(String name, GraphicsDevice device) : super(name, device) {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
@@ -568,7 +569,7 @@ class VertexShader extends Shader {
 /// A fragment shader
 /// Create using [Device.createFragmentShader]
 /// Must be linked into a ShaderProgram before use
-class FragmentShader extends Shader {
+class FragmentShader extends SpectreShader {
   FragmentShader(String name, GraphicsDevice device) : super(name, device) {
     _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
@@ -587,17 +588,6 @@ class FragmentShader extends Shader {
   }
 }
 
-/** A shader program uniform input */
-class ShaderProgramUniform {
-  final String name;
-  final int index;
-  final String type;
-  final int size;
-  final location;
-  ShaderProgramUniform(this.name, this.index, this.type, this.size,
-                       this.location);
-}
-
 /** A shader program attribute input */
 class ShaderProgramAttribute {
   final String name;
@@ -609,16 +599,45 @@ class ShaderProgramAttribute {
                          this.location);
 }
 
-typedef void UniformCallback(ShaderProgramUniform uniform);
-typedef void AttributeCallback(ShaderProgramAttribute attribute);
+/** A shader program uniform input */
+class ShaderProgramUniform {
+  final String name;
+  final int index;
+  final String type;
+  final int size;
+  final location;
+  ShaderProgramUniform(this.name, this.index, this.type, this.size,
+                       this.location);
+}
 
-/// A shader program defines how the programmable units of the GPU pipeline function
-/// Create using [Device.createShaderProgram]
-/// Set using [ImmediateContext.setShaderProgram]
+/** A shader program sampler input */
+class ShaderProgramSampler {
+  final String name;
+  final int index;
+  final String type;
+  final int size;
+  final location;
+  int textureUnit = 0;
+  ShaderProgramSampler(this.name, this.index, this.type, this.size,
+      this.location);
+}
+
+typedef void AttributeCallback(ShaderProgramAttribute attribute);
+typedef void UniformCallback(ShaderProgramUniform uniform);
+typedef void SamplerCallback(ShaderProgramSampler sampler);
+
+/** A shader program specifies the behaviour of the programmable GPU pipeline.
+ * You can create an instance by calling [Graphicsdevice.createShaderProgram].
+ * You can apply a shader program to the GPU pipeline with
+ * [ImmediateContext.setShaderProgram].
+ */
 class ShaderProgram extends DeviceChild {
-  final List<ShaderProgramUniform> uniforms = new List<ShaderProgramUniform>();
-  final List<ShaderProgramAttribute> attributes =
-      new List<ShaderProgramAttribute>();
+  final Map<String, ShaderProgramUniform> uniforms =
+      new Map<String, ShaderProgramUniform>();
+  final Map<String, ShaderProgramAttribute> attributes =
+      new Map<String, ShaderProgramAttribute>();
+  final Map<String, ShaderProgramSampler> samplers =
+      new Map<String, ShaderProgramSampler>();
 
   bool _isLinked = false;
   String _linkLog = '';
@@ -664,14 +683,14 @@ class ShaderProgram extends DeviceChild {
   }
 
   /** Detach [shader] from ShaderProgram. */
-  void detach(Shader shader) {
+  void detach(SpectreShader shader) {
     if (shader != null) {
       device.gl.detachShader(_program, shader._shader);
     }
   }
 
   /** Attach [shader] from ShaderProgram. See also: [link] */
-  void attach(Shader shader) {
+  void attach(SpectreShader shader) {
     if (shader != null) {
       device.gl.attachShader(_program, shader._shader);
     }
@@ -699,7 +718,31 @@ $_linkLog''');
     refreshUniforms();
     refreshAttributes();
     logUniforms();
+    logSamplers();
     logAttributes();
+  }
+
+  bool _isUniformType(int type) {
+    return type == WebGLRenderingContext.FLOAT ||
+           type == WebGLRenderingContext.FLOAT_VEC2 ||
+           type == WebGLRenderingContext.FLOAT_VEC3 ||
+           type == WebGLRenderingContext.FLOAT_VEC4 ||
+           type == WebGLRenderingContext.FLOAT_MAT2 ||
+           type == WebGLRenderingContext.FLOAT_MAT3 ||
+           type == WebGLRenderingContext.FLOAT_MAT4 ||
+           type == WebGLRenderingContext.BOOL ||
+           type == WebGLRenderingContext.BOOL_VEC2 ||
+           type == WebGLRenderingContext.BOOL_VEC3 ||
+           type == WebGLRenderingContext.BOOL_VEC4 ||
+           type == WebGLRenderingContext.INT ||
+           type == WebGLRenderingContext.INT_VEC2 ||
+           type == WebGLRenderingContext.INT_VEC3 ||
+           type == WebGLRenderingContext.INT_VEC4;
+  }
+
+  bool _isSamplerType(int type) {
+    return type == WebGLRenderingContext.SAMPLER_2D ||
+           type == WebGLRenderingContext.SAMPLER_CUBE;
   }
 
   String _convertType(int type) {
@@ -736,6 +779,8 @@ $_linkLog''');
         return 'ivec4';
       case WebGLRenderingContext.SAMPLER_2D:
         return 'sampler2D';
+      case WebGLRenderingContext.SAMPLER_CUBE:
+        return 'samplerCube';
       default:
         return 'unknown code: $type';
     }
@@ -752,16 +797,30 @@ $_linkLog''');
         _program,
         WebGLRenderingContext.ACTIVE_UNIFORMS);
     uniforms.clear();
+    samplers.clear();
+    int numSamplers = 0;
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
       var location = device.gl.getUniformLocation(_program, activeUniform.name);
-      ShaderProgramUniform uniform = new ShaderProgramUniform(
-          activeUniform.name,
-          i,
-          _convertType(activeUniform.type),
-          activeUniform.size,
-          location);
-      uniforms.add(uniform);
+      if (_isSamplerType(activeUniform.type)) {
+        ShaderProgramSampler sampler = new ShaderProgramSampler(
+            activeUniform.name,
+            i,
+            _convertType(activeUniform.type),
+            activeUniform.size,
+            location);
+        samplers[activeUniform.name] = sampler;
+        sampler.textureUnit = numSamplers;
+        device.gl.uniform1i(location, numSamplers++);
+      } else {
+        ShaderProgramUniform uniform = new ShaderProgramUniform(
+            activeUniform.name,
+            i,
+            _convertType(activeUniform.type),
+            activeUniform.size,
+            location);
+        uniforms[activeUniform.name] = uniform;
+      }
     }
   }
 
@@ -780,20 +839,29 @@ $_linkLog''');
           _convertType(activeAttribute.type),
           activeAttribute.size,
           location);
-      attributes.add(attribute);
+      attributes[activeAttribute.name] = attribute;
     }
   }
 
-
+  /** Output each uniform variable input to the log. */
   void logUniforms() {
-    uniforms.forEach((uniform) {
+    forEachUniform((uniform) {
       spectreLog.Info('Uniforms[${uniform.index}] ${uniform.type}'
                       ' ${uniform.name} (${uniform.size})');
     });
   }
 
+  /** Output each sampler input to the log. */
+  void logSamplers() {
+    forEachSampler((sampler) {
+      spectreLog.Info('Sampler[${sampler.index}] ${sampler.type}'
+                      ' ${sampler.name} (${sampler})');
+    });
+  }
+
+  /** Output each attribute input to the log. */
   void logAttributes() {
-    attributes.forEach((attribute) {
+    forEachAttribute((attribute) {
       spectreLog.Info('Attributes[${attribute.index}] ${attribute.type}'
                       ' ${attribute.name} (${attribute.size})');
     });
@@ -805,9 +873,20 @@ $_linkLog''');
    *
    * See [UniformCallback].
    */
-  void forEachUniforms(UniformCallback callback) {
-    uniforms.forEach((uniform) {
+  void forEachUniform(UniformCallback callback) {
+    uniforms.forEach((_, uniform) {
       callback(uniform);
+    });
+  }
+
+  /**
+   * Iteraete over all active sampler inputs and call [callback] for each one.
+   *
+   * See [SamplerCallback].
+   */
+  void forEachSampler(SamplerCallback callback) {
+    samplers.forEach((_, sampler) {
+      callback(sampler);
     });
   }
 
@@ -817,7 +896,7 @@ $_linkLog''');
    * See [AttributeCallback].
    */
   void forEachAttribute(AttributeCallback callback) {
-    attributes.forEach((attribute) {
+    attributes.forEach((_, attribute) {
       callback(attribute);
     });
   }

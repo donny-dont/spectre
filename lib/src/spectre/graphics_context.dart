@@ -540,7 +540,7 @@ class GraphicsContext {
     tex.ready = true;
   }
 
-  void compileShader(Shader shader, String source) {
+  void compileShader(SpectreShader shader, String source) {
     if (shader == null) {
       return;
     }
