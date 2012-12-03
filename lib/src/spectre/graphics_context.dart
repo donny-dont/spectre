@@ -141,10 +141,10 @@ class GraphicsContext {
       }
       _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + i);
       _device.gl.bindTexture(t._target, t._buffer);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s._wrapS);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s._wrapT);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s._minFilter);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s._magFilter);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s.wrapS);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s.wrapT);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s.minFilter);
+      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s.magFilter);
     }
   }
 
@@ -320,169 +320,107 @@ class GraphicsContext {
     }
   }
 
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform2f(String name, num v0, num v1) {
+  WebGLUniformLocation _findUniform(String name) {
     ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+      spectreLog.Error('Cannot set uniform: no ShaderProgram bound.');
+      return null;
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
+    ShaderProgramUniform uniform = sp.uniforms[name];
+    if (uniform == null) {
+      //spectreLog.Error('Cannot set uniform: ${sp} does not have $name');
+      return null;
     }
-    _device.gl.uniform2f(index,v0, v1);
+    return uniform.location;
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniform2f(String name, num v0, num v1) {
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform2f(index,v0, v1);
+    }
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform3f(String name, num v0, num v1, num v2) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform3f(index,v0, v1, v2);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform3f(index,v0, v1, v2);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform4f(String name, num v0, num v1, num v2, num v3) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform4f(index,v0, v1, v2, v3);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform4f(index,v0, v1, v2, v3);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix3(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+  void setUniformMatrix3(String name, Float32Array matrix,
+                         [bool transpose=false]) {
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniformMatrix3fv(index, transpose, matrix);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniformMatrix3fv(index, transpose, matrix);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformInt(String name, int i) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform1i(index, i);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform1i(index, i);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformNum(String name, num i) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform1f(index, i);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform1f(index, i);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniformMatrix4fv(index, transpose, matrix);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniformMatrix4fv(index, transpose, matrix);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector4(String name, Float32Array vector) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform4fv(index, vector);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform4fv(index, vector);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector3(String name, Float32Array vector) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform3fv(index, vector);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform3fv(index, vector);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniformVector2(String name, Float32Array vector) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform2fv(index, vector);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform2fv(index, vector);
   }
 
 
   void setUniformFloat4Array(String name, Float32Array array) {
-    ShaderProgram sp = _shaderProgramHandle;
-    if (sp == null) {
-      spectreLog.Error('Attempting to set uniform with invalid program bound.');
-      return;
+    var index = _findUniform(name);
+    if (index != null) {
+      _device.gl.uniform4fv(index, array);
     }
-    var index = _device.gl.getUniformLocation(sp._program, name);
-    if (index == -1) {
-      spectreLog.Error('Could not find uniform $name in ${sp.name}');
-      return;
-    }
-    _device.gl.uniform4fv(index, array);
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data]
@@ -565,7 +503,7 @@ class GraphicsContext {
     _device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
   }
 
-  void compileShaderFromResource(Shader shader, ShaderResource sr, ResourceManager rm) {
+  void compileShaderFromResource(SpectreShader shader, ShaderResource sr, ResourceManager rm) {
     if (sr == null) {
       return;
     }
