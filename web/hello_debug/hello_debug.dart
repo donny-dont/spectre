@@ -80,8 +80,6 @@ main() {
 
   assert(gl != null);
 
-  // Initialize Spectre
-  initSpectre();
   // Create a GraphicsDevice
   _graphicsDevice = new GraphicsDevice(gl);
   // Print out GraphicsDeviceCapabilities
