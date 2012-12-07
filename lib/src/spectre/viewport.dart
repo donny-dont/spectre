@@ -22,56 +22,39 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
+/// Rendering viewport
+/// Create using [Device.createViewport]
+/// Set using [ImmediateContext.setViewport]
+class Viewport extends DeviceChild {
+  int x;
+  int y;
+  int width;
+  int height;
 
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
-
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
-
-  String toString() => name;
-
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
-    }
+  Viewport(String name, GraphicsDevice device) : super._internal(name, device) {
+    x = 0;
+    y = 0;
+    width = 640;
+    height = 480;
   }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
-  DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
-  }
-
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
   }
+
   void _configDeviceState(Map props) {
+    if (props != null) {
+      dynamic o;
+      o = props['x'];
+      x = o != null ? o : x;
+      o = props['y'];
+      y = o != null ? o : y;
+      o = props['width'];
+      width = o != null ? o : width;
+      o = props['height'];
+      height = o != null ? o : height;
+    }
   }
+
   void _destroyDeviceState() {
   }
 }
-
-
-

@@ -22,56 +22,25 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
+/// IndexBuffer defines the storage for indexes used to construct primitives
+/// Create using [Device.createIndexBuffer]
+/// Set using [Device.setIndexBuffer]
+class IndexBuffer extends SpectreBuffer {
 
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
-
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
-
-  String toString() => name;
-
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
-    }
+  IndexBuffer(String name, GraphicsDevice device) : super(name, device) {
+    _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+    _param_target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
   }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
-  DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
-  }
-
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
+    super._createDeviceState();
   }
+
   void _configDeviceState(Map props) {
+    super._configDeviceState(props);
   }
+
   void _destroyDeviceState() {
+    super._destroyDeviceState();
   }
 }
-
-
-

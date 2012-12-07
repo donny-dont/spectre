@@ -22,56 +22,52 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
+class SpectreShader extends DeviceChild {
+  String _source;
+  WebGLShader _shader;
+  int _type;
 
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
+  SpectreShader(String name, GraphicsDevice device) :
+      super._internal(name, device) {
+    _source = '';
+    _shader = null;
+  }
 
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
+  String get log {
+    return device.gl.getShaderInfoLog(_shader);
+  }
 
-  String toString() => name;
+  WebGLShader get shader => this._shader;
 
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
+  void set source(String s) {
+    _source = s;
+    device.gl.shaderSource(_shader, _source);
+  }
+
+  String get source {
+    return _source;
+  }
+
+  bool get compiled {
+    if (_shader != null) {
+      return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
     }
-  }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
-  DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
+    return false;
   }
 
-  int get hashCode {
-    return name.hashCode;
+  void compile() {
+    device.gl.compileShader(_shader);
   }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
+    _shader = device.gl.createShader(_type);
   }
+
+
   void _configDeviceState(Map props) {
   }
+
   void _destroyDeviceState() {
+    device.gl.deleteShader(_shader);
   }
 }
-
-
-

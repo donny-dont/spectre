@@ -22,56 +22,24 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
-
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
-
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
-
-  String toString() => name;
-
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
-    }
+/// A fragment shader
+/// Create using [Device.createFragmentShader]
+/// Must be linked into a ShaderProgram before use
+class FragmentShader extends SpectreShader {
+  FragmentShader(String name, GraphicsDevice device) : super(name, device) {
+    _type = WebGLRenderingContext.FRAGMENT_SHADER;
   }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
-  DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
-  }
-
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
+    super._createDeviceState();
   }
+
+
   void _configDeviceState(Map props) {
+   super._configDeviceState(props);
   }
+
   void _destroyDeviceState() {
+    super._destroyDeviceState();
   }
 }
-
-
-

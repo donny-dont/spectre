@@ -169,8 +169,6 @@ main() {
 
   assert(gl != null);
 
-  // Initialize Spectre
-  initSpectre();
   // Create a GraphicsDevice
   _graphicsDevice = new GraphicsDevice(gl);
   // Get a reference to the GraphicsContext
