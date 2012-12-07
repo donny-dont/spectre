@@ -22,56 +22,46 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
+class ArrayMesh extends DeviceChild {
+  VertexBuffer vertexArray;
+  int numVertices;
+  int vertexOffset;
 
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
-
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
-
-  String toString() => name;
-
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
-    }
+  ArrayMesh(String name, GraphicsDevice device) : super._internal(name, device) {
+    numVertices = 0;
+    vertexOffset = 0;
   }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
-  DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
-  }
-
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
+    super._createDeviceState();
+    vertexArray = device.createVertexBuffer('${name}.array', {});
   }
+
   void _configDeviceState(Map props) {
+    super._configDeviceState(props);
+    if (props != null) {
+      dynamic o;
+
+      /* TODO
+      o = props['UpdateFromArray'];
+      if (o != null && o is int) {
+
+      }
+
+      o = props['vertexOffset'];
+      if (o != null && o is int) {
+        vertexOffset = o;
+      }
+
+      o = props['numVertices'];
+      if (o != null && o is int) {
+        numVertices = o;
+      }*/
+    }
   }
+
   void _destroyDeviceState() {
+    device.deleteDeviceChild(vertexArray);
+    super._destroyDeviceState();
   }
 }
-
-
-
