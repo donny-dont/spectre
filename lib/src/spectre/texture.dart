@@ -58,6 +58,12 @@ class Texture extends DeviceChild {
 
   Texture(String name, GraphicsDevice device) : super._internal(name, device);
 
+  /** Binds the texture to [unit]. */
+  void bind(int unit) {
+    device.gl.activeTexture(unit);
+    device.gl.bindTexture(_target, _buffer);
+  }
+
   void _createDeviceState() {
     _buffer = device.gl.createTexture();
   }
