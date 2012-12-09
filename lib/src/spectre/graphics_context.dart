@@ -457,12 +457,7 @@ class GraphicsContext {
     if (tex == null) {
       return;
     }
-    _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
-    var oldBind = _device.gl.getParameter(tex._target_param);
-    _device.gl.bindTexture(tex._target, tex._buffer);
-    _device.gl.texImage2D(tex._target, 0, tex._textureFormat, tex._pixelFormat,
-                          tex._pixelType, ir.image);
-    _device.gl.bindTexture(tex._target, oldBind);
+    tex.uploadElement(ir.image);
   }
 
   /// Generate the full mipmap pyramid for [textureHandle]

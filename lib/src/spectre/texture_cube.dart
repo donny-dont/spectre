@@ -22,19 +22,23 @@ part of spectre;
 
 */
 
-/// Texture2D defines the storage for a 2D texture including Mipmaps
-/// Create using [Device.createTexture2D]
-/// Set using [immediateContext.setTextures]
-/// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
-class Texture2D extends Texture {
-  bool _loadError = false;
+class TextureCube extends Texture {
+  static final int PositiveX =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_X;
+  static final int NegativeX =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_X;
+  static final int PositiveY =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Y;
+  static final int NegativeY =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Y;
+  static final int PositiveZ =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Z;
+  static final int NegativeZ =
+      WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z;
 
-  /** Did an error occur when loading from a URL? */
-  bool get loadError => _loadError;
-
-  Texture2D(String name, GraphicsDevice device) : super(name, device) {
-    _target = WebGLRenderingContext.TEXTURE_2D;
-    _target_param = WebGLRenderingContext.TEXTURE_BINDING_2D;
+  TextureCube(String name, GraphicsDevice device) : super(name, device) {
+    _target = WebGLRenderingContext.TEXTURE_CUBE_MAP;
+    _target_param = WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP;
   }
 
   void _createDeviceState() {
@@ -43,38 +47,22 @@ class Texture2D extends Texture {
 
   void _configDeviceState(Map props) {
     super._configDeviceState(props);
-
-    if (props != null && props['pixels'] != null) {
-      var pixels = props['pixels'];
-      uploadElement(pixels);
-    } else {
-      if (props != null) {
-        _width = props['width'] != null ? props['width'] : _width;
-        _height = props['height'] != null ? props['height'] : _height;
-        _textureFormat = props['textureFormat'] != null ?
-            props['textureFormat'] : _textureFormat;
-      }
-      // TODO(johnmccutchan): Kill this hack.
-      // TODO(johnmccutchan): Support texture properties.
-      device.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1);
-      uploadPixelArray(width, height, null);
-    }
   }
 
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
 
-  void _uploadPixelArray(int width, int height, dynamic array,
+  void _uploadPixelArray(int face, int width, int height, dynamic array,
                          int pixelFormat, int pixelType) {
-    device.gl.texImage2D(_target, 0, _textureFormat, width, height,
+    device.gl.texImage2D(face, 0, _textureFormat, width, height,
                          0, pixelFormat, pixelType, array);
   }
 
   /** Replace texture contents with data stored in [array].
    * If [array] is null, space will be allocated on the GPU
    */
-  void uploadPixelArray(int width, int height, dynamic array,
+  void uploadPixelArray(int face, int width, int height, dynamic array,
                         {pixelFormat: Texture.FormatRGBA,
                          pixelType: Texture.PixelTypeU8}) {
     WebGLTexture oldBind = device.gl.getParameter(_target_param);
@@ -85,8 +73,9 @@ class Texture2D extends Texture {
     device.gl.bindTexture(_target, oldBind);
   }
 
-  void _uploadElement(dynamic element, int pixelFormat, int pixelType) {
-    device.gl.texImage2D(_target, 0, _textureFormat,
+  void _uploadElement(int face, dynamic element, int pixelFormat,
+                      int pixelType) {
+    device.gl.texImage2D(face, 0, _textureFormat,
                          pixelFormat, pixelType, element);
   }
 
@@ -96,9 +85,9 @@ class Texture2D extends Texture {
    * The image data will be converted to [pixelFormat] and [pixelType] before
    * being uploaded to the GPU.
    */
-  void uploadElement(dynamic element,
+  void uploadElement(int face, dynamic element,
                      {pixelFormat: Texture.FormatRGBA,
-                         pixelType: Texture.PixelTypeU8}) {
+                      pixelType: Texture.PixelTypeU8}) {
     if (element is ImageElement) {
       _width = element.naturalWidth;
       _height = element.naturalHeight;
@@ -120,7 +109,7 @@ class Texture2D extends Texture {
   /** Replace texture contents with data fetched from [url].
    * If an error occurs while fetching the image, loadError will be true.
    */
-  Future<Texture2D> uploadFromURL(Sting url,
+  Future<Texture2D> uploadFromURL(int face, Sting url,
                                   {pixelFormat: Texture.FormatRGBA,
                                    pixelType: Texture.PixelTypeU8}) {
     ImageElement element = new ImageElement();
@@ -130,7 +119,7 @@ class Texture2D extends Texture {
       completer.complete(this);
     });
     element.on.load.add((event) {
-      uploadElement(element, pixelFormat, pixelType);
+      uploadElement(face, element, pixelFormat, pixelType);
       completer.complete(this);
     });
     // Initiate load.
@@ -139,17 +128,17 @@ class Texture2D extends Texture {
     return completer.future;
   }
 
-  void _generateMipmap() {
-    device.gl.generateMipmap(_target);
+  void _generateMipmap(int face) {
+    device.gl.generateMipmap(face);
   }
 
   /** Generate Mipmap data for texture. This must be done before the texture
    * can be used for rendering.
    */
-  void generateMipmap() {
+  void generateMipmap(int face) {
     WebGLTexture oldBind = device.gl.getParameter(_target_param);
     device.gl.bindTexture(_target, _buffer);
-    _generateMipmap();
+    _generateMipmap(face);
     device.gl.bindTexture(_target, oldBind);
   }
 }

@@ -23,25 +23,34 @@ part of spectre;
 */
 
 class Texture extends DeviceChild {
-  static final int FormatR = WebGLRenderingContext.RED;
-  static final int FormatRG = WebGLRenderingContext.RG;
-  static final int FormatRGB = WebGLRenderingContext.RGB;
-  static final int FormatRGBA = WebGLRenderingContext.RGBA;
-  static final int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT;
+  static const int FormatR = WebGLRenderingContext.RED;
+  static const int FormatRG = WebGLRenderingContext.RG;
+  static const int FormatRGB = WebGLRenderingContext.RGB;
+  static const int FormatRGBA = WebGLRenderingContext.RGBA;
+  static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT;
 
-  static final int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
-  static final int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
-  static final int PixelTypeU32 = WebGLRenderingContext.UNSIGNED_INT;
-  static final int PixelTypeS8 = WebGLRenderingContext.BYTE;
-  static final int PixelTypeS16 = WebGLRenderingContext.SHORT;
-  static final int PixelTypeS32 = WebGLRenderingContext.INT;
-  static final int PixelTypeFloat = WebGLRenderingContext.FLOAT;
+  static const int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
+  static const int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
+  static const int PixelTypeU32 = WebGLRenderingContext.UNSIGNED_INT;
+  static const int PixelTypeS8 = WebGLRenderingContext.BYTE;
+  static const int PixelTypeS16 = WebGLRenderingContext.SHORT;
+  static const int PixelTypeS32 = WebGLRenderingContext.INT;
+  static const int PixelTypeFloat = WebGLRenderingContext.FLOAT;
 
-  int _width;
-  int _height;
-  int _textureFormat;
-  int _pixelFormat;
-  int _pixelType;
+  int _width = 0;
+  int get width => _width;
+  int _height = 0;
+  int get height => _height;
+  int _textureFormat = FormatRGBA;
+  /** Retrieve the internal format used for this texture */
+  int get textureFormat => _textureFormat;
+  /** Set the internal format used for this texture.
+   *
+   * NOTE: Will not take affect until next upload.
+   */
+  set textureFormat(int internalFormat) {
+    _textureFormat = internalFormat;
+  }
 
   int _target;
   int _target_param;
@@ -54,7 +63,6 @@ class Texture extends DeviceChild {
   }
 
   void _configDeviceState(Map props) {
-
   }
 
   void _destroyDeviceState() {
