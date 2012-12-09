@@ -26,15 +26,15 @@ part of spectre;
 /// Create using [Device.createDepthState]
 /// Set using [ImmediateContext.setDepthState]
 class DepthState extends DeviceChild {
-  static final int DepthComparisonOpNever = WebGLRenderingContext.NEVER;
-  static final int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
-  static final int DepthComparisonOpEqual = WebGLRenderingContext.EQUAL;
-  static final int DepthComparisonOpNotEqual = WebGLRenderingContext.NOTEQUAL;
+  static const int DepthComparisonOpNever = WebGLRenderingContext.NEVER;
+  static const int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
+  static const int DepthComparisonOpEqual = WebGLRenderingContext.EQUAL;
+  static const int DepthComparisonOpNotEqual = WebGLRenderingContext.NOTEQUAL;
 
-  static final int DepthComparisonOpLess = WebGLRenderingContext.LESS;
-  static final int DepthComparisonOpLessEqual = WebGLRenderingContext.LEQUAL;
-  static final int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
-  static final int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
+  static const int DepthComparisonOpLess = WebGLRenderingContext.LESS;
+  static const int DepthComparisonOpLessEqual = WebGLRenderingContext.LEQUAL;
+  static const int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
+  static const int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
 
   bool depthTestEnabled;
   bool depthWriteEnabled;

@@ -26,19 +26,19 @@ part of spectre;
 /// Create using [Device.createSamplerState]
 /// Set using [immediateContext.setSamplerStates]
 class SamplerState extends DeviceChild {
-  static final int TextureWrapClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE;
-  static final int TextureWrapMirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT;
-  static final int TextureWrapRepeat = WebGLRenderingContext.REPEAT;
+  static const int TextureWrapClampToEdge = WebGLRenderingContext.CLAMP_TO_EDGE;
+  static const int TextureWrapMirroredRepeat = WebGLRenderingContext.MIRRORED_REPEAT;
+  static const int TextureWrapRepeat = WebGLRenderingContext.REPEAT;
 
-  static final int TextureMagFilterLinear = WebGLRenderingContext.LINEAR;
-  static final int TextureMagFilterNearest = WebGLRenderingContext.NEAREST;
+  static const int TextureMagFilterLinear = WebGLRenderingContext.LINEAR;
+  static const int TextureMagFilterNearest = WebGLRenderingContext.NEAREST;
 
-  static final int TextureMinFilterLinear = WebGLRenderingContext.LINEAR;
-  static final int TextureMinFilterNearest = WebGLRenderingContext.NEAREST;
-  static final int TextureMinFilterNearestMipmapNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
-  static final int TextureMinFilterNearestMipmapLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
-  static final int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
-  static final int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
+  static const int TextureMinFilterLinear = WebGLRenderingContext.LINEAR;
+  static const int TextureMinFilterNearest = WebGLRenderingContext.NEAREST;
+  static const int TextureMinFilterNearestMipmapNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
+  static const int TextureMinFilterNearestMipmapLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
+  static const int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
+  static const int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
 
   int wrapS;
   int wrapT;

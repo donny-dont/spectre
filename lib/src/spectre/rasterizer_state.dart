@@ -26,11 +26,11 @@ part of spectre;
 /// Create using [Device.createRasterizerState]
 /// Set using [ImmediateContext.setRasterizerState]
 class RasterizerState extends DeviceChild {
-  static final int CullFront = WebGLRenderingContext.FRONT;
-  static final int CullBack = WebGLRenderingContext.BACK;
-  static final int CullFrontAndBack = WebGLRenderingContext.FRONT_AND_BACK;
-  static final int FrontCW = WebGLRenderingContext.CW;
-  static final int FrontCCW = WebGLRenderingContext.CCW;
+  static const int CullFront = WebGLRenderingContext.FRONT;
+  static const int CullBack = WebGLRenderingContext.BACK;
+  static const int CullFrontAndBack = WebGLRenderingContext.FRONT_AND_BACK;
+  static const int FrontCW = WebGLRenderingContext.CW;
+  static const int FrontCCW = WebGLRenderingContext.CCW;
 
   bool cullEnabled;
   int cullMode;
