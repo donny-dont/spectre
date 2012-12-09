@@ -26,24 +26,33 @@ part of spectre;
 /// Create using [Device.createBlendState]
 /// Set using [ImmediateContext.setBlendState]
 class BlendState extends DeviceChild {
-  static final int BlendSourceZero = WebGLRenderingContext.ZERO;
-  static final int BlendSourceOne = WebGLRenderingContext.ONE;
-  static final int BlendSourceShaderColor = WebGLRenderingContext.SRC_COLOR;
-  static final int BlendSourceShaderInverseColor = WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
-  static final int BlendSourceShaderAlpha = WebGLRenderingContext.SRC_ALPHA;
-  static final int BlendSourceShaderInverseAlpha = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-  static final int BlendSourceTargetColor = WebGLRenderingContext.DST_COLOR;
-  static final int BlendSourceTargetInverseColor = WebGLRenderingContext.ONE_MINUS_DST_COLOR;
-  static final int BlendSourceTargetAlpha = WebGLRenderingContext.DST_ALPHA;
-  static final int BlendSourceTargetInverseAlpha = WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
-  static final int BlendSourceBlendColor = WebGLRenderingContext.CONSTANT_COLOR;
-  static final int BlendSourceBlendAlpha = WebGLRenderingContext.CONSTANT_ALPHA;
-  static final int BlendSourceBlendInverseColor = WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
-  static final int BlendSourceBlendInverseAlpha = WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
+  static const int BlendSourceZero = WebGLRenderingContext.ZERO;
+  static const int BlendSourceOne = WebGLRenderingContext.ONE;
+  static const int BlendSourceShaderColor =
+      WebGLRenderingContext.SRC_COLOR;
+  static const int BlendSourceShaderInverseColor =
+      WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
+  static const int BlendSourceShaderAlpha =
+      WebGLRenderingContext.SRC_ALPHA;
+  static const int BlendSourceShaderInverseAlpha =
+      WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+  static const int BlendSourceTargetColor = WebGLRenderingContext.DST_COLOR;
+  static const int BlendSourceTargetInverseColor =
+      WebGLRenderingContext.ONE_MINUS_DST_COLOR;
+  static const int BlendSourceTargetAlpha = WebGLRenderingContext.DST_ALPHA;
+  static const int BlendSourceTargetInverseAlpha =
+      WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
+  static const int BlendSourceBlendColor = WebGLRenderingContext.CONSTANT_COLOR;
+  static const int BlendSourceBlendAlpha = WebGLRenderingContext.CONSTANT_ALPHA;
+  static const int BlendSourceBlendInverseColor =
+      WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
+  static const int BlendSourceBlendInverseAlpha =
+      WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
 
-  static final int BlendOpAdd = WebGLRenderingContext.FUNC_ADD;
-  static final int BlendOpSubtract = WebGLRenderingContext.FUNC_SUBTRACT;
-  static final int BlendOpReverseSubtract = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
+  static const int BlendOpAdd = WebGLRenderingContext.FUNC_ADD;
+  static const int BlendOpSubtract = WebGLRenderingContext.FUNC_SUBTRACT;
+  static const int BlendOpReverseSubtract =
+      WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
 
   // Constant blend values
   double blendColorRed;
