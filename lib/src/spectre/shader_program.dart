@@ -301,7 +301,6 @@ $_linkLog''');
     });
   }
 
-
   /**
    * Iterate over all active uniform inputs and call [callback] for each one.
    *
@@ -333,5 +332,191 @@ $_linkLog''');
     attributes.forEach((_, attribute) {
       callback(attribute);
     });
+  }
+
+  dynamic _findUniform(String name) {
+    ShaderProgramUniform uniform = uniforms[name];
+    if (uniform == null) {
+      return null;
+    }
+    return uniform.location;
+  }
+
+  void _setUniform2f(var index, num v0, num v1) {
+    device.gl.uniform2f(index,v0, v1);
+  }
+
+  /// Set Uniform variable [name] in this [ShaderProgram].
+  void setUniform2f(String name, num v0, num v1) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniform2(index, v0, v1);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniform3f(var index, num v0, num v1, num v2) {
+    device.gl.uniform3f(index,v0, v1, v2);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniform3f(String name, num v0, num v1, num v2) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniform3f(index, v0, v1, v2);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniform4f(var index, num v0, num v1, num v2, num v3) {
+    device.gl.uniform4f(index,v0, v1, v2, v3);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniform4f(String name, num v0, num v1, num v2, num v3) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniform4f(index, v0, v1, v2, v3);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformInt(var index, int i) {
+    device.gl.uniform1i(index, i);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformInt(String name, int i) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformInt(index, i);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformNum(var index, num i) {
+    device.gl.uniform1f(index, i);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformNum(String name, num i) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformNum(index, i);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformMatrix2(var idnex, Float32Array matrix, bool transpose) {
+    _device.gl.uniformMatrix2fv(index, transpose, matrix);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformMatrix2(String name, Float32Array matrix,
+                         [bool transpose=false]) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformMatrix2(index, vector);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformMatrix3(var index, Float32Array matrix, bool transpose) {
+    _device.gl.uniformMatrix3fv(index, transpose, matrix);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformMatrix3(String name, Float32Array matrix,
+                         [bool transpose=false]) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformMatrix3(index, vector);
+    devicegl.useProgram(oldBind);
+  }
+
+  void _setUniformMatrix4(var index, Float32Array matrix, bool transpose) {
+    device.gl.uniformMatrix4fv(index, transpose, matrix);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformMatrix4(index, vector);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformVector2(var index, Float32Array vector) {
+    device.gl.uniform2fv(index, vector);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector2(String name, Float32Array vector) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformVector2(index, vector);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformVector3(var index, Float32Array vector) {
+    device.gl.uniform3fv(index, vector);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector3(String name, Float32Array vector) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformVector3(index, vector);
+    device.gl.useProgram(oldBind);
+  }
+
+  void _setUniformVector4(var index, Float32Array vector) {
+    device.gl.uniform4fv(index, vector);
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector4(String name, Float32Array vector) {
+    var index = _findUniform(name);
+    if (index == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
+    _setUniformVector4(index, vector);
+    device.gl.useProgram(oldBind);
   }
 }

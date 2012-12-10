@@ -326,19 +326,14 @@ class GraphicsContext {
       spectreLog.Error('Cannot set uniform: no ShaderProgram bound.');
       return null;
     }
-    ShaderProgramUniform uniform = sp.uniforms[name];
-    if (uniform == null) {
-      //spectreLog.Error('Cannot set uniform: ${sp} does not have $name');
-      return null;
-    }
-    return uniform.location;
+    return sp._findUniform(name);
   }
 
   /// Set Uniform variable [name] in current [ShaderProgram]
   void setUniform2f(String name, num v0, num v1) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniform2f(index,v0, v1);
+      _shaderProgramHandle._setUniform2f(index, v0, v1);
     }
   }
 
@@ -346,7 +341,7 @@ class GraphicsContext {
   void setUniform3f(String name, num v0, num v1, num v2) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniform3f(index,v0, v1, v2);
+      _shaderProgramHandle._setUniform3f(index, v0, v1, v2);
     }
   }
 
@@ -354,7 +349,23 @@ class GraphicsContext {
   void setUniform4f(String name, num v0, num v1, num v2, num v3) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniform4f(index,v0, v1, v2, v3);
+      _shaderProgramHandle._setUniform4f(index, v0, v1, v2, v3);
+    }
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformInt(String name, int i) {
+    var index = _findUniform(name);
+    if (index != null) {
+      _shaderProgramHandle._setUniformInt(index, i);
+    }
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformNum(String name, num i) {
+    var index = _findUniform(name);
+    if (index != null) {
+      _shaderProgramHandle._setUniformNum(index, i);
     }
   }
 
@@ -363,23 +374,7 @@ class GraphicsContext {
                          [bool transpose=false]) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniformMatrix3fv(index, transpose, matrix);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformInt(String name, int i) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _device.gl.uniform1i(index, i);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformNum(String name, num i) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _device.gl.uniform1f(index, i);
+      _shaderProgramHandle._setUniformMatrix3(index, matrix, transpose);
     }
   }
 
@@ -387,23 +382,7 @@ class GraphicsContext {
   void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniformMatrix4fv(index, transpose, matrix);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector4(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _device.gl.uniform4fv(index, vector);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector3(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _device.gl.uniform3fv(index, vector);
+      _shaderProgramHandle._setUniformMatrix4(index, matrix, transpose);
     }
   }
 
@@ -411,15 +390,23 @@ class GraphicsContext {
   void setUniformVector2(String name, Float32Array vector) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniform2fv(index, vector);
+      _shaderProgramHandle._setUniformVector2(index, vector);
     }
   }
 
-
-  void setUniformFloat4Array(String name, Float32Array array) {
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector3(String name, Float32Array vector) {
     var index = _findUniform(name);
     if (index != null) {
-      _device.gl.uniform4fv(index, array);
+      _shaderProgramHandle._setUniformVector3(index, vector);
+    }
+  }
+
+  /// Set Uniform variable [name] in current [ShaderProgram]
+  void setUniformVector4(String name, Float32Array vector) {
+    var index = _findUniform(name);
+    if (index != null) {
+      _shaderProgramHandle._setUniformVector4(index, vector);
     }
   }
 
