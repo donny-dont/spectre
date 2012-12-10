@@ -30,12 +30,37 @@ class RenderBuffer extends DeviceChild {
   static const int FormatRGBA = WebGLRenderingContext.RGBA4;
   static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT16;
 
-  static final int _target = WebGLRenderingContext.RENDERBUFFER;
-  static final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
+  static String formatToString(int format) {
+    if (format == formatRGB) {
+      return 'RGB';
+    }
+    if (format == FormatRGBA) {
+      return 'RGBA';
+    }
+    if (format == FormatDepth) {
+      return 'Depth';
+    }
+    assert(false);
+  }
+
+  static int stringToFormat(String format) {
+    if (format == 'RGB') {
+      return FormatRGB;
+    }
+    if (format == 'RGBA') {
+      return FormatRGBA;
+    }
+    if (format == 'Depth') {
+      return FormatDepth;
+    }
+    assert(false);
+  }
+  final int _target = WebGLRenderingContext.RENDERBUFFER;
+  final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
 
   int _width = 0;
   int _height = 0;
-  int _format = 0;
+  int _format = FormatRGB;
   WebGLRenderbuffer _buffer;
 
   RenderBuffer(String name, GraphicsDevice device) :
@@ -48,30 +73,6 @@ class RenderBuffer extends DeviceChild {
 
   void _destroyDeviceState() {
     device.gl.deleteRenderbuffer(_buffer);
-  }
-
-  void _configDeviceState(Map props) {
-    String format = props['format'];
-    int w = 0;
-    int h = 0;
-    int f = FormatRGB;
-    switch (format) {
-      case 'RGB':
-        f = FormatRGB;
-      break;
-      case 'RGBA':
-        f = FormatRGBA;
-      break;
-      case 'DEPTH':
-        f = FormatDepth;
-      break;
-      default:
-        spectreLog.Error('$format is not a valid RenderBuffer format');
-      break;
-    }
-    w = props['width'];
-    h = props['height'];
-    allocateStorage(w, h, f);
   }
 
   void _allocateStorage(int width, int height, int format) {
