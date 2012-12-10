@@ -47,10 +47,6 @@ class SpectreBuffer extends DeviceChild {
     _buffer = device.gl.createBuffer();
   }
 
-  void _configDeviceState(Map props) {
-    super._configDeviceState(props);
-  }
-
   void _destroyDeviceState() {
     device.gl.deleteBuffer(_buffer);
     super._destroyDeviceState();

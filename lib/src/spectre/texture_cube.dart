@@ -45,10 +45,6 @@ class TextureCube extends Texture {
     super._createDeviceState();
   }
 
-  void _configDeviceState(Map props) {
-    super._configDeviceState(props);
-  }
-
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }

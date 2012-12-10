@@ -63,10 +63,6 @@ class SpectreShader extends DeviceChild {
     _shader = device.gl.createShader(_type);
   }
 
-
-  void _configDeviceState(Map props) {
-  }
-
   void _destroyDeviceState() {
     device.gl.deleteShader(_shader);
   }

@@ -23,11 +23,51 @@ part of spectre;
 */
 
 class Texture extends DeviceChild {
-  static const int FormatR = WebGLRenderingContext.RED;
-  static const int FormatRG = WebGLRenderingContext.RG;
+  //static const int FormatR = WebGLRenderingContext.RED;
+  //static const int FormatRG = WebGLRenderingContext.RG;
   static const int FormatRGB = WebGLRenderingContext.RGB;
   static const int FormatRGBA = WebGLRenderingContext.RGBA;
   static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT;
+
+  static String formatToString(int format) {
+    /*
+    if (format == FormatR) {
+      return 'R';
+    }
+    if (format == FormatRG) {
+      return 'RG';
+    }*/
+    if (format == FormatRGB) {
+      return 'RGB';
+    }
+    if (format == FormatRGBA) {
+      return 'RGBA';
+    }
+    if (format == FormatDepth) {
+      return 'Depth';
+    }
+    assert(false);
+  }
+
+  static int stringToFormat(String format) {
+    /*
+    if (format == 'R') {
+      return FormatR;
+    }
+    if (format == 'RG') {
+      return FormatRG;
+    }*/
+    if (format == 'RGB') {
+      return FormatRGB;
+    }
+    if (format == 'RGBA') {
+      return FormatRGBA;
+    }
+    if (format == 'Depth') {
+      return FormatDepth;
+    }
+    assert(false);
+  }
 
   static const int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
   static const int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
@@ -66,9 +106,6 @@ class Texture extends DeviceChild {
 
   void _createDeviceState() {
     _buffer = device.gl.createTexture();
-  }
-
-  void _configDeviceState(Map props) {
   }
 
   void _destroyDeviceState() {

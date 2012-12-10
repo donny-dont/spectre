@@ -30,14 +30,8 @@ class VertexShader extends SpectreShader {
     _type = WebGLRenderingContext.VERTEX_SHADER;
   }
 
-
   void _createDeviceState() {
     super._createDeviceState();
-  }
-
-
-  void _configDeviceState(Map props) {
-   super._configDeviceState(props);
   }
 
   void _destroyDeviceState() {
