@@ -22,19 +22,25 @@ part of spectre;
 
 */
 
+/** A [RenderTarget] configures the final output stage of the GPU pipeline.
+ * Color, depth, and stencil outputs are specified here.
+ *
+ * NOTE: The system provided RenderTarget can be access via
+ * [Device.systemProvidedRenderTarget].
+ */
 class RenderTarget extends DeviceChild {
+  static final int _target = WebGLRenderingContext.FRAMEBUFFER;
+  static final int _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+
   WebGLFramebuffer _buffer;
-  int _target;
-  int _target_param;
   DeviceChild _colorTarget;
   DeviceChild _depthTarget;
   DeviceChild get colorTarget => _colorTarget;
   DeviceChild get depthTarget => _depthTarget;
   DeviceChild get stencilTarget => null;
 
-  RenderTarget(String name, GraphicsDevice device) : super._internal(name, device) {
-    _target = WebGLRenderingContext.FRAMEBUFFER;
-    _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+  RenderTarget(String name, GraphicsDevice device) :
+    super._internal(name, device) {
   }
 
   void _createDeviceState() {
@@ -69,7 +75,7 @@ class RenderTarget extends DeviceChild {
     } else {
       spectreLog.Info('RenderTarget $name complete.');
     }
-    device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+    device.gl.bindFramebuffer(_target, oldBind);
   }
 
   void attachColorTarget(dynamic colorTexture) {
@@ -102,7 +108,7 @@ class RenderTarget extends DeviceChild {
       spectreLog.Error('attachColorTarget invalid target type.');
       assert(false);
     }
-    device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+    device.gl.bindFramebuffer(_target, oldBind);
   }
 
   void attachDepthTarget(dynamic depthTexture) {
@@ -135,7 +141,7 @@ class RenderTarget extends DeviceChild {
       spectreLog.Error('attachDepthTarget invalid target type.');
       assert(false);
     }
-    device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+    device.gl.bindFramebuffer(_target, oldBind);
   }
 
   void _destroyDeviceState() {

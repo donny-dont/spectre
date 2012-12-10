@@ -288,20 +288,6 @@ class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat4 =
                     const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
-  static const int BufferHandleType = 1;
-  static const int RenderBufferHandleType = 2;
-  static const int RenderTargetHandleType = 3;
-  static const int TextureHandleType = 4;
-  static const int SamplerStateHandleType = 5;
-  static const int ShaderHandleType = 6;
-  static const int ShaderProgramHandleType = 7;
-  static const int ViewportHandleType = 8;
-  static const int DepthStateHandleType = 9;
-  static const int BlendStateHandleType = 10;
-  static const int RasterizerStateHandleType = 11;
-  static const int InputLayoutHandleType = 12;
-  static const int MeshHandleType = 13;
-
   Map _getPropertyMap(dynamic props) {
     if (props is String) {
       props = JSON.parse(props);

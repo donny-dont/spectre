@@ -22,15 +22,24 @@ part of spectre;
 
 */
 
+/** A [RenderBuffer] represents the storage for either a color, depth,
+ * or stencil buffer render target attachment.
+ */
 class RenderBuffer extends DeviceChild {
-  int _target;
-  int _width;
-  int _height;
-  int _format;
+  static const int FormatRGB = WebGLRenderingContext.RGB565;
+  static const int FormatRGBA = WebGLRenderingContext.RGBA4;
+  static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT16;
+
+  static final int _target = WebGLRenderingContext.RENDERBUFFER;
+  static final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
+
+  int _width = 0;
+  int _height = 0;
+  int _format = 0;
   WebGLRenderbuffer _buffer;
 
-  RenderBuffer(String name, GraphicsDevice device) : super._internal(name, device) {
-
+  RenderBuffer(String name, GraphicsDevice device) :
+      super._internal(name, device) {
   }
 
   void _createDeviceState() {
@@ -42,26 +51,43 @@ class RenderBuffer extends DeviceChild {
   }
 
   void _configDeviceState(Map props) {
-    _target = WebGLRenderingContext.RENDERBUFFER;
     String format = props['format'];
+    int w = 0;
+    int h = 0;
+    int f = FormatRGB;
     switch (format) {
-      case 'R8G8B8A8':
-        _format = WebGLRenderingContext.RGB565;
+      case 'RGB':
+        f = FormatRGB;
       break;
-      case 'D32':
-      case 'DEPTH32':
-        _format = WebGLRenderingContext.DEPTH_COMPONENT16;
+      case 'RGBA':
+        f = FormatRGBA;
+      break;
+      case 'DEPTH':
+        f = FormatDepth;
       break;
       default:
-        spectreLog.Error('format is not a valid render buffer format');
+        spectreLog.Error('$format is not a valid RenderBuffer format');
       break;
     }
-    _width = props['width'];
-    _height = props['height'];
+    w = props['width'];
+    h = props['height'];
+    allocateStorage(w, h, f);
+  }
 
-    WebGLRenderbuffer oldBind = device.gl.getParameter(WebGLRenderingContext.RENDERBUFFER_BINDING);
-    device.gl.bindRenderbuffer(_target, _buffer);
+  void _allocateStorage(int width, int height, int format) {
     device.gl.renderbufferStorage(_target, _format, _width, _height);
-    device.gl.bindRenderbuffer(WebGLRenderingContext.RENDERBUFFER, oldBind);
+  }
+
+  /** Allocate storage for render buffer with [format] and
+   * [width]x[height] pixels.
+   */
+  void allocateStorage(int width, int height, int format) {
+    _width = width;
+    _height = height;
+    _format = format;
+    WebGLRenderbuffer oldBind = device.gl.getParameter(_target_param);
+    device.gl.bindRenderbuffer(_target, _buffer);
+    _allocateStorage(width, height, format);
+    device.gl.bindRenderbuffer(_target, oldBind);
   }
 }
