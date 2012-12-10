@@ -49,8 +49,8 @@ class IndexedMesh extends DeviceChild {
         ResourceManager rm = o['resourceManager'];
         MeshResource mesh = o['meshResourceHandle'];
         if (mesh != null) {
-          device.context.updateBuffer(vertexArray, mesh.vertexArray, WebGLRenderingContext.STATIC_DRAW);
-          device.context.updateBuffer(indexArray, mesh.indexArray, WebGLRenderingContext.STATIC_DRAW);
+          vertexArray.uploadData(mesh.vertexArray, SpectreBuffer.UsageStatic);
+          indexArray.uploadData(mesh.indexArray, SpectreBuffer.UsageStatic);
           indexOffset = 0;
           numIndices = mesh.numIndices;
         }
@@ -60,20 +60,14 @@ class IndexedMesh extends DeviceChild {
       if (o != null && o is Map) {
         Map mesh = o['meshes'][0];
         if (o != null && o is Map) {
+          var vertices = new Float32Array.fromList(mesh['vertices']);
+          vertexArray.uploadData(vertices, SpectreBuffer.UsageStatic);
           var indices = new Uint16Array.fromList(mesh['indices']);
-          device.context.updateBuffer(vertexArray, new Float32Array.fromList(mesh['vertices']), WebGLRenderingContext.STATIC_DRAW);
-          device.context.updateBuffer(indexArray, indices, WebGLRenderingContext.STATIC_DRAW);
+          indexArray.uploadData(indices, SpectreBuffer.UsageStatic);
           indexOffset = 0;
           numIndices = indices.length;
         }
       }
-
-      /* TODO
-      o = props['UpdateFromArray'];
-      if (o != null && o is int) {
-
-      }
-      */
 
       o = props['indexOffset'];
       if (o != null && o is int) {

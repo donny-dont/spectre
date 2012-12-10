@@ -148,7 +148,7 @@ class _DebugDrawLineManager {
       }
     }
 
-    context.updateBuffer(_vbo, _vboStorage);
+    _vbo.uploadData(_vboStorage, _vbo.usage);
   }
 
   int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;

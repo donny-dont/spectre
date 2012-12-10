@@ -93,10 +93,8 @@ class SpectrePost {
         verts[index++] = 1.0;
       }
       assert(index == numFloats);
-      vertexBuffer = _device.createVertexBuffer('SpectrePost.VBO', {
-        'usage': 'static'
-      });
-      _device.context.updateBuffer(vertexBuffer, verts);
+      vertexBuffer = _device.createVertexBuffer('SpectrePost.VBO', {});
+      vertexBuffer.uploadData(verts, SpectreBuffer.UsageStatic);
       vertexShader = _device.createVertexShader('SpectrePost.VS', {});
       _device.context.compileShader(vertexShader, '''
 precision highp float;

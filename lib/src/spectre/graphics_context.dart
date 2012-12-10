@@ -423,23 +423,6 @@ class GraphicsContext {
     }
   }
 
-  /// Update the contents of [bufferHandle] with the contents of [data]
-  void updateBuffer(SpectreBuffer buffer,
-                    dynamic data, [int usage = SpectreBuffer.UsageDynamic]) {
-    if (buffer == null) {
-      return;
-    }
-    buffer.uploadData(data, usage);
-  }
-
-  /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
-  void updateSubBuffer(SpectreBuffer buffer, dynamic data, num offset) {
-    if (buffer == null) {
-      return;
-    }
-    buffer.uploadSubData(offset, data);
-  }
-
   /// Update the pixels of [textureHandle] from the [imageResourceHandle]
   ///
   /// Only updates the top level mip map
@@ -458,11 +441,7 @@ class GraphicsContext {
     if (tex == null) {
       return;
     }
-    _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0);
-    var oldBind = _device.gl.getParameter(tex._target_param);
-    _device.gl.bindTexture(tex._target, tex._buffer);
-    _device.gl.generateMipmap(tex._target);
-    _device.gl.bindTexture(tex._target, oldBind);
+    tex.generateMipmap();
     tex.ready = true;
   }
 
