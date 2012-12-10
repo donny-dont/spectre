@@ -23,41 +23,12 @@ part of spectre;
 */
 
 class SpectreShader extends DeviceChild {
-  String _source;
+  String _source = '';
   WebGLShader _shader;
   int _type;
 
   SpectreShader(String name, GraphicsDevice device) :
-      super._internal(name, device) {
-    _source = '';
-    _shader = null;
-  }
-
-  String get log {
-    return device.gl.getShaderInfoLog(_shader);
-  }
-
-  WebGLShader get shader => this._shader;
-
-  void set source(String s) {
-    _source = s;
-    device.gl.shaderSource(_shader, _source);
-  }
-
-  String get source {
-    return _source;
-  }
-
-  bool get compiled {
-    if (_shader != null) {
-      return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
-    }
-    return false;
-  }
-
-  void compile() {
-    device.gl.compileShader(_shader);
-  }
+      super._internal(name, device);
 
   void _createDeviceState() {
     _shader = device.gl.createShader(_type);
@@ -65,5 +36,40 @@ class SpectreShader extends DeviceChild {
 
   void _destroyDeviceState() {
     device.gl.deleteShader(_shader);
+  }
+
+  /** Set shader source code. */
+  void set source(String s) {
+    _source = s;
+    device.gl.shaderSource(_shader, _source);
+    if (autoCompile) {
+      compile();
+    }
+  }
+
+  /** Get shader source code. */
+  String get source {
+    return _source;
+  }
+
+  /** Shader successfully compiled? */
+  bool get compiled {
+    if (_shader != null) {
+      return device.gl.getShaderParameter(_shader, WebGLRenderingContext.COMPILE_STATUS);
+    }
+    return false;
+  }
+
+  /** Enable or disable automatic shader recompilation when source changes.  */
+  bool autoCompile = true;
+
+  /** Compile the shader. */
+  void compile() {
+    device.gl.compileShader(_shader);
+  }
+
+  /** Compile log. */
+  String get compileLog {
+    return device.gl.getShaderInfoLog(_shader);
   }
 }

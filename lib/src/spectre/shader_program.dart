@@ -60,6 +60,7 @@ typedef void AttributeCallback(ShaderProgramAttribute attribute);
 typedef void UniformCallback(ShaderProgramUniform uniform);
 typedef void SamplerCallback(ShaderProgramSampler sampler);
 
+
 /** A shader program specifies the behaviour of the programmable GPU pipeline.
  * You can create an instance by calling [Graphicsdevice.createShaderProgram].
  * You can apply a shader program to the GPU pipeline with
@@ -76,8 +77,24 @@ class ShaderProgram extends DeviceChild {
   bool _isLinked = false;
   String _linkLog = '';
 
-  VertexShader vertexShader;
-  FragmentShader fragmentShader;
+  VertexShader _vertexShader;
+  VertexShader get vertexShader => _vertexShader;
+  set vertexShader(VertexShader vs) {
+    if (_vertexShader != null) {
+      detach(_vertexShader);
+    }
+    _vertexShader = vs;
+    attach(_vertexShader);
+  }
+  FragmentShader _fragmentShader;
+  FragmentShader get fragmentShader => _fragmentShader;
+  set fragmentShader(FragmentShader fs) {
+    if (_fragmentShader != null) {
+      detach(_fragmentShader);
+    }
+    _fragmentShader = fs;
+    attach(_fragmentShader);
+  }
   WebGLProgram _program;
 
   ShaderProgram(String name, GraphicsDevice device) :
@@ -93,15 +110,11 @@ class ShaderProgram extends DeviceChild {
       dynamic o;
       o = props['VertexProgram'];
       if (o != null && o is VertexShader) {
-        detach(vertexShader);
         vertexShader = o;
-        attach(vertexShader);
       }
       o = props['FragmentProgram'];
       if (o != null && o is FragmentShader) {
-        detach(fragmentShader);
         fragmentShader = o;
-        attach(fragmentShader);
       }
       if (vertexShader != null && fragmentShader != null) {
         // relink
@@ -232,6 +245,9 @@ $_linkLog''');
         WebGLRenderingContext.ACTIVE_UNIFORMS);
     uniforms.clear();
     samplers.clear();
+    if (numUniforms == null) {
+      return;
+    }
     int numSamplers = 0;
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
