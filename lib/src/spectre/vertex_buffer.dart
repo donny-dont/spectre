@@ -37,7 +37,6 @@ class VertexBuffer extends SpectreBuffer {
 
   void _configDeviceState(Map props) {
     super._configDeviceState(props);
-
   }
 
   void _destroyDeviceState() {

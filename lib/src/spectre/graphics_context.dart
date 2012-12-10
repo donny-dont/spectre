@@ -424,27 +424,20 @@ class GraphicsContext {
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data]
-  void updateBuffer(SpectreBuffer buffer, ArrayBufferView data, [int usage = null]) {
+  void updateBuffer(SpectreBuffer buffer,
+                    dynamic data, [int usage = SpectreBuffer.UsageDynamic]) {
     if (buffer == null) {
       return;
     }
-    var target = buffer._target;
-    var oldBind = _device.gl.getParameter(buffer._param_target);
-    _device.gl.bindBuffer(buffer._target, buffer._buffer);
-    _device.gl.bufferData(buffer._target, data, usage != null ? usage : buffer._usage);
-    _device.gl.bindBuffer(buffer._target, oldBind);
+    buffer.uploadData(data, usage);
   }
 
   /// Update the contents of [bufferHandle] with the contents of [data] starting at [offset]
-  void updateSubBuffer(SpectreBuffer buffer, ArrayBufferView data, num offset) {
+  void updateSubBuffer(SpectreBuffer buffer, dynamic data, num offset) {
     if (buffer == null) {
       return;
     }
-    var target = buffer._target;
-    var oldBind = _device.gl.getParameter(buffer._param_target);
-    _device.gl.bindBuffer(buffer._target, buffer._buffer);
-    _device.gl.bufferSubData(buffer._target, offset, data);
-    _device.gl.bindBuffer(buffer._target, oldBind);
+    buffer.uploadSubData(offset, data);
   }
 
   /// Update the pixels of [textureHandle] from the [imageResourceHandle]

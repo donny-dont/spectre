@@ -29,8 +29,8 @@ part of spectre;
  * [Device.systemProvidedRenderTarget].
  */
 class RenderTarget extends DeviceChild {
-  static final int _target = WebGLRenderingContext.FRAMEBUFFER;
-  static final int _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+  final int _target = WebGLRenderingContext.FRAMEBUFFER;
+  final int _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
 
   WebGLFramebuffer _buffer;
   DeviceChild _colorTarget;
