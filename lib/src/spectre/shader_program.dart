@@ -29,8 +29,9 @@ class ShaderProgramUniform {
   final String type;
   final int size;
   final location;
+  final UniformSetFunction _apply;
   ShaderProgramUniform(this.name, this.index, this.type, this.size,
-                       this.location);
+                       this.location, this._apply);
 }
 
 /** A shader program sampler input */
@@ -40,7 +41,8 @@ class ShaderProgramSampler {
   final String type;
   final int size;
   final location;
-  int textureUnit = 0;
+  int _textureUnit = 0;
+  int get textureUnit => _textureUnit;
   ShaderProgramSampler(this.name, this.index, this.type, this.size,
       this.location);
 }
@@ -51,20 +53,23 @@ class ShaderProgramAttribute {
   final int index;
   final String type;
   final int size;
-  final location;
+  int _location;
+  int get location => _location;
   ShaderProgramAttribute(this.name, this.index, this.type, this.size,
-                         this.location);
+                         this._location);
 }
 
 typedef void AttributeCallback(ShaderProgramAttribute attribute);
 typedef void UniformCallback(ShaderProgramUniform uniform);
 typedef void SamplerCallback(ShaderProgramSampler sampler);
 
+typedef UniformSetFunction(device, location, argument);
 
 /** A shader program specifies the behaviour of the programmable GPU pipeline.
  * You can create an instance by calling [Graphicsdevice.createShaderProgram].
  * You can apply a shader program to the GPU pipeline with
  * [ImmediateContext.setShaderProgram].
+ *
  */
 class ShaderProgram extends DeviceChild {
   final Map<String, ShaderProgramUniform> uniforms =
@@ -81,19 +86,19 @@ class ShaderProgram extends DeviceChild {
   VertexShader get vertexShader => _vertexShader;
   set vertexShader(VertexShader vs) {
     if (_vertexShader != null) {
-      detach(_vertexShader);
+      _detach(_vertexShader);
     }
     _vertexShader = vs;
-    attach(_vertexShader);
+    _attach(_vertexShader);
   }
   FragmentShader _fragmentShader;
   FragmentShader get fragmentShader => _fragmentShader;
   set fragmentShader(FragmentShader fs) {
     if (_fragmentShader != null) {
-      detach(_fragmentShader);
+      _detach(_fragmentShader);
     }
     _fragmentShader = fs;
-    attach(_fragmentShader);
+    _attach(_fragmentShader);
   }
   WebGLProgram _program;
 
@@ -130,14 +135,14 @@ class ShaderProgram extends DeviceChild {
   }
 
   /** Detach [shader] from ShaderProgram. */
-  void detach(SpectreShader shader) {
+  void _detach(SpectreShader shader) {
     if (shader != null) {
       device.gl.detachShader(_program, shader._shader);
     }
   }
 
   /** Attach [shader] from ShaderProgram. See also: [link] */
-  void attach(SpectreShader shader) {
+  void _attach(SpectreShader shader) {
     if (shader != null) {
       device.gl.attachShader(_program, shader._shader);
     }
@@ -229,7 +234,44 @@ $_linkLog''');
       case WebGLRenderingContext.SAMPLER_CUBE:
         return 'samplerCube';
       default:
-        return 'unknown code: $type';
+        throw new FallthroughError();
+    }
+  }
+
+  UniformSetFunction _findUniformSetForType(int type) {
+    switch (type) {
+      case WebGLRenderingContext.FLOAT:
+        return _setUniform1f;
+      case WebGLRenderingContext.FLOAT_VEC2:
+        return _setUniform2f;
+      case WebGLRenderingContext.FLOAT_VEC3:
+        return _setUniform3f;
+      case WebGLRenderingContext.FLOAT_VEC4:
+        return _setUniform4f;
+      case WebGLRenderingContext.FLOAT_MAT2:
+        return _setUniformMatrix2;
+      case WebGLRenderingContext.FLOAT_MAT3:
+        return _setUniformMatrix3;
+      case WebGLRenderingContext.FLOAT_MAT4:
+        return _setUniformMatrix4;
+      case WebGLRenderingContext.BOOL:
+        return _setUniform1i;
+      case WebGLRenderingContext.BOOL_VEC2:
+        return _setUniform2i;
+      case WebGLRenderingContext.BOOL_VEC3:
+        return _setUniform3i;
+      case WebGLRenderingContext.BOOL_VEC4:
+        return _setUniform4i;
+      case WebGLRenderingContext.INT:
+        return _setUniform1i;
+      case WebGLRenderingContext.INT_VEC2:
+        return _setUniform2i;
+      case WebGLRenderingContext.INT_VEC3:
+        return _setUniform3i;
+      case WebGLRenderingContext.INT_VEC4:
+        return _setUniform4i;
+      default:
+        throw new FallthroughError();
     }
   }
 
@@ -249,6 +291,8 @@ $_linkLog''');
       return;
     }
     int numSamplers = 0;
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
     for (int i = 0; i < numUniforms; i++) {
       WebGLActiveInfo activeUniform = device.gl.getActiveUniform(_program, i);
       var location = device.gl.getUniformLocation(_program, activeUniform.name);
@@ -260,7 +304,7 @@ $_linkLog''');
             activeUniform.size,
             location);
         samplers[activeUniform.name] = sampler;
-        sampler.textureUnit = numSamplers;
+        sampler._textureUnit = numSamplers;
         device.gl.uniform1i(location, numSamplers++);
       } else {
         ShaderProgramUniform uniform = new ShaderProgramUniform(
@@ -268,10 +312,12 @@ $_linkLog''');
             i,
             _convertType(activeUniform.type),
             activeUniform.size,
-            location);
+            location,
+            _findUniformSetForType(activeUniform.type));
         uniforms[activeUniform.name] = uniform;
       }
     }
+    device.gl.useProgram(oldBind);
   }
 
   void refreshAttributes() {
@@ -279,6 +325,11 @@ $_linkLog''');
         _program,
         WebGLRenderingContext.ACTIVE_ATTRIBUTES);
     attributes.clear();
+    if (numAttributes == null) {
+      return;
+    }
+    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
+    device.gl.useProgram(_program);
     for (int i = 0; i < numAttributes; i++) {
       WebGLActiveInfo activeAttribute = device.gl.getActiveAttrib(_program, i);
       var location = device.gl.getAttribLocation(_program,
@@ -291,6 +342,7 @@ $_linkLog''');
           location);
       attributes[activeAttribute.name] = attribute;
     }
+    device.gl.useProgram(oldBind);
   }
 
   /** Output each uniform variable input to the log. */
@@ -358,181 +410,135 @@ $_linkLog''');
     return uniform.location;
   }
 
-  void _setUniform2f(var index, num v0, num v1) {
-    device.gl.uniform2f(index,v0, v1);
+  void _setUniform1f(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniform1fv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform1f(index, argument[0]);
+      return;
+    } else if (argument is num) {
+      device.gl.uniform1f(index, argument);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform2f(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniform2fv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform2f(index, argument[0], argument[1]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform3f(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniform3fv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform3f(index, argument[0], argument[1], argument[2]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform4f(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniform4fv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform4f(index, argument[0], argument[1], argument[2],
+                          argument[3]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform1i(var index, int i) {
+    if (argument is Int32Array) {
+      device.gl.uniform1iv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform1i(index, argument[0]);
+      return;
+    } else if (argument is num) {
+      device.gl.uniform1i(index, argument);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform2i(GraphicsDevice device, var index, var argument) {
+    if (argument is Int32Array) {
+      device.gl.uniform2iv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniformif(index, argument[0], argument[1]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform3i(GraphicsDevice device, var index, var argument) {
+    if (argument is Int32Array) {
+      device.gl.uniform3iv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform3i(index, argument[0], argument[1], argument[2]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniform4i(GraphicsDevice device, var index, var argument) {
+    if (argument is Int32Array) {
+      device.gl.uniform4iv(index, argument);
+      return;
+    } else if (argument is List<num>) {
+      device.gl.uniform4i(index, argument[0], argument[1], argument[2],
+                          argument[3]);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniformMatrix2(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniformMatrix2fv(index, false, argument);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniformMatrix3(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniformMatrix3fv(index, false, argument);
+      return;
+    }
+    throw new FallThroughError();
+  }
+
+  void _setUniformMatrix4(GraphicsDevice device, var index, var argument) {
+    if (argument is Float32Array) {
+      device.gl.uniformMatrix4fv(index, false, argument);
+      return;
+    }
+    throw new FallThroughError();
   }
 
   /// Set Uniform variable [name] in this [ShaderProgram].
-  void setUniform2f(String name, num v0, num v1) {
-    var index = _findUniform(name);
+  void setConstant(String name, var argument) {
+    var uniform = uniforms[name];
     if (index == null) {
       return;
     }
     var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
     device.gl.useProgram(_program);
-    _setUniform2(index, v0, v1);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniform3f(var index, num v0, num v1, num v2) {
-    device.gl.uniform3f(index,v0, v1, v2);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform3f(String name, num v0, num v1, num v2) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniform3f(index, v0, v1, v2);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniform4f(var index, num v0, num v1, num v2, num v3) {
-    device.gl.uniform4f(index,v0, v1, v2, v3);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform4f(String name, num v0, num v1, num v2, num v3) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniform4f(index, v0, v1, v2, v3);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformInt(var index, int i) {
-    device.gl.uniform1i(index, i);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformInt(String name, int i) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformInt(index, i);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformNum(var index, num i) {
-    device.gl.uniform1f(index, i);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformNum(String name, num i) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformNum(index, i);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformMatrix2(var idnex, Float32Array matrix, bool transpose) {
-    _device.gl.uniformMatrix2fv(index, transpose, matrix);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix2(String name, Float32Array matrix,
-                         [bool transpose=false]) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformMatrix2(index, vector);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformMatrix3(var index, Float32Array matrix, bool transpose) {
-    _device.gl.uniformMatrix3fv(index, transpose, matrix);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix3(String name, Float32Array matrix,
-                         [bool transpose=false]) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformMatrix3(index, vector);
-    devicegl.useProgram(oldBind);
-  }
-
-  void _setUniformMatrix4(var index, Float32Array matrix, bool transpose) {
-    device.gl.uniformMatrix4fv(index, transpose, matrix);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformMatrix4(index, vector);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformVector2(var index, Float32Array vector) {
-    device.gl.uniform2fv(index, vector);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector2(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformVector2(index, vector);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformVector3(var index, Float32Array vector) {
-    device.gl.uniform3fv(index, vector);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector3(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformVector3(index, vector);
-    device.gl.useProgram(oldBind);
-  }
-
-  void _setUniformVector4(var index, Float32Array vector) {
-    device.gl.uniform4fv(index, vector);
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector4(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index == null) {
-      return;
-    }
-    var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
-    device.gl.useProgram(_program);
-    _setUniformVector4(index, vector);
+    uniform._apply(device, uniform.location, argument);
     device.gl.useProgram(oldBind);
   }
 }

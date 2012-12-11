@@ -320,93 +320,22 @@ class GraphicsContext {
     }
   }
 
-  WebGLUniformLocation _findUniform(String name) {
+  ShaderProgramUniform _findUniform(String name) {
     ShaderProgram sp = _shaderProgramHandle;
     if (sp == null) {
-      spectreLog.Error('Cannot set uniform: no ShaderProgram bound.');
       return null;
     }
-    return sp._findUniform(name);
+    return sp.uniforms[name];
   }
 
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform2f(String name, num v0, num v1) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniform2f(index, v0, v1);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform3f(String name, num v0, num v1, num v2) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniform3f(index, v0, v1, v2);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniform4f(String name, num v0, num v1, num v2, num v3) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniform4f(index, v0, v1, v2, v3);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformInt(String name, int i) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformInt(index, i);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformNum(String name, num i) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformNum(index, i);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix3(String name, Float32Array matrix,
-                         [bool transpose=false]) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformMatrix3(index, matrix, transpose);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformMatrix4(String name, Float32Array matrix, [bool transpose=false]) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformMatrix4(index, matrix, transpose);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector2(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformVector2(index, vector);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector3(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformVector3(index, vector);
-    }
-  }
-
-  /// Set Uniform variable [name] in current [ShaderProgram]
-  void setUniformVector4(String name, Float32Array vector) {
-    var index = _findUniform(name);
-    if (index != null) {
-      _shaderProgramHandle._setUniformVector4(index, vector);
+  void setConstant(String name, var argument) {
+    ShaderProgramUniform uniform = _findUniform(name);
+    if (uniform != null) {
+      uniform._apply(_device, uniform.location, argument);
+    } else if (_shaderProgramHandle == null ){
+      spectreLog.Error('Cannot set $name: no ShaderProgram bound.');
+    } else {
+      //spectreLog.Error('Cannot set $name: not found.');
     }
   }
 
