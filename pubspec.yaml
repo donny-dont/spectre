@@ -4,8 +4,7 @@ version: 0.5.0
 author: John McCutchan <john@johnmccutchan.com>
 homepage: https://github.com/johnmccutchan/spectre
 dependencies:
-  unittest:
-    sdk: any
+  unittest: any
   marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
   vector_math:
