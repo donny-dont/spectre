@@ -5,7 +5,7 @@ author: John McCutchan <john@johnmccutchan.com>
 homepage: https://github.com/johnmccutchan/spectre
 dependencies:
   unittest:
-    sdk: unittest
+    sdk: any
   marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
   vector_math:
