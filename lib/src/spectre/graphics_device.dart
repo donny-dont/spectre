@@ -315,8 +315,6 @@ class GraphicsDevice {
   static const int MaxDeviceChildren = 2048;
 
   Texture2D _fallbackTexture;
-  RenderTarget _systemProvidedRenderTarget;
-  RenderTarget get systemProvidedRenderTarget => _systemProvidedRenderTarget;
 
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
     context2d.save();
@@ -365,9 +363,14 @@ class GraphicsDevice {
       configureDeviceChild(_fallbackTexture, {'pixels': canvas});
       _context.generateMipmap(_fallbackTexture);
     }
-    _systemProvidedRenderTarget = createRenderTarget(
+    /* Create the system render target by playing some tricks internally.
+     * TODO(johnmccutchan): Move all of this into a named constructor.
+     */
+    RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget',
-        {'SystemProvided': true});
+        {});
+    RenderTarget._systemRenderTarget._destroyDeviceState();
+    RenderTarget._systemRenderTarget._renderable = true;
   }
 
   /// Returns the [DeviceChild] with [name].

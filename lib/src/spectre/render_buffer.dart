@@ -55,6 +55,7 @@ class RenderBuffer extends DeviceChild {
     }
     assert(false);
   }
+
   final int _target = WebGLRenderingContext.RENDERBUFFER;
   final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
 

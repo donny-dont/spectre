@@ -22,11 +22,11 @@ part of spectre;
 
 */
 
-/** A [RenderTarget] configures the final output stage of the GPU pipeline.
- * Color, depth, and stencil outputs are specified here.
+/** A [RenderTarget] controls where color, depth, and stencil data is output
+ * to by the GPU.
  *
- * NOTE: The system provided RenderTarget can be access via
- * [Device.systemProvidedRenderTarget].
+ * NOTE: To output into the system provided render target see
+ * [RenderTarget.systemRenderTarget]
  */
 class RenderTarget extends DeviceChild {
   final int _target = WebGLRenderingContext.FRAMEBUFFER;
@@ -38,6 +38,14 @@ class RenderTarget extends DeviceChild {
   DeviceChild get colorTarget => _colorTarget;
   DeviceChild get depthTarget => _depthTarget;
   DeviceChild get stencilTarget => null;
+
+  static RenderTarget _systemRenderTarget;
+  /** System provided rendering target */
+  static RenderTarget get systemRenderTarget => _systemRenderTarget;
+
+  bool _renderable = false;
+  /** Is the render target valid and renderable? */
+  bool get renderable => _renderable;
 
   RenderTarget(String name, GraphicsDevice device) :
     super._internal(name, device) {
@@ -52,11 +60,6 @@ class RenderTarget extends DeviceChild {
     if (props == null) {
       return;
     }
-    if (props['SystemProvided'] == true) {
-      device.gl.deleteFramebuffer(_buffer);
-      _buffer = null;
-      return;
-    }
     DeviceChild colorHandle = props['color0'] != null ? props['color0'] : null;
     DeviceChild depthHandle = props['depth'] != null ? props['depth'] : null;
     DeviceChild stencilHandle = props['stencil'] != null ? props['stencil'] : null;
@@ -64,24 +67,39 @@ class RenderTarget extends DeviceChild {
       spectreLog.Error('No support for stencil buffers yet.');
     }
 
-    attachColorTarget(colorHandle);
-    attachDepthTarget(depthHandle);
+    colorTarget = colorHandle;
+    depthTarget = depthHandle;
 
+    _updateStatus();
+  }
+
+  void _destroyDeviceState() {
+    if (_buffer != null) {
+      device.gl.deleteFramebuffer(_buffer);
+      _buffer = null;
+    }
+    _renderable = false;
+    super._destroyDeviceState();
+  }
+
+  void _updateStatus() {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
     int fbStatus = device.gl.checkFramebufferStatus(_target);
-    if (fbStatus != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
-      spectreLog.Error('RenderTarget $name incomplete status = $fbStatus');
-    } else {
-      spectreLog.Info('RenderTarget $name complete.');
-    }
+    _renderable = fbStatus == WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
     device.gl.bindFramebuffer(_target, oldBind);
   }
 
-  void attachColorTarget(dynamic colorTexture) {
+  /** Set color buffer output to be [color0].
+   *
+   * null indicates the system provided color buffer.
+   * [Texture2D] is supported.
+   * [RenderBuffer] is supported.
+   */
+  set colorTarget(dynamic color0) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (colorTexture == null) {
+    if (color0 == null) {
       _colorTarget = null;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
@@ -90,31 +108,37 @@ class RenderTarget extends DeviceChild {
       device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
       return;
     }
-    if (colorTexture is RenderBuffer) {
-      RenderBuffer rb = colorTexture as RenderBuffer;
+    if (color0 is RenderBuffer) {
+      RenderBuffer rb = color0 as RenderBuffer;
       _colorTarget = rb;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
-    } else if (colorTexture is Texture2D) {
-      Texture2D t2d = colorTexture as Texture2D;
+    } else if (color0 is Texture2D) {
+      Texture2D t2d = color0   as Texture2D;
       _colorTarget = t2d;
       device.gl.framebufferTexture2D(_target,
                                      WebGLRenderingContext.COLOR_ATTACHMENT0,
                                      WebGLRenderingContext.TEXTURE_2D,
                                      t2d._buffer, 0);
     } else {
-      spectreLog.Error('attachColorTarget invalid target type.');
-      assert(false);
+      throw new FallthroughError();
     }
+    _updateStatus();
     device.gl.bindFramebuffer(_target, oldBind);
   }
 
-  void attachDepthTarget(dynamic depthTexture) {
+  /** Set depth buffer output to be [depth].
+   *
+   * null indicates the system provided depth buffer.
+   * [Texture2D] is supported.
+   * [RenderBuffer] is supported.
+   */
+  set depthTarget(dynamic depth) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (depthTexture == null) {
+    if (depth == null) {
       _depthTarget = null;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
@@ -123,31 +147,24 @@ class RenderTarget extends DeviceChild {
       device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
       return;
     }
-    if (depthTexture is RenderBuffer) {
-      RenderBuffer rb = depthTexture as RenderBuffer;
+    if (depth is RenderBuffer) {
+      RenderBuffer rb = depth as RenderBuffer;
       _depthTarget = rb;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
-    } else if (depthTexture is Texture2D) {
-      Texture2D t2d = depthTexture as Texture2D;
+    } else if (depth is Texture2D) {
+      Texture2D t2d = depth as Texture2D;
       _depthTarget = t2d;
       device.gl.framebufferTexture2D(_target,
                                      WebGLRenderingContext.DEPTH_ATTACHMENT,
                                      WebGLRenderingContext.TEXTURE_2D,
                                      t2d._buffer, 0);
     } else {
-      spectreLog.Error('attachDepthTarget invalid target type.');
-      assert(false);
+      throw new FallthroughError();
     }
+    _updateStatus();
     device.gl.bindFramebuffer(_target, oldBind);
-  }
-
-  void _destroyDeviceState() {
-    if (_buffer != null) {
-      device.gl.deleteFramebuffer(_buffer);
-    }
-    super._destroyDeviceState();
   }
 }
