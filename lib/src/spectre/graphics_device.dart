@@ -363,14 +363,10 @@ class GraphicsDevice {
       configureDeviceChild(_fallbackTexture, {'pixels': canvas});
       _context.generateMipmap(_fallbackTexture);
     }
-    /* Create the system render target by playing some tricks internally.
-     * TODO(johnmccutchan): Move all of this into a named constructor.
-     */
     RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget',
         {});
-    RenderTarget._systemRenderTarget._destroyDeviceState();
-    RenderTarget._systemRenderTarget._renderable = true;
+    RenderTarget._systemRenderTarget._makeSystemTarget();
   }
 
   /// Returns the [DeviceChild] with [name].

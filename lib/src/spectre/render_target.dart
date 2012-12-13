@@ -45,7 +45,7 @@ class RenderTarget extends DeviceChild {
 
   bool _renderable = false;
   /** Is the render target valid and renderable? */
-  bool get renderable => _renderable;
+  bool get isRenderable => _renderable;
 
   RenderTarget(String name, GraphicsDevice device) :
     super._internal(name, device) {
@@ -56,21 +56,9 @@ class RenderTarget extends DeviceChild {
     _buffer = device.gl.createFramebuffer();
   }
 
-  void _configDeviceState(Map props) {
-    if (props == null) {
-      return;
-    }
-    DeviceChild colorHandle = props['color0'] != null ? props['color0'] : null;
-    DeviceChild depthHandle = props['depth'] != null ? props['depth'] : null;
-    DeviceChild stencilHandle = props['stencil'] != null ? props['stencil'] : null;
-    if (stencilHandle != null) {
-      spectreLog.Error('No support for stencil buffers yet.');
-    }
-
-    colorTarget = colorHandle;
-    depthTarget = depthHandle;
-
-    _updateStatus();
+  void _makeSystemTarget() {
+    RenderTarget._systemRenderTarget._destroyDeviceState();
+    RenderTarget._systemRenderTarget._renderable = true;
   }
 
   void _destroyDeviceState() {
@@ -93,8 +81,8 @@ class RenderTarget extends DeviceChild {
   /** Set color buffer output to be [color0].
    *
    * null indicates the system provided color buffer.
-   * [Texture2D] is supported.
-   * [RenderBuffer] is supported.
+   *
+   * The color buffer can be a [Texture2D] or [RenderBuffer].
    */
   set colorTarget(dynamic color0) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
@@ -106,6 +94,7 @@ class RenderTarget extends DeviceChild {
                                         WebGLRenderingContext.RENDERBUFFER,
                                         null);
       device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+      _updateStatus();
       return;
     }
     if (color0 is RenderBuffer) {
@@ -132,8 +121,8 @@ class RenderTarget extends DeviceChild {
   /** Set depth buffer output to be [depth].
    *
    * null indicates the system provided depth buffer.
-   * [Texture2D] is supported.
-   * [RenderBuffer] is supported.
+   *
+   * The depth buffer can be a [Texture2D] or [RenderBuffer].
    */
   set depthTarget(dynamic depth) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
@@ -145,6 +134,7 @@ class RenderTarget extends DeviceChild {
                                         WebGLRenderingContext.RENDERBUFFER,
                                         null);
       device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+      _updateStatus();
       return;
     }
     if (depth is RenderBuffer) {
