@@ -22,8 +22,8 @@ part of spectre;
 
 */
 
-/** A [RenderTarget] controls where color, depth, and stencil data is output
- * to by the GPU.
+/** A [RenderTarget] specifies the buffers where color, depth, and stencil
+ * are written to during a draw call.
  *
  * NOTE: To output into the system provided render target see
  * [RenderTarget.systemRenderTarget]
@@ -78,16 +78,16 @@ class RenderTarget extends DeviceChild {
     device.gl.bindFramebuffer(_target, oldBind);
   }
 
-  /** Set color buffer output to be [color0].
+  /** Set color target to be [colorBuffer].
    *
-   * null indicates the system provided color buffer.
+   * A color buffer must be a [Texture2D] or [RenderBuffer].
    *
-   * The color buffer can be a [Texture2D] or [RenderBuffer].
+   * A null color buffer indicates the system provided color buffer.
    */
-  set colorTarget(dynamic color0) {
+  set colorTarget(dynamic colorBuffer) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (color0 == null) {
+    if (colorBuffer == null) {
       _colorTarget = null;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
@@ -97,15 +97,15 @@ class RenderTarget extends DeviceChild {
       _updateStatus();
       return;
     }
-    if (color0 is RenderBuffer) {
-      RenderBuffer rb = color0 as RenderBuffer;
+    if (colorBuffer is RenderBuffer) {
+      RenderBuffer rb = colorBuffer as RenderBuffer;
       _colorTarget = rb;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
-    } else if (color0 is Texture2D) {
-      Texture2D t2d = color0   as Texture2D;
+    } else if (colorBuffer is Texture2D) {
+      Texture2D t2d = colorBuffer as Texture2D;
       _colorTarget = t2d;
       device.gl.framebufferTexture2D(_target,
                                      WebGLRenderingContext.COLOR_ATTACHMENT0,
@@ -124,10 +124,16 @@ class RenderTarget extends DeviceChild {
    *
    * The depth buffer can be a [Texture2D] or [RenderBuffer].
    */
-  set depthTarget(dynamic depth) {
+  /** Set depth target to be [depthBuffer].
+   *
+   * A depth buffer must be a [Texture2D] or [RenderBuffer].
+   *
+   * A null depth buffer indicates the system provided depth buffer.
+   */
+  set depthTarget(dynamic depthBuffer) {
     WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindFramebuffer(_target, _buffer);
-    if (depth == null) {
+    if (depthBuffer == null) {
       _depthTarget = null;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
@@ -137,15 +143,15 @@ class RenderTarget extends DeviceChild {
       _updateStatus();
       return;
     }
-    if (depth is RenderBuffer) {
-      RenderBuffer rb = depth as RenderBuffer;
+    if (depthBuffer is RenderBuffer) {
+      RenderBuffer rb = depthBuffer as RenderBuffer;
       _depthTarget = rb;
       device.gl.framebufferRenderbuffer(_target,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
-    } else if (depth is Texture2D) {
-      Texture2D t2d = depth as Texture2D;
+    } else if (depthBuffer is Texture2D) {
+      Texture2D t2d = depthBuffer as Texture2D;
       _depthTarget = t2d;
       device.gl.framebufferTexture2D(_target,
                                      WebGLRenderingContext.DEPTH_ATTACHMENT,
