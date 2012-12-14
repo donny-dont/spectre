@@ -48,7 +48,10 @@ class SpectreBuffer extends DeviceChild {
   }
 
   void _destroyDeviceState() {
-    device.gl.deleteBuffer(_buffer);
+    if (_buffer != null) {
+      device.gl.deleteBuffer(_buffer);
+    }
+    _buffer = null;
     super._destroyDeviceState();
   }
 

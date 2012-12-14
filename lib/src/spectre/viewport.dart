@@ -26,35 +26,10 @@ part of spectre;
 /// Create using [Device.createViewport]
 /// Set using [ImmediateContext.setViewport]
 class Viewport extends DeviceChild {
-  int x;
-  int y;
-  int width;
-  int height;
+  int x = 0;
+  int y = 0;
+  int width = 640;
+  int height = 480;
 
-  Viewport(String name, GraphicsDevice device) : super._internal(name, device) {
-    x = 0;
-    y = 0;
-    width = 640;
-    height = 480;
-  }
-
-  void _createDeviceState() {
-  }
-
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-      o = props['x'];
-      x = o != null ? o : x;
-      o = props['y'];
-      y = o != null ? o : y;
-      o = props['width'];
-      width = o != null ? o : width;
-      o = props['height'];
-      height = o != null ? o : height;
-    }
-  }
-
-  void _destroyDeviceState() {
-  }
+  Viewport(String name, GraphicsDevice device) : super._internal(name, device);
 }
