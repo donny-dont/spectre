@@ -134,17 +134,13 @@ class GraphicsContext {
   void _prepareTextures() {
     // TODO: Need to unbind unused texture channels
     for (int i = 0; i < numTextures; i++) {
-      SamplerState s = _samplerStateHandles[i];
-      Texture t = _textureHandles[i];
-      if (s == null || t == null) {
+      SamplerState sampler = _samplerStateHandles[i];
+      Texture texture = _textureHandles[i];
+      if (sampler == null || texture == null) {
         continue;
       }
-      _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + i);
-      _device.gl.bindTexture(t._target, t._buffer);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s.wrapS);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s.wrapT);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s.minFilter);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s.magFilter);
+      texture._bind(WebGLRenderingContext.TEXTURE0 + i);
+      texture._applySampler(sampler);
     }
   }
 
@@ -313,10 +309,10 @@ class GraphicsContext {
     }
     _renderTargetHandle = renderTargetHandle;
     if (_renderTargetHandle == null) {
-      _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+      RenderTarget.systemRenderTarget._bind();
     } else {
       RenderTarget rt = renderTargetHandle;
-      _device.gl.bindFramebuffer(rt._target, rt._buffer);
+      rt._bind();
     }
   }
 

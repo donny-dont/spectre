@@ -84,6 +84,7 @@ class Texture extends DeviceChild {
   int _textureFormat = FormatRGBA;
   /** Retrieve the internal format used for this texture */
   int get textureFormat => _textureFormat;
+
   /** Set the internal format used for this texture.
    *
    * NOTE: Will not take affect until next upload.
@@ -92,23 +93,58 @@ class Texture extends DeviceChild {
     _textureFormat = internalFormat;
   }
 
-  int _target;
-  int _target_param;
-  WebGLTexture _buffer;
+  final int _bindTarget;
+  final int _bindingParam;
+  final int _textureTarget;
+  WebGLTexture _deviceTexture;
 
-  Texture(String name, GraphicsDevice device) : super._internal(name, device);
+  /** Bind this texture and return the previously bound texture. */
+  WebGLTexture _pushBind() {
+    WebGLTexture oldBind = device.gl.getParameter(_bindingParam);
+    device.gl.bindTexture(_bindTarget, _deviceTexture);
+    return oldBind;
+  }
+
+  /** Rebind [oldBind] */
+  void _popBind(WebGLTexture oldBind) {
+    device.gl.bindTexture(_bindTarget, oldBind);
+  }
+
+  Texture(String name, GraphicsDevice device, this._bindTarget,
+          this._bindingParam, this._textureTarget) : super._internal(name,
+                                                                     device);
+
+  void _applySampler(SamplerState sampler) {
+    device.gl.texParameteri(_textureTarget,
+                            WebGLRenderingContext.TEXTURE_WRAP_S,
+                            sampler.wrapS);
+    device.gl.texParameteri(_textureTarget,
+                            WebGLRenderingContext.TEXTURE_WRAP_T,
+                            sampler.wrapT);
+    device.gl.texParameteri(_textureTarget,
+                            WebGLRenderingContext.TEXTURE_MIN_FILTER,
+                            sampler.minFilter);
+    device.gl.texParameteri(_textureTarget,
+                            WebGLRenderingContext.TEXTURE_MAG_FILTER,
+                            sampler.magFilter);
+  }
 
   /** Binds the texture to [unit]. */
-  void bind(int unit) {
+  void _bind(int unit) {
+    // TODO(johnmccutchan): Check # texture units and throw exception when
+    // unit is out of range.
     device.gl.activeTexture(unit);
-    device.gl.bindTexture(_target, _buffer);
+    device.gl.bindTexture(_bindTarget, _deviceTexture);
   }
 
   void _createDeviceState() {
-    _buffer = device.gl.createTexture();
+    _deviceTexture = device.gl.createTexture();
   }
 
   void _destroyDeviceState() {
-    device.gl.deleteTexture(_buffer);
+    if (_deviceTexture != null) {
+      device.gl.deleteTexture(_deviceTexture);
+    }
+    _deviceTexture = null;
   }
 }

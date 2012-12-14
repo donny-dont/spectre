@@ -29,10 +29,10 @@ part of spectre;
  * [RenderTarget.systemRenderTarget]
  */
 class RenderTarget extends DeviceChild {
-  final int _target = WebGLRenderingContext.FRAMEBUFFER;
-  final int _target_param = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+  final int _bindTarget = WebGLRenderingContext.FRAMEBUFFER;
+  final int _bindingParam = WebGLRenderingContext.FRAMEBUFFER_BINDING;
 
-  WebGLFramebuffer _buffer;
+  WebGLFramebuffer _deviceFramebuffer;
   DeviceChild _colorTarget;
   DeviceChild _depthTarget;
   DeviceChild get colorTarget => _colorTarget;
@@ -53,7 +53,7 @@ class RenderTarget extends DeviceChild {
 
   void _createDeviceState() {
     super._createDeviceState();
-    _buffer = device.gl.createFramebuffer();
+    _deviceFramebuffer = device.gl.createFramebuffer();
   }
 
   void _makeSystemTarget() {
@@ -62,21 +62,41 @@ class RenderTarget extends DeviceChild {
   }
 
   void _destroyDeviceState() {
-    if (_buffer != null) {
-      device.gl.deleteFramebuffer(_buffer);
-      _buffer = null;
+    if (_deviceFramebuffer != null) {
+      device.gl.deleteFramebuffer(_deviceFramebuffer);
     }
+    _deviceFramebuffer = null;
     _renderable = false;
     super._destroyDeviceState();
   }
 
-  void _updateStatus() {
-    WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindFramebuffer(_target, _buffer);
-    int fbStatus = device.gl.checkFramebufferStatus(_target);
-    _renderable = fbStatus == WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
-    device.gl.bindFramebuffer(_target, oldBind);
+
+  /** Bind this texture and return the previously bound framebuffer. */
+  WebGLFramebuffer _pushBind() {
+    WebGLFramebuffer oldBind = device.gl.getParameter(_bindingParam);
+    device.gl.bindFramebuffer(_bindTarget, _deviceFramebuffer);
+    return oldBind;
   }
+
+
+  /** Rebind [oldBind] */
+  void _popBind(WebGLFramebuffer oldBind) {
+    device.gl.bindFramebuffer(_bindTarget, oldBind);
+  }
+
+
+  void _bind() {
+    device.gl.bindFramebuffer(_bindTarget, _deviceFramebuffer);
+  }
+
+
+  void _updateStatus() {
+    var oldBind = _pushBind();
+    int fbStatus = device.gl.checkFramebufferStatus(_bindTarget);
+    _renderable = fbStatus == WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
+    _popBind(oldBind);
+  }
+
 
   /** Set color target to be [colorBuffer].
    *
@@ -85,11 +105,10 @@ class RenderTarget extends DeviceChild {
    * A null color buffer indicates the system provided color buffer.
    */
   set colorTarget(dynamic colorBuffer) {
-    WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindFramebuffer(_target, _buffer);
+    var oldBind = _pushBind();
     if (colorBuffer == null) {
       _colorTarget = null;
-      device.gl.framebufferRenderbuffer(_target,
+      device.gl.framebufferRenderbuffer(_bindTarget,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         null);
@@ -100,22 +119,22 @@ class RenderTarget extends DeviceChild {
     if (colorBuffer is RenderBuffer) {
       RenderBuffer rb = colorBuffer as RenderBuffer;
       _colorTarget = rb;
-      device.gl.framebufferRenderbuffer(_target,
+      device.gl.framebufferRenderbuffer(_bindTarget,
                                         WebGLRenderingContext.COLOR_ATTACHMENT0,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
     } else if (colorBuffer is Texture2D) {
       Texture2D t2d = colorBuffer as Texture2D;
       _colorTarget = t2d;
-      device.gl.framebufferTexture2D(_target,
+      device.gl.framebufferTexture2D(_bindTarget,
                                      WebGLRenderingContext.COLOR_ATTACHMENT0,
-                                     WebGLRenderingContext.TEXTURE_2D,
-                                     t2d._buffer, 0);
+                                     t2d._textureTarget,
+                                     t2d._deviceTexture, 0);
     } else {
       throw new FallthroughError();
     }
     _updateStatus();
-    device.gl.bindFramebuffer(_target, oldBind);
+    _popBind(oldBind);
   }
 
   /** Set depth buffer output to be [depth].
@@ -131,11 +150,10 @@ class RenderTarget extends DeviceChild {
    * A null depth buffer indicates the system provided depth buffer.
    */
   set depthTarget(dynamic depthBuffer) {
-    WebGLFramebuffer oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindFramebuffer(_target, _buffer);
+    var oldBind = _pushBind();
     if (depthBuffer == null) {
       _depthTarget = null;
-      device.gl.framebufferRenderbuffer(_target,
+      device.gl.framebufferRenderbuffer(_bindTarget,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         null);
@@ -146,21 +164,21 @@ class RenderTarget extends DeviceChild {
     if (depthBuffer is RenderBuffer) {
       RenderBuffer rb = depthBuffer as RenderBuffer;
       _depthTarget = rb;
-      device.gl.framebufferRenderbuffer(_target,
+      device.gl.framebufferRenderbuffer(_bindTarget,
                                         WebGLRenderingContext.DEPTH_ATTACHMENT,
                                         WebGLRenderingContext.RENDERBUFFER,
                                         rb._buffer);
     } else if (depthBuffer is Texture2D) {
       Texture2D t2d = depthBuffer as Texture2D;
       _depthTarget = t2d;
-      device.gl.framebufferTexture2D(_target,
+      device.gl.framebufferTexture2D(_bindTarget,
                                      WebGLRenderingContext.DEPTH_ATTACHMENT,
-                                     WebGLRenderingContext.TEXTURE_2D,
-                                     t2d._buffer, 0);
+                                     t2d._textureTarget,
+                                     t2d._deviceTexture, 0);
     } else {
       throw new FallthroughError();
     }
     _updateStatus();
-    device.gl.bindFramebuffer(_target, oldBind);
+    _popBind(oldBind);
   }
 }
