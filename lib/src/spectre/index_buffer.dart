@@ -28,13 +28,15 @@ part of spectre;
 class IndexBuffer extends SpectreBuffer {
 
   IndexBuffer(String name, GraphicsDevice device) : super(name, device) {
-    _target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-    _param_target = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
+    _bindTarget = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
+    _bindingParam = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
   }
+
 
   void _createDeviceState() {
     super._createDeviceState();
   }
+
 
   void _destroyDeviceState() {
     super._destroyDeviceState();

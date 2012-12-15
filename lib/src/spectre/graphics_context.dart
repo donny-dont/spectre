@@ -102,7 +102,7 @@ class GraphicsContext {
         continue;
       }
       _device.gl.enableVertexAttribArray(element._attributeIndex);
-      _device.gl.bindBuffer(vb._target, vb._buffer);
+      vb._bind();
       _device.gl.vertexAttribPointer(element._attributeIndex,
         element._attributeFormat.count,
         element._attributeFormat.type,
@@ -114,20 +114,12 @@ class GraphicsContext {
       if (debug) {
         _logVertexAttributes(element._attributeIndex);
       }
-      //_device.gl.bindBuffer(vb._target, null);
-
     }
     if (_indexBufferHandle != null) {
       IndexBuffer indexBuffer = _indexBufferHandle;
-      _device.gl.bindBuffer(indexBuffer._target, indexBuffer._buffer);
-      if (debug) {
-        print('Binding index buffer');
-      }
+      indexBuffer._bind();
     } else {
       _device.gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
-      if (debug) {
-        print('No index buffer');
-      }
     }
   }
 

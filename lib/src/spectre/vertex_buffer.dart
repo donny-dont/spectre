@@ -27,8 +27,8 @@ part of spectre;
 /// Set using [Device.setVertexBuffers]
 class VertexBuffer extends SpectreBuffer {
   VertexBuffer(String name, GraphicsDevice device) : super(name, device) {
-    _target = WebGLRenderingContext.ARRAY_BUFFER;
-    _param_target = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
+    _bindTarget = WebGLRenderingContext.ARRAY_BUFFER;
+    _bindingParam = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
   }
 
   void _createDeviceState() {

@@ -33,32 +33,47 @@ class SpectreBuffer extends DeviceChild {
   static const UsageDynamic = WebGLRenderingContext.DYNAMIC_DRAW;
   /** Hint that buffer data is used many times and never discarded. */
   static const UsageStatic = WebGLRenderingContext.STATIC_DRAW;
-  WebGLBuffer _buffer;
-  int _target;
-  int _param_target;
+  WebGLBuffer _deviceBuffer;
+  int _bindTarget;
+  int _bindingParam;
   int _usage = UsageDynamic;
   int _size = 0;
 
-  SpectreBuffer(String name, GraphicsDevice device) : super._internal(name, device) {
+  SpectreBuffer(String name, GraphicsDevice device)
+      : super._internal(name, device) {
   }
 
   void _createDeviceState() {
     super._createDeviceState();
-    _buffer = device.gl.createBuffer();
+    _deviceBuffer = device.gl.createBuffer();
   }
 
   void _destroyDeviceState() {
-    if (_buffer != null) {
-      device.gl.deleteBuffer(_buffer);
+    if (_deviceBuffer != null) {
+      device.gl.deleteBuffer(_deviceBuffer);
     }
-    _buffer = null;
+    _deviceBuffer = null;
     super._destroyDeviceState();
+  }
+
+  WebGLBuffer _pushBind() {
+    var oldBind = device.gl.getParameter(_bindingParam);
+    device.gl.bindBuffer(_bindTarget, _deviceBuffer);
+    return oldBind;
+  }
+
+  void _bind() {
+    device.gl.bindBuffer(_bindTarget, _deviceBuffer);
+  }
+
+  void _popBind(WebGLBuffer oldBind) {
+    device.gl.bindBuffer(_bindTarget, oldBind);
   }
 
   void _uploadData(dynamic data, int usage) {
     _size = data.byteLength;
     _usage = usage;
-    device.gl.bufferData(_target, data, usage);
+    device.gl.bufferData(_bindTarget, data, usage);
   }
 
   /** Resize buffer to fit [data]. Upload [data] with [usage] hint. */
@@ -66,14 +81,13 @@ class SpectreBuffer extends DeviceChild {
     if (data == null) {
       throw new ArgumentError('data cannot be null.');
     }
-    var oldBind = device.gl.getParameter(_param_target);
-    device.gl.bindBuffer(_target, _buffer);
+    var oldBind = _pushBind();
     _uploadData(data, usage);
-    device.gl.bindBuffer(_target, oldBind);
+    _popBind(oldBind);
   }
 
   void _uploadSubData(int offset, dynamic data) {
-    device.gl.bufferSubData(_target, offset, data);
+    device.gl.bufferSubData(_bindTarget, offset, data);
   }
 
   /** Starting at [offset], upload [data] into buffer.
@@ -86,16 +100,15 @@ class SpectreBuffer extends DeviceChild {
     if (offset + data.byteLength >= _size) {
       throw new RangeError('data will not fit.');
     }
-    var oldBind = device.gl.getParameter(_param_target);
-    device.gl.bindBuffer(_target, _buffer);
+    var oldBind = _pushBind();
     _uploadSubData(offset, data);
-    device.gl.bindBuffer(_target, oldBind);
+    _popBind(oldBind);
   }
 
   void _allocate(int size, int usage) {
     _size = size;
     _usage = usage;
-    device.gl.bufferData(_target, size, usage);
+    device.gl.bufferData(_bindTarget, size, usage);
   }
 
   /** Resize buffer to be [size] bytes with [usage] hint. */
@@ -103,10 +116,9 @@ class SpectreBuffer extends DeviceChild {
     if (size <= 0) {
       throw new ArgumentError('size must be > 0');
     }
-    var oldBind = device.gl.getParameter(_param_target);
-    device.gl.bindBuffer(_target, _buffer);
+    var oldBind = _pushBind();
     _allocate(size, usage);
-    device.gl.bindBuffer(_target, oldBind);
+    _popBind(oldBind);
   }
 
   /** Query the size of the buffer */
