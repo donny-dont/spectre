@@ -23,20 +23,6 @@ part of spectre;
 */
 
 class StencilState extends DeviceChild {
-
-  StencilState(String name, GraphicsDevice device) : super._internal(name, device) {
-
-  }
-
-  void _createDeviceState() {
-
-  }
-
-  void _configDeviceState(Map props) {
-
-  }
-
-  void _destroyDeviceState() {
-
-  }
+  StencilState(String name, GraphicsDevice device)
+      : super._internal(name, device);
 }
