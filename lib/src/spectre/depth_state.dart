@@ -36,32 +36,19 @@ class DepthState extends DeviceChild {
   static const int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
   static const int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
 
-  bool depthTestEnabled;
-  bool depthWriteEnabled;
-  bool polygonOffsetEnabled;
+  bool depthTestEnabled = false;
+  bool depthWriteEnabled = false;
+  bool polygonOffsetEnabled = false;
 
-  num depthNearVal;
-  num depthFarVal;
-  num polygonOffsetFactor;
-  num polygonOffsetUnits;
+  num depthNearVal = 0.0;
+  num depthFarVal = 1.0;
+  num polygonOffsetFactor = 0.0;
+  num polygonOffsetUnits = 0.0;
 
-  int depthComparisonOp;
+  int depthComparisonOp = DepthComparisonOpAlways;
 
-  DepthState(String name, GraphicsDevice device) : super._internal(name, device) {
-    depthTestEnabled = false;
-    depthWriteEnabled = false;
-    polygonOffsetEnabled = false;
-
-    depthNearVal = 0.0;
-    depthFarVal = 1.0;
-    polygonOffsetFactor = 0.0;
-    polygonOffsetUnits = 0.0;
-
-    depthComparisonOp = DepthComparisonOpAlways;
-  }
-
-  void _createDeviceState() {
-  }
+  DepthState(String name, GraphicsDevice device)
+      : super._internal(name, device);
 
   dynamic filter(dynamic o) {
     if (o is String) {
@@ -101,10 +88,6 @@ class DepthState extends DeviceChild {
       o = props['depthComparisonOp'];
       depthComparisonOp = o != null ? filter(o) : depthComparisonOp;
     }
-
-  }
-
-  void _destroyDeviceState() {
 
   }
 }
