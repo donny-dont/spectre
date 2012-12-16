@@ -372,6 +372,7 @@ class DebugDrawManager {
   /** Add a circle primitive. The circle is located at [center] and
    * is drawn in the plane defined by [planeNormal].
    * The circle has [radius] and [color] and is drawn for [duration] seconds.
+   */
   void addCircle(vec3 center, vec3 planeNormal, num radius, vec4 color,
                  [num duration = 0.0, bool depthEnabled = true,
                  int numSegments = 16]) {

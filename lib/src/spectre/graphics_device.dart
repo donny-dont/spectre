@@ -342,7 +342,7 @@ class GraphicsDevice {
       CanvasRenderingContext2D context2d = canvas.getContext('2d');
       _drawGrid(context2d, 512, 512, 8, 8);
       configureDeviceChild(_fallbackTexture, {'pixels': canvas});
-      _context.generateMipmap(_fallbackTexture);
+      _fallbackTexture.generateMipmap();
     }
     RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget',
