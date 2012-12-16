@@ -30,6 +30,8 @@ class SpectreMeshAttribute {
         throw new FallThroughError();
     }
   }
+
+  String toString() => '$name $componentType$componentCount $offset $stride';
 }
 
 class SpectreMesh extends DeviceChild {
