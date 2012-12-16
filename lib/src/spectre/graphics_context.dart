@@ -91,11 +91,7 @@ class GraphicsContext {
     }
     _enabledVertexAttributeArrays.clear();
 
-    if (inputLayout._elements == null) {
-      return;
-    }
-
-    inputLayout._elements.forEach((element) {
+    inputLayout.elements.forEach((element) {
       VertexBuffer vb = _vertexBufferHandles[element.vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');

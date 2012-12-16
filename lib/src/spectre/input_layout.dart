@@ -22,18 +22,18 @@ part of spectre;
 
 */
 
-class _InputLayoutElement {
+class InputLayoutElement {
   final int vboSlot;
   final int attributeIndex;
   final int attributeOffset;
   final int attributeStride;
   final DeviceFormat attributeFormat;
-  _InputLayoutElement(this.vboSlot, this.attributeIndex, this.attributeOffset,
-                      this.attributeStride, this.attributeFormat);
+  InputLayoutElement(this.vboSlot, this.attributeIndex, this.attributeOffset,
+                     this.attributeStride, this.attributeFormat);
 }
 
 class InputLayout extends DeviceChild {
-  final List<_InputLayoutElement> _elements = new List<_InputLayoutElement>();
+  final List<InputLayoutElement> elements = new List<InputLayoutElement>();
   /** A list of shader program attributes the mesh does not have. If this
    * list has any elements the input layout will not be [ready].
    */
@@ -63,7 +63,7 @@ class InputLayout extends DeviceChild {
                     missingAttributes.length == 0;
 
   void _refresh() {
-    _elements.clear();
+    elements.clear();
     missingAttributes.clear();
 
     if (_shaderProgram == null || _mesh == null) {
@@ -79,13 +79,13 @@ class InputLayout extends DeviceChild {
       if (meshAttribute == null) {
         missingAttributes.add(shaderProgramAttribute);
       } else {
-        _InputLayoutElement element = new _InputLayoutElement(
+        InputLayoutElement element = new InputLayoutElement(
             0,
             shaderProgramAttribute.location,
             meshAttribute.offset,
             meshAttribute.stride,
             meshAttribute.deviceFormat);
-        _elements.add(element);
+        elements.add(element);
       }
     });
     print('InputLayour $name refreshed: $ready');
@@ -93,12 +93,5 @@ class InputLayout extends DeviceChild {
 
   InputLayout(String name, GraphicsDevice device)
       : super._internal(name, device) {
-  }
-
-  void _bind() {
-    if (ready == false) {
-      return;
-    }
-    // Apply state.
   }
 }
