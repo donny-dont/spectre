@@ -33,25 +33,6 @@ class DeviceFormat {
   }
 }
 
-/// Description used to create an input layout
-/// Attribute [name] must match name in shader program
-/// Attribute [format] device format for attribute
-/// Attribute [elementStride] bytes between successive elements
-/// Attribute [vertexBufferSlot] the vertex buffer slot to pull elements from
-/// Attribute [vertexBufferOffset] the offset into the
-// vertex buffer to pull the first element
-class InputElementDescription {
-  String name;
-  DeviceFormat format;
-  int elementStride;
-  int vertexBufferSlot;
-  int vertexBufferOffset;
-
-  InputElementDescription(this.name, this.format,
-                          this.elementStride, this.vertexBufferSlot,
-                          this.vertexBufferOffset);
-}
-
 class _InputElementCheckerItem {
   String name;
   int vertexBufferSlot;
@@ -594,37 +575,30 @@ class GraphicsDevice {
   ///
   /// [props] is a JSONS tring or a [Map] containing a set of properties
   /// describing the [InputLayout] being created.
-  InputLayout createInputLayout(String name, Map props) {
+  InputLayout createInputLayout(String name) {
     InputLayout il = new InputLayout(name, this);
     if (_addChildObject(il) == false) {
       return null;
     }
     il._createDeviceState();
-    il._configDeviceState(props);
     return il;
   }
 
-  /// Create an [IndexedMesh] named [name]
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  IndexedMesh createIndexedMesh(String name, Map props) {
-    IndexedMesh indexedMesh = new IndexedMesh(name, this);
-    if (_addChildObject(indexedMesh) == false) {
-      return null;
-    }
-    indexedMesh._createDeviceState();
-    indexedMesh._configDeviceState(props);
-    return indexedMesh;
-  }
-
-  /// Create an [ArrayMesh] name [name]
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  ArrayMesh createArrayMesh(String name, Map props) {
-    ArrayMesh arrayMesh = new ArrayMesh(name, this);
+  SingleArrayMesh createSingleArrayMesh(String name) {
+    SingleArrayMesh arrayMesh = new SingleArrayMesh(name, this);
     if (_addChildObject(arrayMesh) == false) {
       return null;
     }
     arrayMesh._createDeviceState();
-    arrayMesh._configDeviceState(props);
     return arrayMesh;
+  }
+
+  SingleArrayIndexedMesh createSingleArrayIndexedMesh(String name) {
+    SingleArrayIndexedMesh indexedMesh = new SingleArrayIndexedMesh(name, this);
+    if (_addChildObject(indexedMesh) == false) {
+      return null;
+    }
+    indexedMesh._createDeviceState();
+    return indexedMesh;
   }
 }

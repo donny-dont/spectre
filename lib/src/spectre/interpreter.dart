@@ -268,8 +268,8 @@ class Interpreter {
         case Ops.SetIndexedMesh:
           skip = 2;
         {
-          final IndexedMesh indexedMeshHandle = program[i+1];
-          im.setIndexedMesh(indexedMeshHandle);
+          final SingleArrayIndexedMesh indexedMesh = program[i+1];
+          im.setIndexedMesh(indexedMesh);
         }
         break;
         case Ops.SetUniformMatrix4:
@@ -339,8 +339,8 @@ class Interpreter {
         case Ops.DrawIndexedMesh:
           skip = 2;
           {
-            final IndexedMesh indexedMeshHandle = program[i+1];
-            im.drawIndexedMesh(indexedMeshHandle);
+            final SingleArrayIndexedMesh indexedMesh = program[i+1];
+            im.drawIndexedMesh(indexedMesh);
           }
           break;
         case Ops.DeregisterResources:

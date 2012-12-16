@@ -541,4 +541,12 @@ $_linkLog''');
     uniform._apply(device, uniform.location, argument);
     device.gl.useProgram(oldBind);
   }
+
+  void setSamplerUnit(String name, int unit) {
+    var sampler = samplers[name];
+    if (sampler == null) {
+      return;
+    }
+    // Set
+  }
 }

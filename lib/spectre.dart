@@ -29,7 +29,6 @@ import 'dart:json';
 import 'package:vector_math/vector_math_browser.dart';
 import 'package:marker_prof/profiler.dart';
 
-part 'src/spectre/array_mesh.dart';
 part 'src/spectre/blend_state.dart';
 part 'src/spectre/buffer.dart';
 part 'src/spectre/camera.dart';
@@ -42,10 +41,8 @@ part 'src/spectre/device_children.dart';
 part 'src/spectre/fragment_shader.dart';
 part 'src/spectre/graphics_context.dart';
 part 'src/spectre/graphics_device.dart';
-part 'src/spectre/indexed_mesh.dart';
 part 'src/spectre/index_buffer.dart';
 part 'src/spectre/input_layout.dart';
-part 'src/spectre/input_layout_helper.dart';
 part 'src/spectre/interpreter.dart';
 part 'src/spectre/logger.dart';
 part 'src/spectre/mouse_keyboard_camera_controller.dart';
@@ -65,6 +62,7 @@ part 'src/spectre/texture_2d.dart';
 part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';
 part 'src/spectre/viewport.dart';
+part 'src/spectre/mesh.dart';
 
 // We have a single logger
 Logger spectreLog = new PrintLogger();

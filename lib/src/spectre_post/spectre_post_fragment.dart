@@ -24,21 +24,13 @@ part of spectre_post;
 
 class SpectrePostFragment extends SpectrePostPass {
   final ShaderProgram shaderProgram;
-  final List<InputElementDescription> elements;
-  InputLayout inputLayout;
-  SpectrePostFragment(GraphicsDevice device,
-                      String name,
-                      this.shaderProgram,
-                      this.elements) : super() {
-    inputLayout = device.createInputLayout('SpectrePost.InputLayout[$name]', {
-      'shaderProgram': shaderProgram,
-      'elements': elements
-    });
+  final InputLayout inputLayout;
+  SpectrePostFragment(GraphicsDevice device, String name, this.shaderProgram,
+                      this.inputLayout) : super() {
   }
 
   void cleanup(GraphicsDevice device) {
     device.deleteDeviceChild(shaderProgram);
-    device.deleteDeviceChild(inputLayout);
   }
 
   void setup(GraphicsDevice device, Map<String, dynamic> args) {

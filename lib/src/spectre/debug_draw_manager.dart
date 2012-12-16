@@ -114,22 +114,32 @@ class _DebugDrawLineManager {
   static final int DebugDrawVertexSize = 7; // 3 (position) + 4 (color)
   _DebugLineCollection _lines;
 
+  SingleArrayMesh _arrayMesh;
+  InputLayout _vboLayout;
+
   int _maxVertices;
   Float32Array _vboStorage;
-
   int _vboUsed;
-  VertexBuffer _vbo;
-  InputLayout _vboLayout;
+
+
 
   _DebugDrawLineManager(GraphicsDevice device, String name, int vboSize, ShaderProgram lineShaderHandle) {
     _maxVertices = vboSize;
     _lines = new _DebugLineCollection();
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
-    _vbo = device.createVertexBuffer(name, {'usage': 'dynamic', 'size': vboSize*DebugDrawVertexSize});
-    List inputElements = [new InputElementDescription('vPosition', GraphicsDevice.DeviceFormatFloat3, 7*4, 0, 0),
-                          new InputElementDescription('vColor', GraphicsDevice.DeviceFormatFloat4, 7*4, 0, 3*4)];
-    _vboLayout = device.createInputLayout('$name Layout', {'shaderProgram': lineShaderHandle, 'elements':inputElements});
+    _arrayMesh = device.createSingleArrayMesh(name);
+    _arrayMesh.vertexArray.allocate(vboSize*DebugDrawVertexSize*4,
+                                    SpectreBuffer.UsageDynamic);
+    _arrayMesh.attributes['vPosition'] = new SpectreMeshAttribute('vPosition',
+                                                                  'float', 3,
+                                                                  0, 28, false);
+    _arrayMesh.attributes['vColor'] = new SpectreMeshAttribute('vColor',
+                                                                'float', 4,
+                                                                12, 28, false);
+    _vboLayout = device.createInputLayout('$name Layout');
+    _vboLayout.shaderProgram = lineShaderHandle;
+    _vboLayout.mesh = _arrayMesh;
   }
 
   void _prepareForRender(GraphicsContext context) {
@@ -148,7 +158,7 @@ class _DebugDrawLineManager {
       }
     }
 
-    _vbo.uploadData(_vboStorage, _vbo.usage);
+    _arrayMesh.vertexArray.uploadSubData(0, _vboStorage);
   }
 
   int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;
@@ -205,12 +215,13 @@ class _DebugDrawSphereManager {
   List _drawProgram;
 
   ShaderProgram _sphereProgramHandle;
-  IndexedMesh _sphereIndexedMeshHandle;
-  VertexBuffer _sphereVertexBuffer;
-  IndexBuffer _sphereIndexBuffer;
+  SingleArrayIndexedMesh _sphereIndexedMeshHandle;
   int _sphereNumIndices;
   InputLayout _sphereInputLayout;
-  _DebugDrawSphereManager(ShaderProgram sphereProgramHandle, IndexedMesh sphereIndexedMeshHandle, InputLayout sphereInputLayout, int maxSpheres) {
+  _DebugDrawSphereManager(ShaderProgram sphereProgramHandle,
+                          SingleArrayIndexedMesh sphereIndexedMeshHandle,
+                          InputLayout sphereInputLayout,
+                          int maxSpheres) {
     _sphereInputLayout = sphereInputLayout;
     _sphereProgramHandle = sphereProgramHandle;
     _sphereIndexedMeshHandle = sphereIndexedMeshHandle;
@@ -371,7 +382,6 @@ class DebugDrawManager {
     _handles.add(handle);
     handle = _device.createShaderProgram(_sphereShaderProgramName, {});
     _handles.add(handle);
-
     _context.compileShader(_handles[_sphereVertexShaderHandleIndex],
                            _debugSphereVertexShader);
     _context.compileShader(_handles[_sphereFragmentShaderHandleIndex],
@@ -379,18 +389,24 @@ class DebugDrawManager {
     _context.linkShaderProgram(_handles[_sphereShaderProgramHandleIndex],
                                _handles[_sphereVertexShaderHandleIndex],
                                _handles[_sphereFragmentShaderHandleIndex]);
-
-    handle = device.createIndexedMesh(_sphereIndexedMeshName, {
-      'UpdateFromMeshMap': _debugSphereMesh
-    });
+    SingleArrayIndexedMesh mesh;
+    mesh = _device.createSingleArrayIndexedMesh(_sphereIndexedMeshName);
+    mesh.attributes['POSITION'] = new SpectreMeshAttribute('POSITION', 'float',
+                                                           3, 24, 0, false);
+    mesh.vertexArray.uploadData(
+        new Float32Array.fromList(_debugSphereMesh['meshes'][0]['vertices']),
+        SpectreBuffer.UsageStatic);
+    mesh.indexArray.uploadData(
+        new Int16Array.fromList(_debugSphereMesh['meshes'][0]['indices']),
+        SpectreBuffer.UsageStatic);
+    handle = mesh;
     _handles.add(handle);
 
-    // Sphere startup
     InputLayout sphereInputLayout;
-    {
-      var elements = [InputLayoutHelper.inputElementDescriptionFromMeshMap(new InputLayoutDescription('vPosition', 0, 'POSITION'), _debugSphereMesh)];
-      sphereInputLayout = device.createInputLayout('Debug Sphere Input', {'elements':elements, 'shaderProgram':_handles[_sphereShaderProgramHandleIndex]});
-    }
+    sphereInputLayout = _device.createInputLayout('Debug Sphere InputLayout');
+    sphereInputLayout.mesh = mesh;
+    sphereInputLayout.shaderProgram = _handles[_sphereShaderProgramHandleIndex];
+    assert(sphereInputLayout.ready);
 
     _depthEnabledLines = new _DebugDrawLineManager(device, _depthEnabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
     _depthDisabledLines = new _DebugDrawLineManager(device, _depthDisabledLineVBOName, vboSize, _handles[_lineShaderProgramHandleIndex]);
@@ -408,14 +424,14 @@ class DebugDrawManager {
     clb.setIndexBuffer(null);
     // Depth enabled lines
     clb.setDepthState(_handles[_depthEnabledStateHandleIndex]);
-    clb.setVertexBuffers(0, [_depthEnabledLines._vbo]);
+    clb.setVertexBuffers(0, [_depthEnabledLines._arrayMesh.vertexArray]);
     clb.setInputLayout(_depthEnabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 0
     // draw Indirect takes vertexOffset from register 1
     clb.drawIndirect(0, 1);
     // Depth disabled lines
     clb.setDepthState(_handles[_depthDisabledStateHandleIndex]);
-    clb.setVertexBuffers(0, [_depthDisabledLines._vbo]);
+    clb.setVertexBuffers(0, [_depthDisabledLines._arrayMesh.vertexArray]);
     clb.setInputLayout(_depthDisabledLines._vboLayout);
     // draw Indirect takes vertexCount from register 2
     // draw Indirect takes vertexOffset from register 3
@@ -751,7 +767,7 @@ final String _debugSphereVertexShader = '''
 precision highp float;
 
 // Input attributes
-attribute vec3 vPosition;
+attribute vec3 POSITION;
 
 // Input uniforms
 uniform mat4 cameraTransform;
@@ -760,7 +776,7 @@ uniform vec4 debugSphereCenterAndRadius;
 void main() {
     vec3 center = debugSphereCenterAndRadius.xyz;
     float scale = debugSphereCenterAndRadius.w;
-    vec4 vPosition4 = vec4((vPosition * scale) + center, 1.0);
+    vec4 vPosition4 = vec4((POSITION * scale) + center, 1.0);
     gl_Position = cameraTransform*vPosition4;
 }
 ''';

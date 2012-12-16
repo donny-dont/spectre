@@ -197,7 +197,7 @@ class CommandListBuilder {
     ops.add(buf);
   }
 
-  void setIndexedMesh(IndexedMesh indexedMeshHandle) {
+  void setIndexedMesh(SingleArrayIndexedMesh indexedMeshHandle) {
     ops.add(Ops.SetIndexedMesh);
     ops.add(indexedMeshHandle);
   }
@@ -220,7 +220,7 @@ class CommandListBuilder {
     ops.add(indexOffset);
   }
 
-  void drawIndexedMesh(IndexedMesh indexedMeshHandle) {
+  void drawIndexedMesh(SingleArrayIndexedMesh indexedMeshHandle) {
     ops.add(Ops.DrawIndexedMesh);
     ops.add(indexedMeshHandle);
   }

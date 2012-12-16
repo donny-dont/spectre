@@ -97,8 +97,8 @@ class SpectreBuffer extends DeviceChild {
     if (data == null) {
       throw new ArgumentError('data cannot be null.');
     }
-    if (offset + data.byteLength >= _size) {
-      throw new RangeError('data will not fit.');
+    if (offset + data.byteLength > _size) {
+      throw new RangeError('data is too large ${data.byteLength}');
     }
     var oldBind = _pushBind();
     _uploadSubData(offset, data);

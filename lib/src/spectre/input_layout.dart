@@ -23,80 +23,82 @@ part of spectre;
 */
 
 class _InputLayoutElement {
-  int _vboSlot;
-  int _vboOffset;
-  int _attributeIndex;
-  int _attributeStride;
-  DeviceFormat _attributeFormat;
-
-  String toString() {
-    return 'Attribute $_attributeIndex bound to VBO: $_vboSlot VBO_OFFSET: $_vboOffset Attribute Stride: $_attributeStride Format: $_attributeFormat';
-  }
+  final int vboSlot;
+  final int attributeIndex;
+  final int attributeOffset;
+  final int attributeStride;
+  final DeviceFormat attributeFormat;
+  _InputLayoutElement(this.vboSlot, this.attributeIndex, this.attributeOffset,
+                      this.attributeStride, this.attributeFormat);
 }
 
-/// A mapping of vertex buffers to shader program input attributes
-/// Create using [Device.createInputLayout]
-/// Set using [ImmediateContext.setInputLayout]
 class InputLayout extends DeviceChild {
-  int _maxAttributeIndex;
-  List<_InputLayoutElement> _elements;
-  List<InputElementDescription> _elementDescription;
+  final List<_InputLayoutElement> _elements = new List<_InputLayoutElement>();
+  /** A list of shader program attributes the mesh does not have. If this
+   * list has any elements the input layout will not be [ready].
+   */
+  final List<ShaderProgramAttribute> missingAttributes =
+      new List<ShaderProgramAttribute>();
+
   ShaderProgram _shaderProgram;
-
-  InputLayout(String name, GraphicsDevice device) : super._internal(name, device) {
-    _maxAttributeIndex = 0;
-    _elements = null;
-    _elementDescription = null;
+  ShaderProgram get shaderProgram => _shaderProgram;
+  /** Set the shader program. Input layout will be verified to be [ready]. */
+  set shaderProgram(ShaderProgram shaderProgram) {
+    _shaderProgram = shaderProgram;
+    _refresh();
   }
 
-  void _createDeviceState() {
+  SpectreMesh _mesh;
+  SpectreMesh get mesh => _mesh;
+  /** Set the mesh. Input layout will be verified to be [ready]. */
+  set mesh(SpectreMesh mesh) {
+    _mesh = mesh;
+    _refresh();
   }
 
-  void _bind() {
-    if (_elementDescription == null ||
-        _elementDescription.length <= 0 ||
-        _shaderProgram == null) {
+  /** In order for a InputLayout to be ready the mesh must have
+   * all the attributes the shader program requires.
+   */
+  bool get ready => _shaderProgram != null && _mesh != null &&
+                    missingAttributes.length == 0;
+
+  void _refresh() {
+    _elements.clear();
+    missingAttributes.clear();
+
+    if (_shaderProgram == null || _mesh == null) {
       return;
     }
 
-    _InputElementChecker checker = new _InputElementChecker();
-
-    _maxAttributeIndex = -1;
-    _elements = new List<_InputLayoutElement>();
-    for (InputElementDescription e in _elementDescription) {
-      checker.add(e);
-      var index = device.gl.getAttribLocation(_shaderProgram._program, e.name);
-      if (index == -1) {
-        spectreLog.Warning('Can\'t find ${e.name} in ${_shaderProgram.name}');
-        continue;
-      }
-      _InputLayoutElement el = new _InputLayoutElement();
-      el._attributeIndex = index;
-      if (index > _maxAttributeIndex) {
-        _maxAttributeIndex = index;
-      }
-      el._attributeFormat = e.format;
-      el._vboOffset = e.vertexBufferOffset;
-      el._vboSlot = e.vertexBufferSlot;
-      el._attributeStride = e.elementStride;
-      _elements.add(el);
+    if (_shaderProgram.attributes.length == 0 || _mesh.attributes.length == 0) {
+      return;
     }
+
+    _shaderProgram.attributes.forEach((name, shaderProgramAttribute) {
+      SpectreMeshAttribute meshAttribute = _mesh.attributes[name];
+      if (meshAttribute == null) {
+        missingAttributes.add(shaderProgramAttribute);
+      } else {
+        _InputLayoutElement element = new _InputLayoutElement(
+            0,
+            shaderProgramAttribute.location,
+            meshAttribute.offset,
+            meshAttribute.stride,
+            meshAttribute.deviceFormat);
+        _elements.add(element);
+      }
+    });
+    print('InputLayour $name refreshed: $ready');
   }
 
-  void _configDeviceState(Map props) {
-
-    dynamic o;
-
-    o = props['shaderProgram'];
-    if (o != null && o is ShaderProgram) {
-      _shaderProgram = o;
-    }
-    o = props['elements'];
-    if (o != null && o is List) {
-      _elementDescription = o;
-    }
-    _bind();
+  InputLayout(String name, GraphicsDevice device)
+      : super._internal(name, device) {
   }
-  void _destroyDeviceState() {
+
+  void _bind() {
+    if (ready == false) {
+      return;
+    }
+    // Apply state.
   }
 }

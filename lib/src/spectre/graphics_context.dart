@@ -95,26 +95,23 @@ class GraphicsContext {
       return;
     }
 
-    for (var element in inputLayout._elements) {
-      VertexBuffer vb = _vertexBufferHandles[element._vboSlot];
+    inputLayout._elements.forEach((element) {
+      VertexBuffer vb = _vertexBufferHandles[element.vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
-        continue;
+        return;
       }
-      _device.gl.enableVertexAttribArray(element._attributeIndex);
+      _device.gl.enableVertexAttribArray(element.attributeIndex);
       vb._bind();
-      _device.gl.vertexAttribPointer(element._attributeIndex,
-        element._attributeFormat.count,
-        element._attributeFormat.type,
-        element._attributeFormat.normalized,
-        element._attributeStride,
-        element._vboOffset);
+      _device.gl.vertexAttribPointer(element.attributeIndex,
+        element.attributeFormat.count,
+        element.attributeFormat.type,
+        element.attributeFormat.normalized,
+        element.attributeStride,
+        element.attributeOffset);
       // Remember that this was enabled.
-      _enabledVertexAttributeArrays.add(element._attributeIndex);
-      if (debug) {
-        _logVertexAttributes(element._attributeIndex);
-      }
-    }
+      _enabledVertexAttributeArrays.add(element.attributeIndex);
+    });
     if (_indexBufferHandle != null) {
       IndexBuffer indexBuffer = _indexBufferHandle;
       indexBuffer._bind();
@@ -197,12 +194,12 @@ class GraphicsContext {
     _inputLayoutHandle = inputLayoutHandle;
   }
 
-  void setIndexedMesh(IndexedMesh im) {
-    if (im == null) {
+  void setIndexedMesh(SingleArrayIndexedMesh indexedMesh) {
+    if (indexedMesh == null) {
       return;
     }
-    setIndexBuffer(im.indexArray);
-    setVertexBuffers(0, [im.vertexArray]);
+    setIndexBuffer(indexedMesh.indexArray);
+    setVertexBuffers(0, [indexedMesh.vertexArray]);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
@@ -411,11 +408,11 @@ class GraphicsContext {
     _device.gl.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
   }
 
-  void drawIndexedMesh(IndexedMesh im) {
-    if (im == null) {
+  void drawIndexedMesh(SingleArrayIndexedMesh indexedMesh) {
+    if (indexedMesh == null) {
       return;
     }
-    drawIndexed(im.numIndices, im.indexOffset);
+    drawIndexed(indexedMesh.numIndices, 0);
   }
 
   /// Draw a mesh with [numVertices] starting at [vertexOffset]
