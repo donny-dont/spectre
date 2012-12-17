@@ -29,8 +29,8 @@ class GraphicsContext {
   static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
   static final int numVertexBuffers = 2;
   static final int numTextures = 3;
+  final GraphicsDevice device;
 
-  GraphicsDevice _device;
   // Input Assembler
   int _primitiveTopology;
   IndexBuffer _indexBufferHandle;
@@ -52,16 +52,6 @@ class GraphicsContext {
   RenderTarget _renderTargetHandle;
 
   void _PrepareTextures() {
-  }
-
-  void _logVertexAttributes(int index) {
-    var enabled = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_ENABLED);
-    var size = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_SIZE);
-    var stride = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_STRIDE);
-    var type = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_TYPE);
-    var normalized = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_NORMALIZED);
-    var binding = _device.gl.getVertexAttrib(index, WebGLRenderingContext.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING);
-    spectreLog.Info('Vertex Attribute $index $enabled $size $stride $type $normalized $binding');
   }
 
   void _prepareInputs([bool debug=false]) {
@@ -87,69 +77,49 @@ class GraphicsContext {
       if (index == 0) {
         continue;
       }
-      _device.gl.disableVertexAttribArray(index);
+      device.gl.disableVertexAttribArray(index);
     }
     _enabledVertexAttributeArrays.clear();
 
-    if (inputLayout._elements == null) {
-      return;
-    }
-
-    for (var element in inputLayout._elements) {
-      VertexBuffer vb = _vertexBufferHandles[element._vboSlot];
+    inputLayout.elements.forEach((element) {
+      VertexBuffer vb = _vertexBufferHandles[element.vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
-        continue;
+        return;
       }
-      _device.gl.enableVertexAttribArray(element._attributeIndex);
-      _device.gl.bindBuffer(vb._target, vb._buffer);
-      _device.gl.vertexAttribPointer(element._attributeIndex,
-        element._attributeFormat.count,
-        element._attributeFormat.type,
-        element._attributeFormat.normalized,
-        element._attributeStride,
-        element._vboOffset);
+      device.gl.enableVertexAttribArray(element.attributeIndex);
+      vb._bind();
+      device.gl.vertexAttribPointer(element.attributeIndex,
+        element.attributeFormat.count,
+        element.attributeFormat.type,
+        element.attributeFormat.normalized,
+        element.attributeStride,
+        element.attributeOffset);
       // Remember that this was enabled.
-      _enabledVertexAttributeArrays.add(element._attributeIndex);
-      if (debug) {
-        _logVertexAttributes(element._attributeIndex);
-      }
-      //_device.gl.bindBuffer(vb._target, null);
-
-    }
+      _enabledVertexAttributeArrays.add(element.attributeIndex);
+    });
     if (_indexBufferHandle != null) {
       IndexBuffer indexBuffer = _indexBufferHandle;
-      _device.gl.bindBuffer(indexBuffer._target, indexBuffer._buffer);
-      if (debug) {
-        print('Binding index buffer');
-      }
+      indexBuffer._bind();
     } else {
-      _device.gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
-      if (debug) {
-        print('No index buffer');
-      }
+      device.gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
     }
   }
 
   void _prepareTextures() {
     // TODO: Need to unbind unused texture channels
     for (int i = 0; i < numTextures; i++) {
-      SamplerState s = _samplerStateHandles[i];
-      Texture t = _textureHandles[i];
-      if (s == null || t == null) {
+      SamplerState sampler = _samplerStateHandles[i];
+      Texture texture = _textureHandles[i];
+      if (sampler == null || texture == null) {
         continue;
       }
-      _device.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + i);
-      _device.gl.bindTexture(t._target, t._buffer);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_S, s.wrapS);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_WRAP_T, s.wrapT);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MIN_FILTER, s.minFilter);
-      _device.gl.texParameteri(t._target, WebGLRenderingContext.TEXTURE_MAG_FILTER, s.magFilter);
+      texture._bind(WebGLRenderingContext.TEXTURE0 + i);
+      texture._applySampler(sampler);
     }
   }
 
-  GraphicsContext(GraphicsDevice device) {
-    _device = device;
+  GraphicsContext(this.device) {
     _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
     _samplerStateHandles = new List<SamplerState>(numTextures);
     _textureHandles = new List<Texture>(numTextures);
@@ -164,7 +134,7 @@ class GraphicsContext {
       if (index == 0) {
         continue;
       }
-      _device.gl.disableVertexAttribArray(index);
+      device.gl.disableVertexAttribArray(index);
     }
     _preparedInputLayoutHandle = null;
     _enabledVertexAttributeArrays.clear();
@@ -209,12 +179,20 @@ class GraphicsContext {
     _inputLayoutHandle = inputLayoutHandle;
   }
 
-  void setIndexedMesh(IndexedMesh im) {
-    if (im == null) {
+  void setIndexedMesh(SingleArrayIndexedMesh indexedMesh) {
+    if (indexedMesh == null) {
       return;
     }
-    setIndexBuffer(im.indexArray);
-    setVertexBuffers(0, [im.vertexArray]);
+    setIndexBuffer(indexedMesh.indexArray);
+    setVertexBuffers(0, [indexedMesh.vertexArray]);
+  }
+
+  void setMesh(SingleArrayMesh mesh) {
+    if (mesh == null) {
+      return;
+    }
+    setIndexBuffer(null);
+    setVertexBuffers(0, [mesh.vertexArray]);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
@@ -224,7 +202,7 @@ class GraphicsContext {
     }
     _shaderProgramHandle = shaderProgramHandle;
     ShaderProgram sp = shaderProgramHandle;
-    _device.gl.useProgram(sp._program);
+    device.gl.useProgram(sp._program);
   }
 
   /// Set RasterizerState to [rasterizerStateHandle]
@@ -237,13 +215,13 @@ class GraphicsContext {
     if (rs == null) {
       return;
     }
-    _device.gl.lineWidth(rs.lineWidth);
+    device.gl.lineWidth(rs.lineWidth);
     if (rs.cullEnabled) {
-      _device.gl.enable(WebGLRenderingContext.CULL_FACE);
-      _device.gl.cullFace(rs.cullMode);
-      _device.gl.frontFace(rs.cullFrontFace);
+      device.gl.enable(WebGLRenderingContext.CULL_FACE);
+      device.gl.cullFace(rs.cullMode);
+      device.gl.frontFace(rs.cullFrontFace);
     } else {
-      _device.gl.disable(WebGLRenderingContext.CULL_FACE);
+      device.gl.disable(WebGLRenderingContext.CULL_FACE);
     }
   }
 
@@ -256,7 +234,7 @@ class GraphicsContext {
     if (vp == null) {
       return;
     }
-    _device.gl.viewport(vp.x, vp.y, vp.width, vp.height);
+    device.gl.viewport(vp.x, vp.y, vp.width, vp.height);
   }
 
   /// Set BlendState to [blendStateHandle]
@@ -268,16 +246,22 @@ class GraphicsContext {
     if (bs == null) {
       return;
     }
-    _device.gl.colorMask(bs.writeRenderTargetRed, bs.writeRenderTargetGreen, bs.writeRenderTargetBlue, bs.writeRenderTargetAlpha);
+    device.gl.colorMask(bs.writeRenderTargetRed,
+                         bs.writeRenderTargetGreen,
+                         bs.writeRenderTargetBlue,
+                         bs.writeRenderTargetAlpha);
     if (bs.blendEnable == false) {
-      _device.gl.disable(WebGLRenderingContext.BLEND);
+      device.gl.disable(WebGLRenderingContext.BLEND);
       return;
     }
-    _device.gl.enable(WebGLRenderingContext.BLEND);
-    //_device.gl.blendFunc(bs.blendSourceColorFunc, bs.blendDestColorFunc);
-    _device.gl.blendFuncSeparate(bs.blendSourceColorFunc, bs.blendDestColorFunc, bs.blendSourceAlphaFunc, bs.blendDestAlphaFunc);
-    _device.gl.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
-    _device.gl.blendColor(bs.blendColorRed, bs.blendColorGreen, bs.blendColorBlue, bs.blendColorAlpha);
+    device.gl.enable(WebGLRenderingContext.BLEND);
+    device.gl.blendFuncSeparate(bs.blendSourceColorFunc,
+                                bs.blendDestColorFunc,
+                                bs.blendSourceAlphaFunc,
+                                bs.blendDestAlphaFunc);
+    device.gl.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
+    device.gl.blendColor(bs.blendColorRed, bs.blendColorGreen,
+                         bs.blendColorBlue, bs.blendColorAlpha);
   }
 
   /// Set DepthState to [depthStateHandle]
@@ -288,21 +272,21 @@ class GraphicsContext {
     if (ds == null) {
       return;
     }
-    _device.gl.depthRange(ds.depthNearVal, ds.depthFarVal);
+    device.gl.depthRange(ds.depthNearVal, ds.depthFarVal);
     if (ds.depthTestEnabled == false) {
-      _device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
+      device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
     } else {
-      _device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
-      _device.gl.depthFunc(ds.depthComparisonOp);
+      device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+      device.gl.depthFunc(ds.depthComparisonOp);
     }
 
-    _device.gl.depthMask(ds.depthWriteEnabled);
+    device.gl.depthMask(ds.depthWriteEnabled);
 
     if (ds.polygonOffsetEnabled == false) {
-      _device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
     } else {
-      _device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-      _device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
+      device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
     }
   }
 
@@ -313,10 +297,10 @@ class GraphicsContext {
     }
     _renderTargetHandle = renderTargetHandle;
     if (_renderTargetHandle == null) {
-      _device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
+      RenderTarget.systemRenderTarget._bind();
     } else {
       RenderTarget rt = renderTargetHandle;
-      _device.gl.bindFramebuffer(rt._target, rt._buffer);
+      rt._bind();
     }
   }
 
@@ -331,7 +315,7 @@ class GraphicsContext {
   void setConstant(String name, var argument) {
     ShaderProgramUniform uniform = _findUniform(name);
     if (uniform != null) {
-      uniform._apply(_device, uniform.location, argument);
+      uniform._apply(device, uniform.location, argument);
     } else if (_shaderProgramHandle == null ){
       spectreLog.Error('Cannot set $name: no ShaderProgram bound.');
     } else {
@@ -339,64 +323,19 @@ class GraphicsContext {
     }
   }
 
-  /// Update the pixels of [textureHandle] from the [imageResourceHandle]
-  ///
-  /// Only updates the top level mip map
-  void updateTexture2DFromResource(Texture2D tex, ImageResource ir, ResourceManager rm) {
-    if (ir == null) {
-      return;
-    }
-    if (tex == null) {
-      return;
-    }
-    tex.uploadElement(ir.image);
-  }
-
-  /// Generate the full mipmap pyramid for [textureHandle]
-  void generateMipmap(Texture2D tex) {
-    if (tex == null) {
-      return;
-    }
-    tex.generateMipmap();
-    tex.ready = true;
-  }
-
-  void compileShader(SpectreShader shader, String source) {
-    if (shader == null) {
-      return;
-    }
-    shader.source = source;
-    shader.compile();
-    String shaderCompileLog = _device.gl.getShaderInfoLog(shader._shader);
-    spectreLog.Info('Compiled ${shader.name} - $shaderCompileLog');
-  }
-
   void clearColorBuffer(num r, num g, num b, num a) {
-    _device.gl.clearColor(r, g, b, a);
-    _device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    device.gl.clearColor(r, g, b, a);
+    device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
   }
 
   void clearDepthBuffer(num depth) {
-    _device.gl.clearDepth(depth);
-    _device.gl.clear(WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    device.gl.clearDepth(depth);
+    device.gl.clear(WebGLRenderingContext.DEPTH_BUFFER_BIT);
   }
 
   void clearStencilBuffer(int stencil) {
-    _device.gl.clearStencil(stencil);
-    _device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
-  }
-
-  void compileShaderFromResource(SpectreShader shader, ShaderResource sr, ResourceManager rm) {
-    if (sr == null) {
-      return;
-    }
-    compileShader(shader, sr.source);
-  }
-
-  void linkShaderProgram(ShaderProgram sp, VertexShader vs, FragmentShader fs) {
-    _device.gl.attachShader(sp._program, vs._shader);
-    _device.gl.attachShader(sp._program, fs._shader);
-    sp.link();
+    device.gl.clearStencil(stencil);
+    device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
   }
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
@@ -420,14 +359,22 @@ class GraphicsContext {
     }
     _prepareInputs();
     _prepareTextures();
-    _device.gl.drawElements(_primitiveTopology, numIndices, WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
+    device.gl.drawElements(_primitiveTopology, numIndices,
+                           WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
   }
 
-  void drawIndexedMesh(IndexedMesh im) {
-    if (im == null) {
+  void drawIndexedMesh(SingleArrayIndexedMesh indexedMesh) {
+    if (indexedMesh == null) {
       return;
     }
-    drawIndexed(im.numIndices, im.indexOffset);
+    drawIndexed(indexedMesh.numIndices, 0);
+  }
+
+  void drawMesh(SingleArrayMesh mesh) {
+    if (mesh == null) {
+      return;
+    }
+    draw(mesh.numVertices, 0);
   }
 
   /// Draw a mesh with [numVertices] starting at [vertexOffset]
@@ -437,6 +384,6 @@ class GraphicsContext {
     }
     _prepareInputs();
     _prepareTextures();
-    _device.gl.drawArrays(_primitiveTopology, vertexOffset, numVertices);
+    device.gl.drawArrays(_primitiveTopology, vertexOffset, numVertices);
   }
 }

@@ -33,25 +33,6 @@ class DeviceFormat {
   }
 }
 
-/// Description used to create an input layout
-/// Attribute [name] must match name in shader program
-/// Attribute [format] device format for attribute
-/// Attribute [elementStride] bytes between successive elements
-/// Attribute [vertexBufferSlot] the vertex buffer slot to pull elements from
-/// Attribute [vertexBufferOffset] the offset into the
-// vertex buffer to pull the first element
-class InputElementDescription {
-  String name;
-  DeviceFormat format;
-  int elementStride;
-  int vertexBufferSlot;
-  int vertexBufferOffset;
-
-  InputElementDescription(this.name, this.format,
-                          this.elementStride, this.vertexBufferSlot,
-                          this.vertexBufferOffset);
-}
-
 class _InputElementCheckerItem {
   String name;
   int vertexBufferSlot;
@@ -315,8 +296,6 @@ class GraphicsDevice {
   static const int MaxDeviceChildren = 2048;
 
   Texture2D _fallbackTexture;
-  RenderTarget _systemProvidedRenderTarget;
-  RenderTarget get systemProvidedRenderTarget => _systemProvidedRenderTarget;
 
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
     context2d.save();
@@ -350,24 +329,19 @@ class GraphicsDevice {
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
     print(_capabilities);
-    _fallbackTexture = createTexture2D('Device.Fallback', {
-      'width': 512,
-      'height': 512,
-      'textureFormat' : Texture.FormatRGBA,
-      'pixelFormat' : Texture.FormatRGBA,
-      'pixelType': Texture.PixelTypeU8});
+    _fallbackTexture = createTexture2D('Device.Fallback');
     {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;
       canvas.height = 512;
       CanvasRenderingContext2D context2d = canvas.getContext('2d');
       _drawGrid(context2d, 512, 512, 8, 8);
-      configureDeviceChild(_fallbackTexture, {'pixels': canvas});
-      _context.generateMipmap(_fallbackTexture);
+      _fallbackTexture.uploadElement(canvas);
+      _fallbackTexture.generateMipmap();
     }
-    _systemProvidedRenderTarget = createRenderTarget(
-        'SystemProvidedRenderTarget',
-        {'SystemProvided': true});
+    RenderTarget._systemRenderTarget = createRenderTarget(
+        'SystemProvidedRenderTarget');
+    RenderTarget._systemRenderTarget._makeSystemTarget();
   }
 
   /// Returns the [DeviceChild] with [name].
@@ -397,79 +371,53 @@ class GraphicsDevice {
     }
   }
 
-  void configureDeviceChild(DeviceChild child, Map props) {
-    props = _getPropertyMap(props);
-    child._configDeviceState(props);
-  }
-
-  /// Create a [IndexBuffer] named [name]
-  ///
-  /// [props] is a [Map]
-  /// describing the IndexBuffer being created.
-  ///
-  IndexBuffer createIndexBuffer(String name, Map props) {
+  /// Create an [IndexBuffer] named [name]
+  IndexBuffer createIndexBuffer(String name) {
     IndexBuffer ib = new IndexBuffer(name, this);
     if (_addChildObject(ib) == false) {
       return null;
     }
     ib._createDeviceState();
-    ib._configDeviceState(props);
     return ib;
   }
 
   /// Create a [VertexBuffer] named [name]
-  ///
-  /// [props] is a [Map]
-  /// describing the [VertexBuffer] being created
-  VertexBuffer createVertexBuffer(String name, Map props) {
+  VertexBuffer createVertexBuffer(String name) {
     VertexBuffer vb = new VertexBuffer(name, this);
     if (_addChildObject(vb) == false) {
       return null;
     }
     vb._createDeviceState();
-    vb._configDeviceState(props);
     return vb;
   }
 
   /// Create a [RenderBuffer] named [name]
-  ///
-  /// [props] is a [Map]
-  /// describing the [RenderBuffer] being created
-  RenderBuffer createRenderBuffer(String name, Map props) {
+  RenderBuffer createRenderBuffer(String name) {
     RenderBuffer rb = new RenderBuffer(name, this);
     if (_addChildObject(rb) == false) {
       return null;
     }
     rb._createDeviceState();
-    rb._configDeviceState(props);
     return rb;
   }
 
   /// Create a [RenderTarget] named [name]
-  ///
-  /// [props] a [Map]
-  /// describing the [RenderTarget] being created
-  RenderTarget createRenderTarget(String name, Map props) {
+  RenderTarget createRenderTarget(String name) {
     RenderTarget rt = new RenderTarget(name, this);
     if (_addChildObject(rt) == false) {
       return null;
     }
     rt._createDeviceState();
-    rt._configDeviceState(props);
     return rt;
   }
 
   /// Create a [Texture2D] named [name]
-  ///
-  /// [props] is a [Map]
-  /// describing the [Texture2D] being created
-  Texture2D createTexture2D(String name, Map props) {
+  Texture2D createTexture2D(String name) {
     Texture2D tex = new Texture2D(name, this);
     if (_addChildObject(tex) == false) {
       return null;
     }
     tex._createDeviceState();
-    tex._configDeviceState(props);
     if (_fallbackTexture != null) {
       // If the fallback texture is ready we mark all textures unready.
       tex.ready = false;
@@ -478,154 +426,113 @@ class GraphicsDevice {
     return tex;
   }
 
-  /// Create a [VertexShader] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [VertexShader] being created
-  VertexShader createVertexShader(String name, Map props) {
+  /// Create a [VertexShader] named [name].
+  VertexShader createVertexShader(String name) {
     VertexShader vertexShader = new VertexShader(name, this);
     if (_addChildObject(vertexShader) == false) {
       return null;
     }
     vertexShader._createDeviceState();
-    vertexShader._configDeviceState(props);
     return vertexShader;
   }
 
-  /// Create a [FragmentShader] named [name]
-  ///
-  /// [props] is a [Map] containing a set of properties
-  /// describing the [FragmentShader] being created
-  FragmentShader createFragmentShader(String name, Map props) {
+  /// Create a [FragmentShader] named [name].
+  FragmentShader createFragmentShader(String name) {
     FragmentShader fragmentShader = new FragmentShader(name, this);
     if (_addChildObject(fragmentShader) == false) {
       return null;
     }
     fragmentShader._createDeviceState();
-    fragmentShader._configDeviceState(props);
     return fragmentShader;
   }
 
-  /// Create a [ShaderProgram] named [name]
-  ///
-  /// [props] is a [Map] containing a set of properties
-  /// describing the [ShaderProgram] being created
-  ShaderProgram createShaderProgram(String name, Map props) {
+  /// Create a [ShaderProgram] named [name].
+  ShaderProgram createShaderProgram(String name) {
     ShaderProgram shaderProgram = new ShaderProgram(name, this);
     if (_addChildObject(shaderProgram) == false) {
       return null;
     }
     shaderProgram._createDeviceState();
-    shaderProgram._configDeviceState(props);
-
     return shaderProgram;
   }
 
-  /// Create a [SamplerState] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [SamplerState] being created
-  SamplerState createSamplerState(String name, dynamic props) {
+  /// Create a [SamplerState] named [name].
+  SamplerState createSamplerState(String name) {
     SamplerState sampler = new SamplerState(name, this);
     if (_addChildObject(sampler) == false) {
       return null;
     }
     sampler._createDeviceState();
-    sampler._configDeviceState(props);
     return sampler;
   }
 
-  /// Create a [Viewport] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [Viewport] being created
-  Viewport createViewport(String name, Map props) {
+  /// Create a [Viewport] named [name].
+  Viewport createViewport(String name) {
     Viewport viewport = new Viewport(name, this);
     if (_addChildObject(viewport) == false) {
       return null;
     }
     viewport._createDeviceState();
-    viewport._configDeviceState(props);
     return viewport;
   }
 
-  /// Create a [DepthState] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [DepthState] being created
-  DepthState createDepthState(String name, Map props) {
+  /// Create a [DepthState] named [name].
+  DepthState createDepthState(String name) {
     DepthState depthState = new DepthState(name, this);
     if (_addChildObject(depthState) == false) {
       return null;
     }
     depthState._createDeviceState();
-    depthState._configDeviceState(props);
     return depthState;
   }
 
-  /// Create a [BlendState] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [BlendState] being created
-  BlendState createBlendState(String name, Map props) {
+  /// Create a [BlendState] named [name].
+  BlendState createBlendState(String name) {
     BlendState blendState = new BlendState(name, this);
     if (_addChildObject(blendState) == false) {
       return null;
     }
     blendState._createDeviceState();
-    blendState._configDeviceState(props);
     return blendState;
   }
 
-  /// Create a [RasterizerState] named [name]
-  ///
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  /// describing the [RasterizerState] being created
-  RasterizerState createRasterizerState(String name, Object props) {
+  /// Create a [RasterizerState] named [name].
+  RasterizerState createRasterizerState(String name) {
     RasterizerState rasterizerState = new RasterizerState(name, this);
     if (_addChildObject(rasterizerState) == false) {
       return null;
     }
     rasterizerState._createDeviceState();
-    rasterizerState._configDeviceState(props);
     return rasterizerState;
   }
 
-  /// Create an [InputLayout] named [name]
-  ///
-  /// [props] is a JSONS tring or a [Map] containing a set of properties
-  /// describing the [InputLayout] being created.
-  InputLayout createInputLayout(String name, Map props) {
+  /// Create an [InputLayout] named [name].
+  InputLayout createInputLayout(String name) {
     InputLayout il = new InputLayout(name, this);
     if (_addChildObject(il) == false) {
       return null;
     }
     il._createDeviceState();
-    il._configDeviceState(props);
     return il;
   }
 
-  /// Create an [IndexedMesh] named [name]
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  IndexedMesh createIndexedMesh(String name, Map props) {
-    IndexedMesh indexedMesh = new IndexedMesh(name, this);
-    if (_addChildObject(indexedMesh) == false) {
-      return null;
-    }
-    indexedMesh._createDeviceState();
-    indexedMesh._configDeviceState(props);
-    return indexedMesh;
-  }
-
-  /// Create an [ArrayMesh] name [name]
-  /// [props] is a JSON String or a [Map] containing a set of properties
-  ArrayMesh createArrayMesh(String name, Map props) {
-    ArrayMesh arrayMesh = new ArrayMesh(name, this);
+  /// Create a [SingleArrayMesh] named [name].
+  SingleArrayMesh createSingleArrayMesh(String name) {
+    SingleArrayMesh arrayMesh = new SingleArrayMesh(name, this);
     if (_addChildObject(arrayMesh) == false) {
       return null;
     }
     arrayMesh._createDeviceState();
-    arrayMesh._configDeviceState(props);
     return arrayMesh;
+  }
+
+  /// Create a [SingleArrayIndexedMesh] named [name].
+  SingleArrayIndexedMesh createSingleArrayIndexedMesh(String name) {
+    SingleArrayIndexedMesh indexedMesh = new SingleArrayIndexedMesh(name, this);
+    if (_addChildObject(indexedMesh) == false) {
+      return null;
+    }
+    indexedMesh._createDeviceState();
+    return indexedMesh;
   }
 }

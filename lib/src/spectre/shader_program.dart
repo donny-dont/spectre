@@ -110,24 +110,6 @@ class ShaderProgram extends DeviceChild {
     _program = device.gl.createProgram();
   }
 
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-      o = props['VertexProgram'];
-      if (o != null && o is VertexShader) {
-        vertexShader = o;
-      }
-      o = props['FragmentProgram'];
-      if (o != null && o is FragmentShader) {
-        fragmentShader = o;
-      }
-      if (vertexShader != null && fragmentShader != null) {
-        // relink
-        link();
-      }
-    }
-  }
-
   void _destroyDeviceState() {
     fragmentShader = null;
     vertexShader = null;
@@ -540,5 +522,13 @@ $_linkLog''');
     device.gl.useProgram(_program);
     uniform._apply(device, uniform.location, argument);
     device.gl.useProgram(oldBind);
+  }
+
+  void setSamplerUnit(String name, int unit) {
+    var sampler = samplers[name];
+    if (sampler == null) {
+      return;
+    }
+    // Set
   }
 }

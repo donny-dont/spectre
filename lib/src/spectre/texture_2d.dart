@@ -32,33 +32,13 @@ class Texture2D extends Texture {
   /** Did an error occur when loading from a URL? */
   bool get loadError => _loadError;
 
-  Texture2D(String name, GraphicsDevice device) : super(name, device) {
-    _target = WebGLRenderingContext.TEXTURE_2D;
-    _target_param = WebGLRenderingContext.TEXTURE_BINDING_2D;
-  }
+  Texture2D(String name, GraphicsDevice device) :
+      super(name, device, WebGLRenderingContext.TEXTURE_2D,
+          WebGLRenderingContext.TEXTURE_BINDING_2D,
+          WebGLRenderingContext.TEXTURE_2D);
 
   void _createDeviceState() {
     super._createDeviceState();
-  }
-
-  void _configDeviceState(Map props) {
-    super._configDeviceState(props);
-
-    if (props != null && props['pixels'] != null) {
-      var pixels = props['pixels'];
-      uploadElement(pixels);
-    } else {
-      if (props != null) {
-        _width = props['width'] != null ? props['width'] : _width;
-        _height = props['height'] != null ? props['height'] : _height;
-        _textureFormat = props['textureFormat'] != null ?
-            props['textureFormat'] : _textureFormat;
-      }
-      // TODO(johnmccutchan): Kill this hack.
-      // TODO(johnmccutchan): Support texture properties.
-      device.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1);
-      uploadPixelArray(width, height, null);
-    }
   }
 
   void _destroyDeviceState() {
@@ -67,7 +47,7 @@ class Texture2D extends Texture {
 
   void _uploadPixelArray(int width, int height, dynamic array,
                          int pixelFormat, int pixelType) {
-    device.gl.texImage2D(_target, 0, _textureFormat, width, height,
+    device.gl.texImage2D(_textureTarget, 0, _textureFormat, width, height,
                          0, pixelFormat, pixelType, array);
   }
 
@@ -77,16 +57,15 @@ class Texture2D extends Texture {
   void uploadPixelArray(int width, int height, dynamic array,
                         {pixelFormat: Texture.FormatRGBA,
                          pixelType: Texture.PixelTypeU8}) {
-    WebGLTexture oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindTexture(_target, _buffer);
+    var oldBind = _pushBind();
     _width = width;
     _height = height;
     _uploadPixelArray(width, height, array, pixelFormat, pixelType);
-    device.gl.bindTexture(_target, oldBind);
+    _popBind(oldBind);
   }
 
   void _uploadElement(dynamic element, int pixelFormat, int pixelType) {
-    device.gl.texImage2D(_target, 0, _textureFormat,
+    device.gl.texImage2D(_textureTarget, 0, _textureFormat,
                          pixelFormat, pixelType, element);
   }
 
@@ -111,10 +90,9 @@ class Texture2D extends Texture {
     } else {
       throw new ArgumentError('element is not supported.');
     }
-    WebGLTexture oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindTexture(_target, _buffer);
+    var oldBind = _pushBind();
     _uploadElement(element, pixelFormat, pixelType);
-    device.gl.bindTexture(_target, oldBind);
+    _popBind(oldBind);
   }
 
   /** Replace texture contents with data fetched from [url].
@@ -140,16 +118,15 @@ class Texture2D extends Texture {
   }
 
   void _generateMipmap() {
-    device.gl.generateMipmap(_target);
+    device.gl.generateMipmap(_textureTarget);
   }
 
   /** Generate Mipmap data for texture. This must be done before the texture
    * can be used for rendering.
    */
   void generateMipmap() {
-    WebGLTexture oldBind = device.gl.getParameter(_target_param);
-    device.gl.bindTexture(_target, _buffer);
+    var oldBind = _pushBind();
     _generateMipmap();
-    device.gl.bindTexture(_target, oldBind);
+    _popBind(oldBind);
   }
 }
