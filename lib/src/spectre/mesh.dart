@@ -59,7 +59,7 @@ class SingleArrayMesh extends SpectreMesh {
   int numVertices = 0;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]', {});
+    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
   }
 
 
@@ -88,8 +88,8 @@ class SingleArrayIndexedMesh extends SpectreMesh {
 
   SingleArrayIndexedMesh(String name, GraphicsDevice device)
       : super(name, device) {
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]', {});
-    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]', {});
+    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
+    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
   }
 
 

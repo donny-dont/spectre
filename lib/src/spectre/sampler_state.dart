@@ -52,10 +52,6 @@ class SamplerState extends DeviceChild {
     magFilter = TextureMagFilterLinear;
   }
 
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
   dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
@@ -74,23 +70,5 @@ class SamplerState extends DeviceChild {
       return table[o];
     }
     return o;
-  }
-
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-      o = props['wrapS'];
-      wrapS = o != null ? filter(o) : wrapS;
-      o = props['wrapT'];
-      wrapT = o != null ? filter(o) : wrapT;
-      o = props['minFilter'];
-      minFilter = o != null ? filter(o) : minFilter;
-      o = props['magFilter'];
-      magFilter = o != null ? filter(o) : magFilter;
-    }
-
-  }
-
-  void _destroyDeviceState() {
   }
 }

@@ -215,22 +215,20 @@ class DebugDrawManager {
 
   /** Construct and initialize a DebugDrawManager. */
   DebugDrawManager(this.device, [int vboSize=16384]) {
-    _depthEnabled = device.createDepthState(_depthStateEnabledName, {});
+    _depthEnabled = device.createDepthState(_depthStateEnabledName);
     _depthEnabled.depthTestEnabled = true;
     _depthEnabled.depthWriteEnabled = true;
     _depthEnabled.depthComparisonOp = DepthState.DepthComparisonOpLess;
-    _depthDisabled = device.createDepthState(_depthStateDisabledName, {});
+    _depthDisabled = device.createDepthState(_depthStateDisabledName);
     _depthDisabled.depthTestEnabled = false;
     _depthDisabled.depthWriteEnabled = false;
-    _blend = device.createBlendState(_blendStateName, {});
-    _rasterizer = device.createRasterizerState(_rasterizerStateName, {});
+    _blend = device.createBlendState(_blendStateName);
+    _rasterizer = device.createRasterizerState(_rasterizerStateName);
     _rasterizer.cullEnabled = true;
     _rasterizer.lineWidth = 1.0;
-    _lineVertexShader = device.createVertexShader(_lineVertexShaderName, {});
-    _lineFragmentShader = device.createFragmentShader(_lineFragmentShaderName,
-                                                      {});
-    _lineShaderProgram = device.createShaderProgram(_lineShaderProgramName,
-                                                     {});
+    _lineVertexShader = device.createVertexShader(_lineVertexShaderName);
+    _lineFragmentShader = device.createFragmentShader(_lineFragmentShaderName);
+    _lineShaderProgram = device.createShaderProgram(_lineShaderProgramName);
     _lineVertexShader.source = _debugLineVertexShader;
     _lineFragmentShader.source = _debugLineFragmentShader;
     _lineShaderProgram.vertexShader = _lineVertexShader;

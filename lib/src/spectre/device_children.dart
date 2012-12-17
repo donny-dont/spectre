@@ -67,8 +67,6 @@ class DeviceChild implements Hashable {
 
   void _createDeviceState() {
   }
-  void _configDeviceState(Map props) {
-  }
   void _destroyDeviceState() {
   }
 }

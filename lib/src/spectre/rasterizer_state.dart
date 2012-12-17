@@ -45,10 +45,6 @@ class RasterizerState extends DeviceChild {
     lineWidth = 1.0;
   }
 
-  void _createDeviceState() {
-
-  }
-
   dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
@@ -61,23 +57,5 @@ class RasterizerState extends DeviceChild {
       return table[o];
     }
     return o;
-  }
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-
-      o = props['cullEnabled'];
-      cullEnabled = o != null ? filter(o) : cullEnabled;
-      o = props['cullMode'];
-      cullMode = o != null ? filter(o) : cullMode;
-      o = props['cullFrontFace'];
-      cullFrontFace = o != null ? filter(o) : cullFrontFace;
-      o = props['lineWidth'];
-      lineWidth = o != null ? filter(o) : lineWidth;
-    }
-  }
-
-  void _destroyDeviceState() {
-
   }
 }

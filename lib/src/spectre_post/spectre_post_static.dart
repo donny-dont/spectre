@@ -34,10 +34,10 @@ class SpectrePost {
   static void init(GraphicsDevice device) {
     if (_device == null) {
       _device = device;
-      _rasterizerState = _device.createRasterizerState('SpectrePost.RS', {});
+      _rasterizerState = _device.createRasterizerState('SpectrePost.RS');
       _rasterizerState.cullEnabled = false;
-      _depthState = _device.createDepthState('SpectrePost.DS', {});
-      _blendState = _device.createBlendState('SpectrePost.PS', {});
+      _depthState = _device.createDepthState('SpectrePost.DS');
+      _blendState = _device.createBlendState('SpectrePost.PS');
       _blendState.blendEnable = true;
       _blendState.blendSourceColorFunc = BlendState.BlendSourceShaderAlpha;
       _blendState.blendDestColorFunc = BlendState.BlendSourceShaderInverseAlpha;
@@ -105,7 +105,7 @@ class SpectrePost {
                                                                     'float',
                                                                     2, 12, 20,
                                                                     false);
-      _vertexShader = _device.createVertexShader('SpectrePost.VS', {});
+      _vertexShader = _device.createVertexShader('SpectrePost.VS');
       _vertexShader.source = '''
 precision highp float;
 
@@ -193,10 +193,10 @@ void main() {
       return;
     }
     FragmentShader fragmentShader;
-    fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]', {});
+    fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]');
     fragmentShader.source = fragmentSource;
     ShaderProgram passProgram;
-    passProgram = _device.createShaderProgram('SpectrePost.Program[$name]', {});
+    passProgram = _device.createShaderProgram('SpectrePost.Program[$name]');
     passProgram.vertexShader = _vertexShader;
     passProgram.fragmentShader = fragmentShader;
     passProgram.link();

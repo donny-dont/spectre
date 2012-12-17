@@ -66,28 +66,4 @@ class DepthState extends DeviceChild {
     }
     return o;
   }
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-
-      o = props['depthTestEnabled'];
-      depthTestEnabled = o != null ? filter(o) : depthTestEnabled;
-      o = props['depthWriteEnabled'];
-      depthWriteEnabled = o != null ? filter(o) : depthWriteEnabled;
-      o = props['polygonOffsetEnabled'];
-      polygonOffsetEnabled = o != null ? filter(o) : polygonOffsetEnabled;
-
-      o = props['depthNearVal'];
-      depthNearVal = o != null ? filter(o) : depthNearVal;
-      o = props['depthFarVal'];
-      depthFarVal = o != null ? filter(o) : depthFarVal;
-      o = props['polygonOffsetFactor'];
-      polygonOffsetFactor = o != null ? filter(o) : polygonOffsetFactor;
-      o = props['polygonOffsetUnits'];
-      polygonOffsetUnits = o != null ? filter(o) : polygonOffsetUnits;
-      o = props['depthComparisonOp'];
-      depthComparisonOp = o != null ? filter(o) : depthComparisonOp;
-    }
-
-  }
 }

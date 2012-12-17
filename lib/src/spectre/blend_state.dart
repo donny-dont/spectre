@@ -97,8 +97,6 @@ class BlendState extends DeviceChild {
     writeRenderTargetBlue = true;
     writeRenderTargetAlpha = true;
   }
-  void _createDeviceState() {
-  }
 
   dynamic filter(dynamic o) {
     if (o is String) {
@@ -125,46 +123,5 @@ class BlendState extends DeviceChild {
     }
     return o;
   }
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-      o = props['blendColorRed'];
-      blendColorRed = o != null ? filter(o) : blendColorRed;
-      o = props['blendColorGreen'];
-      blendColorGreen = o != null ? filter(o) : blendColorGreen;
-      o = props['blendColorBlue'];
-      blendColorBlue = o != null ? filter(o) : blendColorBlue;
-      o = props['blendColorAlpha'];
-      blendColorAlpha = o != null ? filter(o) : blendColorAlpha;
 
-      o = props['blendEnable'];
-      blendEnable = o != null ? filter(o) : blendEnable;
-      o = props['blendSourceColorFunc'];
-      blendSourceColorFunc = o != null ? filter(o) : blendSourceColorFunc;
-      o = props['blendDestColorFunc'];
-      blendDestColorFunc = o != null ? filter(o) : blendDestColorFunc;
-      o = props['blendSourceAlphaFunc'];
-      blendSourceAlphaFunc = o != null ? filter(o) : blendSourceAlphaFunc;
-      o = props['blendDestAlphaFunc'];
-      blendDestAlphaFunc = o != null ? filter(o) : blendDestAlphaFunc;
-
-      o = props['blendColorOp'];
-      blendColorOp = o != null ? filter(o) : blendColorOp;
-      o = props['blendAlphaOp'];
-      blendAlphaOp = o != null ? filter(o) : blendAlphaOp;
-
-      o = props['writeRenderTargetRed'];
-      writeRenderTargetRed = o != null ? filter(o) : writeRenderTargetRed;
-      o = props['writeRenderTargetGreen'];
-      writeRenderTargetGreen = o != null ? filter(o) : writeRenderTargetGreen;
-      o = props['writeRenderTargetBlue'];
-      writeRenderTargetBlue = o != null ? filter(o) : writeRenderTargetBlue;
-      o = props['writeRenderTargetAlpha'];
-      writeRenderTargetAlpha = o != null ? filter(o) : writeRenderTargetAlpha;
-    }
-  }
-
-  void _destroyDeviceState() {
-
-  }
 }

@@ -41,26 +41,6 @@ class Texture2D extends Texture {
     super._createDeviceState();
   }
 
-  void _configDeviceState(Map props) {
-    super._configDeviceState(props);
-
-    if (props != null && props['pixels'] != null) {
-      var pixels = props['pixels'];
-      uploadElement(pixels);
-    } else {
-      if (props != null) {
-        _width = props['width'] != null ? props['width'] : _width;
-        _height = props['height'] != null ? props['height'] : _height;
-        _textureFormat = props['textureFormat'] != null ?
-            props['textureFormat'] : _textureFormat;
-      }
-      // TODO(johnmccutchan): Kill this hack.
-      // TODO(johnmccutchan): Support texture properties.
-      device.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, 1);
-      uploadPixelArray(width, height, null);
-    }
-  }
-
   void _destroyDeviceState() {
     super._destroyDeviceState();
   }
