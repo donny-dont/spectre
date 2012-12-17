@@ -49,29 +49,24 @@ class BlendState extends DeviceChild {
   static const int BlendSourceBlendInverseAlpha =
       WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
 
-  static const int BlendOpAdd = WebGLRenderingContext.FUNC_ADD;
-  static const int BlendOpSubtract = WebGLRenderingContext.FUNC_SUBTRACT;
-  static const int BlendOpReverseSubtract =
-      WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
-
   //---------------------------------------------------------------------
   // Class variables
   //
   // These should go away once mirrors work for dart2js.
   //---------------------------------------------------------------------
 
-  /// Serialization name for [blendColor].
-  static const String blendColorName = 'blendColor';
   /// Serialization name for [blendEnabled].
   static const String blendEnabledName = 'enabled';
-  /// Serialization name for [alphaBlendFunction].
-  static const String alphaBlendFunctionName = 'alphaBlendFunction';
+  /// Serialization name for [blendFactor].
+  static const String blendFactorName = 'blendFactor';
+  /// Serialization name for [alphaBlendOperation].
+  static const String alphaBlendOperationName = 'alphaBlendOperation';
   /// Serialization name for [alphaDestinationBlend].
   static const String alphaDestinationBlendName = 'alphaDestination';
   /// Serialization name for [alphaSourceBlend].
   static const String alphaSourceBlendName = 'alphaSourceBlend';
-  /// Serialization name for [colorBlendFunction].
-  static const String colorBlendFunctionName = 'colorBlendFunction';
+  /// Serialization name for [colorBlendOperation].
+  static const String colorBlendOperationName = 'colorBlendOperation';
   /// Serialization name for [colorDestinationBlend].
   static const String colorDestinationBlendName = 'colorDestinationBlend';
   /// Serialization name for [colorSourceBlend].
@@ -122,11 +117,11 @@ class BlendState extends DeviceChild {
 
     _blendFactor = new vec4.raw(1.0, 1.0, 1.0, 1.0);
 
-    _alphaBlendOperation = BlendOpAdd;
+    _alphaBlendOperation = BlendOperation.Add;
     _alphaDestinationBlend = BlendSourceOne;
     _alphaSourceBlend = BlendSourceOne;
 
-    _colorBlendOperation = BlendOpAdd;
+    _colorBlendOperation = BlendOperation.Add;
     _colorDestinationBlend = BlendSourceOne;
     _colorSourceBlend = BlendSourceOne;
 
@@ -135,34 +130,9 @@ class BlendState extends DeviceChild {
     _writeRenderTargetBlue = true;
     _writeRenderTargetAlpha = true;
   }
-  void _createDeviceState() {
-  }
+
+  void _createDeviceState() { }
 /*
-  dynamic filter(dynamic o) {
-    if (o is String) {
-      var table = {
-       "BlendSourceZero": WebGLRenderingContext.ZERO,
-       "BlendSourceOne": WebGLRenderingContext.ONE,
-       "BlendSourceShaderColor": WebGLRenderingContext.SRC_COLOR,
-       "BlendSourceShaderInverseColor": WebGLRenderingContext.ONE_MINUS_SRC_COLOR,
-       "BlendSourceShaderAlpha": WebGLRenderingContext.SRC_ALPHA,
-       "BlendSourceShaderInverseAlpha": WebGLRenderingContext.ONE_MINUS_SRC_ALPHA,
-       "BlendSourceTargetColor": WebGLRenderingContext.DST_COLOR,
-       "BlendSourceTargetInverseColor": WebGLRenderingContext.ONE_MINUS_DST_COLOR,
-       "BlendSourceTargetAlpha": WebGLRenderingContext.DST_ALPHA,
-       "BlendSourceTargetInverseAlpha": WebGLRenderingContext.ONE_MINUS_DST_ALPHA,
-       "BlendSourceBlendColor": WebGLRenderingContext.CONSTANT_COLOR,
-       "BlendSourceBlendAlpha": WebGLRenderingContext.CONSTANT_ALPHA,
-       "BlendSourceBlendInverseColor": WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR,
-       "BlendSourceBlendInverseAlpha": WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA,
-       "BlendOpAdd": WebGLRenderingContext.FUNC_ADD,
-       "BlendOpSubtract": WebGLRenderingContext.FUNC_SUBTRACT,
-       "BlendOpReverseSubtract": WebGLRenderingContext.FUNC_REVERSE_SUBTRACT
-      };
-      return table[o];
-    }
-    return o;
-  }
   void _configDeviceState(Map props) {
     if (props != null) {
       dynamic o;
@@ -201,11 +171,9 @@ class BlendState extends DeviceChild {
       writeRenderTargetAlpha = o != null ? filter(o) : writeRenderTargetAlpha;
     }
   }
-
-  void _destroyDeviceState() {
-
-  }
 */
+  void _destroyDeviceState() {}
+
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
@@ -307,10 +275,54 @@ class BlendState extends DeviceChild {
 
   /// Serializes the [BlendState] to a JSON.
   Map toJson() {
+    Map json = new Map();
+
+    json[blendEnabledName] = _enabled;
+
+    json[alphaBlendOperation] = _alphaBlendOperation;
+
+    json[colorBlendOperation] = _colorBlendOperation;
+
+    json[colorWriteChannelsName] = colorWriteChannels;
+
+    Map blendFactorJson = new Map();
+    blendFactorJson['r'] = _blendFactor.r;
+    blendFactorJson['g'] = _blendFactor.g;
+    blendFactorJson['b'] = _blendFactor.b;
+    blendFactorJson['a'] = _blendFactor.a;
+
+    json[blendFactorName] = blendFactorJson;
   }
 
   /// Deserializes the [BlendState] from a JSON.
   void fromJson(Map values) {
+    assert(values != null);
 
+    dynamic value;
+
+    value = values[blendEnabledName];
+    _enabled = (value != null) ? value : _enabled;
+
+    value = values[alphaBlendOperation];
+    _alphaBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _alphaBlendOperation;
+
+    value = values[colorBlendOperation];
+    _colorBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _colorBlendOperation;
+
+    dynamic blendFactorJson = values[blendFactorName];
+
+    if (blendFactorJson != null) {
+      value = blendFactorJson['r'];
+      _blendFactor.r = (value != null) ? value : 0.0;
+
+      value = blendFactorJson['g'];
+      _blendFactor.g = (value != null) ? value : 0.0;
+
+      value = blendFactorJson['b'];
+      _blendFactor.b = (value != null) ? value : 0.0;
+
+      value = blendFactorJson['a'];
+      _blendFactor.a = (value != null) ? value : 0.0;
+    }
   }
 }
