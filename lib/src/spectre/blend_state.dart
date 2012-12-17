@@ -63,7 +63,7 @@ class BlendState extends DeviceChild {
   /// Serialization name for [blendColor].
   static const String blendColorName = 'blendColor';
   /// Serialization name for [blendEnabled].
-  static const String blendEnabledName = 'blendEnabled';
+  static const String blendEnabledName = 'enabled';
   /// Serialization name for [alphaBlendFunction].
   static const String alphaBlendFunctionName = 'alphaBlendFunction';
   /// Serialization name for [alphaDestinationBlend].
@@ -77,24 +77,21 @@ class BlendState extends DeviceChild {
   /// Serialization name for [colorSourceBlend].
   static const String colorSourceBlendName = 'colorSourceBlend';
   /// Serialization name for [colorWriteChannels].
-  static const String colorWriteChannels = 'colorWriteChannels';
+  static const String colorWriteChannelsName = 'colorWriteChannels';
 
   //---------------------------------------------------------------------
   // Member variables
   //---------------------------------------------------------------------
 
-  // Constant blend values
-  double blendColorRed;
-  double blendColorGreen;
-  double blendColorBlue;
-  double blendColorAlpha;
-
   /// Whether blending operations are enabled. Disabled by default.
-  bool _blendEnabled;
+  bool _enabled;
+
+  /// The four-component (RGBA) blend factor for alpha blending.
+  vec4 _blendFactor;
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
-  int _alphaBlendFunction;
+  int _alphaBlendOperation;
   /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
   /// The default is [Blend.One].
   int _alphaDestinationBlend;
@@ -103,7 +100,7 @@ class BlendState extends DeviceChild {
   int _alphaSourceBlend;
   /// The arithmetic operation when blending color values.
   /// The default is [BlendFunction.Add].
-  int _colorBlendFunction;
+  int _colorBlendOperation;
   /// The blend factor for the destination color.
   /// The default is [Blend.One].
   int _colorDestinationBlend;
@@ -121,19 +118,15 @@ class BlendState extends DeviceChild {
   bool _writeRenderTargetAlpha;
 
   BlendState(String name, GraphicsDevice device) : super._internal(name, device) {
-    // Default state
-    blendColorRed = 1.0;
-    blendColorGreen = 1.0;
-    blendColorBlue = 1.0;
-    blendColorAlpha = 1.0;
+    _enabled = false;
 
-    _blendEnabled = false;
+    _blendFactor = new vec4.raw(1.0, 1.0, 1.0, 1.0);
 
-    _alphaBlendFunction = BlendOpAdd;
+    _alphaBlendOperation = BlendOpAdd;
     _alphaDestinationBlend = BlendSourceOne;
     _alphaSourceBlend = BlendSourceOne;
 
-    _colorBlendFunction = BlendOpAdd;
+    _colorBlendOperation = BlendOpAdd;
     _colorDestinationBlend = BlendSourceOne;
     _colorSourceBlend = BlendSourceOne;
 
@@ -144,7 +137,7 @@ class BlendState extends DeviceChild {
   }
   void _createDeviceState() {
   }
-
+/*
   dynamic filter(dynamic o) {
     if (o is String) {
       var table = {
@@ -212,20 +205,24 @@ class BlendState extends DeviceChild {
   void _destroyDeviceState() {
 
   }
-
+*/
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
   /// Whether blending operations are enabled.
-  bool get blendEnabled => _blendEnabled;
-  set blendEnabled(bool value) { _blendEnabled = value; }
+  bool get enabled => _enabled;
+  set enabled(bool value) { _enabled = value; }
+
+  /// The four-component (RGBA) blend factor for alpha blending
+  vec4 get blendFactor => _blendFactor;
+  set blendFactor(vec4 value) { _blendFactor = value; }
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
-  int get alphaBlendFunction => _alphaBlendFunction;
-  set alphaBlendFunction(int value) {
-    _alphaBlendFunction = value;
+  int get alphaBlendOperation => _alphaBlendOperation;
+  set alphaBlendOperation(int value) {
+    _alphaBlendOperation = value;
   }
 
   /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
@@ -244,9 +241,9 @@ class BlendState extends DeviceChild {
 
   /// The arithmetic operation when blending color values.
   /// The default is [BlendFunction.Add].
-  int get colorBlendFunction => _colorBlendFunction;
-  set colorBlendFunction(int value) {
-    _colorBlendFunction = value;
+  int get colorBlendOperation => _colorBlendOperation;
+  set colorBlendOperation(int value) {
+    _colorBlendOperation = value;
   }
 
   /// The blend factor for the destination color.
@@ -261,6 +258,27 @@ class BlendState extends DeviceChild {
   int get colorSourceBlend => _colorSourceBlend;
   set colorSourceBlend(int value) {
     _colorSourceBlend = value;
+  }
+
+  /// The color channels (RGBA) that are enabled for writing during color blending.
+  int get colorWriteChannels {
+    int value;
+
+    // \todo Is there a better way? Shift doesn't work on a bool
+    value  = (_writeRenderTargetRed)   ? ColorWriteChannels.Red   : 0;
+    value |= (_writeRenderTargetGreen) ? ColorWriteChannels.Green : 0;
+    value |= (_writeRenderTargetBlue)  ? ColorWriteChannels.Blue  : 0;
+    value |= (_writeRenderTargetAlpha) ? ColorWriteChannels.All   : 0;
+
+    return value;
+  }
+  set colorWriteChannels(int value) {
+    assert((value >= 0) && (value <= ColorWriteChannels.All));
+
+    _writeRenderTargetRed   = (value & ColorWriteChannels.Red)   == ColorWriteChannels.Red;
+    _writeRenderTargetGreen = (value & ColorWriteChannels.Green) == ColorWriteChannels.Green;
+    _writeRenderTargetBlue  = (value & ColorWriteChannels.Blue)  == ColorWriteChannels.Blue;
+    _writeRenderTargetAlpha = (value & ColorWriteChannels.Alpha) == ColorWriteChannels.Alpha;
   }
 
   /// Whether the red channel is enabled for writing during color blending.
@@ -285,7 +303,6 @@ class BlendState extends DeviceChild {
 
   /// Serializes the [BlendState] to a JSON.
   Map toJson() {
-
   }
 
   /// Deserializes the [BlendState] from a JSON.

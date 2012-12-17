@@ -250,18 +250,19 @@ class GraphicsContext {
                          bs.writeRenderTargetGreen,
                          bs.writeRenderTargetBlue,
                          bs.writeRenderTargetAlpha);
-    if (bs.blendEnable == false) {
+    if (bs.enabled == false) {
       device.gl.disable(WebGLRenderingContext.BLEND);
       return;
     }
     device.gl.enable(WebGLRenderingContext.BLEND);
-    device.gl.blendFuncSeparate(bs.blendSourceColorFunc,
-                                bs.blendDestColorFunc,
-                                bs.blendSourceAlphaFunc,
-                                bs.blendDestAlphaFunc);
-    device.gl.blendEquationSeparate(bs.blendColorOp, bs.blendAlphaOp);
-    device.gl.blendColor(bs.blendColorRed, bs.blendColorGreen,
-                         bs.blendColorBlue, bs.blendColorAlpha);
+    device.gl.blendFuncSeparate(bs.colorSourceBlend,
+                                bs.colorDestinationBlend,
+                                bs.alphaSourceBlend,
+                                bs.alphaDestinationBlend);
+    device.gl.blendEquationSeparate(bs.colorBlendOperation, bs.alphaBlendOperation);
+
+    vec4 blendFactor = bs.blendFactor;
+    device.gl.blendColor(blendFactor.r, blendFactor.g, blendFactor.b, blendFactor.a);
   }
 
   /// Set DepthState to [depthStateHandle]
