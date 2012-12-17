@@ -54,28 +54,71 @@ class BlendState extends DeviceChild {
   static const int BlendOpReverseSubtract =
       WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
 
+  //---------------------------------------------------------------------
+  // Class variables
+  //
+  // These should go away once mirrors work for dart2js.
+  //---------------------------------------------------------------------
+
+  /// Serialization name for [blendColor].
+  static const String blendColorName = 'blendColor';
+  /// Serialization name for [blendEnabled].
+  static const String blendEnabledName = 'blendEnabled';
+  /// Serialization name for [alphaBlendFunction].
+  static const String alphaBlendFunctionName = 'alphaBlendFunction';
+  /// Serialization name for [alphaDestinationBlend].
+  static const String alphaDestinationBlendName = 'alphaDestination';
+  /// Serialization name for [alphaSourceBlend].
+  static const String alphaSourceBlendName = 'alphaSourceBlend';
+  /// Serialization name for [colorBlendFunction].
+  static const String colorBlendFunctionName = 'colorBlendFunction';
+  /// Serialization name for [colorDestinationBlend].
+  static const String colorDestinationBlendName = 'colorDestinationBlend';
+  /// Serialization name for [colorSourceBlend].
+  static const String colorSourceBlendName = 'colorSourceBlend';
+  /// Serialization name for [colorWriteChannels].
+  static const String colorWriteChannels = 'colorWriteChannels';
+
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+
   // Constant blend values
   double blendColorRed;
   double blendColorGreen;
   double blendColorBlue;
   double blendColorAlpha;
 
-  // off by default
-  bool blendEnable;
-  int blendSourceColorFunc; /* "Source" = "Shader" */
-  int blendDestColorFunc; /* "Destination" = "Render Target" */
-  int blendSourceAlphaFunc;
-  int blendDestAlphaFunc;
+  /// Whether blending operations are enabled. Disabled by default.
+  bool _blendEnabled;
 
-  /* Destination = BlendSource<Color|Alpha>Func blend?Op BlendDest<Color|Alpha>Func */
-  int blendColorOp;
-  int blendAlphaOp;
+  /// The arithmetic operation when blending alpha values.
+  /// The default is [BlendFunction.Add].
+  int _alphaBlendFunction;
+  /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
+  /// The default is [Blend.One].
+  int _alphaDestinationBlend;
+  /// The alpha blend factor.
+  /// The default is [Blend.One].
+  int _alphaSourceBlend;
+  /// The arithmetic operation when blending color values.
+  /// The default is [BlendFunction.Add].
+  int _colorBlendFunction;
+  /// The blend factor for the destination color.
+  /// The default is [Blend.One].
+  int _colorDestinationBlend;
+  /// The blend factor for the source color.
+  /// The default is Blend.One.
+  int _colorSourceBlend;
 
-  // Render Target write flags
-  bool writeRenderTargetRed;
-  bool writeRenderTargetGreen;
-  bool writeRenderTargetBlue;
-  bool writeRenderTargetAlpha;
+  /// Whether the red channel is enabled for writing during color blending.
+  bool _writeRenderTargetRed;
+  /// Whether the green channel is enabled for writing during color blending.
+  bool _writeRenderTargetGreen;
+  /// Whether the blue channel is enabled for writing during color blending.
+  bool _writeRenderTargetBlue;
+  /// Whether the alpha channel is enabled for writing during color blending.
+  bool _writeRenderTargetAlpha;
 
   BlendState(String name, GraphicsDevice device) : super._internal(name, device) {
     // Default state
@@ -84,18 +127,20 @@ class BlendState extends DeviceChild {
     blendColorBlue = 1.0;
     blendColorAlpha = 1.0;
 
-    blendEnable = false;
-    blendSourceColorFunc = BlendSourceOne;
-    blendDestColorFunc = BlendSourceZero;
-    blendSourceAlphaFunc = BlendSourceOne;
-    blendDestAlphaFunc = BlendSourceZero;
-    blendColorOp = BlendOpAdd;
-    blendAlphaOp = BlendOpAdd;
+    _blendEnabled = false;
 
-    writeRenderTargetRed = true;
-    writeRenderTargetGreen = true;
-    writeRenderTargetBlue = true;
-    writeRenderTargetAlpha = true;
+    _alphaBlendFunction = BlendOpAdd;
+    _alphaDestinationBlend = BlendSourceOne;
+    _alphaSourceBlend = BlendSourceOne;
+
+    _colorBlendFunction = BlendOpAdd;
+    _colorDestinationBlend = BlendSourceOne;
+    _colorSourceBlend = BlendSourceOne;
+
+    _writeRenderTargetRed = true;
+    _writeRenderTargetGreen = true;
+    _writeRenderTargetBlue = true;
+    _writeRenderTargetAlpha = true;
   }
   void _createDeviceState() {
   }
@@ -138,7 +183,7 @@ class BlendState extends DeviceChild {
       blendColorAlpha = o != null ? filter(o) : blendColorAlpha;
 
       o = props['blendEnable'];
-      blendEnable = o != null ? filter(o) : blendEnable;
+      _blendEnable = o != null ? filter(o) : blendEnable;
       o = props['blendSourceColorFunc'];
       blendSourceColorFunc = o != null ? filter(o) : blendSourceColorFunc;
       o = props['blendDestColorFunc'];
@@ -165,6 +210,86 @@ class BlendState extends DeviceChild {
   }
 
   void _destroyDeviceState() {
+
+  }
+
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// Whether blending operations are enabled.
+  bool get blendEnabled => _blendEnabled;
+  set blendEnabled(bool value) { _blendEnabled = value; }
+
+  /// The arithmetic operation when blending alpha values.
+  /// The default is [BlendFunction.Add].
+  int get alphaBlendFunction => _alphaBlendFunction;
+  set alphaBlendFunction(int value) {
+    _alphaBlendFunction = value;
+  }
+
+  /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
+  /// The default is [Blend.One].
+  int get alphaDestinationBlend => _alphaDestinationBlend;
+  set alphaDestinationBlend(int value) {
+    _alphaDestinationBlend = value;
+  }
+
+  /// The alpha blend factor.
+  /// The default is [Blend.One].
+  int get alphaSourceBlend => _alphaSourceBlend;
+  set alphaSourceBlend(int value) {
+    _alphaSourceBlend = value;
+  }
+
+  /// The arithmetic operation when blending color values.
+  /// The default is [BlendFunction.Add].
+  int get colorBlendFunction => _colorBlendFunction;
+  set colorBlendFunction(int value) {
+    _colorBlendFunction = value;
+  }
+
+  /// The blend factor for the destination color.
+  /// The default is [Blend.One].
+  int get colorDestinationBlend => _colorDestinationBlend;
+  set colorDestinationBlend(int value) {
+    _colorDestinationBlend = value;
+  }
+
+  /// The blend factor for the source color.
+  /// The default is Blend.One.
+  int get colorSourceBlend => _colorSourceBlend;
+  set colorSourceBlend(int value) {
+    _colorSourceBlend = value;
+  }
+
+  /// Whether the red channel is enabled for writing during color blending.
+  bool get writeRenderTargetRed => _writeRenderTargetRed;
+  set writeRenderTargetRed(bool value) { _writeRenderTargetRed = value; }
+
+  /// Whether the green channel is enabled for writing during color blending.
+  bool get writeRenderTargetGreen => _writeRenderTargetGreen;
+  set writeRenderTargetGreen(bool value) { _writeRenderTargetGreen = value; }
+
+  /// Whether the blue channel is enabled for writing during color blending.
+  bool get writeRenderTargetBlue => _writeRenderTargetBlue;
+  set writeRenderTargetBlue(bool value) { _writeRenderTargetBlue = value; }
+
+  /// Whether the alpha channel is enabled for writing during color blending.
+  bool get writeRenderTargetAlpha => _writeRenderTargetAlpha;
+  set writeRenderTargetAlpha(bool value) { _writeRenderTargetAlpha = value; }
+
+  //---------------------------------------------------------------------
+  // Serialization
+  //---------------------------------------------------------------------
+
+  /// Serializes the [BlendState] to a JSON.
+  Map toJson() {
+
+  }
+
+  /// Deserializes the [BlendState] from a JSON.
+  void fromJson(Map values) {
 
   }
 }
