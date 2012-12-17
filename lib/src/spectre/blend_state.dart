@@ -222,6 +222,8 @@ class BlendState extends DeviceChild {
   /// The default is [BlendFunction.Add].
   int get alphaBlendOperation => _alphaBlendOperation;
   set alphaBlendOperation(int value) {
+    assert(BlendOperation.isValid(value));
+
     _alphaBlendOperation = value;
   }
 
@@ -243,6 +245,8 @@ class BlendState extends DeviceChild {
   /// The default is [BlendFunction.Add].
   int get colorBlendOperation => _colorBlendOperation;
   set colorBlendOperation(int value) {
+    assert(BlendOperation.isValid(value));
+
     _colorBlendOperation = value;
   }
 
