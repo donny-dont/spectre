@@ -2,6 +2,7 @@ import 'dart:html';
 import 'dart:math' as Math;
 import 'package:spectre/spectre.dart';
 import 'package:vector_math/vector_math_browser.dart';
+import 'package:game_loop/game_loop.dart';
 
 final String _canvasId = '#backbuffer';
 
@@ -9,6 +10,8 @@ GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
 ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
+
+GameLoop _gameLoop;
 
 Viewport _viewport;
 Camera _camera;
@@ -89,18 +92,11 @@ void _updateBall(double dt) {
   }
 }
 
-void frame(double time) {
+void frame(GameLoop gameLoop) {
   Stopwatch sw = new Stopwatch();
-  if (_lastTime == null) {
-    _lastTime = time;
-    window.requestAnimationFrame(frame);
-    return;
-  }
-  double dt = time - _lastTime;
-  _lastTime = time;
-  double seconds = dt * 0.001;
+  double dt = gameLoop.dt;
   // Update the debug draw manager state
-  _debugDrawManager.update(seconds);
+  _debugDrawManager.update(dt);
   // Clear the color buffer
   _graphicsContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
   // Clear the depth buffer
@@ -133,23 +129,22 @@ void frame(double time) {
     _debugDrawManager.addLine(s, e, new vec4.raw(0.0, 0.0, 1.0, 1.0));
   }
 
-  _updateBall(seconds);
+  _updateBall(dt);
 
   // Draw ball
   _debugDrawManager.addCircle(new vec3(ballPosition.x, ballPosition.y, 0.0),
                               new vec3(0.0, 0.0, 1.0),
-                              ballRadius, new vec4(0.0, 0.0, 1.0, 1.0));
+                              ballRadius,
+                              new vec4(0.0, 0.0, 1.0, 1.0));
   // Prepare the debug draw manager for rendering
   _debugDrawManager.prepareForRender();
   // Render it
   _debugDrawManager.render(_camera);
-  // Schedule our next frame callback
-  window.requestAnimationFrame(frame);
 }
 
 // Handle resizes
-void resizeFrame(Event event) {
-  CanvasElement canvas = query(_canvasId);
+void resizeFrame(GameLoop gameLoop) {
+  CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
@@ -177,31 +172,29 @@ main() {
   _resourceManager = new ResourceManager();
   _resourceManager.setBaseURL(baseUrl);
   // Create a debug draw manager and initialize it
-  _debugDrawManager = new DebugDrawManager();
-  _debugDrawManager.init(_graphicsDevice);
+  _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 
-  // Create a viewport
-  var viewportProperties = {
-    'x': 0,
-    'y': 0,
-    'width': canvas.width,
-    'height': canvas.height
-  };
-
   _makeNormals();
 
   // Create the viewport
-  _viewport = _graphicsDevice.createViewport('view', viewportProperties);
+  _viewport = _graphicsDevice.createViewport('view');
+  _viewport.x = 0;
+  _viewport.y = 0;
+  _viewport.width = canvas.width;
+  _viewport.height = canvas.height;
 
   // Create the camera
   _camera = new Camera();
   _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
   _camera.position = new vec3.raw(0.0, 0.0, -2.5);
   _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
-  window.requestAnimationFrame(frame);
-  window.on.resize.add(resizeFrame);
+
+  _gameLoop = new GameLoop(canvas);
+  _gameLoop.onUpdate = frame;
+  _gameLoop.onResize = resizeFrame;
+  _gameLoop.start();
 }
