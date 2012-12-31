@@ -131,7 +131,7 @@ class RenderTarget extends DeviceChild {
                                      t2d._textureTarget,
                                      t2d._deviceTexture, 0);
     } else {
-      throw new FallthroughError();
+      throw new FallThroughError();
     }
     _updateStatus();
     _popBind(oldBind);
@@ -176,7 +176,7 @@ class RenderTarget extends DeviceChild {
                                      t2d._textureTarget,
                                      t2d._deviceTexture, 0);
     } else {
-      throw new FallthroughError();
+      throw new FallThroughError();
     }
     _updateStatus();
     _popBind(oldBind);
