@@ -16,16 +16,12 @@ class SpectreMeshAttribute {
     switch (componentCount) {
       case 1:
         return GraphicsDevice.DeviceFormatFloat1;
-      break;
       case 2:
         return GraphicsDevice.DeviceFormatFloat2;
-      break;
       case 3:
         return GraphicsDevice.DeviceFormatFloat3;
-      break;
       case 4:
         return GraphicsDevice.DeviceFormatFloat4;
-      break;
       default:
         throw new FallThroughError();
     }
