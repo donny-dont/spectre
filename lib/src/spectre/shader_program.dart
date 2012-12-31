@@ -216,7 +216,7 @@ $_linkLog''');
       case WebGLRenderingContext.SAMPLER_CUBE:
         return 'samplerCube';
       default:
-        throw new FallthroughError();
+        throw new FallThroughError();
     }
   }
 
@@ -253,7 +253,7 @@ $_linkLog''');
       case WebGLRenderingContext.INT_VEC4:
         return _setUniform4i;
       default:
-        throw new FallthroughError();
+        throw new FallThroughError();
     }
   }
 
@@ -440,7 +440,7 @@ $_linkLog''');
     throw new FallThroughError();
   }
 
-  void _setUniform1i(var index, int i) {
+  void _setUniform1i(GraphicsDevice device, var index, var argument) {
     if (argument is Int32Array) {
       device.gl.uniform1iv(index, argument);
       return;
@@ -459,7 +459,7 @@ $_linkLog''');
       device.gl.uniform2iv(index, argument);
       return;
     } else if (argument is List<num>) {
-      device.gl.uniformif(index, argument[0], argument[1]);
+      device.gl.uniform2i(index, argument[0], argument[1]);
       return;
     }
     throw new FallThroughError();
@@ -515,7 +515,7 @@ $_linkLog''');
   /// Set Uniform variable [name] in this [ShaderProgram].
   void setConstant(String name, var argument) {
     var uniform = uniforms[name];
-    if (index == null) {
+    if (uniform == null) {
       return;
     }
     var oldBind = device.gl.getParameter(WebGLRenderingContext.CURRENT_PROGRAM);
