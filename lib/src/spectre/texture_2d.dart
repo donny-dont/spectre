@@ -37,6 +37,10 @@ class Texture2D extends Texture {
           WebGLRenderingContext.TEXTURE_BINDING_2D,
           WebGLRenderingContext.TEXTURE_2D);
 
+  Texture2D._cube(String name, GraphicsDevice device, int bindTarget,
+                  int bindParam, int textureTarget) :
+      super(name, device, bindTarget, bindParam, textureTarget);
+
   void _createDeviceState() {
     super._createDeviceState();
   }
@@ -98,7 +102,7 @@ class Texture2D extends Texture {
   /** Replace texture contents with data fetched from [url].
    * If an error occurs while fetching the image, loadError will be true.
    */
-  Future<Texture2D> uploadFromURL(Sting url,
+  Future<Texture2D> uploadFromURL(String url,
                                   {pixelFormat: Texture.FormatRGBA,
                                    pixelType: Texture.PixelTypeU8}) {
     ImageElement element = new ImageElement();
@@ -108,7 +112,7 @@ class Texture2D extends Texture {
       completer.complete(this);
     });
     element.on.load.add((event) {
-      uploadElement(element, pixelFormat, pixelType);
+      uploadElement(element, pixelFormat:pixelFormat, pixelType:pixelType);
       completer.complete(this);
     });
     // Initiate load.
