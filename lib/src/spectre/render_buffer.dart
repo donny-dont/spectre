@@ -31,7 +31,7 @@ class RenderBuffer extends DeviceChild {
   static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT16;
 
   static String formatToString(int format) {
-    if (format == formatRGB) {
+    if (format == FormatRGB) {
       return 'RGB';
     }
     if (format == FormatRGBA) {
