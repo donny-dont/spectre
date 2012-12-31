@@ -88,7 +88,7 @@ class InputLayout extends DeviceChild {
         elements.add(element);
       }
     });
-    print('InputLayour $name refreshed: $ready');
+    print('InputLayout $name refreshed: $ready');
   }
 
   InputLayout(String name, GraphicsDevice device)
