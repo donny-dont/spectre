@@ -183,6 +183,7 @@ class GraphicsContext {
     if (indexedMesh == null) {
       return;
     }
+    setPrimitiveTopology(indexedMesh.primitiveTopology);
     setIndexBuffer(indexedMesh.indexArray);
     setVertexBuffers(0, [indexedMesh.vertexArray]);
   }
@@ -191,6 +192,7 @@ class GraphicsContext {
     if (mesh == null) {
       return;
     }
+    setPrimitiveTopology(mesh.primitiveTopology);
     setIndexBuffer(null);
     setVertexBuffers(0, [mesh.vertexArray]);
   }
@@ -367,14 +369,14 @@ class GraphicsContext {
     if (indexedMesh == null) {
       return;
     }
-    drawIndexed(indexedMesh.numIndices, 0);
+    drawIndexed(indexedMesh.count, 0);
   }
 
   void drawMesh(SingleArrayMesh mesh) {
     if (mesh == null) {
       return;
     }
-    draw(mesh.numVertices, 0);
+    draw(mesh.count, 0);
   }
 
   /// Draw a mesh with [numVertices] starting at [vertexOffset]

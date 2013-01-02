@@ -34,7 +34,7 @@ class _AssetImporterMesh extends AssetImporter {
     var indexArray = new Uint16Array.fromList(meshes[0]['indices']);
     mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
     mesh.indexArray.uploadData(indexArray, SpectreBuffer.UsageStatic);
-    mesh.numIndices = indexArray.length;
+    mesh.count = indexArray.length;
     meshes[0]['attributes'].forEach((k, v) {
       var attribute = new SpectreMeshAttribute(v['name'],
                                                v['type'],

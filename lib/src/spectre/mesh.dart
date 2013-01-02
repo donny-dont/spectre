@@ -34,6 +34,8 @@ class SpectreMesh extends DeviceChild {
   final Map<String, SpectreMeshAttribute> attributes =
       new Map<String, SpectreMeshAttribute>();
 
+  int count = 0;
+  int primitiveTopology = GraphicsContext.PrimitiveTopologyTriangles;
 
   SpectreMesh(String name, GraphicsDevice device)
       : super._internal(name, device);
@@ -52,9 +54,6 @@ class SpectreMesh extends DeviceChild {
 class SingleArrayMesh extends SpectreMesh {
   VertexBuffer _deviceVertexBuffer;
   VertexBuffer get vertexArray => _deviceVertexBuffer;
-  // TODO(johnmccutchan): Merge numVertices and numIndicies into numElements?
-  // TODO(johnmccutchan): Add the primitive type to the mesh, used for drawing.
-  int numVertices = 0;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
     _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
@@ -72,7 +71,7 @@ class SingleArrayMesh extends SpectreMesh {
       _deviceVertexBuffer._destroyDeviceState();
     }
     _deviceVertexBuffer = null;
-    numVertices = 0;
+    count = 0;
     super._destroyDeviceState();
   }
 }
@@ -82,7 +81,6 @@ class SingleArrayIndexedMesh extends SpectreMesh {
   IndexBuffer _deviceIndexBuffer;
   IndexBuffer get indexArray => _deviceIndexBuffer;
   VertexBuffer get vertexArray => _deviceVertexBuffer;
-  int numIndices = 0;
 
   SingleArrayIndexedMesh(String name, GraphicsDevice device)
       : super(name, device) {
@@ -107,7 +105,7 @@ class SingleArrayIndexedMesh extends SpectreMesh {
     }
     _deviceVertexBuffer = null;
     _deviceIndexBuffer = null;
-    numIndices = 0;
+    count = 0;
     super._destroyDeviceState();
   }
 }

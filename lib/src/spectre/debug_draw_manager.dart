@@ -125,6 +125,7 @@ class _DebugDrawLineManager {
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
     _lineMesh = device.createSingleArrayMesh(name);
+    _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
     _lineMesh.vertexArray.allocate(vboSize*DebugDrawVertexSize*4,
                                    SpectreBuffer.UsageDynamic);
     _lineMesh.attributes['vPosition'] = new SpectreMeshAttribute('vPosition',
@@ -154,6 +155,7 @@ class _DebugDrawLineManager {
       }
     }
     _lineMesh.vertexArray.uploadSubData(0, _vboStorage);
+    _lineMesh.count = vertexCount;
   }
 
   int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;
@@ -595,23 +597,17 @@ class DebugDrawManager {
     mat4 la = cam.lookAtMatrix;
     pm.multiply(la);
     pm.copyIntoArray(_cameraMatrix);
-    device.context.setBlendState(_blend);
-    device.context.setRasterizerState(_rasterizer);
     device.context.setShaderProgram(_lineShaderProgram);
     device.context.setConstant('cameraTransform', _cameraMatrix);
-    device.context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyLines);
-    device.context.setIndexBuffer(null);
     device.context.setDepthState(_depthEnabled);
-    device.context.setVertexBuffers(
-        0,
-        [_depthEnabledLines._lineMesh.vertexArray]);
+    device.context.setBlendState(_blend);
+    device.context.setRasterizerState(_rasterizer);
     device.context.setInputLayout(_depthEnabledLines._lineMeshInputLayout);
-    device.context.draw(_depthEnabledLines.vertexCount, 0);
+    device.context.setMesh(_depthEnabledLines._lineMesh);
+    device.context.drawMesh(_depthEnabledLines._lineMesh);
     device.context.setDepthState(_depthDisabled);
-    device.context.setVertexBuffers(
-        0,
-        [_depthDisabledLines._lineMesh.vertexArray]);
-    device.context.draw(_depthDisabledLines.vertexCount, 0);
+    device.context.setMesh(_depthDisabledLines._lineMesh);
+    device.context.drawMesh(_depthDisabledLines._lineMesh);
   }
 
   /// Update time [seconds], removing any dead debug primitives
