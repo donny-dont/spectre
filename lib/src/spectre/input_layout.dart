@@ -70,7 +70,13 @@ class InputLayout extends DeviceChild {
       return;
     }
 
-    if (_shaderProgram.attributes.length == 0 || _mesh.attributes.length == 0) {
+    if (_shaderProgram.attributes.length == 0) {
+      print('InputLayout $name shaderProgram has 0 attributes.');
+      return;
+    }
+
+    if (_mesh.attributes.length == 0) {
+      print('InputLayout $name mesh has 0 attributes.');
       return;
     }
 
