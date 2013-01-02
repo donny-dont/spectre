@@ -99,4 +99,17 @@ class TextureCube extends Texture {
     _negativeZ._deviceTexture = null;
     super._destroyDeviceState();
   }
+
+  void _generateMipmap() {
+    device.gl.generateMipmap(_textureTarget);
+  }
+
+  /** Generate Mipmap data for texture. This must be done before the texture
+   * can be used for rendering.
+   */
+  void generateMipmap() {
+    var oldBind = _pushBind();
+    _generateMipmap();
+    _popBind(oldBind);
+  }
 }
