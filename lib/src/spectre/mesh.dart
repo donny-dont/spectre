@@ -52,6 +52,8 @@ class SpectreMesh extends DeviceChild {
 class SingleArrayMesh extends SpectreMesh {
   VertexBuffer _deviceVertexBuffer;
   VertexBuffer get vertexArray => _deviceVertexBuffer;
+  // TODO(johnmccutchan): Merge numVertices and numIndicies into numElements?
+  // TODO(johnmccutchan): Add the primitive type to the mesh, used for drawing.
   int numVertices = 0;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
