@@ -60,6 +60,3 @@ part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';
 part 'src/spectre/viewport.dart';
 part 'src/spectre/mesh.dart';
-
-// We have a single logger
-Logger spectreLog = new PrintLogger();

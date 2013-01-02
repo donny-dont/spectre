@@ -28,21 +28,7 @@ import 'dart:json';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 
-part 'src/spectre_asset_pack/spectre_asset_pack.dart';
 part 'src/spectre_asset_pack/texture.dart';
 part 'src/spectre_asset_pack/shader.dart';
 part 'src/spectre_asset_pack/mesh.dart';
-
-/** Register the [spectre] graphics device with the [asset_pack]
- * asset manager. After calling this function, the asset manager
- * will be able to load meshes, textures, and shaders.
- */
-void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
-                                         AssetManager assetManager) {
-  assetManager.importers['mesh'] = new _AssetImporterMesh(graphicsDevice);
-  assetManager.importers['tex2d'] = new _AssetImporterTex2D(graphicsDevice);
-  assetManager.importers['texCube'] = new _AssetImporterTexCube(graphicsDevice);
-  assetManager.loaders['mesh'] = new AssetLoaderText();
-  assetManager.loaders['tex2d'] = new AssetLoaderImage();
-  assetManager.loaders['texCube'] = new _ImagePackLoader();
-}
+part 'src/spectre_asset_pack/spectre_asset_pack.dart';
