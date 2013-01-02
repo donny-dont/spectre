@@ -27,7 +27,7 @@ class _AssetImporterMesh extends AssetImporter {
 
   _AssetImporterMesh(this.device);
 
-  SpectreMesh _processMeshes(AssetRequest request, Map meshes) {
+  SpectreMesh _processMeshes(AssetRequest request, List meshes) {
     final String name = request.name;
     SingleArrayIndexedMesh mesh = device.createSingleArrayIndexedMesh(name);
     var vertexArray = new Float32Array.fromList(meshes[0]['vertices']);
@@ -35,6 +35,15 @@ class _AssetImporterMesh extends AssetImporter {
     mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
     mesh.indexArray.uploadData(indexArray, SpectreBuffer.UsageStatic);
     mesh.numIndices = indexArray.length;
+    meshes[0]['attributes'].forEach((k, v) {
+      var attribute = new SpectreMeshAttribute(v['name'],
+                                               v['type'],
+                                               v['numElements'],
+                                               v['offset'],
+                                               v['stride'],
+                                               v['normalized']);
+      mesh.attributes[k] = attribute;
+    });
     return mesh;
   }
 
