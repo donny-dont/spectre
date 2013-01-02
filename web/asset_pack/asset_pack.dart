@@ -52,6 +52,7 @@ void frame(GameLoop gameLoop) {
                                 new vec4.raw(1.0, 1.0, 1.0, 1.0),
                                 5.0);
   }
+  _drawSkybox();
   // Prepare the debug draw manager for rendering
   _debugDrawManager.prepareForRender();
   // Render it
@@ -69,6 +70,65 @@ void resizeFrame(GameLoop gameLoop) {
   _viewport.height = canvas.height;
   // Fix the camera's aspect ratio
   _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
+}
+
+SingleArrayIndexedMesh _skyboxMesh;
+ShaderProgram _skyboxShaderProgram;
+VertexShader _skyboxVertexShader;
+FragmentShader _skyboxFragmentShader;
+InputLayout _skyboxInputLayout;
+SamplerState _skyboxSampler;
+DepthState _skyboxDepthState;
+BlendState _skyboxBlendState;
+RasterizerState _skyboxRasterizerState;
+
+void _setupSkybox() {
+  _skyboxVertexShader = _graphicsDevice.createVertexShader('skybox.vs');
+  _skyboxFragmentShader = _graphicsDevice.createFragmentShader('skybox.fs');
+  _skyboxShaderProgram = _graphicsDevice.createShaderProgram('skybox.sp');
+  _skyboxVertexShader.source = _assetManager.assets.skyBoxVertexShader;
+  _skyboxVertexShader.compile();
+  assert(_skyboxVertexShader.compiled == true);
+  _skyboxFragmentShader.source = _assetManager.assets.skyBoxFragmentShader;
+  _skyboxFragmentShader.compile();
+  assert(_skyboxFragmentShader.compiled == true);
+  _skyboxShaderProgram.vertexShader = _skyboxVertexShader;
+  _skyboxShaderProgram.fragmentShader = _skyboxFragmentShader;
+  _skyboxShaderProgram.link();
+  assert(_skyboxShaderProgram.linked == true);
+  _skyboxMesh = _assetManager.assets.skyBox;
+  _skyboxInputLayout = _graphicsDevice.createInputLayout('skybox.il');
+  _skyboxInputLayout.mesh = _skyboxMesh;
+  _skyboxInputLayout.shaderProgram = _skyboxShaderProgram;
+
+  assert(_skyboxInputLayout.ready == true);
+  _skyboxSampler = _graphicsDevice.createSamplerState('skybox.ss');
+  _skyboxDepthState = _graphicsDevice.createDepthState('skybox.ds');
+  _skyboxBlendState = _graphicsDevice.createBlendState('skybox.bs');
+  _skyboxRasterizerState = _graphicsDevice.createRasterizerState('skybox.rs');
+}
+
+Float32Array _cameraTransform = new Float32Array(16);
+
+void _drawSkybox() {
+  var context = _graphicsDevice.context;
+  context.setInputLayout(_skyboxInputLayout);
+  context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+  context.setShaderProgram(_skyboxShaderProgram);
+  context.setTextures(0, [_assetManager.assets.space]);
+  context.setSamplers(0, [_skyboxSampler]);
+  mat4 P = _camera.projectionMatrix;
+  mat4 LA = makeLookAt(new vec3.zero(),
+                       _camera.frontDirection,
+                       new vec3(0.0, 1.0, 0.0));
+  P.multiply(LA);
+  P.copyIntoArray(_cameraTransform, 0);
+  context.setConstant('cameraTransform', _cameraTransform);
+  context.setBlendState(_skyboxBlendState);
+  context.setRasterizerState(_skyboxRasterizerState);
+  context.setDepthState(_skyboxDepthState);
+  context.setIndexedMesh(_skyboxMesh);
+  context.drawIndexedMesh(_skyboxMesh);
 }
 
 main() {
@@ -115,10 +175,8 @@ main() {
   _gameLoop.onUpdate = frame;
   _gameLoop.onResize = resizeFrame;
   _assetManager.loadPack('assets', '$baseUrl/assets.pack').then((assetPack) {
-    print('Loaded pack.');
-    assetPack.forEach((k, v) {
-      print('$k');
-    });
+    // All assets are loaded.
+    _setupSkybox();
     _gameLoop.start();
   });
 }
