@@ -299,7 +299,6 @@ class GraphicsDevice {
     _nameMapping = new Map<String, DeviceChild>();
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
-    print(_capabilities);
     _fallbackTexture = createTexture2D('Device.Fallback');
     {
       CanvasElement canvas = new CanvasElement();
@@ -394,6 +393,16 @@ class GraphicsDevice {
       tex.ready = false;
       tex.fallback = _fallbackTexture;
     }
+    return tex;
+  }
+
+  /// Create a [TextureCube] named [name].
+  TextureCube createTextureCube(String name) {
+    TextureCube tex = new TextureCube(name, this);
+    if (_addChildObject(tex) == false) {
+      return null;
+    }
+    tex._createDeviceState();
     return tex;
   }
 
