@@ -26,30 +26,7 @@ part of spectre;
 /// Create using [Device.createBlendState]
 /// Set using [ImmediateContext.setBlendState]
 class BlendState extends DeviceChild {
-/*
-  static const int BlendSourceZero = WebGLRenderingContext.ZERO;
-  static const int BlendSourceOne = WebGLRenderingContext.ONE;
-  static const int BlendSourceShaderColor =
-      WebGLRenderingContext.SRC_COLOR;
-  static const int BlendSourceShaderInverseColor =
-      WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
-  static const int BlendSourceShaderAlpha =
-      WebGLRenderingContext.SRC_ALPHA;
-  static const int BlendSourceShaderInverseAlpha =
-      WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
-  static const int BlendSourceTargetColor = WebGLRenderingContext.DST_COLOR;
-  static const int BlendSourceTargetInverseColor =
-      WebGLRenderingContext.ONE_MINUS_DST_COLOR;
-  static const int BlendSourceTargetAlpha = WebGLRenderingContext.DST_ALPHA;
-  static const int BlendSourceTargetInverseAlpha =
-      WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
-  static const int BlendSourceBlendColor = WebGLRenderingContext.CONSTANT_COLOR;
-  static const int BlendSourceBlendAlpha = WebGLRenderingContext.CONSTANT_ALPHA;
-  static const int BlendSourceBlendInverseColor =
-      WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
-  static const int BlendSourceBlendInverseAlpha =
-      WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
-*/
+
   //---------------------------------------------------------------------
   // Class variables
   //
