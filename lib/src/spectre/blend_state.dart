@@ -26,6 +26,7 @@ part of spectre;
 /// Create using [Device.createBlendState]
 /// Set using [ImmediateContext.setBlendState]
 class BlendState extends DeviceChild {
+/*
   static const int BlendSourceZero = WebGLRenderingContext.ZERO;
   static const int BlendSourceOne = WebGLRenderingContext.ONE;
   static const int BlendSourceShaderColor =
@@ -48,7 +49,7 @@ class BlendState extends DeviceChild {
       WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
   static const int BlendSourceBlendInverseAlpha =
       WebGLRenderingContext.ONE_MINUS_CONSTANT_ALPHA;
-
+*/
   //---------------------------------------------------------------------
   // Class variables
   //
@@ -118,12 +119,12 @@ class BlendState extends DeviceChild {
     _blendFactor = new vec4.raw(1.0, 1.0, 1.0, 1.0);
 
     _alphaBlendOperation = BlendOperation.Add;
-    _alphaDestinationBlend = BlendSourceOne;
-    _alphaSourceBlend = BlendSourceOne;
+    _alphaDestinationBlend = Blend.One;
+    _alphaSourceBlend = Blend.One;
 
     _colorBlendOperation = BlendOperation.Add;
-    _colorDestinationBlend = BlendSourceOne;
-    _colorSourceBlend = BlendSourceOne;
+    _colorDestinationBlend = Blend.One;
+    _colorSourceBlend = Blend.One;
 
     _writeRenderTargetRed = true;
     _writeRenderTargetGreen = true;
@@ -132,46 +133,8 @@ class BlendState extends DeviceChild {
   }
 
   void _createDeviceState() { }
-/*
-  void _configDeviceState(Map props) {
-    if (props != null) {
-      dynamic o;
-      o = props['blendColorRed'];
-      blendColorRed = o != null ? filter(o) : blendColorRed;
-      o = props['blendColorGreen'];
-      blendColorGreen = o != null ? filter(o) : blendColorGreen;
-      o = props['blendColorBlue'];
-      blendColorBlue = o != null ? filter(o) : blendColorBlue;
-      o = props['blendColorAlpha'];
-      blendColorAlpha = o != null ? filter(o) : blendColorAlpha;
-
-      o = props['blendEnable'];
-      _blendEnable = o != null ? filter(o) : blendEnable;
-      o = props['blendSourceColorFunc'];
-      blendSourceColorFunc = o != null ? filter(o) : blendSourceColorFunc;
-      o = props['blendDestColorFunc'];
-      blendDestColorFunc = o != null ? filter(o) : blendDestColorFunc;
-      o = props['blendSourceAlphaFunc'];
-      blendSourceAlphaFunc = o != null ? filter(o) : blendSourceAlphaFunc;
-      o = props['blendDestAlphaFunc'];
-      blendDestAlphaFunc = o != null ? filter(o) : blendDestAlphaFunc;
-
-      o = props['blendColorOp'];
-      blendColorOp = o != null ? filter(o) : blendColorOp;
-      o = props['blendAlphaOp'];
-      blendAlphaOp = o != null ? filter(o) : blendAlphaOp;
-
-      o = props['writeRenderTargetRed'];
-      writeRenderTargetRed = o != null ? filter(o) : writeRenderTargetRed;
-      o = props['writeRenderTargetGreen'];
-      writeRenderTargetGreen = o != null ? filter(o) : writeRenderTargetGreen;
-      o = props['writeRenderTargetBlue'];
-      writeRenderTargetBlue = o != null ? filter(o) : writeRenderTargetBlue;
-      o = props['writeRenderTargetAlpha'];
-      writeRenderTargetAlpha = o != null ? filter(o) : writeRenderTargetAlpha;
-    }
-  }
-*/
+  // \todo Remove?
+  void _configDeviceState(Map props) { fromJson(props); }
   void _destroyDeviceState() {}
 
   //---------------------------------------------------------------------
@@ -305,9 +268,17 @@ class BlendState extends DeviceChild {
 
     value = values[alphaBlendOperation];
     _alphaBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _alphaBlendOperation;
+    value = values[alphaDestinationBlendName];
+    _alphaDestinationBlend = (value != null) ? Blend.deserialize(value) : _alphaDestinationBlend;
+    value = values[alphaSourceBlendName];
+    _alphaSourceBlend = (value != null) ? Blend.deserialize(value) : _alphaSourceBlend;
 
     value = values[colorBlendOperation];
     _colorBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _colorBlendOperation;
+    value = values[colorDestinationBlendName];
+    _colorDestinationBlend = (value != null) ? Blend.deserialize(value) : _colorDestinationBlend;
+    value = values[colorSourceBlendName];
+    _colorSourceBlend = (value != null) ? Blend.deserialize(value) : _colorSourceBlend;
 
     dynamic blendFactorJson = values[blendFactorName];
 
