@@ -26,19 +26,19 @@ class BlendOperation {
   /// The result is the destination added to the source.
   ///
   ///     Result = (Source Color * Source Blend) + (Destination Color * Destination Blend)
-  static const int Add = 0;
+  static const int Add = WebGLRenderingContext.FUNC_ADD;
   /// String representation of [Add].
   static const String AddName = 'BlendOperation.Add';
   /// The result is the source subtracted from the destination.
   ///
   ///     Result = (Destination Color * Destination Blend) - (Source Color * Source Blend)
-  static const int ReverseSubtract = 0;
+  static const int ReverseSubtract = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
   /// String representation of [Subtract].
   static const String ReverseSubtractName = 'BlendOperation.ReverseSubtract';
   /// The result is the destination subtracted from the source.
   ///
   ///     Result = (Source Color * Source Blend) - (Destination Color * Destination Blend)
-  static const int Subtract = 0;
+  static const int Subtract = WebGLRenderingContext.FUNC_SUBTRACT;
   /// String representation of [Subtract].
   static const String SubtractName = 'BlendOperation.Subtract';
 
