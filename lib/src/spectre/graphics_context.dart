@@ -41,7 +41,7 @@ class GraphicsContext {
   // VS and PS stages
   ShaderProgram _shaderProgramHandle;
   List<SamplerState> _samplerStateHandles;
-  List<Texture> _textureHandles;
+  List<SpectreTexture> _textureHandles;
   // Rasterizer
   RasterizerState _rasterizerStateHandle;
   Viewport _viewportHandle;
@@ -110,7 +110,7 @@ class GraphicsContext {
     // TODO: Need to unbind unused texture channels
     for (int i = 0; i < numTextures; i++) {
       SamplerState sampler = _samplerStateHandles[i];
-      Texture texture = _textureHandles[i];
+      SpectreTexture texture = _textureHandles[i];
       if (sampler == null || texture == null) {
         continue;
       }
@@ -122,7 +122,7 @@ class GraphicsContext {
   GraphicsContext(this.device) {
     _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
     _samplerStateHandles = new List<SamplerState>(numTextures);
-    _textureHandles = new List<Texture>(numTextures);
+    _textureHandles = new List<SpectreTexture>(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
   }
 
@@ -341,7 +341,7 @@ class GraphicsContext {
   }
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
-  void setTextures(int texUnitOffset, List<Texture> textureHandles) {
+  void setTextures(int texUnitOffset, List<SpectreTexture> textureHandles) {
     for (int i = texUnitOffset; i < textureHandles.length; i++) {
       _textureHandles[i] = textureHandles[i-texUnitOffset];
     }

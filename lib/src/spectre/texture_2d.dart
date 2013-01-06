@@ -26,7 +26,7 @@ part of spectre;
 /// Create using [Device.createTexture2D]
 /// Set using [immediateContext.setTextures]
 /// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
-class Texture2D extends Texture {
+class Texture2D extends SpectreTexture {
   bool _loadError = false;
 
   /** Did an error occur when loading from a URL? */
@@ -59,8 +59,8 @@ class Texture2D extends Texture {
    * If [array] is null, space will be allocated on the GPU
    */
   void uploadPixelArray(int width, int height, dynamic array,
-                        {pixelFormat: Texture.FormatRGBA,
-                         pixelType: Texture.PixelTypeU8}) {
+                        {pixelFormat: SpectreTexture.FormatRGBA,
+                         pixelType: SpectreTexture.PixelTypeU8}) {
     var oldBind = _pushBind();
     _width = width;
     _height = height;
@@ -80,8 +80,8 @@ class Texture2D extends Texture {
    * being uploaded to the GPU.
    */
   void uploadElement(dynamic element,
-                     {pixelFormat: Texture.FormatRGBA,
-                         pixelType: Texture.PixelTypeU8}) {
+                     {pixelFormat: SpectreTexture.FormatRGBA,
+                         pixelType: SpectreTexture.PixelTypeU8}) {
     if (element is ImageElement) {
       _width = element.naturalWidth;
       _height = element.naturalHeight;
@@ -103,8 +103,8 @@ class Texture2D extends Texture {
    * If an error occurs while fetching the image, loadError will be true.
    */
   Future<Texture2D> uploadFromURL(String url,
-                                  {pixelFormat: Texture.FormatRGBA,
-                                   pixelType: Texture.PixelTypeU8}) {
+                                  {pixelFormat: SpectreTexture.FormatRGBA,
+                                   pixelType: SpectreTexture.PixelTypeU8}) {
     ImageElement element = new ImageElement();
     Completer<Texture2D> completer = new Completer<Texture2D>();
     element.on.error.add((event) {

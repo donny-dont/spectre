@@ -22,7 +22,7 @@ part of spectre;
 
 */
 
-class TextureCube extends Texture {
+class TextureCube extends SpectreTexture {
   Texture2D _positiveX;
   Texture2D _positiveY;
   Texture2D _positiveZ;
