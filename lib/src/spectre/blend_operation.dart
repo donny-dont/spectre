@@ -42,8 +42,8 @@ class BlendOperation {
   /// String representation of [Subtract].
   static const String SubtractName = 'BlendOperation.Subtract';
 
-  /// Deserialize the [BlendOperation].
-  static int deserialize(String name) {
+  /// Convert from a [String] name to the corresponding [BlendOperation] enumeration.
+  static int parse(String name) {
     if (name == AddName) {
       return Add;
     } else if (name == ReverseSubtractName) {
@@ -56,8 +56,8 @@ class BlendOperation {
     return Add;
   }
 
-  /// Serialize the [BlendOperation].
-  static String serialize(int value) {
+  /// Converts the [BlendOperation] enumeration to a [String].
+  static String stringify(int value) {
     if (value == Add) {
       return AddName;
     } else if (value == ReverseSubtract) {
@@ -70,7 +70,7 @@ class BlendOperation {
     return AddName;
   }
 
-  /// Whether the value is a valid enumeration.
+  /// Checks whether the value is a valid enumeration.
   ///
   /// Should be gotten rid of when enums are supported properly.
   static bool isValid(int value) {
@@ -95,5 +95,4 @@ class BlendOperation {
 
     return map;
   }
-
 }

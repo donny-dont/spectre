@@ -130,7 +130,9 @@ class BlendState extends DeviceChild {
   /// The default is [BlendFunction.Add].
   int get alphaBlendOperation => _alphaBlendOperation;
   set alphaBlendOperation(int value) {
-    assert(BlendOperation.isValid(value));
+    if (!BlendOperation.isValid(value)) {
+      throw new ArgumentError('alphaBlendOperation must correspond to an enumeration within BlendOperation.');
+    }
 
     _alphaBlendOperation = value;
   }
@@ -139,6 +141,10 @@ class BlendState extends DeviceChild {
   /// The default is [Blend.One].
   int get alphaDestinationBlend => _alphaDestinationBlend;
   set alphaDestinationBlend(int value) {
+    if (!Blend.isValid(value)) {
+      throw new ArgumentError('alphaDestinationBlend must correspond to an enumeration within Blend.');
+    }
+
     _alphaDestinationBlend = value;
   }
 
@@ -146,6 +152,10 @@ class BlendState extends DeviceChild {
   /// The default is [Blend.One].
   int get alphaSourceBlend => _alphaSourceBlend;
   set alphaSourceBlend(int value) {
+    if (!Blend.isValid(value)) {
+      throw new ArgumentError('alphaSourceBlend must correspond to an enumeration within Blend.');
+    }
+
     _alphaSourceBlend = value;
   }
 
@@ -153,7 +163,9 @@ class BlendState extends DeviceChild {
   /// The default is [BlendFunction.Add].
   int get colorBlendOperation => _colorBlendOperation;
   set colorBlendOperation(int value) {
-    assert(BlendOperation.isValid(value));
+    if (!BlendOperation.isValid(value)) {
+      throw new ArgumentError('colorBlendOperation must correspond to an enumeration within BlendOperation.');
+    }
 
     _colorBlendOperation = value;
   }
@@ -162,6 +174,10 @@ class BlendState extends DeviceChild {
   /// The default is [Blend.One].
   int get colorDestinationBlend => _colorDestinationBlend;
   set colorDestinationBlend(int value) {
+    if (!Blend.isValid(value)) {
+      throw new ArgumentError('colorDestinationBlend must correspond to an enumeration within Blend.');
+    }
+
     _colorDestinationBlend = value;
   }
 
@@ -169,6 +185,10 @@ class BlendState extends DeviceChild {
   /// The default is Blend.One.
   int get colorSourceBlend => _colorSourceBlend;
   set colorSourceBlend(int value) {
+    if (!Blend.isValid(value)) {
+      throw new ArgumentError('colorSourceBlend must correspond to an enumeration within Blend.');
+    }
+
     _colorSourceBlend = value;
   }
 
@@ -185,7 +205,9 @@ class BlendState extends DeviceChild {
     return value;
   }
   set colorWriteChannels(int value) {
-    assert((value >= 0) && (value <= ColorWriteChannels.All));
+    if ((value < 0) || (value > ColorWriteChannels.All)) {
+      throw new ArgumentError('colorWriteChannel must correspond to a flag within ColorWriteChannels.');
+    }
 
     _writeRenderTargetRed   = (value & ColorWriteChannels.Red)   == ColorWriteChannels.Red;
     _writeRenderTargetGreen = (value & ColorWriteChannels.Green) == ColorWriteChannels.Green;
@@ -219,11 +241,13 @@ class BlendState extends DeviceChild {
 
     json[blendEnabledName] = _enabled;
 
-    json[alphaBlendOperation] = _alphaBlendOperation;
+    json[alphaBlendOperationName]   = BlendOperation.stringify(_alphaBlendOperation);
+    json[alphaDestinationBlendName] = Blend.stringify(_alphaDestinationBlend);
+    json[alphaSourceBlendName]      = Blend.stringify(_alphaSourceBlend);
 
-    json[colorBlendOperation] = _colorBlendOperation;
-
-    json[colorWriteChannelsName] = colorWriteChannels;
+    json[colorBlendOperationName]   = BlendOperation.stringify(colorBlendOperation);
+    json[colorDestinationBlendName] = Blend.stringify(colorDestinationBlend);
+    json[colorSourceBlendName]      = Blend.stringify(_colorSourceBlend);
 
     Map blendFactorJson = new Map();
     blendFactorJson['r'] = _blendFactor.r;
@@ -244,18 +268,18 @@ class BlendState extends DeviceChild {
     _enabled = (value != null) ? value : _enabled;
 
     value = values[alphaBlendOperation];
-    _alphaBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _alphaBlendOperation;
+    _alphaBlendOperation = (value != null) ? BlendOperation.parse(value) : _alphaBlendOperation;
     value = values[alphaDestinationBlendName];
-    _alphaDestinationBlend = (value != null) ? Blend.deserialize(value) : _alphaDestinationBlend;
+    _alphaDestinationBlend = (value != null) ? Blend.parse(value) : _alphaDestinationBlend;
     value = values[alphaSourceBlendName];
-    _alphaSourceBlend = (value != null) ? Blend.deserialize(value) : _alphaSourceBlend;
+    _alphaSourceBlend = (value != null) ? Blend.parse(value) : _alphaSourceBlend;
 
     value = values[colorBlendOperation];
-    _colorBlendOperation = (value != null) ? BlendOperation.deserialize(value) : _colorBlendOperation;
+    _colorBlendOperation = (value != null) ? BlendOperation.parse(value) : _colorBlendOperation;
     value = values[colorDestinationBlendName];
-    _colorDestinationBlend = (value != null) ? Blend.deserialize(value) : _colorDestinationBlend;
+    _colorDestinationBlend = (value != null) ? Blend.parse(value) : _colorDestinationBlend;
     value = values[colorSourceBlendName];
-    _colorSourceBlend = (value != null) ? Blend.deserialize(value) : _colorSourceBlend;
+    _colorSourceBlend = (value != null) ? Blend.parse(value) : _colorSourceBlend;
 
     dynamic blendFactorJson = values[blendFactorName];
 

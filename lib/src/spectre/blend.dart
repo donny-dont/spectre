@@ -99,8 +99,8 @@ class Blend {
   /// String representation of [InverseBlendFactor].
   static const String InverseBlendFactorName = 'Blend.InverseBlendFactor';
 
-  /// Deserialize the [Blend].
-  static int deserialize(String name) {
+  /// Convert from a [String] name to the corresponding [Blend] enumeration.
+  static int parse(String name) {
     switch (name) {
       case ZeroName                   : return Zero;
       case OneName                    : return One;
@@ -121,8 +121,8 @@ class Blend {
     return Zero;
   }
 
-  /// Serialize the [Blend].
-  static String serialize(int value) {
+  /// Converts the [Blend] enumeration to a [String].
+  static String stringify(int value) {
     switch (value) {
       case Zero                   : return ZeroName;
       case One                    : return OneName;
@@ -143,7 +143,7 @@ class Blend {
     return ZeroName;
   }
 
-  /// Whether the value is a valid enumeration.
+  /// Checks whether the value is a valid enumeration.
   ///
   /// Should be gotten rid of when enums are supported properly.
   static bool isValid(int value) {
@@ -186,5 +186,4 @@ class Blend {
 
     return map;
   }
-
 }
