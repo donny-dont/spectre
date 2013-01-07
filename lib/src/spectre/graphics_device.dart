@@ -33,35 +33,6 @@ class DeviceFormat {
   }
 }
 
-class _InputElementCheckerItem {
-  String name;
-  int vertexBufferSlot;
-  int vertexBufferOffset;
-  _InputElementCheckerItem(this.name, this.vertexBufferSlot,
-                           this.vertexBufferOffset);
-}
-
-class _InputElementChecker {
-  List<_InputElementCheckerItem> items;
-  _InputElementChecker() {
-    items = new List<_InputElementCheckerItem>();
-  }
-
-  void add(InputElementDescription d) {
-    _InputElementCheckerItem item;
-    item = new _InputElementCheckerItem(d.name,
-                                        d.vertexBufferSlot,
-                                        d.vertexBufferOffset);
-    for(_InputElementCheckerItem check in items) {
-      if (check.vertexBufferOffset == item.vertexBufferOffset &&
-          check.vertexBufferSlot == item.vertexBufferSlot) {
-        spectreLog.Warning('Input elements -  ${check.name} and ${item.name} - share same offset. This is likely an error.');
-      }
-    }
-    items.add(item);
-  }
-}
-
 /// Allows the querying of the capabilities of the [GraphicsDevice].
 ///
 /// Can be used to get maximum values for the underlying WebGL implementation as
@@ -328,7 +299,6 @@ class GraphicsDevice {
     _nameMapping = new Map<String, DeviceChild>();
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
-    print(_capabilities);
     _fallbackTexture = createTexture2D('Device.Fallback');
     {
       CanvasElement canvas = new CanvasElement();
@@ -423,6 +393,16 @@ class GraphicsDevice {
       tex.ready = false;
       tex.fallback = _fallbackTexture;
     }
+    return tex;
+  }
+
+  /// Create a [TextureCube] named [name].
+  TextureCube createTextureCube(String name) {
+    TextureCube tex = new TextureCube(name, this);
+    if (_addChildObject(tex) == false) {
+      return null;
+    }
+    tex._createDeviceState();
     return tex;
   }
 

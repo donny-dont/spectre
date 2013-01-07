@@ -22,7 +22,7 @@ part of spectre;
 
 */
 
-class TextureCube extends Texture {
+class TextureCube extends SpectreTexture {
   Texture2D _positiveX;
   Texture2D _positiveY;
   Texture2D _positiveZ;
@@ -42,37 +42,37 @@ class TextureCube extends Texture {
       : super(name, device, WebGLRenderingContext.TEXTURE_CUBE_MAP,
           WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
           WebGLRenderingContext.TEXTURE_CUBE_MAP) {
-    _positiveX = new Texture2D(
+    _positiveX = new Texture2D._cube(
         '$name[+X]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_X);
-    _positiveY = new Texture2D(
+    _positiveY = new Texture2D._cube(
         '$name[+Y]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Y);
-    _positiveZ = new Texture2D(
+    _positiveZ = new Texture2D._cube(
         '$name[+Z]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Z);
-    _negativeX = new Texture2D(
+    _negativeX = new Texture2D._cube(
         '$name[-X]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_X);
-    _negativeY = new Texture2D(
+    _negativeY = new Texture2D._cube(
         '$name[-Y]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Y);
-    _negativeZ = new Texture2D(
+    _negativeZ = new Texture2D._cube(
         '$name[-Z]',
         device,
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
@@ -98,5 +98,18 @@ class TextureCube extends Texture {
     _negativeY._deviceTexture = null;
     _negativeZ._deviceTexture = null;
     super._destroyDeviceState();
+  }
+
+  void _generateMipmap() {
+    device.gl.generateMipmap(_textureTarget);
+  }
+
+  /** Generate Mipmap data for texture. This must be done before the texture
+   * can be used for rendering.
+   */
+  void generateMipmap() {
+    var oldBind = _pushBind();
+    _generateMipmap();
+    _popBind(oldBind);
   }
 }

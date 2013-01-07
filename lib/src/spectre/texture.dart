@@ -22,7 +22,7 @@ part of spectre;
 
 */
 
-class Texture extends DeviceChild {
+class SpectreTexture extends DeviceChild {
   //static const int FormatR = WebGLRenderingContext.RED;
   //static const int FormatRG = WebGLRenderingContext.RG;
   static const int FormatRGB = WebGLRenderingContext.RGB;
@@ -110,9 +110,9 @@ class Texture extends DeviceChild {
     device.gl.bindTexture(_bindTarget, oldBind);
   }
 
-  Texture(String name, GraphicsDevice device, this._bindTarget,
-          this._bindingParam, this._textureTarget) : super._internal(name,
-                                                                     device);
+  SpectreTexture(String name, GraphicsDevice device, this._bindTarget,
+                 this._bindingParam, this._textureTarget)
+      : super._internal(name, device);
 
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,

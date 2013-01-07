@@ -130,7 +130,7 @@ class ResourceManager {
   }
 
   Future<bool> loadResources(Collection<ResourceBase> handles, [bool force=true]) {
-    List<Future<int>> futures = new List<Future<int>>();
+    List<Future<ResourceBase>> futures = new List<Future<ResourceBase>>();
     handles.forEach((handle) {
       var r = loadResource(handle, force);
       futures.add(r);

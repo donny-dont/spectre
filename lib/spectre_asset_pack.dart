@@ -1,8 +1,5 @@
-part of spectre_post;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,23 +19,16 @@ part of spectre_post;
 
 */
 
-class SpectrePostFragment extends SpectrePostPass {
-  final ShaderProgram shaderProgram;
-  final InputLayout inputLayout;
-  SpectrePostFragment(GraphicsDevice device, String name, this.shaderProgram,
-                      this.inputLayout) : super() {
-  }
+/** Spectre asset_pack companion library */
 
-  void cleanup(GraphicsDevice device) {
-    device.deleteDeviceChild(shaderProgram);
-  }
+library spectre_asset_pack;
 
-  void setup(GraphicsDevice device, Map<String, dynamic> args) {
-    List<SpectreTexture> textures = args['textures'];
-    List<SamplerState> samplers = args['samplers'];
-    device.context.setTextures(0, textures);
-    device.context.setSamplers(0, samplers);
-    device.context.setShaderProgram(shaderProgram);
-    device.context.setInputLayout(inputLayout);
-  }
-}
+import 'dart:html';
+import 'dart:json';
+import 'package:asset_pack/asset_pack.dart';
+import 'package:spectre/spectre.dart';
+
+part 'src/spectre_asset_pack/texture.dart';
+part 'src/spectre_asset_pack/shader.dart';
+part 'src/spectre_asset_pack/mesh.dart';
+part 'src/spectre_asset_pack/spectre_asset_pack.dart';

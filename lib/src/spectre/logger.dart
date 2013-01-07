@@ -67,7 +67,7 @@ class HtmlLogger implements Logger {
     _line_num = 0;
   }
   void _Append(String a) {
-    _logElement.innerHTML = '$a ${_logElement.innerHTML}';
+    _logElement.innerHtml = '$a ${_logElement.innerHtml}';
     _line_num++;
   }
   void Error(String e) {
@@ -84,3 +84,6 @@ class HtmlLogger implements Logger {
   }
   void Log(String i) => Info(i);
 }
+
+// We have a single logger
+Logger spectreLog = new PrintLogger();

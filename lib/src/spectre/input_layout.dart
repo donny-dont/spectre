@@ -70,7 +70,13 @@ class InputLayout extends DeviceChild {
       return;
     }
 
-    if (_shaderProgram.attributes.length == 0 || _mesh.attributes.length == 0) {
+    if (_shaderProgram.attributes.length == 0) {
+      print('InputLayout $name shaderProgram has 0 attributes.');
+      return;
+    }
+
+    if (_mesh.attributes.length == 0) {
+      print('InputLayout $name mesh has 0 attributes.');
       return;
     }
 
@@ -88,7 +94,7 @@ class InputLayout extends DeviceChild {
         elements.add(element);
       }
     });
-    print('InputLayour $name refreshed: $ready');
+    print('InputLayout $name refreshed: $ready');
   }
 
   InputLayout(String name, GraphicsDevice device)

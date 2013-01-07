@@ -68,7 +68,7 @@ class TransformGraph {
 
   void _swapAndPop(int index) {
     // Move end of list into index we are removing.
-    TransformGraphNode last = _nodes.last();
+    TransformGraphNode last = _nodes.last;
     _nodes[index] = last;
     // Remove last node.
     _nodes.removeLast();
@@ -129,18 +129,6 @@ class TransformGraph {
         }
       }
     }
-  }
-
-  /// Get a copy of the world transform for [nodeHandle]
-  void getWorldMatrix(int nodeHandle, mat4 out) {
-    if (nodeHandle == 0) {
-      return;
-    }
-    if (_handleSystem.validHandle(nodeHandle) == false) {
-      return;
-    }
-    int index = Handle.getIndex(nodeHandle);
-    _worldTransforms[index].copyInto(out);
   }
 
   /// Get a reference to the world transform for [node]

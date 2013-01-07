@@ -1,8 +1,5 @@
-part of spectre_post;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,23 +19,4 @@ part of spectre_post;
 
 */
 
-class SpectrePostFragment extends SpectrePostPass {
-  final ShaderProgram shaderProgram;
-  final InputLayout inputLayout;
-  SpectrePostFragment(GraphicsDevice device, String name, this.shaderProgram,
-                      this.inputLayout) : super() {
-  }
-
-  void cleanup(GraphicsDevice device) {
-    device.deleteDeviceChild(shaderProgram);
-  }
-
-  void setup(GraphicsDevice device, Map<String, dynamic> args) {
-    List<SpectreTexture> textures = args['textures'];
-    List<SamplerState> samplers = args['samplers'];
-    device.context.setTextures(0, textures);
-    device.context.setSamplers(0, samplers);
-    device.context.setShaderProgram(shaderProgram);
-    device.context.setInputLayout(inputLayout);
-  }
-}
+part of spectre_asset_pack;

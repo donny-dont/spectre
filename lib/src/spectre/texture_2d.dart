@@ -26,7 +26,7 @@ part of spectre;
 /// Create using [Device.createTexture2D]
 /// Set using [immediateContext.setTextures]
 /// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
-class Texture2D extends Texture {
+class Texture2D extends SpectreTexture {
   bool _loadError = false;
 
   /** Did an error occur when loading from a URL? */
@@ -36,6 +36,10 @@ class Texture2D extends Texture {
       super(name, device, WebGLRenderingContext.TEXTURE_2D,
           WebGLRenderingContext.TEXTURE_BINDING_2D,
           WebGLRenderingContext.TEXTURE_2D);
+
+  Texture2D._cube(String name, GraphicsDevice device, int bindTarget,
+                  int bindParam, int textureTarget) :
+      super(name, device, bindTarget, bindParam, textureTarget);
 
   void _createDeviceState() {
     super._createDeviceState();
@@ -55,8 +59,8 @@ class Texture2D extends Texture {
    * If [array] is null, space will be allocated on the GPU
    */
   void uploadPixelArray(int width, int height, dynamic array,
-                        {pixelFormat: Texture.FormatRGBA,
-                         pixelType: Texture.PixelTypeU8}) {
+                        {pixelFormat: SpectreTexture.FormatRGBA,
+                         pixelType: SpectreTexture.PixelTypeU8}) {
     var oldBind = _pushBind();
     _width = width;
     _height = height;
@@ -76,8 +80,8 @@ class Texture2D extends Texture {
    * being uploaded to the GPU.
    */
   void uploadElement(dynamic element,
-                     {pixelFormat: Texture.FormatRGBA,
-                         pixelType: Texture.PixelTypeU8}) {
+                     {pixelFormat: SpectreTexture.FormatRGBA,
+                         pixelType: SpectreTexture.PixelTypeU8}) {
     if (element is ImageElement) {
       _width = element.naturalWidth;
       _height = element.naturalHeight;
@@ -98,9 +102,9 @@ class Texture2D extends Texture {
   /** Replace texture contents with data fetched from [url].
    * If an error occurs while fetching the image, loadError will be true.
    */
-  Future<Texture2D> uploadFromURL(Sting url,
-                                  {pixelFormat: Texture.FormatRGBA,
-                                   pixelType: Texture.PixelTypeU8}) {
+  Future<Texture2D> uploadFromURL(String url,
+                                  {pixelFormat: SpectreTexture.FormatRGBA,
+                                   pixelType: SpectreTexture.PixelTypeU8}) {
     ImageElement element = new ImageElement();
     Completer<Texture2D> completer = new Completer<Texture2D>();
     element.on.error.add((event) {
@@ -108,7 +112,7 @@ class Texture2D extends Texture {
       completer.complete(this);
     });
     element.on.load.add((event) {
-      uploadElement(element, pixelFormat, pixelType);
+      uploadElement(element, pixelFormat:pixelFormat, pixelType:pixelType);
       completer.complete(this);
     });
     // Initiate load.

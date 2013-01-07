@@ -9,3 +9,7 @@ dependencies:
     git: https://github.com/johnmccutchan/markerprof.git
   vector_math:
     git: https://github.com/johnmccutchan/DartVectorMath.git
+  game_loop:
+    git: https://github.com/johnmccutchan/game_loop.git
+  asset_pack:
+    git: https://github.com/johnmccutchan/asset_pack.git
