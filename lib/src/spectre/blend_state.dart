@@ -131,7 +131,7 @@ class BlendState extends DeviceChild {
   int get alphaBlendOperation => _alphaBlendOperation;
   set alphaBlendOperation(int value) {
     if (!BlendOperation.isValid(value)) {
-      throw new ArgumentError('alphaBlendOperation must correspond to an enumeration within BlendOperation.');
+      throw new ArgumentError('alphaBlendOperation must be an enumeration within BlendOperation.');
     }
 
     _alphaBlendOperation = value;
@@ -142,7 +142,7 @@ class BlendState extends DeviceChild {
   int get alphaDestinationBlend => _alphaDestinationBlend;
   set alphaDestinationBlend(int value) {
     if (!Blend.isValid(value)) {
-      throw new ArgumentError('alphaDestinationBlend must correspond to an enumeration within Blend.');
+      throw new ArgumentError('alphaDestinationBlend must be an enumeration within Blend.');
     }
 
     _alphaDestinationBlend = value;
@@ -153,7 +153,7 @@ class BlendState extends DeviceChild {
   int get alphaSourceBlend => _alphaSourceBlend;
   set alphaSourceBlend(int value) {
     if (!Blend.isValid(value)) {
-      throw new ArgumentError('alphaSourceBlend must correspond to an enumeration within Blend.');
+      throw new ArgumentError('alphaSourceBlend must be an enumeration within Blend.');
     }
 
     _alphaSourceBlend = value;
@@ -164,7 +164,7 @@ class BlendState extends DeviceChild {
   int get colorBlendOperation => _colorBlendOperation;
   set colorBlendOperation(int value) {
     if (!BlendOperation.isValid(value)) {
-      throw new ArgumentError('colorBlendOperation must correspond to an enumeration within BlendOperation.');
+      throw new ArgumentError('colorBlendOperation must be an enumeration within BlendOperation.');
     }
 
     _colorBlendOperation = value;
@@ -175,7 +175,7 @@ class BlendState extends DeviceChild {
   int get colorDestinationBlend => _colorDestinationBlend;
   set colorDestinationBlend(int value) {
     if (!Blend.isValid(value)) {
-      throw new ArgumentError('colorDestinationBlend must correspond to an enumeration within Blend.');
+      throw new ArgumentError('colorDestinationBlend must be an enumeration within Blend.');
     }
 
     _colorDestinationBlend = value;
@@ -186,7 +186,7 @@ class BlendState extends DeviceChild {
   int get colorSourceBlend => _colorSourceBlend;
   set colorSourceBlend(int value) {
     if (!Blend.isValid(value)) {
-      throw new ArgumentError('colorSourceBlend must correspond to an enumeration within Blend.');
+      throw new ArgumentError('colorSourceBlend must be an enumeration within Blend.');
     }
 
     _colorSourceBlend = value;
@@ -206,7 +206,7 @@ class BlendState extends DeviceChild {
   }
   set colorWriteChannels(int value) {
     if ((value < 0) || (value > ColorWriteChannels.All)) {
-      throw new ArgumentError('colorWriteChannel must correspond to a flag within ColorWriteChannels.');
+      throw new ArgumentError('colorWriteChannel must be a flag within ColorWriteChannels.');
     }
 
     _writeRenderTargetRed   = (value & ColorWriteChannels.Red)   == ColorWriteChannels.Red;
