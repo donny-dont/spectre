@@ -245,8 +245,8 @@ class BlendState extends DeviceChild {
     json[alphaDestinationBlendName] = Blend.stringify(_alphaDestinationBlend);
     json[alphaSourceBlendName]      = Blend.stringify(_alphaSourceBlend);
 
-    json[colorBlendOperationName]   = BlendOperation.stringify(colorBlendOperation);
-    json[colorDestinationBlendName] = Blend.stringify(colorDestinationBlend);
+    json[colorBlendOperationName]   = BlendOperation.stringify(_colorBlendOperation);
+    json[colorDestinationBlendName] = Blend.stringify(_colorDestinationBlend);
     json[colorSourceBlendName]      = Blend.stringify(_colorSourceBlend);
 
     Map blendFactorJson = new Map();
