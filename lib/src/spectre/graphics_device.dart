@@ -240,6 +240,13 @@ class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat4 =
                     const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
+  // Dump all children.
+  void dumpChildren() {
+    _nameMapping.forEach((n, child) {
+      print('${child.name} ${child.runtimeType}');
+    });
+  }
+
   Map _getPropertyMap(dynamic props) {
     if (props is String) {
       props = JSON.parse(props);

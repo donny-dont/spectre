@@ -67,6 +67,7 @@ class DeviceChild implements Hashable {
 
   void _createDeviceState() {
   }
+
   void _destroyDeviceState() {
   }
 }
