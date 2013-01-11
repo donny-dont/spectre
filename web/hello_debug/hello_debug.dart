@@ -18,10 +18,13 @@ Camera _camera;
 double _lastTime;
 bool _circleDrawn = false;
 
-void frame(GameLoop gameLoop) {
+void gameFrame(GameLoop gameLoop) {
   double dt = gameLoop.dt;
   // Update the debug draw manager state
   _debugDrawManager.update(dt);
+}
+
+void renderFrame(GameLoop gameLoop) {
   // Clear the color buffer
   _graphicsContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
   // Clear the depth buffer
@@ -106,7 +109,8 @@ main() {
   _camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
 
   _gameLoop = new GameLoop(canvas);
-  _gameLoop.onUpdate = frame;
+  _gameLoop.onUpdate = gameFrame;
+  _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
   _gameLoop.start();
 }

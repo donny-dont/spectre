@@ -92,11 +92,14 @@ void _updateBall(double dt) {
   }
 }
 
-void frame(GameLoop gameLoop) {
-  Stopwatch sw = new Stopwatch();
+void gameFrame(GameLoop gameLoop) {
   double dt = gameLoop.dt;
   // Update the debug draw manager state
   _debugDrawManager.update(dt);
+  _updateBall(dt);
+}
+
+void renderFrame(GameLoop gameLoop) {
   // Clear the color buffer
   _graphicsContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
   // Clear the depth buffer
@@ -128,8 +131,6 @@ void frame(GameLoop gameLoop) {
     vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
     _debugDrawManager.addLine(s, e, new vec4.raw(0.0, 0.0, 1.0, 1.0));
   }
-
-  _updateBall(dt);
 
   // Draw ball
   _debugDrawManager.addCircle(new vec3(ballPosition.x, ballPosition.y, 0.0),
@@ -194,7 +195,8 @@ main() {
   _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
 
   _gameLoop = new GameLoop(canvas);
-  _gameLoop.onUpdate = frame;
+  _gameLoop.onUpdate = gameFrame;
+  _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
   _gameLoop.start();
 }

@@ -21,10 +21,13 @@ Camera _camera;
 double _lastTime;
 bool _circleDrawn = false;
 
-void frame(GameLoop gameLoop) {
+void gameFrame(GameLoop gameLoop) {
   double dt = gameLoop.dt;
   // Update the debug draw manager state
   _debugDrawManager.update(dt);
+}
+
+void renderFrame(GameLoop gameLoop) {
   // Clear the color buffer
   _graphicsContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
   // Clear the depth buffer
@@ -172,7 +175,8 @@ main() {
   _assetManager = new AssetManager();
   registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
   _gameLoop = new GameLoop(canvas);
-  _gameLoop.onUpdate = frame;
+  _gameLoop.onUpdate = gameFrame;
+  _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
   _assetManager.loadPack('assets', '$baseUrl/assets.pack').then((assetPack) {
     // All assets are loaded.
