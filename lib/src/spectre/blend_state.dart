@@ -232,6 +232,50 @@ class BlendState extends DeviceChild {
   set writeRenderTargetAlpha(bool value) { _writeRenderTargetAlpha = value; }
 
   //---------------------------------------------------------------------
+  // Equality
+  //---------------------------------------------------------------------
+
+  bool operator== (BlendState other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    if (_enabled != other._enabled) {
+      return false;
+    }
+
+    //if (_blendFactor != other._blendFactor) {
+    //  return false;
+    //}
+
+    if (_alphaBlendOperation != other._alphaBlendOperation) {
+      print('alphaBlendOperator ${_alphaBlendOperation} ${other._alphaBlendOperation}');
+      return false;
+    }
+    if (_alphaDestinationBlend != other._alphaDestinationBlend) {
+      return false;
+    }
+    if (_alphaSourceBlend != other._alphaSourceBlend) {
+      return false;
+    }
+
+    if (_colorBlendOperation != other._colorBlendOperation) {
+      return false;
+    }
+    if (_colorDestinationBlend != other._colorDestinationBlend) {
+      return false;
+    }
+    if (_colorSourceBlend != other._colorSourceBlend) {
+      return false;
+    }
+
+    return ((_writeRenderTargetRed   == other._writeRenderTargetRed)   &&
+            (_writeRenderTargetGreen == other._writeRenderTargetGreen) &&
+            (_writeRenderTargetBlue  == other._writeRenderTargetBlue)  &&
+            (_writeRenderTargetAlpha == other._writeRenderTargetAlpha));
+  }
+
+  //---------------------------------------------------------------------
   // Serialization
   //---------------------------------------------------------------------
 
@@ -256,6 +300,10 @@ class BlendState extends DeviceChild {
     blendFactorJson['a'] = _blendFactor.a;
 
     json[blendFactorName] = blendFactorJson;
+
+    json[colorWriteChannelsName] = colorWriteChannels;
+
+    return json;
   }
 
   /// Deserializes the [BlendState] from a JSON.
@@ -267,14 +315,14 @@ class BlendState extends DeviceChild {
     value = values[blendEnabledName];
     _enabled = (value != null) ? value : _enabled;
 
-    value = values[alphaBlendOperation];
+    value = values[alphaBlendOperationName];
     _alphaBlendOperation = (value != null) ? BlendOperation.parse(value) : _alphaBlendOperation;
     value = values[alphaDestinationBlendName];
     _alphaDestinationBlend = (value != null) ? Blend.parse(value) : _alphaDestinationBlend;
     value = values[alphaSourceBlendName];
     _alphaSourceBlend = (value != null) ? Blend.parse(value) : _alphaSourceBlend;
 
-    value = values[colorBlendOperation];
+    value = values[colorBlendOperationName];
     _colorBlendOperation = (value != null) ? BlendOperation.parse(value) : _colorBlendOperation;
     value = values[colorDestinationBlendName];
     _colorDestinationBlend = (value != null) ? Blend.parse(value) : _colorDestinationBlend;
@@ -295,6 +343,11 @@ class BlendState extends DeviceChild {
 
       value = blendFactorJson['a'];
       _blendFactor.a = (value != null) ? value : 0.0;
+    }
+
+    value = values[colorWriteChannelsName];
+    if (value != null) {
+      colorWriteChannels = value;
     }
   }
 }
