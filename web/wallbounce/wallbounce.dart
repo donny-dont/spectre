@@ -133,7 +133,9 @@ void renderFrame(GameLoop gameLoop) {
   }
 
   // Draw ball
-  _debugDrawManager.addCircle(new vec3(ballPosition.x, ballPosition.y, 0.0),
+  var extraTime = ballVelocity * gameLoop.accumulatedTime;
+  var renderPosition = ballPosition + (ballDirection.scaled(extraTime));
+  _debugDrawManager.addCircle(new vec3(renderPosition.x, renderPosition.y, 0.0),
                               new vec3(0.0, 0.0, 1.0),
                               ballRadius,
                               new vec4(0.0, 0.0, 1.0, 1.0));
