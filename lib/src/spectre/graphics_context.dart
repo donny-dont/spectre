@@ -22,7 +22,7 @@ part of spectre;
 
 */
 
-/** The [GraphicsContext] configures the GPU pipeline and executes draw commands */
+/// The [GraphicsContext] configures the GPU pipeline and executes draw commands.
 class GraphicsContext {
   static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
   static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
@@ -320,9 +320,13 @@ class GraphicsContext {
   }
 
   /// Sets the current [BlendState] to use on the pipeline.
+  ///
+  /// If [blendState] is null all values of the pipeline associated with blending
+  /// will be reset to their defaults.
   void setBlendState(BlendState blendState) {
     if (blendState == null) {
-      throw new ArgumentError('The BlendState should not be null');
+      _resetBlendState();
+      return;
     }
 
     // Disable/Enable blending if necessary
