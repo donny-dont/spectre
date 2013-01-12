@@ -119,7 +119,10 @@ void main() {
     copy.blendFactor.g = 0.0;
     copy.blendFactor.b = 0.0;
     copy.blendFactor.a = 0.0;
-    copy.colorWriteChannels = ColorWriteChannels.None;
+    copy.writeRenderTargetRed   = false;
+    copy.writeRenderTargetGreen = false;
+    copy.writeRenderTargetBlue  = false;
+    copy.writeRenderTargetAlpha = false;
 
     Map json = original.toJson();
     copy.fromJson(json);

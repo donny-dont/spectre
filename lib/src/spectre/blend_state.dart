@@ -51,6 +51,14 @@ class BlendState extends DeviceChild {
   static const String colorSourceBlendName = 'colorSourceBlend';
   /// Serialization name for [colorWriteChannels].
   static const String colorWriteChannelsName = 'colorWriteChannels';
+  /// Serialization name for [writeRenderTargetRed].
+  static const String writeRenderTargetRedName = 'writeRenderTargetRed';
+  /// Serialization name for [writeRenderTargetGreen].
+  static const String writeRenderTargetGreenName = 'writeRenderTargetGreen';
+  /// Serialization name for [writeRenderTargetBlue].
+  static const String writeRenderTargetBlueName = 'writeRenderTargetBlue';
+  /// Serialization name for [writeRenderTargetAlpha].
+  static const String writeRenderTargetAlphaName = 'writeRenderTargetAlpha';
 
   //---------------------------------------------------------------------
   // Member variables
@@ -192,29 +200,6 @@ class BlendState extends DeviceChild {
     _colorSourceBlend = value;
   }
 
-  /// The color channels (RGBA) that are enabled for writing during color blending.
-  int get colorWriteChannels {
-    int value;
-
-    // \todo Is there a better way? Shift doesn't work on a bool
-    value  = (_writeRenderTargetRed)   ? ColorWriteChannels.Red   : 0;
-    value |= (_writeRenderTargetGreen) ? ColorWriteChannels.Green : 0;
-    value |= (_writeRenderTargetBlue)  ? ColorWriteChannels.Blue  : 0;
-    value |= (_writeRenderTargetAlpha) ? ColorWriteChannels.All   : 0;
-
-    return value;
-  }
-  set colorWriteChannels(int value) {
-    if ((value < 0) || (value > ColorWriteChannels.All)) {
-      throw new ArgumentError('colorWriteChannel must be a flag within ColorWriteChannels.');
-    }
-
-    _writeRenderTargetRed   = (value & ColorWriteChannels.Red)   == ColorWriteChannels.Red;
-    _writeRenderTargetGreen = (value & ColorWriteChannels.Green) == ColorWriteChannels.Green;
-    _writeRenderTargetBlue  = (value & ColorWriteChannels.Blue)  == ColorWriteChannels.Blue;
-    _writeRenderTargetAlpha = (value & ColorWriteChannels.Alpha) == ColorWriteChannels.Alpha;
-  }
-
   /// Whether the red channel is enabled for writing during color blending.
   bool get writeRenderTargetRed => _writeRenderTargetRed;
   set writeRenderTargetRed(bool value) { _writeRenderTargetRed = value; }
@@ -244,12 +229,15 @@ class BlendState extends DeviceChild {
       return false;
     }
 
-    //if (_blendFactor != other._blendFactor) {
-    //  return false;
-    //}
+    if ((_blendFactor.r != other._blendFactor.r) ||
+        (_blendFactor.g != other._blendFactor.g) ||
+        (_blendFactor.b != other._blendFactor.b) ||
+        (_blendFactor.a != other._blendFactor.a))
+    {
+      return false;
+    }
 
     if (_alphaBlendOperation != other._alphaBlendOperation) {
-      print('alphaBlendOperator ${_alphaBlendOperation} ${other._alphaBlendOperation}');
       return false;
     }
     if (_alphaDestinationBlend != other._alphaDestinationBlend) {
@@ -301,7 +289,10 @@ class BlendState extends DeviceChild {
 
     json[blendFactorName] = blendFactorJson;
 
-    json[colorWriteChannelsName] = colorWriteChannels;
+    json[writeRenderTargetRedName]   = _writeRenderTargetRed;
+    json[writeRenderTargetGreenName] = _writeRenderTargetGreen;
+    json[writeRenderTargetBlueName]  = _writeRenderTargetBlue;
+    json[writeRenderTargetAlphaName] = _writeRenderTargetAlpha;
 
     return json;
   }
@@ -345,9 +336,13 @@ class BlendState extends DeviceChild {
       _blendFactor.a = (value != null) ? value : 0.0;
     }
 
-    value = values[colorWriteChannelsName];
-    if (value != null) {
-      colorWriteChannels = value;
-    }
+    value = values[writeRenderTargetRedName];
+    _writeRenderTargetRed = (value != null) ? value : _writeRenderTargetRed;
+    value = values[writeRenderTargetGreenName];
+    _writeRenderTargetGreen = (value != null) ? value : _writeRenderTargetGreen;
+    value = values[writeRenderTargetBlueName];
+    _writeRenderTargetBlue = (value != null) ? value : _writeRenderTargetBlue;
+    value = values[writeRenderTargetAlphaName];
+    _writeRenderTargetAlpha = (value != null) ? value : _writeRenderTargetAlpha;
   }
 }
