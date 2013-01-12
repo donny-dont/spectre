@@ -1,4 +1,4 @@
-library blend_state_tests;
+library blend_state_test;
 
 /*
 

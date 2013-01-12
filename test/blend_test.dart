@@ -1,4 +1,4 @@
-library blend_tests;
+library blend_test;
 
 /*
 
