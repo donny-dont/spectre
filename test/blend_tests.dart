@@ -22,11 +22,28 @@ library blend_tests;
 
 */
 
-import "package:unittest/unittest.dart";
+import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import "package:spectre/spectre.dart";
+import 'package:spectre/spectre.dart';
+import 'dart:html';
 
 void main() {
+  test('values', () {
+    expect(Blend.Zero                   , WebGLRenderingContext.ZERO);
+    expect(Blend.One                    , WebGLRenderingContext.ONE);
+    expect(Blend.SourceColor            , WebGLRenderingContext.SRC_COLOR);
+    expect(Blend.InverseSourceColor     , WebGLRenderingContext.ONE_MINUS_SRC_COLOR);
+    expect(Blend.SourceAlpha            , WebGLRenderingContext.SRC_ALPHA);
+    expect(Blend.InverseSourceAlpha     , WebGLRenderingContext.ONE_MINUS_SRC_ALPHA);
+    expect(Blend.DestinationAlpha       , WebGLRenderingContext.DST_ALPHA);
+    expect(Blend.InverseDestinationAlpha, WebGLRenderingContext.ONE_MINUS_DST_ALPHA);
+    expect(Blend.DestinationColor       , WebGLRenderingContext.DST_COLOR);
+    expect(Blend.InverseDestinationColor, WebGLRenderingContext.ONE_MINUS_DST_COLOR);
+    expect(Blend.SourceAlphaSaturation  , WebGLRenderingContext.SRC_ALPHA_SATURATE);
+    expect(Blend.BlendFactor            , WebGLRenderingContext.CONSTANT_COLOR);
+    expect(Blend.InverseBlendFactor     , WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR);
+  });
+
   test('stringify', () {
     expect(Blend.stringify(Blend.Zero)                   , Blend.ZeroName);
     expect(Blend.stringify(Blend.One)                    , Blend.OneName);
@@ -41,6 +58,8 @@ void main() {
     expect(Blend.stringify(Blend.SourceAlphaSaturation)  , Blend.SourceAlphaSaturationName);
     expect(Blend.stringify(Blend.BlendFactor)            , Blend.BlendFactorName);
     expect(Blend.stringify(Blend.InverseBlendFactor)     , Blend.InverseBlendFactorName);
+
+    expect(() { Blend.stringify(-1); }, throws);
   });
 
   test('parse', () {
@@ -57,6 +76,8 @@ void main() {
     expect(Blend.parse(Blend.SourceAlphaSaturationName)  , Blend.SourceAlphaSaturation);
     expect(Blend.parse(Blend.BlendFactorName)            , Blend.BlendFactor);
     expect(Blend.parse(Blend.InverseBlendFactorName)     , Blend.InverseBlendFactor);
+
+    expect(() { Blend.parse('NotValid'); }, throws);
   });
 
   test('isValid', () {
@@ -75,5 +96,25 @@ void main() {
     expect(Blend.isValid(Blend.InverseBlendFactor)     , true);
 
     expect(Blend.isValid(-1), false);
+  });
+
+  test('mappings', () {
+    Map values = Blend.mappings;
+
+    expect(values[Blend.ZeroName]                   , Blend.Zero);
+    expect(values[Blend.OneName]                    , Blend.One);
+    expect(values[Blend.SourceColorName]            , Blend.SourceColor);
+    expect(values[Blend.InverseSourceColorName]     , Blend.InverseSourceColor);
+    expect(values[Blend.SourceAlphaName]            , Blend.SourceAlpha);
+    expect(values[Blend.InverseSourceAlphaName]     , Blend.InverseSourceAlpha);
+    expect(values[Blend.DestinationAlphaName]       , Blend.DestinationAlpha);
+    expect(values[Blend.InverseDestinationAlphaName], Blend.InverseDestinationAlpha);
+    expect(values[Blend.DestinationColorName]       , Blend.DestinationColor);
+    expect(values[Blend.InverseDestinationColorName], Blend.InverseDestinationColor);
+    expect(values[Blend.SourceAlphaSaturationName]  , Blend.SourceAlphaSaturation);
+    expect(values[Blend.BlendFactorName]            , Blend.BlendFactor);
+    expect(values[Blend.InverseBlendFactorName]     , Blend.InverseBlendFactor);
+
+    expect(values.length, 13);
   });
 }

@@ -46,7 +46,7 @@ void testBlendSetter(String testName, dynamic function) {
     expect(function(blendState, Blend.InverseBlendFactor)     , Blend.InverseBlendFactor);
 
     // Should throw
-    //expectThrow(function(blendState, -1));
+    expect(() { function(blendState, -1); }, throwsArgumentError);
   });
 }
 
@@ -60,7 +60,7 @@ void testBlendOperationSetter(String testName, dynamic function) {
     expect(function(blendState, BlendOperation.Subtract)       , BlendOperation.Subtract);
 
     // Should throw
-    //expectThrow(function(blendState, -1));
+    expect(() { function(blendState, -1); }, throwsArgumentError);
   });
 }
 
