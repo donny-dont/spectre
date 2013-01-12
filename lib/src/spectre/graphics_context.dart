@@ -391,19 +391,22 @@ class GraphicsContext {
       }
 
       // Modify the blend factor if necessary
-      vec4 blendFactor = blendState.blendFactor;
-
-      if ((_blendStateRedBlendFactor   != blendFactor.r) ||
-          (_blendStateGreenBlendFactor != blendFactor.g) ||
-          (_blendStateBlueBlendFactor  != blendFactor.b) ||
-          (_blendStateAlphaBlendFactor != blendFactor.a))
+      if ((_blendStateRedBlendFactor   != blendState.blendFactorRed)   ||
+          (_blendStateGreenBlendFactor != blendState.blendFactorGreen) ||
+          (_blendStateBlueBlendFactor  != blendState.blendFactorBlue)  ||
+          (_blendStateAlphaBlendFactor != blendState.blendFactorAlpha))
       {
-        device.gl.blendColor(blendFactor.r, blendFactor.g, blendFactor.b, blendFactor.a);
+        device.gl.blendColor(
+          blendState.blendFactorRed,
+          blendState.blendFactorGreen,
+          blendState.blendFactorBlue,
+          blendState.blendFactorAlpha
+        );
 
-        _blendStateRedBlendFactor   = blendFactor.r;
-        _blendStateGreenBlendFactor = blendFactor.g;
-        _blendStateBlueBlendFactor  = blendFactor.b;
-        _blendStateAlphaBlendFactor = blendFactor.a;
+        _blendStateRedBlendFactor   = blendState.blendFactorRed;
+        _blendStateGreenBlendFactor = blendState.blendFactorGreen;
+        _blendStateBlueBlendFactor  = blendState.blendFactorBlue;
+        _blendStateAlphaBlendFactor = blendState.blendFactorAlpha;
       }
     }
   }
