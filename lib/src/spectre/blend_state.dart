@@ -37,6 +37,14 @@ class BlendState extends DeviceChild {
   static const String blendEnabledName = 'enabled';
   /// Serialization name for [blendFactor].
   static const String blendFactorName = 'blendFactor';
+  /// Serialization name for [blendFactorRed].
+  static const String blendFactorRedName = 'blendFactorRed';
+  /// Serialization name for [blendFactorGreen].
+  static const String blendFactorGreenName = 'blendFactorGreen';
+  /// Serialization name for [blendFactorBlue].
+  static const String blendFactorBlueName = 'blendFactorBlue';
+  /// Serialization name for [blendFactorAlpha].
+  static const String blendFactorAlphaName = 'blendFactorAlpha';
   /// Serialization name for [alphaBlendOperation].
   static const String alphaBlendOperationName = 'alphaBlendOperation';
   /// Serialization name for [alphaDestinationBlend].
@@ -69,6 +77,15 @@ class BlendState extends DeviceChild {
 
   /// The four-component (RGBA) blend factor for alpha blending.
   vec4 _blendFactor;
+
+  /// The red component of the blend factor for alpha blending.
+  double _blendFactorRed;
+  /// The green component of the blend factor for alpha blending.
+  double _blendFactorGreen;
+  /// The blue component of the blend factor for alpha blending.
+  double _blendFactorBlue;
+  /// The alpha component of the blend factor for alpha blending.
+  double _blendFactorAlpha;
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
@@ -130,9 +147,21 @@ class BlendState extends DeviceChild {
   bool get enabled => _enabled;
   set enabled(bool value) { _enabled = value; }
 
-  /// The four-component (RGBA) blend factor for alpha blending
-  vec4 get blendFactor => _blendFactor;
-  set blendFactor(vec4 value) { _blendFactor = value; }
+  /// The red component of the blend factor for alpha blending.
+  double get blendFactorRed => _blendFactorRed;
+  set blendFactorRed(double value) { _blendFactorRed = value; }
+
+  /// The green component of the blend factor for alpha blending.
+  double get blendFactorGreen => _blendFactorGreen;
+  set blendFactorGreen(double value) { _blendFactorGreen = value; }
+
+  /// The blue component of the blend factor for alpha blending.
+  double get blendFactorBlue => _blendFactorBlue;
+  set blendFactorBlue(double value) { _blendFactorBlue = value; }
+
+  /// The alpha component of the blend factor for alpha blending.
+  double get blendFactorAlpha => _blendFactorAlpha;
+  set blendFactorAlpha(double value) { _blendFactorAlpha = value; }
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
@@ -220,6 +249,7 @@ class BlendState extends DeviceChild {
   // Equality
   //---------------------------------------------------------------------
 
+  /// Compares two [BlendState]s for equality.
   bool operator== (BlendState other) {
     if (identical(this, other)) {
       return true;
@@ -273,6 +303,11 @@ class BlendState extends DeviceChild {
 
     json[blendEnabledName] = _enabled;
 
+    json[blendFactorRedName]   = _blendFactorRed;
+    json[blendFactorGreenName] = _blendFactorGreen;
+    json[blendFactorBlueName]  = _blendFactorBlue;
+    json[blendFactorAlphaName] = _blendFactorAlpha;
+
     json[alphaBlendOperationName]   = BlendOperation.stringify(_alphaBlendOperation);
     json[alphaDestinationBlendName] = Blend.stringify(_alphaDestinationBlend);
     json[alphaSourceBlendName]      = Blend.stringify(_alphaSourceBlend);
@@ -280,14 +315,6 @@ class BlendState extends DeviceChild {
     json[colorBlendOperationName]   = BlendOperation.stringify(_colorBlendOperation);
     json[colorDestinationBlendName] = Blend.stringify(_colorDestinationBlend);
     json[colorSourceBlendName]      = Blend.stringify(_colorSourceBlend);
-
-    Map blendFactorJson = new Map();
-    blendFactorJson['r'] = _blendFactor.r;
-    blendFactorJson['g'] = _blendFactor.g;
-    blendFactorJson['b'] = _blendFactor.b;
-    blendFactorJson['a'] = _blendFactor.a;
-
-    json[blendFactorName] = blendFactorJson;
 
     json[writeRenderTargetRedName]   = _writeRenderTargetRed;
     json[writeRenderTargetGreenName] = _writeRenderTargetGreen;
@@ -306,6 +333,15 @@ class BlendState extends DeviceChild {
     value = values[blendEnabledName];
     _enabled = (value != null) ? value : _enabled;
 
+    value = values[blendFactorRedName];
+    _blendFactorRed = (value != null) ? value : _blendFactorRed;
+    value = values[blendFactorGreenName];
+    _blendFactorGreen = (value != null) ? value : _blendFactorGreen;
+    value = values[blendFactorBlueName];
+    _blendFactorBlue = (value != null) ? value : _blendFactorBlue;
+    value = values[blendFactorAlphaName];
+    _blendFactorAlpha = (value != null) ? value : _blendFactorAlpha;
+
     value = values[alphaBlendOperationName];
     _alphaBlendOperation = (value != null) ? BlendOperation.parse(value) : _alphaBlendOperation;
     value = values[alphaDestinationBlendName];
@@ -319,22 +355,6 @@ class BlendState extends DeviceChild {
     _colorDestinationBlend = (value != null) ? Blend.parse(value) : _colorDestinationBlend;
     value = values[colorSourceBlendName];
     _colorSourceBlend = (value != null) ? Blend.parse(value) : _colorSourceBlend;
-
-    dynamic blendFactorJson = values[blendFactorName];
-
-    if (blendFactorJson != null) {
-      value = blendFactorJson['r'];
-      _blendFactor.r = (value != null) ? value : 0.0;
-
-      value = blendFactorJson['g'];
-      _blendFactor.g = (value != null) ? value : 0.0;
-
-      value = blendFactorJson['b'];
-      _blendFactor.b = (value != null) ? value : 0.0;
-
-      value = blendFactorJson['a'];
-      _blendFactor.a = (value != null) ? value : 0.0;
-    }
 
     value = values[writeRenderTargetRedName];
     _writeRenderTargetRed = (value != null) ? value : _writeRenderTargetRed;

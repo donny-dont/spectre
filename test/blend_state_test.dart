@@ -115,10 +115,10 @@ void main() {
     copy.colorBlendOperation = BlendOperation.ReverseSubtract;
     copy.colorDestinationBlend = Blend.InverseBlendFactor;
     copy.colorSourceBlend = Blend.InverseBlendFactor;
-    copy.blendFactor.r = 0.0;
-    copy.blendFactor.g = 0.0;
-    copy.blendFactor.b = 0.0;
-    copy.blendFactor.a = 0.0;
+    copy.blendFactorRed   = 0.0;
+    copy.blendFactorGreen = 0.0;
+    copy.blendFactorBlue  = 0.0;
+    copy.blendFactorAlpha = 0.0;
     copy.writeRenderTargetRed   = false;
     copy.writeRenderTargetGreen = false;
     copy.writeRenderTargetBlue  = false;
