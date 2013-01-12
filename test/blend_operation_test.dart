@@ -39,7 +39,7 @@ void main() {
     expect(BlendOperation.stringify(BlendOperation.ReverseSubtract), BlendOperation.ReverseSubtractName);
     expect(BlendOperation.stringify(BlendOperation.Subtract)       , BlendOperation.SubtractName);
 
-    expect(() { BlendOperation.stringify(-1); }, throws);
+    expect(() { BlendOperation.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
@@ -47,7 +47,7 @@ void main() {
     expect(BlendOperation.parse(BlendOperation.ReverseSubtractName), BlendOperation.ReverseSubtract);
     expect(BlendOperation.parse(BlendOperation.SubtractName)       , BlendOperation.Subtract);
 
-    expect(() { BlendOperation.parse('NotValid'); }, throws);
+    expect(() { BlendOperation.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('isValid', () {

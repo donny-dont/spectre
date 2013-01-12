@@ -59,7 +59,7 @@ void main() {
     expect(Blend.stringify(Blend.BlendFactor)            , Blend.BlendFactorName);
     expect(Blend.stringify(Blend.InverseBlendFactor)     , Blend.InverseBlendFactorName);
 
-    expect(() { Blend.stringify(-1); }, throws);
+    expect(() { Blend.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
@@ -77,7 +77,7 @@ void main() {
     expect(Blend.parse(Blend.BlendFactorName)            , Blend.BlendFactor);
     expect(Blend.parse(Blend.InverseBlendFactorName)     , Blend.InverseBlendFactor);
 
-    expect(() { Blend.parse('NotValid'); }, throws);
+    expect(() { Blend.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('isValid', () {
