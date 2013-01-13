@@ -73,67 +73,48 @@ class BlendState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Whether blending operations are enabled. Disabled by default.
-  bool _enabled;
+  bool _enabled = false;
 
   /// The red component of the blend factor for alpha blending.
-  double _blendFactorRed;
+  double _blendFactorRed = 1.0;
   /// The green component of the blend factor for alpha blending.
-  double _blendFactorGreen;
+  double _blendFactorGreen = 1.0;
   /// The blue component of the blend factor for alpha blending.
-  double _blendFactorBlue;
+  double _blendFactorBlue = 1.0;
   /// The alpha component of the blend factor for alpha blending.
-  double _blendFactorAlpha;
+  double _blendFactorAlpha = 1.0;
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
-  int _alphaBlendOperation;
+  int _alphaBlendOperation = BlendOperation.Add;
   /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
   /// The default is [Blend.One].
-  int _alphaDestinationBlend;
+  int _alphaDestinationBlend = Blend.One;
   /// The alpha blend factor.
   /// The default is [Blend.One].
-  int _alphaSourceBlend;
+  int _alphaSourceBlend = Blend.One;
   /// The arithmetic operation when blending color values.
   /// The default is [BlendFunction.Add].
-  int _colorBlendOperation;
+  int _colorBlendOperation = BlendOperation.Add;
   /// The blend factor for the destination color.
   /// The default is [Blend.One].
-  int _colorDestinationBlend;
+  int _colorDestinationBlend = Blend.One;
   /// The blend factor for the source color.
   /// The default is Blend.One.
-  int _colorSourceBlend;
+  int _colorSourceBlend = Blend.One;
 
   /// Whether the red channel is enabled for writing during color blending.
-  bool _writeRenderTargetRed;
+  bool _writeRenderTargetRed = true;
   /// Whether the green channel is enabled for writing during color blending.
-  bool _writeRenderTargetGreen;
+  bool _writeRenderTargetGreen = true;
   /// Whether the blue channel is enabled for writing during color blending.
-  bool _writeRenderTargetBlue;
+  bool _writeRenderTargetBlue = true;
   /// Whether the alpha channel is enabled for writing during color blending.
-  bool _writeRenderTargetAlpha;
+  bool _writeRenderTargetAlpha = true;
 
   /// Creates an instance of the BlendState class with default values.
-  BlendState(String name, GraphicsDevice device) : super._internal(name, device) {
-    _enabled = false;
-
-    _blendFactorRed = 1.0;
-    _blendFactorGreen = 1.0;
-    _blendFactorBlue  = 1.0;
-    _blendFactorAlpha = 1.0;
-
-    _alphaBlendOperation = BlendOperation.Add;
-    _alphaDestinationBlend = Blend.One;
-    _alphaSourceBlend = Blend.One;
-
-    _colorBlendOperation = BlendOperation.Add;
-    _colorDestinationBlend = Blend.One;
-    _colorSourceBlend = Blend.One;
-
-    _writeRenderTargetRed = true;
-    _writeRenderTargetGreen = true;
-    _writeRenderTargetBlue = true;
-    _writeRenderTargetAlpha = true;
-  }
+  BlendState(String name, GraphicsDevice device)
+    : super._internal(name, device);
 
   void _createDeviceState() { }
   void _destroyDeviceState() {}
