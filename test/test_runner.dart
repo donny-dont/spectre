@@ -30,9 +30,8 @@ import 'graphics_context_test.dart' as graphics_context_test;
 void main() {
   useHtmlConfiguration();
 
-  //group('Blend tests', blend_test.main);
-  //group('BlendOperation tests', blend_operation_test.main);
-  //group('BlendState tests', blend_state_test.main);
-
+  group('Blend tests', blend_test.main);
+  group('BlendOperation tests', blend_operation_test.main);
+  group('BlendState tests', blend_state_test.main);
   group('GraphicsContext tests', graphics_context_test.main);
 }

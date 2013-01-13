@@ -307,7 +307,6 @@ void testBlendStateTransitions(MockWebGLRenderingContext gl, GraphicsContext gra
   graphicsContext.setBlendState(blendState);
 
   if (blendState.enabled) {
-    print(gl.log);
     gl.getLogs(callsTo('enable')).verify(happenedOnce);
     gl.getLogs(callsTo('blendFuncSeparate')).verify(happenedOnce);
     gl.getLogs(callsTo('blendEquationSeparate')).verify(happenedOnce);
@@ -342,9 +341,6 @@ void main() {
   GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
   test('construction', () {
-    LogEntryList logEntries = gl.log;
-    print(logEntries);
-
     // Make sure reset was called
     verifyBlendStateReset(gl);
   });
