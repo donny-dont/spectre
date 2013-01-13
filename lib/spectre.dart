@@ -35,6 +35,7 @@ part 'src/spectre/blend_state.dart';
 part 'src/spectre/buffer.dart';
 part 'src/spectre/camera.dart';
 part 'src/spectre/camera_controller.dart';
+part 'src/spectre/cull_mode.dart';
 part 'src/spectre/debug_draw_manager.dart';
 part 'src/spectre/depth_state.dart';
 part 'src/spectre/device_children.dart';
