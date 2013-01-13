@@ -112,12 +112,53 @@ class BlendState extends DeviceChild {
   /// Whether the alpha channel is enabled for writing during color blending.
   bool _writeRenderTargetAlpha = true;
 
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
   /// Creates an instance of the BlendState class with default values.
   BlendState(String name, GraphicsDevice device)
     : super._internal(name, device);
 
-  void _createDeviceState() { }
-  void _destroyDeviceState() {}
+  /// Initializes an instance of the BlendState class with settings for additive blend.
+  /// This adds the destination data to the source data without using alpha.
+  BlendState.additive(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _enabled = true
+    , _alphaDestinationBlend = Blend.One
+    , _alphaSourceBlend = Blend.SourceAlpha
+    , _colorDestinationBlend = Blend.One
+    , _colorSourceBlend = Blend.SourceAlpha;
+
+  /// Initializes an intance of the BlendState class with settings for alpha blend.
+  /// This blends the source and destination data using alpha.
+  BlendState.alphaBlend(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _enabled = true
+    , _alphaDestinationBlend = Blend.InverseSourceAlpha
+    , _alphaSourceBlend = Blend.One
+    , _colorDestinationBlend = Blend.InverseSourceAlpha
+    , _colorSourceBlend = Blend.One;
+
+  /// Initializes an instance of the BlendState class with settings for blending with non-premultipled alpha.
+  /// This blends source and destination data by using alpha while assuming the
+  /// color data contains no alpha information.
+  BlendState.nonPremultiplied(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _enabled = true
+    , _alphaDestinationBlend = Blend.InverseSourceAlpha
+    , _alphaSourceBlend = Blend.SourceAlpha
+    , _colorDestinationBlend = Blend.InverseSourceAlpha
+    , _colorSourceBlend = Blend.SourceAlpha;
+
+  /// Initializes an instance of the BlendState class with settings for opaque blend.
+  /// This overwrites the source with the destination data.
+  BlendState.opaque(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _alphaDestinationBlend = Blend.Zero
+    , _alphaSourceBlend = Blend.One
+    , _colorDestinationBlend = Blend.Zero
+    , _colorSourceBlend = Blend.One;
 
   //---------------------------------------------------------------------
   // Properties
@@ -378,5 +419,19 @@ class BlendState extends DeviceChild {
     _writeRenderTargetBlue = (value != null) ? value : _writeRenderTargetBlue;
     value = values[writeRenderTargetAlphaName];
     _writeRenderTargetAlpha = (value != null) ? value : _writeRenderTargetAlpha;
+  }
+
+  //---------------------------------------------------------------------
+  // Private methods
+  //---------------------------------------------------------------------
+
+  void _createDeviceState() {
+    // BlendState doesn't actually create resources on the graphics card
+    // Empty because there's nothing to create.
+  }
+
+  void _destroyDeviceState() {
+    // BlendState doesn't actually create resources on the graphics card
+    // Empty because there's nothing to destroy.
   }
 }

@@ -83,8 +83,52 @@ void testColorSetter(String testName, dynamic function) {
   });
 }
 
+void testConstructor(BlendState blendState, bool enabled, int alphaDestinationBlend, int alphaSourceBlend, int colorDestinationBlend, int colorSourceBlend) {
+  expect(blendState.enabled, enabled);
+
+  expect(blendState.blendFactorRed  , 1.0);
+  expect(blendState.blendFactorGreen, 1.0);
+  expect(blendState.blendFactorBlue , 1.0);
+  expect(blendState.blendFactorAlpha, 1.0);
+
+  expect(blendState.alphaBlendOperation  , BlendOperation.Add);
+  expect(blendState.alphaDestinationBlend, alphaDestinationBlend);
+  expect(blendState.alphaSourceBlend     , alphaSourceBlend);
+  expect(blendState.colorBlendOperation  , BlendOperation.Add);
+  expect(blendState.colorDestinationBlend, colorDestinationBlend);
+  expect(blendState.colorSourceBlend     , colorSourceBlend);
+
+  expect(blendState.writeRenderTargetRed  , true);
+  expect(blendState.writeRenderTargetGreen, true);
+  expect(blendState.writeRenderTargetBlue , true);
+  expect(blendState.writeRenderTargetAlpha, true);
+}
+
 void main() {
-  // Test enumeration setters
+  // Construction
+  test('construction', () {
+    // Default constructor
+    BlendState defaultState = new BlendState('BlendStateDefault', null);
+    testConstructor(defaultState, false, Blend.One, Blend.One, Blend.One, Blend.One);
+
+    // BlendState.additive
+    BlendState additive = new BlendState.additive('BlendStateAdditive', null);
+    testConstructor(additive, true, Blend.One, Blend.SourceAlpha, Blend.One, Blend.SourceAlpha);
+
+    // BlendState.alphaBlend
+    BlendState alphaBlend = new BlendState.alphaBlend('BlendStateAlphaBlend', null);
+    testConstructor(alphaBlend, true, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha, Blend.One);
+
+    // BlendState.nonPremultiplied
+    BlendState nonPremultiplied = new BlendState.nonPremultiplied('BlendStateNonPremultiplied', null);
+    testConstructor(nonPremultiplied, true, Blend.InverseSourceAlpha, Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.SourceAlpha);
+
+    // Blend.opaque
+    BlendState opaque = new BlendState.opaque('BlendStateOpaque', null);
+    testConstructor(opaque, false, Blend.Zero, Blend.One, Blend.Zero, Blend.One);
+  });
+
+  // Enumeration setters
   testBlendOperationSetter('alphaBlendOperation', (blendState, value) {
     blendState.alphaBlendOperation = value;
     return blendState.alphaBlendOperation;
@@ -115,7 +159,7 @@ void main() {
     return blendState.colorSourceBlend;
   });
 
-  // Test color setters
+  // Color setters
   testColorSetter('blendFactorRed', (blendState, value) {
     blendState.blendFactorRed = value;
     return blendState.blendFactorRed;
