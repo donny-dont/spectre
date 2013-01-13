@@ -25,6 +25,7 @@ import 'package:unittest/html_enhanced_config.dart';
 import 'blend_test.dart' as blend_test;
 import 'blend_operation_test.dart' as blend_operation_test;
 import 'blend_state_test.dart' as blend_state_test;
+import 'front_face_test.dart' as front_face_test;
 import 'graphics_context_test.dart' as graphics_context_test;
 
 void main() {
@@ -33,5 +34,6 @@ void main() {
   group('Blend tests', blend_test.main);
   group('BlendOperation tests', blend_operation_test.main);
   group('BlendState tests', blend_state_test.main);
+  group('FrontFace tests', front_face_test.main);
   group('GraphicsContext tests', graphics_context_test.main);
 }

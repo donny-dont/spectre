@@ -39,6 +39,7 @@ part 'src/spectre/debug_draw_manager.dart';
 part 'src/spectre/depth_state.dart';
 part 'src/spectre/device_children.dart';
 part 'src/spectre/fragment_shader.dart';
+part 'src/spectre/front_face.dart';
 part 'src/spectre/graphics_context.dart';
 part 'src/spectre/graphics_device.dart';
 part 'src/spectre/index_buffer.dart';
