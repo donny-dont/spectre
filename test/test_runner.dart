@@ -21,14 +21,14 @@
 */
 
 import 'package:unittest/unittest.dart';
-import 'package:unittest/html_config.dart';
+import 'package:unittest/html_enhanced_config.dart';
 import 'blend_test.dart' as blend_test;
 import 'blend_operation_test.dart' as blend_operation_test;
 import 'blend_state_test.dart' as blend_state_test;
 import 'graphics_context_test.dart' as graphics_context_test;
 
 void main() {
-  useHtmlConfiguration();
+  useHtmlEnhancedConfiguration();
 
   group('Blend tests', blend_test.main);
   group('BlendOperation tests', blend_operation_test.main);
