@@ -75,9 +75,6 @@ class BlendState extends DeviceChild {
   /// Whether blending operations are enabled. Disabled by default.
   bool _enabled;
 
-  /// The four-component (RGBA) blend factor for alpha blending.
-  vec4 _blendFactor;
-
   /// The red component of the blend factor for alpha blending.
   double _blendFactorRed;
   /// The green component of the blend factor for alpha blending.
@@ -118,7 +115,10 @@ class BlendState extends DeviceChild {
   BlendState(String name, GraphicsDevice device) : super._internal(name, device) {
     _enabled = false;
 
-    _blendFactor = new vec4.raw(1.0, 1.0, 1.0, 1.0);
+    _blendFactorRed = 1.0;
+    _blendFactorGreen = 1.0;
+    _blendFactorBlue  = 1.0;
+    _blendFactorAlpha = 1.0;
 
     _alphaBlendOperation = BlendOperation.Add;
     _alphaDestinationBlend = Blend.One;
@@ -259,10 +259,10 @@ class BlendState extends DeviceChild {
       return false;
     }
 
-    if ((_blendFactor.r != other._blendFactor.r) ||
-        (_blendFactor.g != other._blendFactor.g) ||
-        (_blendFactor.b != other._blendFactor.b) ||
-        (_blendFactor.a != other._blendFactor.a))
+    if ((_blendFactorRed   != other._blendFactorRed)   ||
+        (_blendFactorGreen != other._blendFactorGreen) ||
+        (_blendFactorBlue  != other._blendFactorBlue)  ||
+        (_blendFactorAlpha != other._blendFactorAlpha))
     {
       return false;
     }
