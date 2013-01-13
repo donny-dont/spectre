@@ -165,25 +165,4 @@ class Blend {
 
     return false;
   }
-
-  /// Gets a map containing a name value mapping of the [Blend] enumerations.
-  static Map<String, int> get mappings {
-    Map<String, int> map = new Map<String, int>();
-
-    map[ZeroName]                    = Zero;
-    map[OneName]                     = One;
-    map[SourceColorName]             = SourceColor;
-    map[InverseSourceColorName]      = InverseSourceColor;
-    map[SourceAlphaName]             = SourceAlpha;
-    map[InverseSourceAlphaName]      = InverseSourceAlpha;
-    map[DestinationAlphaName]        = DestinationAlpha;
-    map[InverseDestinationAlphaName] = InverseDestinationAlpha;
-    map[DestinationColorName]        = DestinationColor;
-    map[InverseDestinationColorName] = InverseDestinationColor;
-    map[SourceAlphaSaturationName]   = SourceAlphaSaturation;
-    map[BlendFactorName]             = BlendFactor;
-    map[InverseBlendFactorName]      = InverseBlendFactor;
-
-    return map;
-  }
 }

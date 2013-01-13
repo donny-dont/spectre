@@ -57,14 +57,4 @@ void main() {
 
     expect(BlendOperation.isValid(-1), false);
   });
-
-  test('mappings', () {
-    Map values = BlendOperation.mappings;
-
-    expect(values[BlendOperation.AddName]            , BlendOperation.Add);
-    expect(values[BlendOperation.ReverseSubtractName], BlendOperation.ReverseSubtract);
-    expect(values[BlendOperation.SubtractName]       , BlendOperation.Subtract);
-
-    expect(values.length, 3);
-  });
 }

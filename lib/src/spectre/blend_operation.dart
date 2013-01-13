@@ -84,15 +84,4 @@ class BlendOperation {
 
     return false;
   }
-
-  /// Gets a map containing a name value mapping of the [BlendOperation] enumerations.
-  static Map<String, int> get mappings {
-    Map<String, int> map = new Map<String, int>();
-
-    map[AddName] = Add;
-    map[ReverseSubtractName] = ReverseSubtract;
-    map[SubtractName] = Subtract;
-
-    return map;
-  }
 }

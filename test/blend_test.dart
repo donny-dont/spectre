@@ -97,24 +97,4 @@ void main() {
 
     expect(Blend.isValid(-1), false);
   });
-
-  test('mappings', () {
-    Map values = Blend.mappings;
-
-    expect(values[Blend.ZeroName]                   , Blend.Zero);
-    expect(values[Blend.OneName]                    , Blend.One);
-    expect(values[Blend.SourceColorName]            , Blend.SourceColor);
-    expect(values[Blend.InverseSourceColorName]     , Blend.InverseSourceColor);
-    expect(values[Blend.SourceAlphaName]            , Blend.SourceAlpha);
-    expect(values[Blend.InverseSourceAlphaName]     , Blend.InverseSourceAlpha);
-    expect(values[Blend.DestinationAlphaName]       , Blend.DestinationAlpha);
-    expect(values[Blend.InverseDestinationAlphaName], Blend.InverseDestinationAlpha);
-    expect(values[Blend.DestinationColorName]       , Blend.DestinationColor);
-    expect(values[Blend.InverseDestinationColorName], Blend.InverseDestinationColor);
-    expect(values[Blend.SourceAlphaSaturationName]  , Blend.SourceAlphaSaturation);
-    expect(values[Blend.BlendFactorName]            , Blend.BlendFactor);
-    expect(values[Blend.InverseBlendFactorName]     , Blend.InverseBlendFactor);
-
-    expect(values.length, 13);
-  });
 }
