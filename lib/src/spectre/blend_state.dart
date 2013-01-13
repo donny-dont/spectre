@@ -112,6 +112,7 @@ class BlendState extends DeviceChild {
   /// Whether the alpha channel is enabled for writing during color blending.
   bool _writeRenderTargetAlpha;
 
+  /// Creates an instance of the BlendState class with default values.
   BlendState(String name, GraphicsDevice device) : super._internal(name, device) {
     _enabled = false;
 
@@ -135,8 +136,6 @@ class BlendState extends DeviceChild {
   }
 
   void _createDeviceState() { }
-  // \todo Remove?
-  void _configDeviceState(Map props) { fromJson(props); }
   void _destroyDeviceState() {}
 
   //---------------------------------------------------------------------
@@ -148,23 +147,52 @@ class BlendState extends DeviceChild {
   set enabled(bool value) { _enabled = value; }
 
   /// The red component of the blend factor for alpha blending.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorRed => _blendFactorRed;
-  set blendFactorRed(double value) { _blendFactorRed = value; }
+  set blendFactorRed(double value) {
+    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+      throw new ArgumentError('blendFactorRed must be in the range [0, 1]');
+    }
+
+    _blendFactorRed = value;
+  }
 
   /// The green component of the blend factor for alpha blending.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorGreen => _blendFactorGreen;
-  set blendFactorGreen(double value) { _blendFactorGreen = value; }
+  set blendFactorGreen(double value) {
+    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
+    }
+
+    _blendFactorGreen = value;
+  }
 
   /// The blue component of the blend factor for alpha blending.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorBlue => _blendFactorBlue;
-  set blendFactorBlue(double value) { _blendFactorBlue = value; }
+  set blendFactorBlue(double value) {
+    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+      throw new ArgumentError('blendFactorBlue must be in the range [0, 1]');
+    }
+
+    _blendFactorBlue = value;
+  }
 
   /// The alpha component of the blend factor for alpha blending.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorAlpha => _blendFactorAlpha;
-  set blendFactorAlpha(double value) { _blendFactorAlpha = value; }
+  set blendFactorAlpha(double value) {
+    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+      throw new ArgumentError('blendFactorAlpha must be in the range [0, 1]');
+    }
+
+    _blendFactorAlpha = value;
+  }
 
   /// The arithmetic operation when blending alpha values.
   /// The default is [BlendFunction.Add].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [BlendOperation].
   int get alphaBlendOperation => _alphaBlendOperation;
   set alphaBlendOperation(int value) {
     if (!BlendOperation.isValid(value)) {
@@ -176,6 +204,7 @@ class BlendState extends DeviceChild {
 
   /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
   /// The default is [Blend.One].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [Blend].
   int get alphaDestinationBlend => _alphaDestinationBlend;
   set alphaDestinationBlend(int value) {
     if (!Blend.isValid(value)) {
@@ -187,6 +216,7 @@ class BlendState extends DeviceChild {
 
   /// The alpha blend factor.
   /// The default is [Blend.One].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [Blend].
   int get alphaSourceBlend => _alphaSourceBlend;
   set alphaSourceBlend(int value) {
     if (!Blend.isValid(value)) {
@@ -198,6 +228,7 @@ class BlendState extends DeviceChild {
 
   /// The arithmetic operation when blending color values.
   /// The default is [BlendFunction.Add].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [Blend].
   int get colorBlendOperation => _colorBlendOperation;
   set colorBlendOperation(int value) {
     if (!BlendOperation.isValid(value)) {
@@ -209,6 +240,7 @@ class BlendState extends DeviceChild {
 
   /// The blend factor for the destination color.
   /// The default is [Blend.One].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [Blend].
   int get colorDestinationBlend => _colorDestinationBlend;
   set colorDestinationBlend(int value) {
     if (!Blend.isValid(value)) {
@@ -220,6 +252,7 @@ class BlendState extends DeviceChild {
 
   /// The blend factor for the source color.
   /// The default is Blend.One.
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [Blend].
   int get colorSourceBlend => _colorSourceBlend;
   set colorSourceBlend(int value) {
     if (!Blend.isValid(value)) {

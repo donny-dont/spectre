@@ -64,8 +64,27 @@ void testBlendOperationSetter(String testName, dynamic function) {
   });
 }
 
+void testColorSetter(String testName, dynamic function) {
+  BlendState blendState = new BlendState('BlendStateTest', null);
+
+  test(testName, () {
+    expect(function(blendState, 0.0), 0.0);
+    expect(function(blendState, 0.5), 0.5);
+    expect(function(blendState, 1.0), 1.0);
+
+    expect(() { function(blendState, -0.00001); }, throwsArgumentError);
+    expect(() { function(blendState,  1.00001); }, throwsArgumentError);
+    expect(() { function(blendState, -1.00000); }, throwsArgumentError);
+    expect(() { function(blendState,  2.00000); }, throwsArgumentError);
+
+    expect(() { function(blendState, double.INFINITY); }         , throwsArgumentError);
+    expect(() { function(blendState, double.NEGATIVE_INFINITY); }, throwsArgumentError);
+    expect(() { function(blendState, double.NAN); }              , throwsArgumentError);
+  });
+}
+
 void main() {
-  // Test setters
+  // Test enumeration setters
   testBlendOperationSetter('alphaBlendOperation', (blendState, value) {
     blendState.alphaBlendOperation = value;
     return blendState.alphaBlendOperation;
@@ -94,6 +113,27 @@ void main() {
   testBlendSetter('colorSourceBlend', (blendState, value) {
     blendState.colorSourceBlend = value;
     return blendState.colorSourceBlend;
+  });
+
+  // Test color setters
+  testColorSetter('blendFactorRed', (blendState, value) {
+    blendState.blendFactorRed = value;
+    return blendState.blendFactorRed;
+  });
+
+  testColorSetter('blendFactorGreen', (blendState, value) {
+    blendState.blendFactorGreen = value;
+    return blendState.blendFactorGreen;
+  });
+
+  testColorSetter('blendFactorBlue', (blendState, value) {
+    blendState.blendFactorBlue = value;
+    return blendState.blendFactorBlue;
+  });
+
+  testColorSetter('blendFactorRed', (blendState, value) {
+    blendState.blendFactorAlpha = value;
+    return blendState.blendFactorAlpha;
   });
 
   // Equality
