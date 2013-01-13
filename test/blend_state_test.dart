@@ -109,7 +109,7 @@ void main() {
   test('construction', () {
     // Default constructor
     BlendState defaultState = new BlendState('BlendStateDefault', null);
-    testConstructor(defaultState, false, Blend.One, Blend.One, Blend.One, Blend.One);
+    testConstructor(defaultState, true, Blend.One, Blend.One, Blend.One, Blend.One);
 
     // BlendState.additive
     BlendState additive = new BlendState.additive('BlendStateAdditive', null);

@@ -72,8 +72,8 @@ class BlendState extends DeviceChild {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// Whether blending operations are enabled. Disabled by default.
-  bool _enabled = false;
+  /// Whether blending operations are enabled. Enabled by default.
+  bool _enabled = true;
 
   /// The red component of the blend factor for alpha blending.
   double _blendFactorRed = 1.0;
@@ -124,7 +124,6 @@ class BlendState extends DeviceChild {
   /// This adds the destination data to the source data without using alpha.
   BlendState.additive(String name, GraphicsDevice device)
     : super._internal(name, device)
-    , _enabled = true
     , _alphaDestinationBlend = Blend.One
     , _alphaSourceBlend = Blend.SourceAlpha
     , _colorDestinationBlend = Blend.One
@@ -134,7 +133,6 @@ class BlendState extends DeviceChild {
   /// This blends the source and destination data using alpha.
   BlendState.alphaBlend(String name, GraphicsDevice device)
     : super._internal(name, device)
-    , _enabled = true
     , _alphaDestinationBlend = Blend.InverseSourceAlpha
     , _alphaSourceBlend = Blend.One
     , _colorDestinationBlend = Blend.InverseSourceAlpha
@@ -145,7 +143,6 @@ class BlendState extends DeviceChild {
   /// color data contains no alpha information.
   BlendState.nonPremultiplied(String name, GraphicsDevice device)
     : super._internal(name, device)
-    , _enabled = true
     , _alphaDestinationBlend = Blend.InverseSourceAlpha
     , _alphaSourceBlend = Blend.SourceAlpha
     , _colorDestinationBlend = Blend.InverseSourceAlpha
@@ -155,6 +152,7 @@ class BlendState extends DeviceChild {
   /// This overwrites the source with the destination data.
   BlendState.opaque(String name, GraphicsDevice device)
     : super._internal(name, device)
+    , _enabled = false
     , _alphaDestinationBlend = Blend.Zero
     , _alphaSourceBlend = Blend.One
     , _colorDestinationBlend = Blend.Zero
