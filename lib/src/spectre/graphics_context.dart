@@ -51,39 +51,62 @@ class GraphicsContext {
   RenderTarget _renderTargetHandle;
 
   //---------------------------------------------------------------------
-  // BlendState variables
+  // Default variables
   //---------------------------------------------------------------------
 
-  /// Whether blending operations are enabled.
-  bool _blendStateEnabled;
-  /// Whether the red channel is enabled for writing during color blending.
-  bool _blendStateWriteRenderTargetRed;
-  /// Whether the green channel is enabled for writing during color blending.
-  bool _blendStateWriteRenderTargetGreen;
-  /// Whether the blue channel is enabled for writing during color blending.
-  bool _blendStateWriteRenderTargetBlue;
-  /// Whether the alpha channel is enabled for writing during color blending.
-  bool _blendStateWriteRenderTargetAlpha;
-  /// The blend factor for the destination alpha; the percentage of the destination alpha included in the result.
-  int _blendStateAlphaDestinationBlend;
-  /// The alpha blend factor.
-  int _blendStateAlphaSourceBlend;
-  /// The arithmetic operation when blending color values.
-  int _blendStateColorBlendOperation;
-  /// The blend factor for the destination color.
-  int _blendStateColorDestinationBlend;
-  /// The blend factor for the source color.
-  int _blendStateColorSourceBlend;
-  /// The arithmetic operation when blending alpha values.
-  int _blendStateAlphaBlendOperation;
-  /// The red component of the blend factor used for alpha blending.
-  double _blendStateRedBlendFactor;
-  /// The green component of the blend factor used for alpha blending.
-  double _blendStateGreenBlendFactor;
-  /// The blue component of the blend factor used for alpha blending.
-  double _blendStateBlueBlendFactor;
-  /// The alpha component of the blend factor used for alpha blending.
-  double _blendStateAlphaBlendFactor;
+  /// The default [BlendState] to use.
+  /// Constructed with the values in [BlendState.opaque].
+  BlendState _blendStateDefault;
+
+  //---------------------------------------------------------------------
+  // State variables
+  //---------------------------------------------------------------------
+
+  /// The current [BlendState] of the pipeline.
+  BlendState _blendState;
+
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  GraphicsContext(this.device) {
+    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
+    _samplerStateHandles = new List<SamplerState>(numTextures);
+    _textureHandles = new List<SpectreTexture>(numTextures);
+    _enabledVertexAttributeArrays = new List<int>();
+
+    _initializeState();
+    reset();
+  }
+
+  /// Initialize the WebGL pipeline state.
+  /// Creates all the default state values and applies them to the pipeline.
+  void _initializeState() {
+    // BlendState setup
+    _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
+    _blendState = new BlendState.opaque('CurrentBlendState', device);
+
+    device.gl.disable(WebGLRenderingContext.BLEND);
+    device.gl.blendFuncSeparate(
+      _blendState.colorSourceBlend,
+      _blendState.colorDestinationBlend,
+      _blendState.alphaSourceBlend,
+      _blendState.alphaDestinationBlend
+    );
+    device.gl.blendEquationSeparate(_blendState.colorBlendOperation, _blendState.alphaBlendOperation);
+    device.gl.colorMask(
+      _blendState.writeRenderTargetRed,
+      _blendState.writeRenderTargetGreen,
+      _blendState.writeRenderTargetBlue,
+      _blendState.writeRenderTargetAlpha
+    );
+    device.gl.blendColor(
+      _blendState.blendFactorRed,
+      _blendState.blendFactorGreen,
+      _blendState.blendFactorBlue,
+      _blendState.blendFactorAlpha
+    );
+  }
 
   void _PrepareTextures() {
   }
@@ -153,14 +176,6 @@ class GraphicsContext {
     }
   }
 
-  GraphicsContext(this.device) {
-    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
-    _samplerStateHandles = new List<SamplerState>(numTextures);
-    _textureHandles = new List<SpectreTexture>(numTextures);
-    _enabledVertexAttributeArrays = new List<int>();
-
-    reset();
-  }
 
   /// Resets the cached GPU pipeline state
   void reset() {
@@ -190,50 +205,7 @@ class GraphicsContext {
     _stencilStateHandle = null;
     _renderTargetHandle = null;
 
-    _resetBlendState();
-  }
-
-  /// Resets the [BlendState] within the pipeline.
-  void _resetBlendState() {
-    _blendStateEnabled = false;
-    device.gl.disable(WebGLRenderingContext.BLEND);
-
-    _blendStateAlphaDestinationBlend = Blend.One;
-    _blendStateAlphaSourceBlend      = Blend.One;
-    _blendStateColorDestinationBlend = Blend.One;
-    _blendStateColorSourceBlend      = Blend.One;
-    device.gl.blendFuncSeparate(
-      _blendStateColorSourceBlend,
-      _blendStateColorDestinationBlend,
-      _blendStateAlphaSourceBlend,
-      _blendStateAlphaDestinationBlend
-    );
-
-    _blendStateColorBlendOperation = BlendOperation.Add;
-    _blendStateAlphaBlendOperation = BlendOperation.Add;
-    device.gl.blendEquationSeparate(_blendStateColorBlendOperation, _blendStateAlphaBlendOperation);
-
-    _blendStateWriteRenderTargetRed   = true;
-    _blendStateWriteRenderTargetGreen = true;
-    _blendStateWriteRenderTargetBlue  = true;
-    _blendStateWriteRenderTargetAlpha = true;
-    device.gl.colorMask(
-      _blendStateWriteRenderTargetRed,
-      _blendStateWriteRenderTargetGreen,
-      _blendStateWriteRenderTargetBlue,
-      _blendStateWriteRenderTargetAlpha
-    );
-
-    _blendStateRedBlendFactor   = 1.0;
-    _blendStateGreenBlendFactor = 1.0;
-    _blendStateBlueBlendFactor  = 1.0;
-    _blendStateAlphaBlendFactor = 1.0;
-    device.gl.blendColor(
-      _blendStateRedBlendFactor,
-      _blendStateGreenBlendFactor,
-      _blendStateBlueBlendFactor,
-      _blendStateAlphaBlendFactor
-    );
+    setBlendState(_blendStateDefault);
   }
 
   /// Configure the primitive topology
@@ -325,26 +297,26 @@ class GraphicsContext {
   /// will be reset to their defaults.
   void setBlendState(BlendState blendState) {
     if (blendState == null) {
-      _resetBlendState();
+      setBlendState(_blendStateDefault);
       return;
     }
 
     // Disable/Enable blending if necessary
-    if (_blendStateEnabled != blendState.enabled) {
+    if (_blendState.enabled != blendState.enabled) {
       if (blendState.enabled) {
         device.gl.enable(WebGLRenderingContext.BLEND);
       } else {
         device.gl.disable(WebGLRenderingContext.BLEND);
       }
 
-      _blendStateEnabled = blendState.enabled;
+      _blendState.enabled = blendState.enabled;
     }
 
     // Modify the color write channels if necessary
-    if ((_blendStateWriteRenderTargetRed   != blendState.writeRenderTargetRed)   ||
-        (_blendStateWriteRenderTargetGreen != blendState.writeRenderTargetGreen) ||
-        (_blendStateWriteRenderTargetBlue  != blendState.writeRenderTargetBlue)  ||
-        (_blendStateWriteRenderTargetAlpha != blendState.writeRenderTargetAlpha))
+    if ((_blendState.writeRenderTargetRed   != blendState.writeRenderTargetRed)   ||
+        (_blendState.writeRenderTargetGreen != blendState.writeRenderTargetGreen) ||
+        (_blendState.writeRenderTargetBlue  != blendState.writeRenderTargetBlue)  ||
+        (_blendState.writeRenderTargetAlpha != blendState.writeRenderTargetAlpha))
     {
       device.gl.colorMask(
         blendState.writeRenderTargetRed,
@@ -353,19 +325,19 @@ class GraphicsContext {
         blendState.writeRenderTargetAlpha
       );
 
-      _blendStateWriteRenderTargetRed   = blendState.writeRenderTargetRed;
-      _blendStateWriteRenderTargetGreen = blendState.writeRenderTargetGreen;
-      _blendStateWriteRenderTargetBlue  = blendState.writeRenderTargetBlue;
-      _blendStateWriteRenderTargetAlpha = blendState.writeRenderTargetAlpha;
+      _blendState.writeRenderTargetRed   = blendState.writeRenderTargetRed;
+      _blendState.writeRenderTargetGreen = blendState.writeRenderTargetGreen;
+      _blendState.writeRenderTargetBlue  = blendState.writeRenderTargetBlue;
+      _blendState.writeRenderTargetAlpha = blendState.writeRenderTargetAlpha;
     }
 
     // If blending is enabled enable all the functionality
-    if (_blendStateEnabled) {
+    if (_blendState.enabled) {
       // Modify the blend functions if necessary
-      if ((_blendStateColorSourceBlend      != blendState.colorSourceBlend)      ||
-          (_blendStateColorDestinationBlend != blendState.colorDestinationBlend) ||
-          (_blendStateAlphaSourceBlend      != blendState.alphaSourceBlend)      ||
-          (_blendStateAlphaDestinationBlend != blendState.alphaDestinationBlend))
+      if ((_blendState.colorSourceBlend      != blendState.colorSourceBlend)      ||
+          (_blendState.colorDestinationBlend != blendState.colorDestinationBlend) ||
+          (_blendState.alphaSourceBlend      != blendState.alphaSourceBlend)      ||
+          (_blendState.alphaDestinationBlend != blendState.alphaDestinationBlend))
       {
         device.gl.blendFuncSeparate(
           blendState.colorSourceBlend,
@@ -374,27 +346,27 @@ class GraphicsContext {
           blendState.alphaDestinationBlend
         );
 
-        _blendStateColorSourceBlend      = blendState.colorSourceBlend;
-        _blendStateColorDestinationBlend = blendState.colorDestinationBlend;
-        _blendStateAlphaSourceBlend      = blendState.alphaSourceBlend;
-        _blendStateAlphaDestinationBlend = blendState.alphaDestinationBlend;
+        _blendState.colorSourceBlend      = blendState.colorSourceBlend;
+        _blendState.colorDestinationBlend = blendState.colorDestinationBlend;
+        _blendState.alphaSourceBlend      = blendState.alphaSourceBlend;
+        _blendState.alphaDestinationBlend = blendState.alphaDestinationBlend;
       }
 
       // Modify the blend operations if necessary
-      if ((_blendStateColorBlendOperation != blendState.colorBlendOperation) ||
-          (_blendStateAlphaBlendOperation != blendState.alphaBlendOperation))
+      if ((_blendState.colorBlendOperation != blendState.colorBlendOperation) ||
+          (_blendState.alphaBlendOperation != blendState.alphaBlendOperation))
       {
         device.gl.blendEquationSeparate(blendState.colorBlendOperation, blendState.alphaBlendOperation);
 
-        _blendStateColorBlendOperation = blendState.colorBlendOperation;
-        _blendStateAlphaBlendOperation = blendState.alphaBlendOperation;
+        _blendState.colorBlendOperation = blendState.colorBlendOperation;
+        _blendState.alphaBlendOperation = blendState.alphaBlendOperation;
       }
 
       // Modify the blend factor if necessary
-      if ((_blendStateRedBlendFactor   != blendState.blendFactorRed)   ||
-          (_blendStateGreenBlendFactor != blendState.blendFactorGreen) ||
-          (_blendStateBlueBlendFactor  != blendState.blendFactorBlue)  ||
-          (_blendStateAlphaBlendFactor != blendState.blendFactorAlpha))
+      if ((_blendState.blendFactorRed   != blendState.blendFactorRed)   ||
+          (_blendState.blendFactorGreen != blendState.blendFactorGreen) ||
+          (_blendState.blendFactorBlue  != blendState.blendFactorBlue)  ||
+          (_blendState.blendFactorAlpha != blendState.blendFactorAlpha))
       {
         device.gl.blendColor(
           blendState.blendFactorRed,
@@ -403,10 +375,10 @@ class GraphicsContext {
           blendState.blendFactorAlpha
         );
 
-        _blendStateRedBlendFactor   = blendState.blendFactorRed;
-        _blendStateGreenBlendFactor = blendState.blendFactorGreen;
-        _blendStateBlueBlendFactor  = blendState.blendFactorBlue;
-        _blendStateAlphaBlendFactor = blendState.blendFactorAlpha;
+        _blendState.blendFactorRed   = blendState.blendFactorRed;
+        _blendState.blendFactorGreen = blendState.blendFactorGreen;
+        _blendState.blendFactorBlue  = blendState.blendFactorBlue;
+        _blendState.blendFactorAlpha = blendState.blendFactorAlpha;
       }
     }
   }

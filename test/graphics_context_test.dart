@@ -54,13 +54,53 @@ void copyBlendState(BlendState original, BlendState copy) {
   copy.writeRenderTargetAlpha = original.writeRenderTargetAlpha;
 }
 
-void verifyBlendStateReset(MockWebGLRenderingContext gl) {
-  // Make sure _resetBlendState was called
-  gl.getLogs(callsTo('disable')).verify(happenedOnce);
-  gl.getLogs(callsTo('blendFuncSeparate')).verify(happenedOnce);
-  gl.getLogs(callsTo('blendEquationSeparate')).verify(happenedOnce);
-  gl.getLogs(callsTo('colorMask')).verify(happenedOnce);
-  gl.getLogs(callsTo('blendColor')).verify(happenedOnce);
+void verifyInitialBlendState(MockWebGLRenderingContext gl) {
+  LogEntryList logEntries;
+  List args;
+
+  BlendState blendState = new BlendState.opaque('InitialBlendState', null);
+
+  // Make sure BlendState.opaque was used
+  logEntries = gl.getLogs(callsTo('disable'));
+  logEntries.verify(happenedOnce);
+  expect(logEntries.first.args[0], WebGLRenderingContext.BLEND);
+
+  logEntries = gl.getLogs(callsTo('colorMask'));
+  logEntries.verify(happenedOnce);
+
+  args = logEntries.first.args;
+  expect(args[0], blendState.writeRenderTargetRed);
+  expect(args[1], blendState.writeRenderTargetGreen);
+  expect(args[2], blendState.writeRenderTargetBlue);
+  expect(args[3], blendState.writeRenderTargetAlpha);
+
+  logEntries = gl.getLogs(callsTo('blendFuncSeparate'));
+  logEntries.verify(happenedOnce);
+
+  args = logEntries.first.args;
+
+  expect(args[0], blendState.colorSourceBlend);
+  expect(args[1], blendState.colorDestinationBlend);
+  expect(args[2], blendState.alphaSourceBlend);
+  expect(args[3], blendState.alphaDestinationBlend);
+
+  logEntries = gl.getLogs(callsTo('blendEquationSeparate'));
+  logEntries.verify(happenedOnce);
+
+  args = logEntries.first.args;
+
+  expect(args[0], blendState.colorBlendOperation);
+  expect(args[1], blendState.alphaBlendOperation);
+
+  logEntries = gl.getLogs(callsTo('blendColor'));
+  logEntries.verify(happenedOnce);
+
+  args = logEntries.first.args;
+
+  expect(args[0], blendState.blendFactorRed);
+  expect(args[1], blendState.blendFactorGreen);
+  expect(args[2], blendState.blendFactorBlue);
+  expect(args[3], blendState.blendFactorAlpha);
 }
 
 int verifyBlendState(MockWebGLRenderingContext gl, BlendState blendState, BlendState blendStateLast, [bool copyState = true]) {
@@ -178,12 +218,14 @@ int verifyBlendState(MockWebGLRenderingContext gl, BlendState blendState, BlendS
   return numEntries;
 }
 
-void testBlendStateTransitions(MockWebGLRenderingContext gl, GraphicsContext graphicsContext, bool blendEnabled) {
-  gl.clearLogs();
+void testBlendStateTransitions(bool blendEnabled) {
+  MockWebGLRenderingContext gl = new MockWebGLRenderingContext();
+  MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
+  GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
   // Passing null will reset the values
   graphicsContext.setBlendState(null);
-  verifyBlendStateReset(gl);
+  verifyInitialBlendState(gl);
 
   gl.clearLogs();
 
@@ -324,10 +366,10 @@ void testBlendStateTransitions(MockWebGLRenderingContext gl, GraphicsContext gra
   expect(gl.log.logs.length, numEntries);
 }
 
-void testBlendState(MockWebGLRenderingContext gl, GraphicsContext graphicsContext) {
+void testBlendState() {
   test('setBlendState', () {
-    testBlendStateTransitions(gl, graphicsContext, true);
-    testBlendStateTransitions(gl, graphicsContext, false);
+    testBlendStateTransitions(true);
+    testBlendStateTransitions(false);
   });
 }
 
@@ -336,14 +378,14 @@ void testBlendState(MockWebGLRenderingContext gl, GraphicsContext graphicsContex
 //---------------------------------------------------------------------
 
 void main() {
-  MockWebGLRenderingContext gl = new MockWebGLRenderingContext();
-  MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
-  GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
-
   test('construction', () {
+    MockWebGLRenderingContext gl = new MockWebGLRenderingContext();
+    MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
+    GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
+
     // Make sure reset was called
-    verifyBlendStateReset(gl);
+    verifyInitialBlendState(gl);
   });
 
-  testBlendState(gl, graphicsContext);
+  testBlendState();
 }
