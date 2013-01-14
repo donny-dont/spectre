@@ -184,7 +184,66 @@ void main() {
     BlendState blendState0 = new BlendState('BlendState0', null);
     BlendState blendState1 = new BlendState('BlendState1', null);
 
+    // Check equality
+    expect(blendState0, blendState0);
     expect(blendState0, blendState1);
+
+    // Check inequality
+    blendState0.alphaBlendOperation = BlendOperation.ReverseSubtract;
+    expect(blendState0 == blendState1, false);
+    blendState1.alphaBlendOperation = blendState0.alphaBlendOperation;
+
+    blendState0.alphaDestinationBlend = Blend.BlendFactor;
+    expect(blendState0 == blendState1, false);
+    blendState1.alphaDestinationBlend = blendState0.alphaDestinationBlend;
+
+    blendState0.alphaSourceBlend = Blend.BlendFactor;
+    expect(blendState0 == blendState1, false);
+    blendState1.alphaSourceBlend = blendState0.alphaSourceBlend;
+
+    blendState0.colorBlendOperation = BlendOperation.ReverseSubtract;
+    expect(blendState0 == blendState1, false);
+    blendState1.colorBlendOperation = blendState0.colorBlendOperation;
+
+    blendState0.colorDestinationBlend = Blend.BlendFactor;
+    expect(blendState0 == blendState1, false);
+    blendState1.colorDestinationBlend = blendState0.colorDestinationBlend;
+
+    blendState0.colorSourceBlend = Blend.BlendFactor;
+    expect(blendState0 == blendState1, false);
+    blendState1.colorSourceBlend = blendState0.colorSourceBlend;
+
+    blendState0.blendFactorRed = 0.0;
+    expect(blendState0 == blendState1, false);
+    blendState1.blendFactorRed = blendState0.blendFactorRed;
+
+    blendState0.blendFactorGreen = 0.0;
+    expect(blendState0 == blendState1, false);
+    blendState1.blendFactorGreen = blendState0.blendFactorGreen;
+
+    blendState0.blendFactorBlue = 0.0;
+    expect(blendState0 == blendState1, false);
+    blendState1.blendFactorBlue = blendState0.blendFactorBlue;
+
+    blendState0.blendFactorAlpha = 0.0;
+    expect(blendState0 == blendState1, false);
+    blendState1.blendFactorAlpha = blendState0.blendFactorAlpha;
+
+    blendState0.writeRenderTargetRed = false;
+    expect(blendState0 == blendState1, false);
+    blendState1.writeRenderTargetRed = blendState0.writeRenderTargetRed;
+
+    blendState0.writeRenderTargetGreen = false;
+    expect(blendState0 == blendState1, false);
+    blendState1.writeRenderTargetGreen = blendState0.writeRenderTargetGreen;
+
+    blendState0.writeRenderTargetBlue = false;
+    expect(blendState0 == blendState1, false);
+    blendState1.writeRenderTargetBlue = blendState0.writeRenderTargetBlue;
+
+    blendState0.writeRenderTargetAlpha = false;
+    expect(blendState0 == blendState1, false);
+    blendState1.writeRenderTargetAlpha = blendState0.writeRenderTargetAlpha;
   });
 
   // Serialization
