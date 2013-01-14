@@ -122,6 +122,8 @@ class GraphicsContext {
 
     device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
     device.gl.polygonOffset(_rasterizerState.depthBias, _rasterizerState.slopeScaleDepthBias);
+
+    device.gl.disable(WebGLRenderingContext.SCISSOR_TEST);
   }
 
   void _PrepareTextures() {
@@ -465,6 +467,17 @@ class GraphicsContext {
       if (offsetEnabled) {
         device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
       }
+    }
+
+    // Disable/Enable scissor test if necessary
+    if (_rasterizerState.scissorTestEnabled != rasterizerState.scissorTestEnabled) {
+      if (rasterizerState.scissorTestEnabled) {
+        device.gl.enable(WebGLRenderingContext.SCISSOR_TEST);
+      } else {
+        device.gl.disable(WebGLRenderingContext.SCISSOR_TEST);
+      }
+
+      _rasterizerState.scissorTestEnabled = rasterizerState.scissorTestEnabled;
     }
   }
 
