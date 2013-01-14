@@ -170,44 +170,44 @@ class BlendState extends DeviceChild {
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorRed => _blendFactorRed;
   set blendFactorRed(double value) {
-    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _blendFactorRed = value;
+    } else {
       throw new ArgumentError('blendFactorRed must be in the range [0, 1]');
     }
-
-    _blendFactorRed = value;
   }
 
   /// The green component of the blend factor for alpha blending.
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorGreen => _blendFactorGreen;
   set blendFactorGreen(double value) {
-    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _blendFactorGreen = value;
+    } else {
       throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
     }
-
-    _blendFactorGreen = value;
   }
 
   /// The blue component of the blend factor for alpha blending.
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorBlue => _blendFactorBlue;
   set blendFactorBlue(double value) {
-    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
-      throw new ArgumentError('blendFactorBlue must be in the range [0, 1]');
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _blendFactorBlue = value;
+    } else {
+      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
     }
-
-    _blendFactorBlue = value;
   }
 
   /// The alpha component of the blend factor for alpha blending.
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get blendFactorAlpha => _blendFactorAlpha;
   set blendFactorAlpha(double value) {
-    if ((value < 0.0) || (value > 1.0) || (value.isNaN)) {
-      throw new ArgumentError('blendFactorAlpha must be in the range [0, 1]');
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _blendFactorAlpha = value;
+    } else {
+      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
     }
-
-    _blendFactorAlpha = value;
   }
 
   /// The arithmetic operation when blending alpha values.
