@@ -23,7 +23,6 @@ library blend_state_test;
 */
 
 import "package:unittest/unittest.dart";
-import 'package:unittest/html_config.dart';
 import "package:spectre/spectre.dart";
 
 void testBlendSetter(String testName, dynamic function) {
