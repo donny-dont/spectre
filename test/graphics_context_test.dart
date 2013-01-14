@@ -30,6 +30,18 @@ import 'dart:html';
 part 'mock_webgl_rendering_context.dart';
 
 //---------------------------------------------------------------------
+// GraphicsContext testing utility functions
+//---------------------------------------------------------------------
+
+void verifyInitialPipelineState(MockWebGLRenderingContext gl) {
+  verifyInitialBlendState(gl);
+  verifyInitialRasterizerState(gl);
+
+  // Number of GL calls in GraphicsContext._initializeState
+  expect(gl.log.logs.length, 11);
+}
+
+//---------------------------------------------------------------------
 // BlendState testing utility functions
 //---------------------------------------------------------------------
 
@@ -55,52 +67,48 @@ void copyBlendState(BlendState original, BlendState copy) {
 }
 
 void verifyInitialBlendState(MockWebGLRenderingContext gl) {
-  LogEntryList logEntries;
-  List args;
-
   BlendState blendState = new BlendState.opaque('InitialBlendState', null);
 
   // Make sure BlendState.opaque was used
-  logEntries = gl.getLogs(callsTo('disable'));
-  logEntries.verify(happenedOnce);
-  expect(logEntries.first.args[0], WebGLRenderingContext.BLEND);
+  gl.getLogs(callsTo('disable', WebGLRenderingContext.BLEND)).verify(happenedOnce);
 
-  logEntries = gl.getLogs(callsTo('colorMask'));
-  logEntries.verify(happenedOnce);
+  gl.getLogs(
+    callsTo(
+      'colorMask',
+      blendState.writeRenderTargetRed,
+      blendState.writeRenderTargetGreen,
+      blendState.writeRenderTargetBlue,
+      blendState.writeRenderTargetAlpha
+    )
+  ).verify(happenedOnce);
 
-  args = logEntries.first.args;
-  expect(args[0], blendState.writeRenderTargetRed);
-  expect(args[1], blendState.writeRenderTargetGreen);
-  expect(args[2], blendState.writeRenderTargetBlue);
-  expect(args[3], blendState.writeRenderTargetAlpha);
+  gl.getLogs(
+    callsTo(
+      'blendFuncSeparate',
+      blendState.colorSourceBlend,
+      blendState.colorDestinationBlend,
+      blendState.alphaSourceBlend,
+      blendState.alphaDestinationBlend
+    )
+  ).verify(happenedOnce);
 
-  logEntries = gl.getLogs(callsTo('blendFuncSeparate'));
-  logEntries.verify(happenedOnce);
+  gl.getLogs(
+    callsTo(
+      'blendEquationSeparate',
+      blendState.colorBlendOperation,
+      blendState.alphaBlendOperation
+    )
+  ).verify(happenedOnce);
 
-  args = logEntries.first.args;
-
-  expect(args[0], blendState.colorSourceBlend);
-  expect(args[1], blendState.colorDestinationBlend);
-  expect(args[2], blendState.alphaSourceBlend);
-  expect(args[3], blendState.alphaDestinationBlend);
-
-  logEntries = gl.getLogs(callsTo('blendEquationSeparate'));
-  logEntries.verify(happenedOnce);
-
-  args = logEntries.first.args;
-
-  expect(args[0], blendState.colorBlendOperation);
-  expect(args[1], blendState.alphaBlendOperation);
-
-  logEntries = gl.getLogs(callsTo('blendColor'));
-  logEntries.verify(happenedOnce);
-
-  args = logEntries.first.args;
-
-  expect(args[0], blendState.blendFactorRed);
-  expect(args[1], blendState.blendFactorGreen);
-  expect(args[2], blendState.blendFactorBlue);
-  expect(args[3], blendState.blendFactorAlpha);
+  gl.getLogs(
+    callsTo(
+      'blendColor',
+      blendState.blendFactorRed,
+      blendState.blendFactorGreen,
+      blendState.blendFactorBlue,
+      blendState.blendFactorAlpha
+    )
+  ).verify(happenedOnce);
 }
 
 int verifyBlendState(MockWebGLRenderingContext gl, BlendState blendState, BlendState blendStateLast, [bool copyState = true]) {
@@ -374,6 +382,35 @@ void testBlendState() {
 }
 
 //---------------------------------------------------------------------
+// RasterizerState testing utility functions
+//---------------------------------------------------------------------
+
+void copyRasterizerState(RasterizerState original, RasterizerState copy, [bool copyState]) {
+  copy.cullMode  = original.cullMode;
+  copy.frontFace = original.frontFace;
+
+  copy.depthBias           = original.depthBias;
+  copy.slopeScaleDepthBias = original.depthBias;
+
+  copy.scissorTestEnabled = original.scissorTestEnabled;
+}
+
+void verifyInitialRasterizerState(MockWebGLRenderingContext gl) {
+  RasterizerState rasterizerState = new RasterizerState.cullClockwise('InitialRasterizerState', null);
+
+  // Make sure RasterizerState.cullClockwise was used
+  gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
+
+  gl.getLogs(callsTo('cullFace', rasterizerState.cullMode)).verify(happenedOnce);
+  gl.getLogs(callsTo('frontFace', rasterizerState.frontFace)).verify(happenedOnce);
+
+  gl.getLogs(callsTo('disable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+  gl.getLogs(callsTo('polygonOffset', rasterizerState.depthBias, rasterizerState.slopeScaleDepthBias)).verify(happenedOnce);
+
+  gl.getLogs(callsTo('disable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+}
+
+//---------------------------------------------------------------------
 // Test entry point
 //---------------------------------------------------------------------
 
@@ -384,7 +421,7 @@ void main() {
     GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
     // Make sure reset was called
-    verifyInitialBlendState(gl);
+    verifyInitialPipelineState(gl);
   });
 
   testBlendState();

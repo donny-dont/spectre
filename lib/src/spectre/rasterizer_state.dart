@@ -26,36 +26,169 @@ part of spectre;
 /// Create using [Device.createRasterizerState]
 /// Set using [ImmediateContext.setRasterizerState]
 class RasterizerState extends DeviceChild {
-  static const int CullFront = WebGLRenderingContext.FRONT;
-  static const int CullBack = WebGLRenderingContext.BACK;
-  static const int CullFrontAndBack = WebGLRenderingContext.FRONT_AND_BACK;
-  static const int FrontCW = WebGLRenderingContext.CW;
-  static const int FrontCCW = WebGLRenderingContext.CCW;
 
-  bool cullEnabled;
-  int cullMode;
-  int cullFrontFace;
+  //---------------------------------------------------------------------
+  // Class variables
+  //
+  // These should go away once mirrors work for dart2js.
+  //---------------------------------------------------------------------
 
-  num lineWidth;
+  /// Serialization name for [cullMode].
+  static const String cullModeName = 'cullMode';
+  /// Serialization name for [frontFace].
+  static const String frontFaceName = 'frontFace';
+  /// Serialization name for [depthBias].
+  static const String depthBiasName = 'depthBias';
+  /// Serialization name for [slopeScaleDepthBias].
+  static const String slopeScaleDepthBiasName = 'slopeScaleDepthBias';
+  /// Serialization name for [scissorTestEnabled].
+  static const String scissorTestEnabledName = 'scissorTestEnabled';
 
-  RasterizerState(String name, GraphicsDevice device) : super._internal(name, device) {
-    cullEnabled = false;
-    cullMode = CullBack;
-    cullFrontFace = FrontCCW;
-    lineWidth = 1.0;
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+
+  /// Spcifies what triangles are culled based on its direction.
+  /// The default value is [CullMode.Back].
+  int _cullMode = CullMode.Back;
+  /// Specifies the winding of a front facing polygon.
+  /// The default value is [FrontFace.CounterClockwise].
+  int _frontFace = FrontFace.CounterClockwise;
+  /// The depth bias for polygons.
+  /// This is the amount of bias to apply to the depth of a primitive to alleviate depth testing
+  /// problems for primitives of similar depth.
+  /// The default value is 0.
+  double _depthBias = 0.0;
+  /// A bias value that takes into account the slope of a polygon.
+  /// This bias value is applied to coplanar primitives to reduce aliasing and other rendering
+  /// artifacts caused by z-fighting.
+  /// The default is 0.
+  double _slopeScaleDepthBias = 0.0;
+  /// Whether scissor testing is enabled.
+  /// ScissorTestEnable  Enables or disables scissor testing.
+  /// The default is false.
+  bool _scissorTestEnabled = false;
+
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  /// Creates a new instance of the [RasterizerState] class.
+  RasterizerState(String name, GraphicsDevice device)
+    : super._internal(name, device);
+
+  /// Initializes an instance of the [RasterizerState] class with settings for culling primitives with clockwise winding order.
+  /// The state object has the following settings.
+  ///     cullMode = CullMode.Back;
+  ///     frontFace = FrontFace.CounterClockwise;
+  RasterizerState.cullClockwise(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _cullMode = CullMode.Back
+    , _frontFace = FrontFace.CounterClockwise;
+
+  /// Initializes an instance of the [RasterizerState] class with settings for culling primitives with counter-clockwise winding order.
+  /// The state object has the following settings.
+  ///     cullMode = CullMode.Back;
+  ///     frontFace = Clockwise;
+  RasterizerState.cullCounterClockwise(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _cullMode = CullMode.Back
+    , _frontFace = FrontFace.Clockwise;
+
+  /// Initializes an instance of the [RasterizerState] class with settings for not culling any primitives.
+  /// The state object has the following settings.
+  ///     cullMode = CullMode.None;
+  ///     frontFace = FrontFace.CounterClockwise;
+  RasterizerState.cullNone(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _cullMode = CullMode.None
+    , _frontFace = FrontFace.CounterClockwise;
+
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// Spcifies what triangles are culled based on its direction.
+  /// The default value is [CullMode.Back].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [CullMode].
+  int get cullMode => _cullMode;
+  set cullMode(int value) {
+    if (!CullMode.isValid(value)) {
+      throw new ArgumentError('cullMode must be an enumeration within CullMode.');
+    }
+
+    _cullMode = value;
   }
 
-  dynamic filter(dynamic o) {
-    if (o is String) {
-      var table = {
-       "CullFront": WebGLRenderingContext.FRONT,
-       "CullBack": WebGLRenderingContext.BACK,
-       "CullFrontAndBack": WebGLRenderingContext.FRONT_AND_BACK,
-       "FrontCW": WebGLRenderingContext.CW,
-       "FrontCCW": WebGLRenderingContext.CCW,
-      };
-      return table[o];
+
+  /// Specifies the winding of a front facing polygon.
+  /// The default value is [FrontFace.CounterClockwise].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [FrontFace].
+  int get frontFace => _frontFace;
+  set frontFace(int value) {
+    if (!FrontFace.isValid(value)) {
+      throw new ArgumentError('frontFace must be an enumeration within FrontFace.');
     }
-    return o;
+
+    _frontFace = value;
+  }
+
+  /// The depth bias for polygons.
+  /// This is the amount of bias to apply to the depth of a primitive to alleviate depth testing
+  /// problems for primitives of similar depth.
+  /// The default value is 0.
+  double get depthBias => _depthBias;
+  set depthBias(double value) { _depthBias = value; }
+
+  /// A bias value that takes into account the slope of a polygon.
+  /// This bias value is applied to coplanar primitives to reduce aliasing and other rendering
+  /// artifacts caused by z-fighting.
+  /// The default is 0.
+  double get slopeScaleDepthBias => _slopeScaleDepthBias;
+  set slopeScaleDepthBias(double value) { _slopeScaleDepthBias = value; }
+
+  /// Whether scissor testing is enabled.
+  /// ScissorTestEnable  Enables or disables scissor testing.
+  /// The default is false.
+  bool get scissorTestEnabled => _scissorTestEnabled;
+  set scissorTestEnabled(bool value) { _scissorTestEnabled = value; }
+
+  //---------------------------------------------------------------------
+  // Serialization
+  //---------------------------------------------------------------------
+
+  /// Serializes the [RasterizerState] to a JSON.
+  Map toJson() {
+    Map json = new Map();
+
+    json[cullModeName]  = CullMode.stringify(_cullMode);
+    json[frontFaceName] = FrontFace.stringify(_frontFace);
+
+    json[depthBiasName]           = _depthBias;
+    json[slopeScaleDepthBiasName] = _slopeScaleDepthBias;
+
+    json[scissorTestEnabledName] = _scissorTestEnabled;
+
+    return json;
+  }
+
+  /// Deserializes the [RasterizerState] from a JSON.
+  void fromJson(Map values) {
+    assert(values != null);
+
+    dynamic value;
+
+    value = values[cullModeName];
+    _cullMode = (value != null) ? CullMode.parse(value) : _cullMode;
+    value = values[frontFaceName];
+    _frontFace = (value != null) ? FrontFace.parse(value): _frontFace;
+
+    value = values[depthBiasName];
+    _depthBias = (value != null) ? value : _depthBias;
+    value = values[slopeScaleDepthBiasName];
+    _slopeScaleDepthBias = (value != null) ? value : _slopeScaleDepthBias;
+
+    value = values[scissorTestEnabledName];
+    _scissorTestEnabled = (value != null) ? value : _scissorTestEnabled;
   }
 }
