@@ -172,9 +172,11 @@ class BlendState extends DeviceChild {
   set blendFactorRed(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
       _blendFactorRed = value;
-    } else {
-      throw new ArgumentError('blendFactorRed must be in the range [0, 1]');
+
+      return;
     }
+
+    throw new ArgumentError('blendFactorRed must be in the range [0, 1]');
   }
 
   /// The green component of the blend factor for alpha blending.
@@ -183,9 +185,10 @@ class BlendState extends DeviceChild {
   set blendFactorGreen(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
       _blendFactorGreen = value;
-    } else {
-      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
+      return;
     }
+
+    throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
   }
 
   /// The blue component of the blend factor for alpha blending.
@@ -194,9 +197,10 @@ class BlendState extends DeviceChild {
   set blendFactorBlue(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
       _blendFactorBlue = value;
-    } else {
-      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
+      return;
     }
+
+    throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
   }
 
   /// The alpha component of the blend factor for alpha blending.
@@ -205,9 +209,10 @@ class BlendState extends DeviceChild {
   set blendFactorAlpha(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
       _blendFactorAlpha = value;
-    } else {
-      throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
+      return;
     }
+
+    throw new ArgumentError('blendFactorGreen must be in the range [0, 1]');
   }
 
   /// The arithmetic operation when blending alpha values.
