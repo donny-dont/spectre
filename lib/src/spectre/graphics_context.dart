@@ -57,6 +57,9 @@ class GraphicsContext {
   /// The default [BlendState] to use.
   /// Constructed with the values in [BlendState.opaque].
   BlendState _blendStateDefault;
+  /// The default [RasterizerState] to use.
+  /// Constructed with the values in [RasterizerState.cullClockwise].
+  RasterizerState _rasterizerStateDefault;
 
   //---------------------------------------------------------------------
   // State variables
@@ -64,6 +67,8 @@ class GraphicsContext {
 
   /// The current [BlendState] of the pipeline.
   BlendState _blendState;
+  /// The current [RasterizerState] of the pipeline.
+  RasterizerState _rasterizerState;
 
   //---------------------------------------------------------------------
   // Construction
@@ -106,6 +111,17 @@ class GraphicsContext {
       _blendState.blendFactorBlue,
       _blendState.blendFactorAlpha
     );
+
+    // RasterizerState setup
+    _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
+    _rasterizerState = new RasterizerState.cullClockwise('CurrentRasterizerState', device);
+
+    device.gl.enable(WebGLRenderingContext.CULL_FACE);
+    device.gl.cullFace(_rasterizerState.cullMode);
+    device.gl.frontFace(_rasterizerState.frontFace);
+
+    device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+    device.gl.polygonOffset(_rasterizerState.depthBias, _rasterizerState.slopeScaleDepthBias);
   }
 
   void _PrepareTextures() {
@@ -259,25 +275,6 @@ class GraphicsContext {
     device.gl.useProgram(sp._program);
   }
 
-  /// Set RasterizerState to [rasterizerStateHandle]
-  void setRasterizerState(RasterizerState rasterizerStateHandle) {
-    if (_rasterizerStateHandle == rasterizerStateHandle) {
-      return;
-    }
-    _rasterizerStateHandle = rasterizerStateHandle;
-    RasterizerState rs = rasterizerStateHandle;
-    if (rs == null) {
-      return;
-    }
-    device.gl.lineWidth(rs.lineWidth);
-    if (rs.cullEnabled) {
-      device.gl.enable(WebGLRenderingContext.CULL_FACE);
-      device.gl.cullFace(rs.cullMode);
-      device.gl.frontFace(rs.cullFrontFace);
-    } else {
-      device.gl.disable(WebGLRenderingContext.CULL_FACE);
-    }
-  }
 
   /// Set Viewport to [viewportHandle]
   void setViewport(Viewport vp) {
@@ -406,6 +403,68 @@ class GraphicsContext {
     } else {
       device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
       device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
+    }
+  }
+
+  /// Sets the current [RasterizerState] to use on the pipeline.
+  ///
+  /// If [rasterizerState] is null all values of the pipeline associated with blending
+  /// will be reset to their defaults.
+  void setRasterizerState(RasterizerState rasterizerState) {
+    if (rasterizerState == null) {
+      setRasterizerState(_rasterizerStateDefault);
+    }
+
+    // Disable/Enable culling if necessary
+    if (_rasterizerState.cullMode != rasterizerState.cullMode) {
+      if (rasterizerState.cullMode == CullMode.None) {
+        device.gl.disable(WebGLRenderingContext.CULL_FACE);
+      } else {
+        device.gl.enable(WebGLRenderingContext.CULL_FACE);
+      }
+
+      _rasterizerState.cullMode = rasterizerState.cullMode;
+    }
+
+    // If culling is enabled enable culling mode and winding order
+    if (_rasterizerState.cullMode != CullMode.None) {
+      // Modify the cull mode if necessary
+      if (_rasterizerState.cullMode != rasterizerState.cullMode) {
+        device.gl.cullFace(rasterizerState.cullMode);
+
+        _rasterizerState.cullMode = rasterizerState.cullMode;
+      }
+
+      // Modify the front face if necessary
+      if (_rasterizerState.frontFace != rasterizerState.frontFace) {
+        device.gl.frontFace(rasterizerState.frontFace);
+
+        _rasterizerState.frontFace = rasterizerState.frontFace;
+      }
+    }
+
+    bool offsetEnabled = ((_rasterizerState.depthBias != 0.0) || (_rasterizerState.slopeScaleDepthBias != 0.0));
+
+    if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0)) {
+      // Enable polygon offset
+      if (!offsetEnabled) {
+        device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      }
+
+      // Modify the polygon offset if necessary
+      if ((_rasterizerState.depthBias           != rasterizerState.depthBias) ||
+          (_rasterizerState.slopeScaleDepthBias != rasterizerState.slopeScaleDepthBias))
+      {
+        device.gl.polygonOffset(rasterizerState.depthBias, rasterizerState.slopeScaleDepthBias);
+
+        _rasterizerState.depthBias           = rasterizerState.depthBias;
+        _rasterizerState.slopeScaleDepthBias = rasterizerState.slopeScaleDepthBias;
+      }
+    } else {
+      // Disable polygon offset
+      if (offsetEnabled) {
+        device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+      }
     }
   }
 
