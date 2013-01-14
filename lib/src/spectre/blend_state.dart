@@ -423,18 +423,4 @@ class BlendState extends DeviceChild {
     value = values[writeRenderTargetAlphaName];
     _writeRenderTargetAlpha = (value != null) ? value : _writeRenderTargetAlpha;
   }
-
-  //---------------------------------------------------------------------
-  // Private methods
-  //---------------------------------------------------------------------
-
-  void _createDeviceState() {
-    // BlendState doesn't actually create resources on the graphics card
-    // Empty because there's nothing to create.
-  }
-
-  void _destroyDeviceState() {
-    // BlendState doesn't actually create resources on the graphics card
-    // Empty because there's nothing to destroy.
-  }
 }
