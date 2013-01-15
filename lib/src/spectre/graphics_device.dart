@@ -395,11 +395,6 @@ class GraphicsDevice {
       return null;
     }
     tex._createDeviceState();
-    if (_fallbackTexture != null) {
-      // If the fallback texture is ready we mark all textures unready.
-      tex.ready = false;
-      tex.fallback = _fallbackTexture;
-    }
     return tex;
   }
 
