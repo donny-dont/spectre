@@ -410,7 +410,7 @@ class GraphicsContext {
 
   /// Sets the current [RasterizerState] to use on the pipeline.
   ///
-  /// If [rasterizerState] is null all values of the pipeline associated with blending
+  /// If [rasterizerState] is null all values of the pipeline associated with rasterization
   /// will be reset to their defaults.
   void setRasterizerState(RasterizerState rasterizerState) {
     if (rasterizerState == null) {
