@@ -26,6 +26,7 @@ library spectre;
 
 import 'dart:html';
 import 'dart:json';
+import 'package:meta/meta.dart';
 import 'package:vector_math/vector_math_browser.dart';
 import 'package:marker_prof/profiler.dart';
 import 'package:property_map/property_map.dart';
