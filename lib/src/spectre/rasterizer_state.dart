@@ -26,23 +26,20 @@ part of spectre;
 /// Create using [Device.createRasterizerState]
 /// Set using [ImmediateContext.setRasterizerState]
 class RasterizerState extends DeviceChild {
-
   //---------------------------------------------------------------------
-  // Class variables
-  //
-  // These should go away once mirrors work for dart2js.
+  // Serialization names
   //---------------------------------------------------------------------
 
   /// Serialization name for [cullMode].
-  static const String cullModeName = 'cullMode';
+  static const String _cullModeName = 'cullMode';
   /// Serialization name for [frontFace].
-  static const String frontFaceName = 'frontFace';
+  static const String _frontFaceName = 'frontFace';
   /// Serialization name for [depthBias].
-  static const String depthBiasName = 'depthBias';
+  static const String _depthBiasName = 'depthBias';
   /// Serialization name for [slopeScaleDepthBias].
-  static const String slopeScaleDepthBiasName = 'slopeScaleDepthBias';
+  static const String _slopeScaleDepthBiasName = 'slopeScaleDepthBias';
   /// Serialization name for [scissorTestEnabled].
-  static const String scissorTestEnabledName = 'scissorTestEnabled';
+  static const String _scissorTestEnabledName = 'scissorTestEnabled';
 
   //---------------------------------------------------------------------
   // Member variables
@@ -187,13 +184,13 @@ class RasterizerState extends DeviceChild {
   dynamic toJson() {
     Map json = new Map();
 
-    json[cullModeName]  = CullMode.stringify(_cullMode);
-    json[frontFaceName] = FrontFace.stringify(_frontFace);
+    json[_cullModeName]  = CullMode.stringify(_cullMode);
+    json[_frontFaceName] = FrontFace.stringify(_frontFace);
 
-    json[depthBiasName]           = _depthBias;
-    json[slopeScaleDepthBiasName] = _slopeScaleDepthBias;
+    json[_depthBiasName]           = _depthBias;
+    json[_slopeScaleDepthBiasName] = _slopeScaleDepthBias;
 
-    json[scissorTestEnabledName] = _scissorTestEnabled;
+    json[_scissorTestEnabledName] = _scissorTestEnabled;
 
     return json;
   }
@@ -205,17 +202,17 @@ class RasterizerState extends DeviceChild {
 
     dynamic value;
 
-    value = values[cullModeName];
+    value = values[_cullModeName];
     _cullMode = (value != null) ? CullMode.parse(value) : _cullMode;
-    value = values[frontFaceName];
+    value = values[_frontFaceName];
     _frontFace = (value != null) ? FrontFace.parse(value): _frontFace;
 
-    value = values[depthBiasName];
+    value = values[_depthBiasName];
     _depthBias = (value != null) ? value : _depthBias;
-    value = values[slopeScaleDepthBiasName];
+    value = values[_slopeScaleDepthBiasName];
     _slopeScaleDepthBias = (value != null) ? value : _slopeScaleDepthBias;
 
-    value = values[scissorTestEnabledName];
+    value = values[_scissorTestEnabledName];
     _scissorTestEnabled = (value != null) ? value : _scissorTestEnabled;
   }
 }
