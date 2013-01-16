@@ -24,50 +24,25 @@ part of spectre;
 
 /// A resource created by a device
 /// All resources have a [name]
-
-class DeviceChild implements Hashable {
-  static final int StatusDirty = 0x1;
-  static final int StatusReady = 0x2;
-
-  String name;
-  GraphicsDevice device;
-  int _status;
-  DeviceChild fallback;
-
+class DeviceChild implements Serializable {
+  final GraphicsDevice device;
+  final String name;
   String toString() => name;
 
-  void set dirty(bool r) {
-    if (r) {
-      _status |= StatusDirty;
-    } else {
-      _status &= ~StatusDirty;
-    }
-  }
-  bool get dirty => (_status & StatusDirty) != 0;
-  void set ready(bool r) {
-    if (r) {
-      _status |= StatusReady;
-    } else {
-      _status &= ~StatusReady;
-    }
-  }
-  bool get ready => (_status & StatusReady) != 0;
-
   DeviceChild._internal(this.name, this.device) {
-    _status = 0;
-    ready = true;
-    dirty = false;
   }
-
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  bool equals(DeviceChild b) => name == b.name && device == b.device;
 
   void _createDeviceState() {
   }
+
   void _destroyDeviceState() {
+  }
+
+  dynamic toJson() {
+    return '';
+  }
+
+  void fromJson(dynamic a) {
   }
 }
 

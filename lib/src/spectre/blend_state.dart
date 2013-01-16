@@ -353,7 +353,7 @@ class BlendState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Serializes the [BlendState] to a JSON.
-  Map toJson() {
+  dynamic toJson() {
     Map json = new Map();
 
     json[_blendEnabledName] = _enabled;

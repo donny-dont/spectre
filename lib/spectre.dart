@@ -28,6 +28,7 @@ import 'dart:html';
 import 'dart:json';
 import 'package:vector_math/vector_math_browser.dart';
 import 'package:marker_prof/profiler.dart';
+import 'package:property_map/property_map.dart';
 
 part 'src/spectre/blend.dart';
 part 'src/spectre/blend_operation.dart';

@@ -45,6 +45,7 @@ class _AssetImporterTex2D extends AssetImporter {
 
   void delete(dynamic imported) {
     assert(imported is Texture2D);
+    print('Deleting ${imported.name}');
     device.deleteDeviceChild(imported);
   }
 }
@@ -87,6 +88,7 @@ class _AssetImporterTexCube extends AssetImporter {
 
   void delete(dynamic imported) {
     assert(imported is TextureCube);
+    print('Deleting ${imported.name}');
     device.deleteDeviceChild(imported);
   }
 }

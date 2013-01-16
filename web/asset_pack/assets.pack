@@ -1,1 +1,79 @@
-[{"loadArguments":{},"name":"unitCube","url":"/mesh/unitCube.mesh","type":"mesh","importArguments":{}},{"loadArguments":{},"name":"positiveX","url":"/tex2d/positiveX.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"negativeY","url":"/tex2d/negativeY.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"skyBox","url":"/mesh/skyBox.mesh","type":"mesh","importArguments":{}},{"loadArguments":{},"name":"space","url":"/texCube/space.texCube","type":"texCube","importArguments":{}},{"loadArguments":{},"name":"positiveY","url":"/tex2d/positiveY.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"negativeZ","url":"/tex2d/negativeZ.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"positiveZ","url":"/tex2d/positiveZ.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"skyBoxFragmentShader","url":"/text/skyBoxFragmentShader.glsl","type":"text","importArguments":{}},{"loadArguments":{},"name":"negativeX","url":"/tex2d/negativeX.png","type":"tex2d","importArguments":{}},{"loadArguments":{},"name":"skyBoxVertexShader","url":"/text/skyBoxVertexShader.glsl","type":"text","importArguments":{}}]
+{
+  "unitCube" : {
+    "loadArguments" : {},
+    "name" : "unitCube",
+    "url" : "/mesh/unitCube.mesh",
+    "type" : "mesh",
+    "importArguments" : {}
+  },
+  "positiveX" : {
+    "loadArguments" : {},
+    "name" : "positiveX",
+    "url" : "/tex2d/positiveX.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  },
+  "negativeY" : {
+    "loadArguments" : {},
+    "name" : "negativeY",
+    "url" : "/tex2d/negativeY.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  },
+  "skyBoxFragmentShader" : {
+    "loadArguments" : {},
+    "name" : "skyBoxFragmentShader",
+    "url" : "/text/skyBoxFragmentShader.glsl",
+    "type" : "text",
+    "importArguments" : {}
+  },
+  "skyBox" : {
+    "loadArguments" : {},
+    "name" : "skyBox",
+    "url" : "/mesh/skyBox.mesh",
+    "type" : "mesh",
+    "importArguments" : {}
+  },
+  "space" : {
+    "loadArguments" : {},
+    "name" : "space",
+    "url" : "/texCube/space.texCube",
+    "type" : "texCube",
+    "importArguments" : {}
+  },
+  "positiveY" : {
+    "loadArguments" : {},
+    "name" : "positiveY",
+    "url" : "/tex2d/positiveY.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  },
+  "negativeZ" : {
+    "loadArguments" : {},
+    "name" : "negativeZ",
+    "url" : "/tex2d/negativeZ.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  },
+  "positiveZ" : {
+    "loadArguments" : {},
+    "name" : "positiveZ",
+    "url" : "/tex2d/positiveZ.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  },
+  "skyBoxVertexShader" : {
+    "loadArguments" : {},
+    "name" : "skyBoxVertexShader",
+    "url" : "/text/skyBoxVertexShader.glsl",
+    "type" : "text",
+    "importArguments" : {}
+  },
+  "negativeX" : {
+    "loadArguments" : {},
+    "name" : "negativeX",
+    "url" : "/tex2d/negativeX.png",
+    "type" : "tex2d",
+    "importArguments" : {}
+  }
+}

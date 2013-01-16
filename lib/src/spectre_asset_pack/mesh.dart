@@ -83,6 +83,7 @@ class _AssetImporterMesh extends AssetImporter {
     }
   }
   void delete(SpectreMesh imported) {
+    print('Deleting ${imported.name}');
     device.deleteDeviceChild(imported);
   }
 }

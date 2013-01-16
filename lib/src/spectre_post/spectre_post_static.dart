@@ -38,11 +38,11 @@ class SpectrePost {
       _rasterizerState.cullMode = CullMode.None;
       _depthState = _device.createDepthState('SpectrePost.DS');
       _blendState = _device.createBlendState('SpectrePost.PS');
-      _blendState.blendEnable = true;
-      _blendState.blendSourceColorFunc = BlendState.BlendSourceShaderAlpha;
-      _blendState.blendDestColorFunc = BlendState.BlendSourceShaderInverseAlpha;
-      _blendState.blendSourceAlphaFunc = BlendState.BlendSourceShaderAlpha;
-      _blendState.blendDestAlphaFunc = BlendState.BlendSourceShaderInverseAlpha;
+      _blendState.enabled = true;
+      _blendState.colorSourceBlend = Blend.SourceColor;
+      _blendState.colorDestinationBlend = Blend.InverseSourceAlpha;
+      _blendState.alphaSourceBlend = Blend.SourceAlpha;
+      _blendState.alphaDestinationBlend = Blend.InverseDestinationAlpha;
       _passes = new Map<String, SpectrePostPass>();
       _arrayMesh = _device.createSingleArrayMesh('SpectrePost.Mesh');
       const int numFloats = 6 * (3+2);

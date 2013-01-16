@@ -56,13 +56,12 @@ class SingleArrayMesh extends SpectreMesh {
   VertexBuffer get vertexArray => _deviceVertexBuffer;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
   }
 
 
   void _createDeviceState() {
     super._createDeviceState();
-    _deviceVertexBuffer._createDeviceState();
+    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
   }
 
 
@@ -84,27 +83,25 @@ class SingleArrayIndexedMesh extends SpectreMesh {
 
   SingleArrayIndexedMesh(String name, GraphicsDevice device)
       : super(name, device) {
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
   }
 
 
   void _createDeviceState() {
     super._createDeviceState();
-    _deviceVertexBuffer._createDeviceState();
-    _deviceIndexBuffer._createDeviceState();
+    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
+    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
   }
 
 
   void _destroyDeviceState() {
     if (_deviceVertexBuffer != null) {
-      _deviceVertexBuffer._destroyDeviceState();
+      device.deleteDeviceChild(_deviceVertexBuffer);
+      _deviceVertexBuffer = null;
     }
     if (_deviceIndexBuffer != null) {
-      _deviceIndexBuffer._destroyDeviceState();
+      device.deleteDeviceChild(_deviceIndexBuffer);
+      _deviceIndexBuffer = null;
     }
-    _deviceVertexBuffer = null;
-    _deviceIndexBuffer = null;
     count = 0;
     super._destroyDeviceState();
   }
