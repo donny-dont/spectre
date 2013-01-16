@@ -179,7 +179,6 @@ class RasterizerState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Serializes the [RasterizerState] to a JSON.
-  @override
   dynamic toJson() {
     Map json = new Map();
 
@@ -195,7 +194,6 @@ class RasterizerState extends DeviceChild {
   }
 
   /// Deserializes the [RasterizerState] from a JSON.
-  @override
   void fromJson(dynamic values) {
     assert(values != null);
 
