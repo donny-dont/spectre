@@ -26,47 +26,44 @@ part of spectre;
 /// Create using [Device.createBlendState]
 /// Set using [ImmediateContext.setBlendState]
 class BlendState extends DeviceChild {
-
   //---------------------------------------------------------------------
-  // Class variables
-  //
-  // These should go away once mirrors work for dart2js.
+  // Serialization names
   //---------------------------------------------------------------------
 
   /// Serialization name for [blendEnabled].
-  static const String blendEnabledName = 'enabled';
+  static const String _blendEnabledName = 'enabled';
   /// Serialization name for [blendFactor].
-  static const String blendFactorName = 'blendFactor';
+  static const String _blendFactorName = 'blendFactor';
   /// Serialization name for [blendFactorRed].
-  static const String blendFactorRedName = 'blendFactorRed';
+  static const String _blendFactorRedName = 'blendFactorRed';
   /// Serialization name for [blendFactorGreen].
-  static const String blendFactorGreenName = 'blendFactorGreen';
+  static const String _blendFactorGreenName = 'blendFactorGreen';
   /// Serialization name for [blendFactorBlue].
-  static const String blendFactorBlueName = 'blendFactorBlue';
+  static const String _blendFactorBlueName = 'blendFactorBlue';
   /// Serialization name for [blendFactorAlpha].
-  static const String blendFactorAlphaName = 'blendFactorAlpha';
+  static const String _blendFactorAlphaName = 'blendFactorAlpha';
   /// Serialization name for [alphaBlendOperation].
-  static const String alphaBlendOperationName = 'alphaBlendOperation';
+  static const String _alphaBlendOperationName = 'alphaBlendOperation';
   /// Serialization name for [alphaDestinationBlend].
-  static const String alphaDestinationBlendName = 'alphaDestination';
+  static const String _alphaDestinationBlendName = 'alphaDestination';
   /// Serialization name for [alphaSourceBlend].
-  static const String alphaSourceBlendName = 'alphaSourceBlend';
+  static const String _alphaSourceBlendName = 'alphaSourceBlend';
   /// Serialization name for [colorBlendOperation].
-  static const String colorBlendOperationName = 'colorBlendOperation';
+  static const String _colorBlendOperationName = 'colorBlendOperation';
   /// Serialization name for [colorDestinationBlend].
-  static const String colorDestinationBlendName = 'colorDestinationBlend';
+  static const String _colorDestinationBlendName = 'colorDestinationBlend';
   /// Serialization name for [colorSourceBlend].
-  static const String colorSourceBlendName = 'colorSourceBlend';
+  static const String _colorSourceBlendName = 'colorSourceBlend';
   /// Serialization name for [colorWriteChannels].
-  static const String colorWriteChannelsName = 'colorWriteChannels';
+  static const String _colorWriteChannelsName = 'colorWriteChannels';
   /// Serialization name for [writeRenderTargetRed].
-  static const String writeRenderTargetRedName = 'writeRenderTargetRed';
+  static const String _writeRenderTargetRedName = 'writeRenderTargetRed';
   /// Serialization name for [writeRenderTargetGreen].
-  static const String writeRenderTargetGreenName = 'writeRenderTargetGreen';
+  static const String _writeRenderTargetGreenName = 'writeRenderTargetGreen';
   /// Serialization name for [writeRenderTargetBlue].
-  static const String writeRenderTargetBlueName = 'writeRenderTargetBlue';
+  static const String _writeRenderTargetBlueName = 'writeRenderTargetBlue';
   /// Serialization name for [writeRenderTargetAlpha].
-  static const String writeRenderTargetAlphaName = 'writeRenderTargetAlpha';
+  static const String _writeRenderTargetAlphaName = 'writeRenderTargetAlpha';
 
   //---------------------------------------------------------------------
   // Member variables
@@ -359,25 +356,25 @@ class BlendState extends DeviceChild {
   Map toJson() {
     Map json = new Map();
 
-    json[blendEnabledName] = _enabled;
+    json[_blendEnabledName] = _enabled;
 
-    json[blendFactorRedName]   = _blendFactorRed;
-    json[blendFactorGreenName] = _blendFactorGreen;
-    json[blendFactorBlueName]  = _blendFactorBlue;
-    json[blendFactorAlphaName] = _blendFactorAlpha;
+    json[_blendFactorRedName]   = _blendFactorRed;
+    json[_blendFactorGreenName] = _blendFactorGreen;
+    json[_blendFactorBlueName]  = _blendFactorBlue;
+    json[_blendFactorAlphaName] = _blendFactorAlpha;
 
-    json[alphaBlendOperationName]   = BlendOperation.stringify(_alphaBlendOperation);
-    json[alphaDestinationBlendName] = Blend.stringify(_alphaDestinationBlend);
-    json[alphaSourceBlendName]      = Blend.stringify(_alphaSourceBlend);
+    json[_alphaBlendOperationName]   = BlendOperation.stringify(_alphaBlendOperation);
+    json[_alphaDestinationBlendName] = Blend.stringify(_alphaDestinationBlend);
+    json[_alphaSourceBlendName]      = Blend.stringify(_alphaSourceBlend);
 
-    json[colorBlendOperationName]   = BlendOperation.stringify(_colorBlendOperation);
-    json[colorDestinationBlendName] = Blend.stringify(_colorDestinationBlend);
-    json[colorSourceBlendName]      = Blend.stringify(_colorSourceBlend);
+    json[_colorBlendOperationName]   = BlendOperation.stringify(_colorBlendOperation);
+    json[_colorDestinationBlendName] = Blend.stringify(_colorDestinationBlend);
+    json[_colorSourceBlendName]      = Blend.stringify(_colorSourceBlend);
 
-    json[writeRenderTargetRedName]   = _writeRenderTargetRed;
-    json[writeRenderTargetGreenName] = _writeRenderTargetGreen;
-    json[writeRenderTargetBlueName]  = _writeRenderTargetBlue;
-    json[writeRenderTargetAlphaName] = _writeRenderTargetAlpha;
+    json[_writeRenderTargetRedName]   = _writeRenderTargetRed;
+    json[_writeRenderTargetGreenName] = _writeRenderTargetGreen;
+    json[_writeRenderTargetBlueName]  = _writeRenderTargetBlue;
+    json[_writeRenderTargetAlphaName] = _writeRenderTargetAlpha;
 
     return json;
   }
@@ -388,39 +385,39 @@ class BlendState extends DeviceChild {
 
     dynamic value;
 
-    value = values[blendEnabledName];
+    value = values[_blendEnabledName];
     _enabled = (value != null) ? value : _enabled;
 
-    value = values[blendFactorRedName];
+    value = values[_blendFactorRedName];
     _blendFactorRed = (value != null) ? value : _blendFactorRed;
-    value = values[blendFactorGreenName];
+    value = values[_blendFactorGreenName];
     _blendFactorGreen = (value != null) ? value : _blendFactorGreen;
-    value = values[blendFactorBlueName];
+    value = values[_blendFactorBlueName];
     _blendFactorBlue = (value != null) ? value : _blendFactorBlue;
-    value = values[blendFactorAlphaName];
+    value = values[_blendFactorAlphaName];
     _blendFactorAlpha = (value != null) ? value : _blendFactorAlpha;
 
-    value = values[alphaBlendOperationName];
+    value = values[_alphaBlendOperationName];
     _alphaBlendOperation = (value != null) ? BlendOperation.parse(value) : _alphaBlendOperation;
-    value = values[alphaDestinationBlendName];
+    value = values[_alphaDestinationBlendName];
     _alphaDestinationBlend = (value != null) ? Blend.parse(value) : _alphaDestinationBlend;
-    value = values[alphaSourceBlendName];
+    value = values[_alphaSourceBlendName];
     _alphaSourceBlend = (value != null) ? Blend.parse(value) : _alphaSourceBlend;
 
-    value = values[colorBlendOperationName];
+    value = values[_colorBlendOperationName];
     _colorBlendOperation = (value != null) ? BlendOperation.parse(value) : _colorBlendOperation;
-    value = values[colorDestinationBlendName];
+    value = values[_colorDestinationBlendName];
     _colorDestinationBlend = (value != null) ? Blend.parse(value) : _colorDestinationBlend;
-    value = values[colorSourceBlendName];
+    value = values[_colorSourceBlendName];
     _colorSourceBlend = (value != null) ? Blend.parse(value) : _colorSourceBlend;
 
-    value = values[writeRenderTargetRedName];
+    value = values[_writeRenderTargetRedName];
     _writeRenderTargetRed = (value != null) ? value : _writeRenderTargetRed;
-    value = values[writeRenderTargetGreenName];
+    value = values[_writeRenderTargetGreenName];
     _writeRenderTargetGreen = (value != null) ? value : _writeRenderTargetGreen;
-    value = values[writeRenderTargetBlueName];
+    value = values[_writeRenderTargetBlueName];
     _writeRenderTargetBlue = (value != null) ? value : _writeRenderTargetBlue;
-    value = values[writeRenderTargetAlphaName];
+    value = values[_writeRenderTargetAlphaName];
     _writeRenderTargetAlpha = (value != null) ? value : _writeRenderTargetAlpha;
   }
 }
