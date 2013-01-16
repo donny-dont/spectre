@@ -35,7 +35,7 @@ class SpectrePost {
     if (_device == null) {
       _device = device;
       _rasterizerState = _device.createRasterizerState('SpectrePost.RS');
-      _rasterizerState.cullEnabled = false;
+      _rasterizerState.cullMode = CullMode.None;
       _depthState = _device.createDepthState('SpectrePost.DS');
       _blendState = _device.createBlendState('SpectrePost.PS');
       _blendState.enabled = true;

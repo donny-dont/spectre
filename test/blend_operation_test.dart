@@ -23,7 +23,6 @@ library blend_operation_test;
 */
 
 import 'package:unittest/unittest.dart';
-import 'package:unittest/html_config.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
 

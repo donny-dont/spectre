@@ -226,8 +226,7 @@ class DebugDrawManager {
     _depthDisabled.depthWriteEnabled = false;
     _blend = device.createBlendState(_blendStateName);
     _rasterizer = device.createRasterizerState(_rasterizerStateName);
-    _rasterizer.cullEnabled = true;
-    _rasterizer.lineWidth = 1.0;
+    _rasterizer.cullMode = CullMode.Back;
     _lineVertexShader = device.createVertexShader(_lineVertexShaderName);
     _lineFragmentShader = device.createFragmentShader(_lineFragmentShaderName);
     _lineShaderProgram = device.createShaderProgram(_lineShaderProgramName);
