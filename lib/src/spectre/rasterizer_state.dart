@@ -117,7 +117,6 @@ class RasterizerState extends DeviceChild {
     _cullMode = value;
   }
 
-
   /// Specifies the winding of a front facing polygon.
   /// The default value is [FrontFace.CounterClockwise].
   /// Throws [ArgumentError] if the [value] is not an enumeration within [FrontFace].

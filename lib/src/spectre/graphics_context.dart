@@ -415,21 +415,22 @@ class GraphicsContext {
   void setRasterizerState(RasterizerState rasterizerState) {
     if (rasterizerState == null) {
       setRasterizerState(_rasterizerStateDefault);
+      return;
     }
 
     // Disable/Enable culling if necessary
     if (_rasterizerState.cullMode != rasterizerState.cullMode) {
       if (rasterizerState.cullMode == CullMode.None) {
         device.gl.disable(WebGLRenderingContext.CULL_FACE);
-      } else {
+
+        _rasterizerState.cullMode = rasterizerState.cullMode;
+      } else if (_rasterizerState.cullMode == CullMode.None) {
         device.gl.enable(WebGLRenderingContext.CULL_FACE);
       }
-
-      _rasterizerState.cullMode = rasterizerState.cullMode;
     }
 
     // If culling is enabled enable culling mode and winding order
-    if (_rasterizerState.cullMode != CullMode.None) {
+    if (rasterizerState.cullMode != CullMode.None) {
       // Modify the cull mode if necessary
       if (_rasterizerState.cullMode != rasterizerState.cullMode) {
         device.gl.cullFace(rasterizerState.cullMode);
@@ -466,6 +467,9 @@ class GraphicsContext {
       // Disable polygon offset
       if (offsetEnabled) {
         device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+
+        _rasterizerState.depthBias           = rasterizerState.depthBias;
+        _rasterizerState.slopeScaleDepthBias = rasterizerState.slopeScaleDepthBias;
       }
     }
 
