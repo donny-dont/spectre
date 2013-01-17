@@ -52,19 +52,19 @@ class CompareFunction {
   /// Always pass the test.
   static const int Always = WebGLRenderingContext.ALWAYS;
   /// Accept the new pixel if its value is equal to the value of the current pixel.
-  static const int Equal = WebGLRenderingContext;
+  static const int Equal = WebGLRenderingContext.EQUAL;
   /// Accept the new pixel if its value is greater than the value of the current pixel.
-  static const int Greater = 2;
+  static const int Greater = WebGLRenderingContext.GREATER;
   /// Accept the new pixel if its value is greater than or equal to the value of the current pixel.
-  static const int GreaterEqual = 3;
+  static const int GreaterEqual = WebGLRenderingContext.GEQUAL;
   /// Accept the new pixel if its value is less than the value of the current pixel.
-  static const int Less = 4;
+  static const int Less = WebGLRenderingContext.LESS;
   /// Accept the new pixel if its value is less than or equal to the value of the current pixel.
-  static const int LessEqual = 5;
+  static const int LessEqual = WebGLRenderingContext.LEQUAL;
   /// Always fail the test.
-  static const int Fail = 4;
+  static const int Fail = WebGLRenderingContext.NEVER;
   ///  Accept the new pixel if its value does not equal the value of the current pixel.
-  static const int NotEqual = 5;
+  static const int NotEqual = WebGLRenderingContext.NOTEQUAL;
 
   //---------------------------------------------------------------------
   // Class methods
