@@ -1,4 +1,4 @@
-library cull_mode_test;
+library compare_function_test;
 
 /*
 
