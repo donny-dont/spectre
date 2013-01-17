@@ -22,48 +22,111 @@ part of spectre;
 
 */
 
-/// DepthState controls depth testing and writing to a depth buffer
+/// Contains depth state for the device.
 /// Create using [Device.createDepthState]
 /// Set using [ImmediateContext.setDepthState]
 class DepthState extends DeviceChild {
-  static const int DepthComparisonOpNever = WebGLRenderingContext.NEVER;
-  static const int DepthComparisonOpAlways = WebGLRenderingContext.ALWAYS;
-  static const int DepthComparisonOpEqual = WebGLRenderingContext.EQUAL;
-  static const int DepthComparisonOpNotEqual = WebGLRenderingContext.NOTEQUAL;
+  //---------------------------------------------------------------------
+  // Serialization names
+  //---------------------------------------------------------------------
 
-  static const int DepthComparisonOpLess = WebGLRenderingContext.LESS;
-  static const int DepthComparisonOpLessEqual = WebGLRenderingContext.LEQUAL;
-  static const int DepthComparisonOpGreaterEqual = WebGLRenderingContext.GEQUAL;
-  static const int DepthComparisonOpGreater = WebGLRenderingContext.GREATER;
+  /// Serialization name for [depthBufferEnabled].
+  static const String _depthBufferEnabledName = 'depthBufferEnabled';
+  /// Serialization name for [depthBufferWriteEnabled].
+  static const String _depthBufferWriteEnabledName = 'depthBufferWriteEnabled';
+  /// Serialization name for [depthBufferFunction].
+  static const String _depthBufferFunctionName = 'depthBufferFunction';
 
-  bool depthTestEnabled = false;
-  bool depthWriteEnabled = false;
-  bool polygonOffsetEnabled = false;
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
 
-  num depthNearVal = 0.0;
-  num depthFarVal = 1.0;
-  num polygonOffsetFactor = 0.0;
-  num polygonOffsetUnits = 0.0;
+  /// Whether depth buffering is enabled or disabled.
+  /// The default is true.
+  bool _depthBufferEnabled = true;
+  /// Whether writing to the depth buffer is enabled or disabled.
+  /// The default is true.
+  bool _depthBufferWriteEnabled = false;
+  /// The comparison function for the depth-buffer test.
+  /// The default is CompareFunction.LessEqual
+  int _depthBufferFunction = CompareFunction.LessEqual;
 
-  int depthComparisonOp = DepthComparisonOpAlways;
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
 
+  /// Creates an instance of [DepthState] with default values.
   DepthState(String name, GraphicsDevice device)
       : super._internal(name, device);
 
-  dynamic filter(dynamic o) {
-    if (o is String) {
-      Map table = {
-        "DepthComparisonOpNever": WebGLRenderingContext.NEVER,
-        "DepthComparisonOpAlways": WebGLRenderingContext.ALWAYS,
-        "DepthComparisonOpEqual": WebGLRenderingContext.EQUAL,
-        "DepthComparisonOpNotEqual": WebGLRenderingContext.NOTEQUAL,
-        "DepthComparisonOpLess": WebGLRenderingContext.LESS,
-        "DepthComparisonOpLessEqual": WebGLRenderingContext.LEQUAL,
-        "DepthComparisonOpGreaterEqual": WebGLRenderingContext.GEQUAL,
-        "DepthComparisonOpGreater": WebGLRenderingContext.GREATER,
-      };
-      return table[o];
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// Whether depth buffering is enabled or disabled.
+  /// The default is true.
+  bool get depthBufferEnabled => _depthBufferEnabled;
+  set depthBufferEnabled(bool value) { _depthBufferEnabled = value; }
+
+  /// Whether writing to the depth buffer is enabled or disabled.
+  /// The default is true.
+  bool get depthBufferWriteEnabled => _depthBufferWriteEnabled;
+  set depthBufferWriteEnabled(bool value) { _depthBufferWriteEnabled = value; }
+
+  /// The comparison function for the depth-buffer test.
+  /// The default is CompareFunction.LessEqual
+  int get depthBufferFunction => _depthBufferFunction = CompareFunction.LessEqual;
+  set depthBufferFunction(int value) {
+    if (!CompareFunction.isValid(value)) {
+      throw new ArgumentError('depthBufferFunction must be an enumeration within CompareFunction.');
     }
-    return o;
+
+    _depthBufferFunction = value;
+  }
+
+  //---------------------------------------------------------------------
+  // Equality
+  //---------------------------------------------------------------------
+
+  /// Compares two [DepthState]s for equality.
+  bool operator== (DepthState other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return ((_depthBufferEnabled      == other._depthBufferEnabled)      &&
+            (_depthBufferWriteEnabled == other._depthBufferWriteEnabled) &&
+            (_depthBufferFunction     == other._depthBufferFunction));
+  }
+
+  //---------------------------------------------------------------------
+  // Serialization
+  //---------------------------------------------------------------------
+
+  /// Serializes the [BlendState] to a JSON.
+  dynamic toJson() {
+    Map json = new Map();
+
+    json[_depthBufferEnabledName] = _depthBufferEnabled;
+    json[_depthBufferWriteEnabledName] = _depthBufferWriteEnabled;
+    json[_depthBufferFunctionName]     = _depthBufferFunctionName;
+
+    return json;
+  }
+
+  /// Deserializes the [BlendState] from a JSON.
+  void fromJson(Map values) {
+    assert(values != null);
+
+    dynamic value;
+
+    value = values[_depthBufferEnabledName];
+    _depthBufferEnabled = (value != null) ? value : _depthBufferEnabled;
+
+    value = values[_depthBufferWriteEnabledName];
+    _depthBufferWriteEnabled = (value != null) ? value : _depthBufferWriteEnabled;
+
+    value = values[_depthBufferFunctionName];
+    _depthBufferFunction = (value != null) ? value : _depthBufferFunction;
   }
 }

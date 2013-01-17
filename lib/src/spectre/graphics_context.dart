@@ -68,6 +68,8 @@ class GraphicsContext {
   Viewport _viewport;
   /// The current [BlendState] of the pipeline.
   BlendState _blendState;
+  /// The current [DepthState] of the pipeline.
+  DepthState _depthState;
   /// The current [RasterizerState] of the pipeline.
   RasterizerState _rasterizerState;
 
@@ -118,6 +120,9 @@ class GraphicsContext {
       _blendState.blendFactorBlue,
       _blendState.blendFactorAlpha
     );
+
+    // DepthState setup
+    _depthState = new DepthState('DepthStateDefault', device);
 
     // RasterizerState setup
     _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
@@ -403,29 +408,35 @@ class GraphicsContext {
     }
   }
 
-  /// Set DepthState to [depthStateHandle]
-  void setDepthState(DepthState ds) {
-    if (_depthStateHandle == ds) {
+  /// Sets the current [DepthState] to use on the pipeline.
+  ///
+  /// If [depthState] is null all values of the pipeline associated with depth
+  /// will be reset to their defaults.
+  void setDepthState(DepthState depthState) {
+    if (depthState == null) {
       return;
     }
-    if (ds == null) {
-      return;
-    }
-    device.gl.depthRange(ds.depthNearVal, ds.depthFarVal);
-    if (ds.depthTestEnabled == false) {
-      device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
-    } else {
-      device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
-      device.gl.depthFunc(ds.depthComparisonOp);
+
+    if (_depthState.depthBufferEnabled != depthState.depthBufferEnabled) {
+      if (_depthState.depthBufferEnabled) {
+        device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+      } else {
+        device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
+      }
+
+      _depthState.depthBufferEnabled = depthState.depthBufferEnabled;
     }
 
-    device.gl.depthMask(ds.depthWriteEnabled);
+    if ((_depthState.depthBufferEnabled) && (_depthState.depthBufferFunction != depthState.depthBufferFunction)) {
+      device.gl.depthFunc(depthState.depthBufferFunction);
 
-    if (ds.polygonOffsetEnabled == false) {
-      device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-    } else {
-      device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-      device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
+      _depthState.depthBufferFunction = depthState.depthBufferFunction;
+    }
+
+    if (_depthState.depthBufferWriteEnabled != depthState.depthBufferWriteEnabled) {
+      device.gl.depthMask(depthState.depthBufferWriteEnabled);
+
+      _depthState.depthBufferWriteEnabled = depthState.depthBufferWriteEnabled;
     }
   }
 

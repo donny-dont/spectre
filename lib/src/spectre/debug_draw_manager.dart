@@ -218,12 +218,12 @@ class DebugDrawManager {
   /** Construct and initialize a DebugDrawManager. */
   DebugDrawManager(this.device, [int vboSize=16384]) {
     _depthEnabled = device.createDepthState(_depthStateEnabledName);
-    _depthEnabled.depthTestEnabled = true;
-    _depthEnabled.depthWriteEnabled = true;
-    _depthEnabled.depthComparisonOp = DepthState.DepthComparisonOpLess;
+    _depthEnabled.depthBufferEnabled = true;
+    _depthEnabled.depthBufferWriteEnabled = true;
+    _depthEnabled.depthBufferFunction = CompareFunction.LessEqual;
     _depthDisabled = device.createDepthState(_depthStateDisabledName);
-    _depthDisabled.depthTestEnabled = false;
-    _depthDisabled.depthWriteEnabled = false;
+    _depthDisabled.depthBufferEnabled = false;
+    _depthDisabled.depthBufferWriteEnabled = false;
     _blend = device.createBlendState(_blendStateName);
     _rasterizer = device.createRasterizerState(_rasterizerStateName);
     _rasterizer.cullMode = CullMode.Back;
