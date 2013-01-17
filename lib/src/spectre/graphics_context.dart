@@ -44,7 +44,6 @@ class GraphicsContext {
   List<SpectreTexture> _textureHandles;
   // Rasterizer
   RasterizerState _rasterizerStateHandle;
-  Viewport _viewportHandle;
   // Output-Merger
   DepthState _depthStateHandle;
   StencilState _stencilStateHandle;
@@ -65,6 +64,8 @@ class GraphicsContext {
   // State variables
   //---------------------------------------------------------------------
 
+  /// The current [Viewport] of the pipeline.
+  Viewport _viewport;
   /// The current [BlendState] of the pipeline.
   BlendState _blendState;
   /// The current [RasterizerState] of the pipeline.
@@ -87,6 +88,12 @@ class GraphicsContext {
   /// Initialize the WebGL pipeline state.
   /// Creates all the default state values and applies them to the pipeline.
   void _initializeState() {
+    // Viewport setup
+    _viewport = new Viewport('ViewportDefault', device);
+    
+    device.gl.viewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height);
+    device.gl.depthRange(_viewport.minDepth, _viewport.maxDepth);
+    
     // BlendState setup
     _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
     _blendState = new BlendState.opaque('CurrentBlendState', device);
@@ -218,7 +225,6 @@ class GraphicsContext {
       _textureHandles[i] = null;
     }
     _rasterizerStateHandle = null;
-    _viewportHandle = null;
     _depthStateHandle = null;
     _stencilStateHandle = null;
     _renderTargetHandle = null;
@@ -278,16 +284,31 @@ class GraphicsContext {
   }
 
 
-  /// Set Viewport to [viewportHandle]
-  void setViewport(Viewport vp) {
-    if (vp == _viewportHandle) {
+  /// Sets a [Viewport] identifying the portion of the render target to receive draw calls.
+  void setViewport(Viewport viewport) {
+    if (viewport == null) {
       return;
     }
-    _viewportHandle = vp;
-    if (vp == null) {
-      return;
+    
+    if ((_viewport.x      != viewport.x)     ||
+        (_viewport.y      != viewport.y)     ||
+        (_viewport.width  != viewport.width) ||
+        (_viewport.height != viewport.height))
+    {
+      device.gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+      
+      _viewport.x      = viewport.x;
+      _viewport.y      = viewport.y;
+      _viewport.width  = viewport.width;
+      _viewport.height = viewport.height;
     }
-    device.gl.viewport(vp.x, vp.y, vp.width, vp.height);
+    
+    if ((_viewport.minDepth != viewport.minDepth) || (_viewport.maxDepth != viewport.maxDepth)) {
+      device.gl.depthRange(viewport.minDepth, viewport.maxDepth);
+      
+      _viewport.minDepth = viewport.minDepth;
+      _viewport.maxDepth = viewport.maxDepth;
+    }
   }
 
   /// Sets the current [BlendState] to use on the pipeline.
