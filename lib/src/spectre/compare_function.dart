@@ -101,7 +101,7 @@ class CompareFunction {
     }
 
     assert(false);
-    return AlwaysName;
+    return _alwaysName;
   }
 
   /// Checks whether the value is a valid enumeration.
