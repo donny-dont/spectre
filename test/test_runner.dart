@@ -29,6 +29,7 @@ import 'cull_mode_test.dart' as cull_mode_test;
 import 'front_face_test.dart' as front_face_test;
 import 'graphics_context_test.dart' as graphics_context_test;
 import 'rasterizer_state_test.dart' as rasterizer_state_test;
+import 'viewport_test.dart' as viewport_test;
 
 void main() {
   useHtmlEnhancedConfiguration();
@@ -40,4 +41,5 @@ void main() {
   group('FrontFace tests', front_face_test.main);
   group('GraphicsContext tests', graphics_context_test.main);
   group('RasterizerState tests', rasterizer_state_test.main);
+  group('Viewport tests', viewport_test.main);
 }
