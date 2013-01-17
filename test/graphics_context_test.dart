@@ -34,11 +34,28 @@ part 'mock_webgl_rendering_context.dart';
 //---------------------------------------------------------------------
 
 void verifyInitialPipelineState(MockWebGLRenderingContext gl) {
-  verifyInitialBlendState(gl);
-  verifyInitialRasterizerState(gl);
+  int calls = 0;
+
+  calls += verifyInitialViewport(gl);
+  calls += verifyInitialBlendState(gl);
+  calls += verifyInitialRasterizerState(gl);
 
   // Number of GL calls in GraphicsContext._initializeState
-  expect(gl.log.logs.length, 11);
+  expect(gl.log.logs.length, calls);
+}
+
+//---------------------------------------------------------------------
+// Viewport testing utility functions
+//---------------------------------------------------------------------
+
+int verifyInitialViewport(MockWebGLRenderingContext gl) {
+  Viewport viewport = new Viewport('Viewport', null);
+
+  // Make sure initial Viewport was used
+  gl.getLogs(callsTo('viewport')).verify(happenedOnce);
+  gl.getLogs(callsTo('depthRange', viewport.minDepth, viewport.maxDepth)).verify(happenedOnce);
+
+  return 2;
 }
 
 //---------------------------------------------------------------------
@@ -66,7 +83,7 @@ void copyBlendState(BlendState original, BlendState copy) {
   copy.writeRenderTargetAlpha = original.writeRenderTargetAlpha;
 }
 
-void verifyInitialBlendState(MockWebGLRenderingContext gl) {
+int verifyInitialBlendState(MockWebGLRenderingContext gl) {
   BlendState blendState = new BlendState.opaque('InitialBlendState', null);
 
   // Make sure BlendState.opaque was used
@@ -109,6 +126,8 @@ void verifyInitialBlendState(MockWebGLRenderingContext gl) {
       blendState.blendFactorAlpha
     )
   ).verify(happenedOnce);
+
+  return 5;
 }
 
 int verifyBlendState(MockWebGLRenderingContext gl, BlendState blendState, BlendState blendStateLast, [bool copyState = true]) {
@@ -395,7 +414,7 @@ void copyRasterizerState(RasterizerState original, RasterizerState copy, [bool c
   copy.scissorTestEnabled = original.scissorTestEnabled;
 }
 
-void verifyInitialRasterizerState(MockWebGLRenderingContext gl) {
+int verifyInitialRasterizerState(MockWebGLRenderingContext gl) {
   RasterizerState rasterizerState = new RasterizerState.cullClockwise('InitialRasterizerState', null);
 
   // Make sure RasterizerState.cullClockwise was used
@@ -408,6 +427,8 @@ void verifyInitialRasterizerState(MockWebGLRenderingContext gl) {
   gl.getLogs(callsTo('polygonOffset', rasterizerState.depthBias, rasterizerState.slopeScaleDepthBias)).verify(happenedOnce);
 
   gl.getLogs(callsTo('disable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+
+  return 6;
 }
 
 int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasterizerState, RasterizerState rasterizerStateLast, [bool copyState = true]) {
@@ -418,10 +439,10 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
       gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(neverHappened);
     } else {
       gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(neverHappened);
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);      
+      gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
     }
   }
-  
+
   // Check the methods that will only be called if culling is enabled
   if (rasterizerState.cullMode != CullMode.None) {
     // Check to see if cullFace was called
@@ -430,7 +451,7 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
     } else {
       gl.getLogs(callsTo('cullFace')).verify(neverHappened);
     }
-    
+
     // Check to see if frontFace was called
     if (rasterizerState.frontFace != rasterizerStateLast.frontFace) {
       gl.getLogs(callsTo('frontFace', rasterizerState.frontFace)).verify(happenedOnce);
@@ -438,16 +459,16 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
       gl.getLogs(callsTo('frontFace')).verify(neverHappened);
     }
   }
-  
+
   // Check the methods that will only be called if a polygon offset is specified
   bool offsetEnabled = ((rasterizerStateLast.depthBias != 0.0) || (rasterizerStateLast.slopeScaleDepthBias != 0.0));
-  
+
   if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0.0)) {
     // Check to see if polygon offset is enabled
     if (!offsetEnabled) {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);      
+      gl.getLogs(callsTo('enable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
     }
-    
+
     // Check to see if polygonOffset was called
     if ((rasterizerState.depthBias           != rasterizerStateLast.depthBias) ||
         (rasterizerState.slopeScaleDepthBias != rasterizerStateLast.slopeScaleDepthBias))
@@ -471,7 +492,7 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
       gl.getLogs(callsTo('disable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
     }
   }
-  
+
   // Copy the state if requested
   if (copyState) {
     copyRasterizerState(rasterizerState, rasterizerStateLast);
@@ -498,7 +519,7 @@ void testRasterizerStateTransitions(bool cullEnabled) {
 
   // Create the initial rasterizer state
   RasterizerState rasterizerState = new RasterizerState('RasterizerState', null);
-  
+
   rasterizerState.cullMode = (cullEnabled) ? CullMode.Front : CullMode.None;
   rasterizerState.frontFace = FrontFace.Clockwise;
   rasterizerState.depthBias = 1.0;
@@ -506,7 +527,7 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   rasterizerState.scissorTestEnabled = true;
 
   graphicsContext.setRasterizerState(rasterizerState);
-  int numEntries;  
+  int numEntries;
 
   if (rasterizerState.cullMode != CullMode.None) {
     gl.getLogs(callsTo('cullFace')).verify(happenedOnce);
@@ -539,18 +560,18 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   // This should result in zero calls
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast), 0);
-  
+
   // Change the front face
   rasterizerState.frontFace = FrontFace.CounterClockwise;
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast, cullEnabled), (cullEnabled) ? 1: 0);
-  
+
   // Change the polygon offset values
   rasterizerState.depthBias = 0.0;
   rasterizerState.slopeScaleDepthBias = 0.0;
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast), 1);
-  
+
   rasterizerState.depthBias = 1.0;
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast), 2);
@@ -558,22 +579,22 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   rasterizerState.slopeScaleDepthBias = 1.0;
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast), 1);
-  
+
   // Change the scissor test
   rasterizerState.scissorTestEnabled = !rasterizerState.scissorTestEnabled;
   graphicsContext.setRasterizerState(rasterizerState);
   expect(verifyRasterizerState(gl, rasterizerState, rasterizerStateLast), 1);
-  
+
   if (cullEnabled) {
     rasterizerState.cullMode = CullMode.None;
-    
+
     numEntries = 1;
   } else {
     rasterizerState.cullMode = CullMode.Back;
-    
+
     numEntries = 2;
   }
-  
+
   graphicsContext.setRasterizerState(rasterizerState);
 
   expect(gl.log.logs.length, numEntries);
