@@ -90,10 +90,10 @@ class GraphicsContext {
   void _initializeState() {
     // Viewport setup
     _viewport = new Viewport('ViewportDefault', device);
-    
+
     device.gl.viewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height);
     device.gl.depthRange(_viewport.minDepth, _viewport.maxDepth);
-    
+
     // BlendState setup
     _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
     _blendState = new BlendState.opaque('CurrentBlendState', device);
@@ -289,23 +289,23 @@ class GraphicsContext {
     if (viewport == null) {
       return;
     }
-    
+
     if ((_viewport.x      != viewport.x)     ||
         (_viewport.y      != viewport.y)     ||
         (_viewport.width  != viewport.width) ||
         (_viewport.height != viewport.height))
     {
       device.gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
-      
+
       _viewport.x      = viewport.x;
       _viewport.y      = viewport.y;
       _viewport.width  = viewport.width;
       _viewport.height = viewport.height;
     }
-    
+
     if ((_viewport.minDepth != viewport.minDepth) || (_viewport.maxDepth != viewport.maxDepth)) {
       device.gl.depthRange(viewport.minDepth, viewport.maxDepth);
-      
+
       _viewport.minDepth = viewport.minDepth;
       _viewport.maxDepth = viewport.maxDepth;
     }

@@ -28,10 +28,10 @@ import "package:spectre/spectre.dart";
 void testConstructor(Viewport viewport, int x, int y, int width, int height) {
   expect(viewport.x, x);
   expect(viewport.y, y);
-  
+
   expect(viewport.width , width);
   expect(viewport.height, height);
-  
+
   expect(viewport.minDepth, 0.0);
   expect(viewport.maxDepth, 1.0);
 }
@@ -42,7 +42,7 @@ void main() {
     // Default constructor
     Viewport defaultViewport = new Viewport('ViewportDefault', null);
     testConstructor(defaultViewport, 0, 0, 640, 480);
-    
+
     // Viewport.bounds
     Viewport bounds = new Viewport.bounds('ViewportBounds', null, 160, 120, 320, 240);
     testConstructor(bounds, 160, 120, 320, 240);
@@ -65,19 +65,19 @@ void main() {
     viewport0.y = 120;
     expect(viewport0 == viewport1, false);
     viewport1.y = viewport0.y;
-    
+
     viewport0.width = 320;
     expect(viewport0 == viewport1, false);
     viewport1.width = viewport0.width;
-    
+
     viewport0.height = 240;
     expect(viewport0 == viewport1, false);
     viewport1.height = viewport0.height;
-    
+
     viewport0.minDepth = 0.1;
     expect(viewport0 == viewport1, false);
     viewport1.minDepth = viewport0.minDepth;
-    
+
     viewport0.maxDepth = 0.9;
     expect(viewport0 == viewport1, false);
     viewport1.maxDepth = viewport0.maxDepth;

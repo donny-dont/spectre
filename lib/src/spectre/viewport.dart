@@ -42,7 +42,7 @@ class Viewport extends DeviceChild {
   static const String _minDepthName = 'minDepth';
   /// Serialization name for [maxDepth].
   static const String _maxDepthName = 'maxDepth';
-  
+
   //---------------------------------------------------------------------
   // Member variables
   //---------------------------------------------------------------------
@@ -67,12 +67,12 @@ class Viewport extends DeviceChild {
   /// Creates an instance of the [Viewport] class.
   Viewport(String name, GraphicsDevice device)
     : super._internal(name, device);
-  
+
   /// Creates an instance of the [Viewport] class.
   /// The rectangular bounding box is specified.
   Viewport.bounds(String name, GraphicsDevice device, int this._x, int this._y, int this._width, int this._height)
     : super._internal(name, device);
-  
+
   //---------------------------------------------------------------------
   // Equality
   //---------------------------------------------------------------------
@@ -86,14 +86,14 @@ class Viewport extends DeviceChild {
     if ((_x != other._x) || (_y != other._y)) {
       return false;
     }
-    
+
     if ((_width != other._width) || (_height != other._height)) {
       return false;
     }
-    
+
     return ((_minDepth == other._minDepth) && (_maxDepth == other._maxDepth));
   }
-  
+
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
@@ -101,31 +101,31 @@ class Viewport extends DeviceChild {
   /// The x-coordinate of the upper left corner of the viewport on the render-target surface.
   int get x => _x;
   set x(int value) { _x = value; }
-  
+
   /// The y-coordinate of the upper left corner of the viewport on the render-target surface.
   int get y => _y ;
   set y(int value) { _y = value; }
-  
+
   /// The width of the viewport on the render-target surface, in pixels.
   int get width => _width;
   set width(int value) { _width = value; }
-  
+
   /// The height of the viewport on the render-target surface, in pixels.
   int get height => _height;
   set height(int value) { _height = value; }
-  
+
   /// The minimum depth of the clip volume.
   double get minDepth => _minDepth;
   set minDepth(double value) { _minDepth = value; }
-  
+
   /// The maximum depth of the clip volume.
   double get maxDepth => _maxDepth;
   set maxDepth(double value) { _maxDepth = value; }
-  
+
   //---------------------------------------------------------------------
   // Serialization
   //---------------------------------------------------------------------
-  
+
   /// Serializes the [RasterizerState] to a JSON.
   dynamic toJson() {
     Map json = new Map();
