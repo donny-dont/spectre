@@ -30,6 +30,7 @@ class Viewport extends DeviceChild {
   int y = 0;
   int width = 640;
   int height = 480;
+  double get aspectRatio => width.toDouble()/height.toDouble();
 
   Viewport(String name, GraphicsDevice device) : super._internal(name, device);
 }
