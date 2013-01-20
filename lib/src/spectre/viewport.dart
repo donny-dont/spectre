@@ -55,9 +55,9 @@ class Viewport extends DeviceChild {
   int _width = 640;
   /// The height of the viewport on the render-target surface, in pixels.
   int _height = 480;
-  /// The minimum depth of the clip volume.
+  /// The minimum depth of the viewport.
   double _minDepth = 0.0;
-  /// The maximum depth of the clip volume.
+  /// The maximum depth of the viewport.
   double _maxDepth = 1.0;
 
   //---------------------------------------------------------------------
@@ -107,20 +107,50 @@ class Viewport extends DeviceChild {
   set y(int value) { _y = value; }
 
   /// The width of the viewport on the render-target surface, in pixels.
+  /// Throws [ArgumentError] if [value] is not a positive number.
   int get width => _width;
-  set width(int value) { _width = value; }
+  set width(int value) {
+    if (value < 0) {
+      throw new ArgumentError('width must be a positive number');
+    }
+
+    _width = value;
+  }
 
   /// The height of the viewport on the render-target surface, in pixels.
+  /// Throws [ArgumentError] if [value] is not a positive number.
   int get height => _height;
-  set height(int value) { _height = value; }
+  set height(int value) {
+    if (value < 0) {
+      throw new ArgumentError('height must be a positive number');
+    }
 
-  /// The minimum depth of the clip volume.
+    _height = value;
+  }
+
+  /// The minimum depth of the viewport.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get minDepth => _minDepth;
-  set minDepth(double value) { _minDepth = value; }
+  set minDepth(double value) {
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _minDepth = value;
+      return;
+    }
 
-  /// The maximum depth of the clip volume.
+    throw new ArgumentError('minDepth must be in the range [0, 1]');
+  }
+
+  /// The maximum depth of the viewport.
+  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get maxDepth => _maxDepth;
-  set maxDepth(double value) { _maxDepth = value; }
+  set maxDepth(double value) {
+    if ((value >= 0.0) && (value <= 1.0)) {
+      _maxDepth = value;
+      return;
+    }
+
+    throw new ArgumentError('maxDepth must be in the range [0, 1]');
+  }
 
   //---------------------------------------------------------------------
   // Serialization

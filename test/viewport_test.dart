@@ -25,6 +25,36 @@ library viewport_test;
 import "package:unittest/unittest.dart";
 import "package:spectre/spectre.dart";
 
+void testDimensionSetter(String testName, dynamic function) {
+  Viewport viewport = new Viewport('ViewportTest', null);
+
+  test(testName, () {
+    expect(function(viewport,    0), 0);
+    expect(function(viewport, 1024), 1024);
+
+    expect(() { function(viewport, -1); }, throwsArgumentError);
+  });
+}
+
+void testDepthRangeSetter(String testName, dynamic function) {
+  Viewport viewport = new Viewport('ViewportTest', null);
+
+  test(testName, () {
+    expect(function(viewport, 0.0), 0.0);
+    expect(function(viewport, 0.5), 0.5);
+    expect(function(viewport, 1.0), 1.0);
+
+    expect(() { function(viewport, -0.00001); }, throwsArgumentError);
+    expect(() { function(viewport,  1.00001); }, throwsArgumentError);
+    expect(() { function(viewport, -1.00000); }, throwsArgumentError);
+    expect(() { function(viewport,  2.00000); }, throwsArgumentError);
+
+    expect(() { function(viewport, double.INFINITY); }         , throwsArgumentError);
+    expect(() { function(viewport, double.NEGATIVE_INFINITY); }, throwsArgumentError);
+    expect(() { function(viewport, double.NAN); }              , throwsArgumentError);
+  });
+}
+
 void testConstructor(Viewport viewport, int x, int y, int width, int height) {
   expect(viewport.x, x);
   expect(viewport.y, y);
@@ -46,6 +76,28 @@ void main() {
     // Viewport.bounds
     Viewport bounds = new Viewport.bounds('ViewportBounds', null, 160, 120, 320, 240);
     testConstructor(bounds, 160, 120, 320, 240);
+  });
+
+  // Dimension setters
+  testDimensionSetter('width', (viewport, value) {
+    viewport.width = value;
+    return viewport.width;
+  });
+
+  testDimensionSetter('height', (viewport, value) {
+    viewport.height = value;
+    return viewport.height;
+  });
+
+  // Range setters
+  testDepthRangeSetter('minDepth', (viewport, value) {
+    viewport.minDepth = value;
+    return viewport.minDepth;
+  });
+
+  testDepthRangeSetter('maxDepth', (viewport, value) {
+    viewport.maxDepth = value;
+    return viewport.maxDepth;
   });
 
   // Equality
