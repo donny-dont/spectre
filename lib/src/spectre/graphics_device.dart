@@ -242,19 +242,9 @@ class GraphicsDevice {
 
   // Dump all children.
   void dumpChildren() {
-    _nameMapping.forEach((n, child) {
+    _children.forEach((child) {
       print('${child.name} ${child.runtimeType}');
     });
-  }
-
-  Map _getPropertyMap(dynamic props) {
-    if (props is String) {
-      props = JSON.parse(props);
-    }
-    if ((props is Map) == false) {
-      return null;
-    }
-    return props;
   }
 
   GraphicsContext _context;
@@ -266,14 +256,7 @@ class GraphicsDevice {
   WebGLRenderingContext _gl;
   WebGLRenderingContext get gl => _gl;
 
-  Set<DeviceChild> _childrenObjects;
-
-  // Maps from child object name to handle
-  Map<String, DeviceChild> _nameMapping;
-
-  static const int MaxDeviceChildren = 2048;
-
-  Texture2D _fallbackTexture;
+  final Set<DeviceChild> _children = new Set<DeviceChild>();
 
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
     context2d.save();
@@ -302,12 +285,11 @@ class GraphicsDevice {
   /// Constructs a GPU device
   GraphicsDevice(WebGLRenderingContext gl) {
     _gl = gl;
-    _childrenObjects = new Set<DeviceChild>();
-    _nameMapping = new Map<String, DeviceChild>();
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
-    _fallbackTexture = createTexture2D('Device.Fallback');
-    {
+    /*
+     var _fallbackTexture = createTexture2D('Device.Fallback');
+     {
       CanvasElement canvas = new CanvasElement();
       canvas.width = 512;
       canvas.height = 512;
@@ -316,32 +298,20 @@ class GraphicsDevice {
       _fallbackTexture.uploadElement(canvas);
       _fallbackTexture.generateMipmap();
     }
+    */
     RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget');
     RenderTarget._systemRenderTarget._makeSystemTarget();
   }
 
-  /// Returns the [DeviceChild] with [name].
-  DeviceChild getDeviceChild(String name) {
-    return _nameMapping[name];
-  }
 
-  bool _addChildObject(DeviceChild child) {
-    if (_nameMapping.containsKey(child.name)) {
-      return false;
-    }
-    _nameMapping[child.name] = child;
-  }
-
-  Map<String, DeviceChild> get children => _nameMapping;
-
-  /// Deletes the device child [handle]
+  /// Deletes the device child [child].
   void deleteDeviceChild(DeviceChild child) {
     child._destroyDeviceState();
-    _nameMapping.remove(child.name);
-    _childrenObjects.remove(child);
+    _children.remove(child);
   }
 
+  /// Delete a list of device children [children].
   void batchDeleteDeviceChildren(List<DeviceChild> children) {
     for (DeviceChild dc in children) {
       deleteDeviceChild(dc);
@@ -351,9 +321,7 @@ class GraphicsDevice {
   /// Create an [IndexBuffer] named [name]
   IndexBuffer createIndexBuffer(String name) {
     IndexBuffer ib = new IndexBuffer(name, this);
-    if (_addChildObject(ib) == false) {
-      return null;
-    }
+    _children.add(ib);
     ib._createDeviceState();
     return ib;
   }
@@ -361,9 +329,7 @@ class GraphicsDevice {
   /// Create a [VertexBuffer] named [name]
   VertexBuffer createVertexBuffer(String name) {
     VertexBuffer vb = new VertexBuffer(name, this);
-    if (_addChildObject(vb) == false) {
-      return null;
-    }
+    _children.add(vb);
     vb._createDeviceState();
     return vb;
   }
@@ -371,9 +337,7 @@ class GraphicsDevice {
   /// Create a [RenderBuffer] named [name]
   RenderBuffer createRenderBuffer(String name) {
     RenderBuffer rb = new RenderBuffer(name, this);
-    if (_addChildObject(rb) == false) {
-      return null;
-    }
+    _children.add(rb);
     rb._createDeviceState();
     return rb;
   }
@@ -381,9 +345,7 @@ class GraphicsDevice {
   /// Create a [RenderTarget] named [name]
   RenderTarget createRenderTarget(String name) {
     RenderTarget rt = new RenderTarget(name, this);
-    if (_addChildObject(rt) == false) {
-      return null;
-    }
+    _children.add(rt);
     rt._createDeviceState();
     return rt;
   }
@@ -391,9 +353,7 @@ class GraphicsDevice {
   /// Create a [Texture2D] named [name]
   Texture2D createTexture2D(String name) {
     Texture2D tex = new Texture2D(name, this);
-    if (_addChildObject(tex) == false) {
-      return null;
-    }
+    _children.add(tex);
     tex._createDeviceState();
     return tex;
   }
@@ -401,9 +361,7 @@ class GraphicsDevice {
   /// Create a [TextureCube] named [name].
   TextureCube createTextureCube(String name) {
     TextureCube tex = new TextureCube(name, this);
-    if (_addChildObject(tex) == false) {
-      return null;
-    }
+    _children.add(tex);
     tex._createDeviceState();
     return tex;
   }
@@ -411,9 +369,7 @@ class GraphicsDevice {
   /// Create a [VertexShader] named [name].
   VertexShader createVertexShader(String name) {
     VertexShader vertexShader = new VertexShader(name, this);
-    if (_addChildObject(vertexShader) == false) {
-      return null;
-    }
+    _children.add(vertexShader);
     vertexShader._createDeviceState();
     return vertexShader;
   }
@@ -421,9 +377,7 @@ class GraphicsDevice {
   /// Create a [FragmentShader] named [name].
   FragmentShader createFragmentShader(String name) {
     FragmentShader fragmentShader = new FragmentShader(name, this);
-    if (_addChildObject(fragmentShader) == false) {
-      return null;
-    }
+    _children.add(fragmentShader);
     fragmentShader._createDeviceState();
     return fragmentShader;
   }
@@ -431,9 +385,7 @@ class GraphicsDevice {
   /// Create a [ShaderProgram] named [name].
   ShaderProgram createShaderProgram(String name) {
     ShaderProgram shaderProgram = new ShaderProgram(name, this);
-    if (_addChildObject(shaderProgram) == false) {
-      return null;
-    }
+    _children.add(shaderProgram);
     shaderProgram._createDeviceState();
     return shaderProgram;
   }
@@ -441,9 +393,7 @@ class GraphicsDevice {
   /// Create a [SamplerState] named [name].
   SamplerState createSamplerState(String name) {
     SamplerState sampler = new SamplerState(name, this);
-    if (_addChildObject(sampler) == false) {
-      return null;
-    }
+    _children.add(sampler);
     sampler._createDeviceState();
     return sampler;
   }
@@ -451,9 +401,7 @@ class GraphicsDevice {
   /// Create a [Viewport] named [name].
   Viewport createViewport(String name) {
     Viewport viewport = new Viewport(name, this);
-    if (_addChildObject(viewport) == false) {
-      return null;
-    }
+    _children.add(viewport);
     viewport._createDeviceState();
     return viewport;
   }
@@ -461,9 +409,7 @@ class GraphicsDevice {
   /// Create a [DepthState] named [name].
   DepthState createDepthState(String name) {
     DepthState depthState = new DepthState(name, this);
-    if (_addChildObject(depthState) == false) {
-      return null;
-    }
+    _children.add(depthState);
     depthState._createDeviceState();
     return depthState;
   }
@@ -471,9 +417,7 @@ class GraphicsDevice {
   /// Create a [BlendState] named [name].
   BlendState createBlendState(String name) {
     BlendState blendState = new BlendState(name, this);
-    if (_addChildObject(blendState) == false) {
-      return null;
-    }
+    _children.add(blendState);
     blendState._createDeviceState();
     return blendState;
   }
@@ -481,9 +425,7 @@ class GraphicsDevice {
   /// Create a [RasterizerState] named [name].
   RasterizerState createRasterizerState(String name) {
     RasterizerState rasterizerState = new RasterizerState(name, this);
-    if (_addChildObject(rasterizerState) == false) {
-      return null;
-    }
+    _children.add(rasterizerState);
     rasterizerState._createDeviceState();
     return rasterizerState;
   }
@@ -491,9 +433,7 @@ class GraphicsDevice {
   /// Create an [InputLayout] named [name].
   InputLayout createInputLayout(String name) {
     InputLayout il = new InputLayout(name, this);
-    if (_addChildObject(il) == false) {
-      return null;
-    }
+    _children.add(il);
     il._createDeviceState();
     return il;
   }
@@ -501,9 +441,7 @@ class GraphicsDevice {
   /// Create a [SingleArrayMesh] named [name].
   SingleArrayMesh createSingleArrayMesh(String name) {
     SingleArrayMesh arrayMesh = new SingleArrayMesh(name, this);
-    if (_addChildObject(arrayMesh) == false) {
-      return null;
-    }
+    _children.add(arrayMesh);
     arrayMesh._createDeviceState();
     return arrayMesh;
   }
@@ -511,9 +449,7 @@ class GraphicsDevice {
   /// Create a [SingleArrayIndexedMesh] named [name].
   SingleArrayIndexedMesh createSingleArrayIndexedMesh(String name) {
     SingleArrayIndexedMesh indexedMesh = new SingleArrayIndexedMesh(name, this);
-    if (_addChildObject(indexedMesh) == false) {
-      return null;
-    }
+    _children.add(indexedMesh);
     indexedMesh._createDeviceState();
     return indexedMesh;
   }
