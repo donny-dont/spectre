@@ -154,6 +154,7 @@ class RasterizerState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Compares two [RasterizerState]s for equality.
+  /*
   bool operator== (RasterizerState other) {
     if (identical(this, other)) {
       return true;
@@ -173,6 +174,7 @@ class RasterizerState extends DeviceChild {
 
     return _scissorTestEnabled == other._scissorTestEnabled;
   }
+  */
 
   //---------------------------------------------------------------------
   // Serialization
