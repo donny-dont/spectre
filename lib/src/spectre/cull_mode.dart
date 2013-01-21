@@ -46,6 +46,10 @@ class CullMode {
   /// Do not draw triangles that are back-facing.
   static const int Back = WebGLRenderingContext.BACK;
 
+  //---------------------------------------------------------------------
+  // Class methods
+  //---------------------------------------------------------------------
+
   /// Convert from a [String] name to the corresponding [CullMode] enumeration.
   static int parse(String name) {
     if (name == _noneName) {
