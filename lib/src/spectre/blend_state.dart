@@ -305,6 +305,7 @@ class BlendState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Compares two [BlendState]s for equality.
+  /*
   bool operator== (BlendState other) {
     if (identical(this, other)) {
       return true;
@@ -347,6 +348,7 @@ class BlendState extends DeviceChild {
             (_writeRenderTargetBlue  == other._writeRenderTargetBlue)  &&
             (_writeRenderTargetAlpha == other._writeRenderTargetAlpha));
   }
+  */
 
   //---------------------------------------------------------------------
   // Serialization

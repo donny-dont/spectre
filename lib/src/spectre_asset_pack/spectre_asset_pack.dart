@@ -27,10 +27,20 @@ part of spectre_asset_pack;
  */
 void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
                                          AssetManager assetManager) {
-  assetManager.importers['mesh'] = new _AssetImporterMesh(graphicsDevice);
-  assetManager.importers['tex2d'] = new _AssetImporterTex2D(graphicsDevice);
-  assetManager.importers['texCube'] = new _AssetImporterTexCube(graphicsDevice);
   assetManager.loaders['mesh'] = new AssetLoaderText();
   assetManager.loaders['tex2d'] = new AssetLoaderImage();
   assetManager.loaders['texCube'] = new _ImagePackLoader();
+  assetManager.loaders['vertexShader'] = new AssetLoaderText();
+  assetManager.loaders['fragmentShader'] = new AssetLoaderText();
+  assetManager.loaders['shaderProgram'] = new _TextListLoader();
+
+  assetManager.importers['mesh'] = new _AssetImporterMesh(graphicsDevice);
+  assetManager.importers['tex2d'] = new _AssetImporterTex2D(graphicsDevice);
+  assetManager.importers['texCube'] = new _AssetImporterTexCube(graphicsDevice);
+  assetManager.importers['vertexShader'] =
+      new _AssetImporterVertexShader(graphicsDevice);
+  assetManager.importers['fragmentShader'] =
+      new _AssetImporterFragmentShader(graphicsDevice);
+  assetManager.importers['shaderProgram'] =
+      new _AssetImporterShaderProgram(graphicsDevice);
 }

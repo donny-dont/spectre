@@ -140,6 +140,9 @@ class Viewport extends DeviceChild {
     throw new ArgumentError('minDepth must be in the range [0, 1]');
   }
 
+  /// The aspect ratio used by the viewport.
+  double get aspectRation => width / height;
+
   /// The maximum depth of the viewport.
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].
   double get maxDepth => _maxDepth;
