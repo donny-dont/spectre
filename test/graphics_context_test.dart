@@ -38,6 +38,7 @@ void verifyInitialPipelineState(MockWebGLRenderingContext gl) {
 
   calls += verifyInitialViewport(gl);
   calls += verifyInitialBlendState(gl);
+  calls += verifyInitialDepthState(gl);
   calls += verifyInitialRasterizerState(gl);
 
   // Number of GL calls in GraphicsContext._initializeState
@@ -401,10 +402,143 @@ void testBlendState() {
 }
 
 //---------------------------------------------------------------------
+// DepthState testing utility functions
+//---------------------------------------------------------------------
+
+void copyDepthState(DepthState original, DepthState copy) {
+  copy.depthBufferEnabled      = original.depthBufferEnabled;
+  copy.depthBufferWriteEnabled = original.depthBufferWriteEnabled;
+  copy.depthBufferFunction     = original.depthBufferFunction;
+}
+
+int verifyInitialDepthState(MockWebGLRenderingContext gl) {
+  DepthState depthState = new DepthState.depthWrite('InitialDepthState', null);
+
+  // Make sure DepthState.cullClockwise was used
+  gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+
+  gl.getLogs(callsTo('depthFunc', depthState.depthBufferFunction)).verify(happenedOnce);
+  gl.getLogs(callsTo('depthMask', depthState.depthBufferWriteEnabled)).verify(happenedOnce);
+
+  return 3;
+}
+
+int verifyDepthState(MockWebGLRenderingContext gl, DepthState depthState, DepthState depthStateLast, [bool copyState = true]) {
+  // Check to see if the depth buffer was enabled/disabled
+  if (depthState.depthBufferEnabled != depthStateLast.depthBufferEnabled) {
+    if (depthState.depthBufferEnabled) {
+      gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+      gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(neverHappened);
+    } else {
+      gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(neverHappened);
+      gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+    }
+  }
+
+  // Check the methods that will only be called if the depth buffer is enabled
+  if (depthState.depthBufferEnabled) {
+    // Check to see if depthFunc was called
+    if (depthState.depthBufferFunction != depthStateLast.depthBufferFunction) {
+      gl.getLogs(callsTo('depthFunc', depthState.depthBufferFunction)).verify(happenedOnce);
+    } else {
+      gl.getLogs(callsTo('depthFunc')).verify(neverHappened);
+    }
+  }
+
+  // Check to see if writing to the depth buffer was enabled/disabled
+  if (depthState.depthBufferWriteEnabled != depthStateLast.depthBufferWriteEnabled) {
+    gl.getLogs(callsTo('depthMask', depthState.depthBufferWriteEnabled)).verify(happenedOnce);
+  }
+
+  // Copy the state if requested
+  if (copyState) {
+    copyDepthState(depthState, depthStateLast);
+  }
+
+  // Clear the log
+  int numEntries = gl.log.logs.length;
+  gl.clearLogs();
+
+  // Return the number of entries
+  return numEntries;
+}
+
+void testDepthStateTransitions(bool depthBufferEnabled) {
+  MockWebGLRenderingContext gl = new MockWebGLRenderingContext();
+  MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
+  GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
+
+  // Passing null will reset the values
+  graphicsContext.setDepthState(null);
+  verifyInitialRasterizerState(gl);
+
+  gl.clearLogs();
+
+  // Create the initial depth state
+  DepthState depthState = new DepthState('DepthState', null);
+
+  depthState.depthBufferEnabled = depthBufferEnabled;
+  depthState.depthBufferWriteEnabled = false;
+  depthState.depthBufferFunction = CompareFunction.Always;
+
+  graphicsContext.setDepthState(depthState);
+  int numEntries;
+
+  if (depthBufferEnabled) {
+    gl.getLogs(callsTo('depthFunc')).verify(happenedOnce);
+    gl.getLogs(callsTo('depthMask')).verify(happenedOnce);
+
+    // Shouldn't call enable
+    numEntries = 2;
+  } else {
+    gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+    gl.getLogs(callsTo('depthMask')).verify(happenedOnce);
+
+    // Shouldn't call depthFunc
+    numEntries = 2;
+  }
+
+  expect(gl.log.logs.length, numEntries);
+
+  gl.clearLogs();
+
+  // Create another RasterizerState to provide a comparison
+  DepthState depthStateLast = new DepthState('DepthStateLast', null);
+  copyDepthState(depthState, depthStateLast);
+
+  // Set the same state values again
+  // This should result in zero calls
+  graphicsContext.setDepthState(depthState);
+  expect(verifyDepthState(gl, depthState, depthStateLast), 0);
+
+  // Change whether the depth buffer is writeable
+  depthState.depthBufferWriteEnabled = !depthState.depthBufferWriteEnabled;
+  graphicsContext.setDepthState(depthState);
+  expect(verifyDepthState(gl, depthState, depthStateLast), 1);
+
+  // Change the depth function
+  depthState.depthBufferFunction = CompareFunction.NotEqual;
+  graphicsContext.setDepthState(depthState);
+  expect(verifyDepthState(gl, depthState, depthStateLast, depthBufferEnabled), (depthBufferEnabled) ? 1 : 0);
+
+  // Change whether the depth buffer is enabled
+  depthState.depthBufferEnabled = !depthState.depthBufferEnabled;
+  graphicsContext.setDepthState(depthState);
+  expect(verifyDepthState(gl, depthState, depthStateLast), (depthBufferEnabled) ? 1 : 2);
+}
+
+void testDepthState() {
+  test('setDepthState', () {
+    testDepthStateTransitions(true);
+    testDepthStateTransitions(false);
+  });
+}
+
+//---------------------------------------------------------------------
 // RasterizerState testing utility functions
 //---------------------------------------------------------------------
 
-void copyRasterizerState(RasterizerState original, RasterizerState copy, [bool copyState]) {
+void copyRasterizerState(RasterizerState original, RasterizerState copy) {
   copy.cullMode  = original.cullMode;
   copy.frontFace = original.frontFace;
 
@@ -622,5 +756,6 @@ void main() {
   });
 
   testBlendState();
+  testDepthState();
   testRasterizerState();
 }

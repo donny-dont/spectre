@@ -42,10 +42,6 @@ class GraphicsContext {
   ShaderProgram _shaderProgramHandle;
   List<SamplerState> _samplerStateHandles;
   List<SpectreTexture> _textureHandles;
-  // Rasterizer
-  RasterizerState _rasterizerStateHandle;
-  // Output-Merger
-  DepthState _depthStateHandle;
   StencilState _stencilStateHandle;
   RenderTarget _renderTargetHandle;
 
@@ -56,6 +52,9 @@ class GraphicsContext {
   /// The default [BlendState] to use.
   /// Constructed with the values in [BlendState.opaque].
   BlendState _blendStateDefault;
+  /// The default [DepthState] to use.
+  /// Constructed with the values in [DepthState.depthWrite].
+  DepthState _depthStateDefault;
   /// The default [RasterizerState] to use.
   /// Constructed with the values in [RasterizerState.cullClockwise].
   RasterizerState _rasterizerStateDefault;
@@ -122,7 +121,12 @@ class GraphicsContext {
     );
 
     // DepthState setup
-    _depthState = new DepthState('DepthStateDefault', device);
+    _depthStateDefault = new DepthState.depthWrite('DepthStateDefault', device);
+    _depthState = new DepthState.depthWrite('CurrentDepthState', device);
+
+    device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+    device.gl.depthMask(_depthState.depthBufferWriteEnabled);
+    device.gl.depthFunc(_depthState.depthBufferFunction);
 
     // RasterizerState setup
     _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
@@ -229,12 +233,12 @@ class GraphicsContext {
       _samplerStateHandles[i] = null;
       _textureHandles[i] = null;
     }
-    _rasterizerStateHandle = null;
-    _depthStateHandle = null;
     _stencilStateHandle = null;
     _renderTargetHandle = null;
 
     setBlendState(_blendStateDefault);
+    setDepthState(_depthStateDefault);
+    setRasterizerState(_rasterizerStateDefault);
   }
 
   /// Configure the primitive topology
@@ -287,7 +291,6 @@ class GraphicsContext {
     ShaderProgram sp = shaderProgramHandle;
     device.gl.useProgram(sp._program);
   }
-
 
   /// Sets a [Viewport] identifying the portion of the render target to receive draw calls.
   void setViewport(Viewport viewport) {
@@ -418,7 +421,7 @@ class GraphicsContext {
     }
 
     if (_depthState.depthBufferEnabled != depthState.depthBufferEnabled) {
-      if (_depthState.depthBufferEnabled) {
+      if (depthState.depthBufferEnabled) {
         device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
       } else {
         device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
