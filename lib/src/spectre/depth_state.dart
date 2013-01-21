@@ -57,7 +57,25 @@ class DepthState extends DeviceChild {
 
   /// Creates an instance of [DepthState] with default values.
   DepthState(String name, GraphicsDevice device)
-      : super._internal(name, device);
+    : super._internal(name, device);
+
+  /// Creates an instance of [DepthState] with a writeable depth buffer.
+  DepthState.depthWrite(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _depthBufferEnabled = true
+    , _depthBufferWriteEnabled = true;
+
+  /// Creates an instance of [DepthState] with a read-only depth buffer.
+  DepthState.depthRead(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _depthBufferEnabled = true
+    , _depthBufferWriteEnabled = false;
+
+  /// Creates an instance of [DepthState] which doesn't use a depth buffer.
+  DepthState.none(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _depthBufferEnabled = false
+    , _depthBufferWriteEnabled = false;
 
   //---------------------------------------------------------------------
   // Properties
@@ -75,7 +93,7 @@ class DepthState extends DeviceChild {
 
   /// The comparison function for the depth-buffer test.
   /// The default is CompareFunction.LessEqual
-  int get depthBufferFunction => _depthBufferFunction = CompareFunction.LessEqual;
+  int get depthBufferFunction => _depthBufferFunction;
   set depthBufferFunction(int value) {
     if (!CompareFunction.isValid(value)) {
       throw new ArgumentError('depthBufferFunction must be an enumeration within CompareFunction.');
@@ -107,9 +125,9 @@ class DepthState extends DeviceChild {
   dynamic toJson() {
     Map json = new Map();
 
-    json[_depthBufferEnabledName] = _depthBufferEnabled;
+    json[_depthBufferEnabledName]      = _depthBufferEnabled;
     json[_depthBufferWriteEnabledName] = _depthBufferWriteEnabled;
-    json[_depthBufferFunctionName]     = _depthBufferFunctionName;
+    json[_depthBufferFunctionName]     = CompareFunction.stringify(_depthBufferFunction);
 
     return json;
   }
@@ -127,6 +145,6 @@ class DepthState extends DeviceChild {
     _depthBufferWriteEnabled = (value != null) ? value : _depthBufferWriteEnabled;
 
     value = values[_depthBufferFunctionName];
-    _depthBufferFunction = (value != null) ? value : _depthBufferFunction;
+    _depthBufferFunction = (value != null) ? CompareFunction.parse(value) : _depthBufferFunction;
   }
 }
