@@ -76,7 +76,7 @@ class Viewport extends DeviceChild {
   //---------------------------------------------------------------------
   // Equality
   //---------------------------------------------------------------------
-
+/*
   /// Compares two [Viewport]s for equality.
   bool operator== (Viewport other) {
     if (identical(this, other)) {
@@ -93,7 +93,7 @@ class Viewport extends DeviceChild {
 
     return ((_minDepth == other._minDepth) && (_maxDepth == other._maxDepth));
   }
-
+*/
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
