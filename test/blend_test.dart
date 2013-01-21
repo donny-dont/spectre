@@ -44,37 +44,37 @@ void main() {
   });
 
   test('stringify', () {
-    expect(Blend.stringify(Blend.Zero)                   , Blend.ZeroName);
-    expect(Blend.stringify(Blend.One)                    , Blend.OneName);
-    expect(Blend.stringify(Blend.SourceColor)            , Blend.SourceColorName);
-    expect(Blend.stringify(Blend.InverseSourceColor)     , Blend.InverseSourceColorName);
-    expect(Blend.stringify(Blend.SourceAlpha)            , Blend.SourceAlphaName);
-    expect(Blend.stringify(Blend.InverseSourceAlpha)     , Blend.InverseSourceAlphaName);
-    expect(Blend.stringify(Blend.DestinationAlpha)       , Blend.DestinationAlphaName);
-    expect(Blend.stringify(Blend.InverseDestinationAlpha), Blend.InverseDestinationAlphaName);
-    expect(Blend.stringify(Blend.DestinationColor)       , Blend.DestinationColorName);
-    expect(Blend.stringify(Blend.InverseDestinationColor), Blend.InverseDestinationColorName);
-    expect(Blend.stringify(Blend.SourceAlphaSaturation)  , Blend.SourceAlphaSaturationName);
-    expect(Blend.stringify(Blend.BlendFactor)            , Blend.BlendFactorName);
-    expect(Blend.stringify(Blend.InverseBlendFactor)     , Blend.InverseBlendFactorName);
+    expect(Blend.stringify(Blend.Zero)                   , 'Blend.Zero');
+    expect(Blend.stringify(Blend.One)                    , 'Blend.One');
+    expect(Blend.stringify(Blend.SourceColor)            , 'Blend.SourceColor');
+    expect(Blend.stringify(Blend.InverseSourceColor)     , 'Blend.InverseSourceColor');
+    expect(Blend.stringify(Blend.SourceAlpha)            , 'Blend.SourceAlpha');
+    expect(Blend.stringify(Blend.InverseSourceAlpha)     , 'Blend.InverseSourceAlpha');
+    expect(Blend.stringify(Blend.DestinationAlpha)       , 'Blend.DestinationAlpha');
+    expect(Blend.stringify(Blend.InverseDestinationAlpha), 'Blend.InverseDestinationAlpha');
+    expect(Blend.stringify(Blend.DestinationColor)       , 'Blend.DestinationColor');
+    expect(Blend.stringify(Blend.InverseDestinationColor), 'Blend.InverseDestinationColor');
+    expect(Blend.stringify(Blend.SourceAlphaSaturation)  , 'Blend.SourceAlphaSaturation');
+    expect(Blend.stringify(Blend.BlendFactor)            , 'Blend.BlendFactor');
+    expect(Blend.stringify(Blend.InverseBlendFactor)     , 'Blend.InverseBlendFactor');
 
     expect(() { Blend.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
-    expect(Blend.parse(Blend.ZeroName)                   , Blend.Zero);
-    expect(Blend.parse(Blend.OneName)                    , Blend.One);
-    expect(Blend.parse(Blend.SourceColorName)            , Blend.SourceColor);
-    expect(Blend.parse(Blend.InverseSourceColorName)     , Blend.InverseSourceColor);
-    expect(Blend.parse(Blend.SourceAlphaName)            , Blend.SourceAlpha);
-    expect(Blend.parse(Blend.InverseSourceAlphaName)     , Blend.InverseSourceAlpha);
-    expect(Blend.parse(Blend.DestinationAlphaName)       , Blend.DestinationAlpha);
-    expect(Blend.parse(Blend.InverseDestinationAlphaName), Blend.InverseDestinationAlpha);
-    expect(Blend.parse(Blend.DestinationColorName)       , Blend.DestinationColor);
-    expect(Blend.parse(Blend.InverseDestinationColorName), Blend.InverseDestinationColor);
-    expect(Blend.parse(Blend.SourceAlphaSaturationName)  , Blend.SourceAlphaSaturation);
-    expect(Blend.parse(Blend.BlendFactorName)            , Blend.BlendFactor);
-    expect(Blend.parse(Blend.InverseBlendFactorName)     , Blend.InverseBlendFactor);
+    expect(Blend.parse('Blend.Zero')                   , Blend.Zero);
+    expect(Blend.parse('Blend.One')                    , Blend.One);
+    expect(Blend.parse('Blend.SourceColor')            , Blend.SourceColor);
+    expect(Blend.parse('Blend.InverseSourceColor')     , Blend.InverseSourceColor);
+    expect(Blend.parse('Blend.SourceAlpha')            , Blend.SourceAlpha);
+    expect(Blend.parse('Blend.InverseSourceAlpha')     , Blend.InverseSourceAlpha);
+    expect(Blend.parse('Blend.DestinationAlpha')       , Blend.DestinationAlpha);
+    expect(Blend.parse('Blend.InverseDestinationAlpha'), Blend.InverseDestinationAlpha);
+    expect(Blend.parse('Blend.DestinationColor')       , Blend.DestinationColor);
+    expect(Blend.parse('Blend.InverseDestinationColor'), Blend.InverseDestinationColor);
+    expect(Blend.parse('Blend.SourceAlphaSaturation')  , Blend.SourceAlphaSaturation);
+    expect(Blend.parse('Blend.BlendFactor')            , Blend.BlendFactor);
+    expect(Blend.parse('Blend.InverseBlendFactor')     , Blend.InverseBlendFactor);
 
     expect(() { Blend.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });

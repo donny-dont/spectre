@@ -34,17 +34,17 @@ void main() {
   });
 
   test('stringify', () {
-    expect(BlendOperation.stringify(BlendOperation.Add)            , BlendOperation.AddName);
-    expect(BlendOperation.stringify(BlendOperation.ReverseSubtract), BlendOperation.ReverseSubtractName);
-    expect(BlendOperation.stringify(BlendOperation.Subtract)       , BlendOperation.SubtractName);
+    expect(BlendOperation.stringify(BlendOperation.Add)            , 'BlendOperation.Add');
+    expect(BlendOperation.stringify(BlendOperation.ReverseSubtract), 'BlendOperation.ReverseSubtract');
+    expect(BlendOperation.stringify(BlendOperation.Subtract)       , 'BlendOperation.Subtract');
 
     expect(() { BlendOperation.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
-    expect(BlendOperation.parse(BlendOperation.AddName)            , BlendOperation.Add);
-    expect(BlendOperation.parse(BlendOperation.ReverseSubtractName), BlendOperation.ReverseSubtract);
-    expect(BlendOperation.parse(BlendOperation.SubtractName)       , BlendOperation.Subtract);
+    expect(BlendOperation.parse('BlendOperation.Add')            , BlendOperation.Add);
+    expect(BlendOperation.parse('BlendOperation.ReverseSubtract'), BlendOperation.ReverseSubtract);
+    expect(BlendOperation.parse('BlendOperation.Subtract')       , BlendOperation.Subtract);
 
     expect(() { BlendOperation.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });

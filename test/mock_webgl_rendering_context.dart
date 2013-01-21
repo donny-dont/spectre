@@ -38,6 +38,10 @@ class MockWebGLRenderingContext extends Mock implements WebGLRenderingContext {
     when(callsTo('colorMask')).alwaysReturn(null);
     when(callsTo('blendColor')).alwaysReturn(null);
 
+    // DepthState calls
+    when(callsTo('depthFunc')).alwaysReturn(null);
+    when(callsTo('depthMask')).alwaysReturn(null);
+
     // RasterizerState calls
     when(callsTo('cullFace')).alwaysReturn(null);
     when(callsTo('frontFace')).alwaysReturn(null);

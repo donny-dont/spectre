@@ -42,11 +42,6 @@ class GraphicsContext {
   ShaderProgram _shaderProgramHandle;
   List<SamplerState> _samplerStateHandles;
   List<SpectreTexture> _textureHandles;
-  // Rasterizer
-  RasterizerState _rasterizerStateHandle;
-  Viewport _viewportHandle;
-  // Output-Merger
-  DepthState _depthStateHandle;
   StencilState _stencilStateHandle;
   RenderTarget _renderTargetHandle;
 
@@ -57,6 +52,9 @@ class GraphicsContext {
   /// The default [BlendState] to use.
   /// Constructed with the values in [BlendState.opaque].
   BlendState _blendStateDefault;
+  /// The default [DepthState] to use.
+  /// Constructed with the values in [DepthState.depthWrite].
+  DepthState _depthStateDefault;
   /// The default [RasterizerState] to use.
   /// Constructed with the values in [RasterizerState.cullClockwise].
   RasterizerState _rasterizerStateDefault;
@@ -65,8 +63,12 @@ class GraphicsContext {
   // State variables
   //---------------------------------------------------------------------
 
+  /// The current [Viewport] of the pipeline.
+  Viewport _viewport;
   /// The current [BlendState] of the pipeline.
   BlendState _blendState;
+  /// The current [DepthState] of the pipeline.
+  DepthState _depthState;
   /// The current [RasterizerState] of the pipeline.
   RasterizerState _rasterizerState;
 
@@ -87,6 +89,12 @@ class GraphicsContext {
   /// Initialize the WebGL pipeline state.
   /// Creates all the default state values and applies them to the pipeline.
   void _initializeState() {
+    // Viewport setup
+    _viewport = new Viewport('ViewportDefault', device);
+
+    device.gl.viewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height);
+    device.gl.depthRange(_viewport.minDepth, _viewport.maxDepth);
+
     // BlendState setup
     _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
     _blendState = new BlendState.opaque('CurrentBlendState', device);
@@ -111,6 +119,14 @@ class GraphicsContext {
       _blendState.blendFactorBlue,
       _blendState.blendFactorAlpha
     );
+
+    // DepthState setup
+    _depthStateDefault = new DepthState.depthWrite('DepthStateDefault', device);
+    _depthState = new DepthState.depthWrite('CurrentDepthState', device);
+
+    device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+    device.gl.depthMask(_depthState.depthBufferWriteEnabled);
+    device.gl.depthFunc(_depthState.depthBufferFunction);
 
     // RasterizerState setup
     _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
@@ -217,13 +233,12 @@ class GraphicsContext {
       _samplerStateHandles[i] = null;
       _textureHandles[i] = null;
     }
-    _rasterizerStateHandle = null;
-    _viewportHandle = null;
-    _depthStateHandle = null;
     _stencilStateHandle = null;
     _renderTargetHandle = null;
 
     setBlendState(_blendStateDefault);
+    setDepthState(_depthStateDefault);
+    setRasterizerState(_rasterizerStateDefault);
   }
 
   /// Configure the primitive topology
@@ -277,17 +292,31 @@ class GraphicsContext {
     device.gl.useProgram(sp._program);
   }
 
+  /// Sets a [Viewport] identifying the portion of the render target to receive draw calls.
+  void setViewport(Viewport viewport) {
+    if (viewport == null) {
+      return;
+    }
 
-  /// Set Viewport to [viewportHandle]
-  void setViewport(Viewport vp) {
-    if (vp == _viewportHandle) {
-      return;
+    if ((_viewport.x      != viewport.x)     ||
+        (_viewport.y      != viewport.y)     ||
+        (_viewport.width  != viewport.width) ||
+        (_viewport.height != viewport.height))
+    {
+      device.gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+
+      _viewport.x      = viewport.x;
+      _viewport.y      = viewport.y;
+      _viewport.width  = viewport.width;
+      _viewport.height = viewport.height;
     }
-    _viewportHandle = vp;
-    if (vp == null) {
-      return;
+
+    if ((_viewport.minDepth != viewport.minDepth) || (_viewport.maxDepth != viewport.maxDepth)) {
+      device.gl.depthRange(viewport.minDepth, viewport.maxDepth);
+
+      _viewport.minDepth = viewport.minDepth;
+      _viewport.maxDepth = viewport.maxDepth;
     }
-    device.gl.viewport(vp.x, vp.y, vp.width, vp.height);
   }
 
   /// Sets the current [BlendState] to use on the pipeline.
@@ -382,29 +411,35 @@ class GraphicsContext {
     }
   }
 
-  /// Set DepthState to [depthStateHandle]
-  void setDepthState(DepthState ds) {
-    if (_depthStateHandle == ds) {
+  /// Sets the current [DepthState] to use on the pipeline.
+  ///
+  /// If [depthState] is null all values of the pipeline associated with depth
+  /// will be reset to their defaults.
+  void setDepthState(DepthState depthState) {
+    if (depthState == null) {
       return;
     }
-    if (ds == null) {
-      return;
-    }
-    device.gl.depthRange(ds.depthNearVal, ds.depthFarVal);
-    if (ds.depthTestEnabled == false) {
-      device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
-    } else {
-      device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
-      device.gl.depthFunc(ds.depthComparisonOp);
+
+    if (_depthState.depthBufferEnabled != depthState.depthBufferEnabled) {
+      if (depthState.depthBufferEnabled) {
+        device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+      } else {
+        device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
+      }
+
+      _depthState.depthBufferEnabled = depthState.depthBufferEnabled;
     }
 
-    device.gl.depthMask(ds.depthWriteEnabled);
+    if ((_depthState.depthBufferEnabled) && (_depthState.depthBufferFunction != depthState.depthBufferFunction)) {
+      device.gl.depthFunc(depthState.depthBufferFunction);
 
-    if (ds.polygonOffsetEnabled == false) {
-      device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-    } else {
-      device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
-      device.gl.polygonOffset(ds.polygonOffsetFactor, ds.polygonOffsetUnits);
+      _depthState.depthBufferFunction = depthState.depthBufferFunction;
+    }
+
+    if (_depthState.depthBufferWriteEnabled != depthState.depthBufferWriteEnabled) {
+      device.gl.depthMask(depthState.depthBufferWriteEnabled);
+
+      _depthState.depthBufferWriteEnabled = depthState.depthBufferWriteEnabled;
     }
   }
 

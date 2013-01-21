@@ -33,15 +33,15 @@ void main() {
   });
 
   test('stringify', () {
-    expect(FrontFace.stringify(FrontFace.Clockwise)       , FrontFace.ClockwiseName);
-    expect(FrontFace.stringify(FrontFace.CounterClockwise), FrontFace.CounterClockwiseName);
+    expect(FrontFace.stringify(FrontFace.Clockwise)       , 'FrontFace.Clockwise');
+    expect(FrontFace.stringify(FrontFace.CounterClockwise), 'FrontFace.CounterClockwise');
 
     expect(() { FrontFace.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
-    expect(FrontFace.parse(FrontFace.ClockwiseName)       , FrontFace.Clockwise);
-    expect(FrontFace.parse(FrontFace.CounterClockwiseName), FrontFace.CounterClockwise);
+    expect(FrontFace.parse('FrontFace.Clockwise')       , FrontFace.Clockwise);
+    expect(FrontFace.parse('FrontFace.CounterClockwise'), FrontFace.CounterClockwise);
 
     expect(() { FrontFace.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });

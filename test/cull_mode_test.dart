@@ -34,17 +34,17 @@ void main() {
   });
 
   test('stringify', () {
-    expect(CullMode.stringify(CullMode.None) , CullMode.NoneName);
-    expect(CullMode.stringify(CullMode.Front), CullMode.FrontName);
-    expect(CullMode.stringify(CullMode.Back) , CullMode.BackName);
+    expect(CullMode.stringify(CullMode.None) , 'CullMode.None');
+    expect(CullMode.stringify(CullMode.Front), 'CullMode.Front');
+    expect(CullMode.stringify(CullMode.Back) , 'CullMode.Back');
 
     expect(() { CullMode.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
   });
 
   test('parse', () {
-    expect(CullMode.parse(CullMode.NoneName) , CullMode.None);
-    expect(CullMode.parse(CullMode.FrontName), CullMode.Front);
-    expect(CullMode.parse(CullMode.BackName) , CullMode.Back);
+    expect(CullMode.parse('CullMode.None') , CullMode.None);
+    expect(CullMode.parse('CullMode.Front'), CullMode.Front);
+    expect(CullMode.parse('CullMode.Back') , CullMode.Back);
 
     expect(() { CullMode.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
   });

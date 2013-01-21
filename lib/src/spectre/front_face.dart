@@ -24,20 +24,33 @@ part of spectre;
 
 /// Defines the winding used to determine whether a triangle is front or back facing.
 class FrontFace {
+  //---------------------------------------------------------------------
+  // Serialization names
+  //---------------------------------------------------------------------
+
+  /// String representation of [Clockwise].
+  static const String _clockwiseName = 'FrontFace.Clockwise';
+  /// String representation of [CounterClockwise].
+  static const String _counterClockwiseName = 'FrontFace.CounterClockwise';
+
+  //---------------------------------------------------------------------
+  // Enumerations
+  //---------------------------------------------------------------------
+
   /// Triangles are considered front-facing if its vertices are clockwise.
   static const int Clockwise = WebGLRenderingContext.CW;
-  /// String representation of [Clockwise].
-  static const String ClockwiseName = 'FrontFace.Clockwise';
   /// Triangles are considered front-facing if its vertices are counter-clockwise.
   static const int CounterClockwise = WebGLRenderingContext.CCW;
-  /// String representation of [CounterClockwise].
-  static const String CounterClockwiseName = 'FrontFace.CounterClockwise';
+
+  //---------------------------------------------------------------------
+  // Class methods
+  //---------------------------------------------------------------------
 
   /// Convert from a [String] name to the corresponding [FrontFace] enumeration.
   static int parse(String name) {
-    if (name == ClockwiseName) {
+    if (name == _clockwiseName) {
       return Clockwise;
-    } else if (name == CounterClockwiseName) {
+    } else if (name == _counterClockwiseName) {
       return CounterClockwise;
     }
 
@@ -48,13 +61,13 @@ class FrontFace {
   /// Converts the [Blend] enumeration to a [String].
   static String stringify(int value) {
     if (value == Clockwise) {
-      return ClockwiseName;
+      return _clockwiseName;
     } else if (value == CounterClockwise) {
-      return CounterClockwiseName;
+      return _counterClockwiseName;
     }
 
     assert(false);
-    return ClockwiseName;
+    return _clockwiseName;
   }
 
   /// Checks whether the value is a valid enumeration.

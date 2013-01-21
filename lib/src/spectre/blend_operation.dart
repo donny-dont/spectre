@@ -23,32 +23,45 @@ part of spectre;
 */
 
 class BlendOperation {
+  //---------------------------------------------------------------------
+  // Serialization names
+  //---------------------------------------------------------------------
+
+  /// String representation of [Add].
+  static const String _addName = 'BlendOperation.Add';
+  /// String representation of [Subtract].
+  static const String _reverseSubtractName = 'BlendOperation.ReverseSubtract';
+  /// String representation of [Subtract].
+  static const String _subtractName = 'BlendOperation.Subtract';
+
+  //---------------------------------------------------------------------
+  // Enumerations
+  //---------------------------------------------------------------------
+
   /// The result is the destination added to the source.
   ///
   ///     Result = (Source Color * Source Blend) + (Destination Color * Destination Blend)
   static const int Add = WebGLRenderingContext.FUNC_ADD;
-  /// String representation of [Add].
-  static const String AddName = 'BlendOperation.Add';
   /// The result is the source subtracted from the destination.
   ///
   ///     Result = (Destination Color * Destination Blend) - (Source Color * Source Blend)
   static const int ReverseSubtract = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
-  /// String representation of [Subtract].
-  static const String ReverseSubtractName = 'BlendOperation.ReverseSubtract';
   /// The result is the destination subtracted from the source.
   ///
   ///     Result = (Source Color * Source Blend) - (Destination Color * Destination Blend)
   static const int Subtract = WebGLRenderingContext.FUNC_SUBTRACT;
-  /// String representation of [Subtract].
-  static const String SubtractName = 'BlendOperation.Subtract';
+
+  //---------------------------------------------------------------------
+  // Class methods
+  //---------------------------------------------------------------------
 
   /// Convert from a [String] name to the corresponding [BlendOperation] enumeration.
   static int parse(String name) {
-    if (name == AddName) {
+    if (name == _addName) {
       return Add;
-    } else if (name == ReverseSubtractName) {
+    } else if (name == _reverseSubtractName) {
       return ReverseSubtract;
-    } else if (name == SubtractName) {
+    } else if (name == _subtractName) {
       return Subtract;
     }
 
@@ -59,15 +72,15 @@ class BlendOperation {
   /// Converts the [BlendOperation] enumeration to a [String].
   static String stringify(int value) {
     if (value == Add) {
-      return AddName;
+      return _addName;
     } else if (value == ReverseSubtract) {
-      return ReverseSubtractName;
+      return _reverseSubtractName;
     } else if (value == Subtract) {
-      return SubtractName;
+      return _subtractName;
     }
 
     assert(false);
-    return AddName;
+    return _addName;
   }
 
   /// Checks whether the value is a valid enumeration.

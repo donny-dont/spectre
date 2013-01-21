@@ -24,26 +24,39 @@ part of spectre;
 
 /// Indicates whether triangles facing a particular direction are drawn.
 class CullMode {
+  //---------------------------------------------------------------------
+  // Serialization names
+  //---------------------------------------------------------------------
+
+  /// String representation of [None].
+  static const String _noneName = 'CullMode.None';
+  /// String representation of [Front].
+  static const String _frontName = 'CullMode.Front';
+  /// String representation of [Back].
+  static const String _backName = 'CullMode.Back';
+
+  //---------------------------------------------------------------------
+  // Enumerations
+  //---------------------------------------------------------------------
+
   /// Always draw all triangles.
   static const int None = 0;
-  /// String representation of [None].
-  static const String NoneName = 'CullMode.None';
   /// Do not draw triangles that are front-facing.
-  static int Front = WebGLRenderingContext.FRONT;
-  /// String representation of [Front].
-  static const String FrontName = 'CullMode.Front';
+  static const int Front = WebGLRenderingContext.FRONT;
   /// Do not draw triangles that are back-facing.
-  static int Back = WebGLRenderingContext.BACK;
-  /// String representation of [Back].
-  static const String BackName = 'CullMode.Back';
+  static const int Back = WebGLRenderingContext.BACK;
+
+  //---------------------------------------------------------------------
+  // Class methods
+  //---------------------------------------------------------------------
 
   /// Convert from a [String] name to the corresponding [CullMode] enumeration.
   static int parse(String name) {
-    if (name == NoneName) {
+    if (name == _noneName) {
       return None;
-    } else if (name == FrontName) {
+    } else if (name == _frontName) {
       return Front;
-    } else if (name == BackName) {
+    } else if (name == _backName) {
       return Back;
     }
 
@@ -54,15 +67,15 @@ class CullMode {
   /// Converts the [CullMode] enumeration to a [String].
   static String stringify(int value) {
     if (value == None) {
-      return NoneName;
+      return _noneName;
     } else if (value == Front) {
-      return FrontName;
+      return _frontName;
     } else if (value == Back) {
-      return BackName;
+      return _backName;
     }
 
     assert(false);
-    return NoneName;
+    return _noneName;
   }
 
   /// Checks whether the value is a valid enumeration.
