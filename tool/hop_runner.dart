@@ -9,7 +9,7 @@ import 'package:bot/hop_tasks.dart';
 void main() {
   _assertKnownPath();
 
-  addTask('docs', getCompileDocsFunc('origin/gh-pages', 'packages/', _getLibs));
+  addTask('docs', getCompileDocsFunc('gh-pages', 'packages/', _getLibs));
 
   runHopCore();
 }
