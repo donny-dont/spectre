@@ -24,7 +24,8 @@
 library spectre_asset_pack;
 
 import 'dart:html';
-import 'dart:json';
+import 'dart:json' as JSON;
+import 'dart:async';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 
