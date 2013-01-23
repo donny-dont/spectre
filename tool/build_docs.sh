@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+##
+# Run from the root of the spectre project to generate docs and
+# deploy to gh-pages on github. 
+# ~/dart/spectre$ ./tool/build_docs.sh
+##
 git push origin --delete gh-pages
 git checkout --orphan gh-pages &&
 dartdoc -m static --pkg packages/ lib/*.dart &&
