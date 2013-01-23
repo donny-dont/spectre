@@ -277,7 +277,7 @@ class ShaderProgramResource extends ResourceBase {
       }
     }
     if (futures.length > 0) {
-      Future all = Futures.wait(futures);
+      Future all = Future.wait(futures);
       all.then((results) {
         int index = 0;
         if (fetchedVertex) {
@@ -383,7 +383,7 @@ class PackResource extends ResourceBase {
         }
       }
       _fireUpdated();
-      Future allLoaded = Futures.wait(futures);
+      Future allLoaded = Future.wait(futures);
       allLoaded.then((_unused) {
         result.completer.complete(result.handle);
       });
