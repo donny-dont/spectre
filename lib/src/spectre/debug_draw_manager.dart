@@ -216,7 +216,7 @@ class DebugDrawManager {
   final GraphicsDevice device;
 
   /** Construct and initialize a DebugDrawManager. */
-  DebugDrawManager(this.device, [int vboSize=16384]) {
+  DebugDrawManager(this.device, {int vboSize: 16384}) {
     _depthEnabled = device.createDepthState(_depthStateEnabledName);
     _depthEnabled.depthBufferEnabled = true;
     _depthEnabled.depthBufferWriteEnabled = true;
@@ -270,7 +270,7 @@ class DebugDrawManager {
    * The line is drawn in [color] for [duration] seconds.
    */
   void addLine(vec3 start, vec3 finish, vec4 color,
-               [num duration = 0.0, bool depthEnabled=true]) {
+               {num duration: 0.0, bool depthEnabled: true}) {
     if (depthEnabled) {
       _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
                                                color.a, duration);

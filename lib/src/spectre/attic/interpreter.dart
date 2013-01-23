@@ -27,7 +27,7 @@ class Interpreter {
   List registers;
 
   Interpreter() {
-    registers = new List(NumRegisters);
+    registers = new List.fixedLength(NumRegisters);
   }
 
   void clearRegisters() {
@@ -173,7 +173,7 @@ class Interpreter {
           final ShaderProgram shaderProgramHandle = program[i+3];
           final List<InputLayoutDescription> inputs = program[i+4];
           final List output = program[i+5];
-          List<InputElementDescription> elements = new List<InputElementDescription>(inputs.length);
+          List<InputElementDescription> elements = new List<InputElementDescription>.fixedLength(inputs.length);
           for (int j = 0; j < inputs.length; j++) {
             elements[j] = InputLayoutHelper.inputElementDescriptionFromMesh(inputs[j], mr);
           }

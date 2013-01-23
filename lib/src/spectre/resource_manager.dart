@@ -135,7 +135,7 @@ class ResourceManager {
       var r = loadResource(handle, force);
       futures.add(r);
     });
-    Future<List> allFutures = Futures.wait(futures);
+    Future<List> allFutures = Future.wait(futures);
     Completer<bool> completer = new Completer<bool>();
     allFutures.then((result) {
       completer.complete(true);

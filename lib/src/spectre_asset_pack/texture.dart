@@ -111,7 +111,7 @@ class _ImagePackLoader extends AssetLoader {
           Future futureImg = imgLoader.load(imgRequest);
           futureImages.add(futureImg);
         });
-        Futures.wait(futureImages).then((images) {
+        Future.wait(futureImages).then((images) {
           completer.complete(images);
         });
       } catch (e) {

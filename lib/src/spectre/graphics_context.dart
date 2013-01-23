@@ -77,9 +77,9 @@ class GraphicsContext {
   //---------------------------------------------------------------------
 
   GraphicsContext(this.device) {
-    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
-    _samplerStateHandles = new List<SamplerState>(numTextures);
-    _textureHandles = new List<SpectreTexture>(numTextures);
+    _vertexBufferHandles = new List<VertexBuffer>.fixedLength(numVertexBuffers);
+    _samplerStateHandles = new List<SamplerState>.fixedLength(numTextures);
+    _textureHandles = new List<SpectreTexture>.fixedLength(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
 
     _initializeState();
@@ -145,7 +145,7 @@ class GraphicsContext {
   void _PrepareTextures() {
   }
 
-  void _prepareInputs([bool debug=false]) {
+  void _prepareInputs({bool debug: false}) {
     if (_inputLayoutHandle == 0) {
       spectreLog.Error('Prepare for draw no input layout');
       return;

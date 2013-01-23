@@ -92,7 +92,7 @@ class _TextListLoader extends AssetLoader {
           var futureText = textLoader.load(textRequest);
           futureTexts.add(futureText);
         });
-        Futures.wait(futureTexts).then((text) {
+        Future.wait(futureTexts).then((text) {
           completer.complete(text);
         });
       } catch (e) {

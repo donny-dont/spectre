@@ -41,7 +41,7 @@ List<vec2> lineNormals;
 
 void _makeNormals() {
   assert(lineStart.length == lineEnd.length);
-  lineNormals = new List<vec2>(lineStart.length);
+  lineNormals = new List<vec2>.fixedLength(lineStart.length);
   for (int i = 0; i < lineStart.length; i++) {
     vec2 n = lineEnd[i]-lineStart[i];
     n.normalize();
