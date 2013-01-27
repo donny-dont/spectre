@@ -15,4 +15,5 @@ dependencies:
     git: https://github.com/johnmccutchan/asset_pack.git
   property_map:
     git: https://github.com/sethillgard/property_map.git
-  browser: any
+  bot:
+    git: git://github.com/kevmoo/bot.dart.git
