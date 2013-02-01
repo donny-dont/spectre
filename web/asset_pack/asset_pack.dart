@@ -17,12 +17,26 @@ GameLoop _gameLoop;
 AssetManager _assetManager;
 
 Viewport _viewport;
-Camera _camera;
+final Camera camera = new Camera();
+final cameraController = new MouseKeyboardCameraController();
 double _lastTime;
 bool _circleDrawn = false;
 
 void gameFrame(GameLoop gameLoop) {
   double dt = gameLoop.dt;
+  cameraController.forward =
+      gameLoop.keyboard.buttons[GameLoopKeyboard.W].down;
+  cameraController.backward =
+      gameLoop.keyboard.buttons[GameLoopKeyboard.S].down;
+  cameraController.strafeLeft =
+      gameLoop.keyboard.buttons[GameLoopKeyboard.A].down;
+  cameraController.strafeRight =
+      gameLoop.keyboard.buttons[GameLoopKeyboard.D].down;
+  if (gameLoop.pointerLock.locked) {
+    cameraController.accumDX = gameLoop.mouse.dx;
+    cameraController.accumDY = gameLoop.mouse.dy;
+  }
+  cameraController.UpdateCamera(gameLoop.dt, camera);
   // Update the debug draw manager state
   _debugDrawManager.update(dt);
 }
@@ -55,11 +69,13 @@ void renderFrame(GameLoop gameLoop) {
                                 new vec4.raw(1.0, 1.0, 1.0, 1.0),
                                 5.0);
   }
+
   _drawSkybox();
+  _drawSkinnedCharacter();
   // Prepare the debug draw manager for rendering
   _debugDrawManager.prepareForRender();
   // Render it
-  _debugDrawManager.render(_camera);
+  _debugDrawManager.render(camera);
 }
 
 // Handle resizes
@@ -72,7 +88,7 @@ void resizeFrame(GameLoop gameLoop) {
   _viewport.width = canvas.width;
   _viewport.height = canvas.height;
   // Fix the camera's aspect ratio
-  _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
+  camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
 }
 
 SingleArrayIndexedMesh _skyboxMesh;
@@ -95,6 +111,7 @@ void _setupSkybox() {
   _skyboxSampler = _graphicsDevice.createSamplerState('skybox.ss');
   _skyboxDepthState = _graphicsDevice.createDepthState('skybox.ds');
   _skyboxBlendState = _graphicsDevice.createBlendState('skybox.bs');
+  _skyboxBlendState.enabled = false;
   _skyboxRasterizerState = _graphicsDevice.createRasterizerState('skybox.rs');
   _skyboxRasterizerState.cullMode = CullMode.None;
 }
@@ -108,18 +125,90 @@ void _drawSkybox() {
   context.setShaderProgram(_skyboxShaderProgram);
   context.setTextures(0, [_assetManager.assets.space]);
   context.setSamplers(0, [_skyboxSampler]);
-  mat4 P = _camera.projectionMatrix;
-  mat4 LA = makeLookAt(new vec3.zero(),
-                       _camera.frontDirection,
-                       new vec3(0.0, 1.0, 0.0));
-  P.multiply(LA);
-  P.copyIntoArray(_cameraTransform, 0);
+  {
+    mat4 P = camera.projectionMatrix;
+    mat4 LA = makeLookAt(new vec3.zero(),
+        camera.frontDirection,
+        new vec3(0.0, 1.0, 0.0));
+    P.multiply(LA);
+    P.copyIntoArray(_cameraTransform, 0);
+  }
   context.setConstant('cameraTransform', _cameraTransform);
   context.setBlendState(_skyboxBlendState);
   context.setRasterizerState(_skyboxRasterizerState);
   context.setDepthState(_skyboxDepthState);
   context.setIndexedMesh(_skyboxMesh);
   context.drawIndexedMesh(_skyboxMesh);
+}
+
+ShaderProgram _skinnedShaderProgram;
+InputLayout _skinnedInputLayout;
+SkinnedMesh _skinnedMesh;
+RasterizerState _skinnedRasterizerState;
+DepthState _skinnedDepthState;
+
+void _drawSkinnedBones(SkinnedMesh mesh, int id) {
+  List<double> origin = [0.0, 0.0, 0.0];
+  origin[0] = mesh.finalBoneTransforms[id][12];
+  origin[1] = mesh.finalBoneTransforms[id][13];
+  origin[2] = mesh.finalBoneTransforms[id][14];
+  int childOffset = mesh.boneChildrenOffsets[id];
+  while (mesh.boneChildrenIds[childOffset] != -1) {
+    List<double> end = [0.0, 0.0, 0.0];
+    int childId = mesh.boneChildrenIds[childOffset];
+    end[0] = mesh.finalBoneTransforms[childId][12];
+    end[1] = mesh.finalBoneTransforms[childId][13];
+    end[2] = mesh.finalBoneTransforms[childId][14];
+    _debugDrawManager.addLine(new vec3.raw(origin[0],
+                                           origin[1],
+                                           origin[2]),
+                              new vec3.raw(end[0], end[1], end[2]),
+                              new vec4.raw(1.0, 1.0, 1.0, 1.0));
+    _drawSkinnedBones(mesh, childId);
+    childOffset++;
+  }
+}
+
+void _setupSkinnedCharacter() {
+  _skinnedShaderProgram = _assetManager.assets.litdiffuse;
+  assert(_skinnedShaderProgram.linked == true);
+  _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
+                                   _assetManager.assets.bob);
+  _skinnedInputLayout = _graphicsDevice.createInputLayout('skinned.il');
+  _skinnedInputLayout.mesh = _skinnedMesh;
+  _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
+  _skinnedRasterizerState = _graphicsDevice.createRasterizerState('skinned.rs');
+  _skinnedRasterizerState.cullMode = CullMode.Back;
+  _skinnedDepthState = _graphicsDevice.createDepthState('skinned.ds');
+  _skinnedDepthState.depthBufferEnabled = true;
+  _skinnedDepthState.depthBufferWriteEnabled = true;
+  _skinnedDepthState.depthBufferFunction = CompareFunction.LessEqual;
+}
+
+void _drawSkinnedCharacter() {
+  _drawSkinnedBones(_skinnedMesh, 0);
+  var context = _graphicsDevice.context;
+  context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+  context.setShaderProgram(_skinnedShaderProgram);
+  context.setTextures(0, [_assetManager.assets.wood]);
+  context.setSamplers(0, [_skyboxSampler]);
+  {
+    mat4 P = camera.projectionMatrix;
+    mat4 LA = camera.lookAtMatrix;
+    P.multiply(LA);
+    P.copyIntoArray(_cameraTransform, 0);
+  }
+  context.setConstant('cameraTransform', _cameraTransform);
+  context.setBlendState(_skyboxBlendState);
+  context.setRasterizerState(_skinnedRasterizerState);
+  context.setDepthState(_skinnedDepthState);
+  context.setIndexBuffer(_skinnedMesh.indexArray);
+  context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
+  context.setInputLayout(_skinnedInputLayout);
+  for (int i = 0; i < 2; i++) {
+    context.drawIndexed(_skinnedMesh.meshes[i]['count'],
+                        _skinnedMesh.meshes[i]['offset']);
+  }
 }
 
 main() {
@@ -155,10 +244,9 @@ main() {
   _viewport.height = canvas.height;
 
   // Create the camera
-  _camera = new Camera();
-  _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  _camera.position = new vec3.raw(2.0, 2.0, 2.0);
-  _camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+  camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
+  camera.position = new vec3.raw(2.0, 2.0, 2.0);
+  camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
 
   _assetManager = new AssetManager();
   registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
@@ -169,6 +257,7 @@ main() {
   _assetManager.loadPack('assets', '$baseUrl/assets.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
+    _setupSkinnedCharacter();
     _gameLoop.start();
   });
 }
