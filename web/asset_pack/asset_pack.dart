@@ -190,7 +190,6 @@ void _drawSkinnedCharacter() {
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);
-  context.setTextures(0, [_assetManager.assets.wood]);
   context.setSamplers(0, [_skyboxSampler]);
   {
     mat4 P = camera.projectionMatrix;
@@ -205,10 +204,32 @@ void _drawSkinnedCharacter() {
   context.setIndexBuffer(_skinnedMesh.indexArray);
   context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
   context.setInputLayout(_skinnedInputLayout);
-  for (int i = 0; i < 2; i++) {
-    context.drawIndexed(_skinnedMesh.meshes[i]['count'],
-                        _skinnedMesh.meshes[i]['offset']);
-  }
+
+  //context.drawIndexed(3081, 0);
+  //int count;
+  //int offset;
+
+  // Draw with body texture
+  context.setTextures(0, [_assetManager.assets.guard_body]);
+  context.drawIndexed(_skinnedMesh.meshes[0]['count'], _skinnedMesh.meshes[0]['offset']);
+  context.drawIndexed(_skinnedMesh.meshes[5]['count'], _skinnedMesh.meshes[5]['offset']);
+
+  // Draw with face texture
+  context.setTextures(0, [_assetManager.assets.guard_face]);
+  context.drawIndexed(_skinnedMesh.meshes[1]['count'], _skinnedMesh.meshes[1]['offset']);
+
+  // Draw with helmet texture
+  context.setTextures(0, [_assetManager.assets.guard_helmet]);
+  context.drawIndexed(_skinnedMesh.meshes[2]['count'], _skinnedMesh.meshes[2]['offset']);
+
+  // Draw with iron grill texture
+  context.setTextures(0, [_assetManager.assets.iron_grill]);
+  context.drawIndexed(_skinnedMesh.meshes[3]['count'], _skinnedMesh.meshes[3]['offset']);
+
+  // Draw with round grill texture
+  context.setTextures(0, [_assetManager.assets.round_grill]);
+  context.drawIndexed(_skinnedMesh.meshes[4]['count'], _skinnedMesh.meshes[4]['offset']);
+
 }
 
 main() {

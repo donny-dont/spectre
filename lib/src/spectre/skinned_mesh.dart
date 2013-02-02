@@ -343,10 +343,6 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     int boneId = boneIndex++;
     String name = b['name'];
     List<String> children = b['children'];
-    // HACK around broken bone hierarchy.
-    if (name == "origin") {
-      children = ["sheath", "pubis"];
-    }
     if (children == null) {
       children = [];
     }
