@@ -146,25 +146,36 @@ InputLayout _skinnedInputLayout;
 SkinnedMesh _skinnedMesh;
 RasterizerState _skinnedRasterizerState;
 DepthState _skinnedDepthState;
-
-void _drawSkinnedBones(SkinnedMesh mesh, int id) {
+int _depthGuard = 100;
+double _skeletonScale = 1.0;
+void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   List<double> origin = [0.0, 0.0, 0.0];
-  origin[0] = mesh.finalBoneTransforms[id][12];
-  origin[1] = mesh.finalBoneTransforms[id][13];
-  origin[2] = mesh.finalBoneTransforms[id][14];
+  origin[0] = mesh.globalBoneTransforms[id][12] * _skeletonScale;
+  origin[1] = mesh.globalBoneTransforms[id][13] * _skeletonScale;
+  origin[2] = mesh.globalBoneTransforms[id][14] * _skeletonScale;
   int childOffset = mesh.boneChildrenOffsets[id];
+  if (id == 0) {
+    _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
+        new vec4.raw(1.0, 0.0, 1.0, 1.0));
+  } else {
+  _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
+                             new vec4.raw(0.0, 1.0, 1.0, 1.0));
+  }
+  if (depth >= _depthGuard) {
+    return;
+  }
   while (mesh.boneChildrenIds[childOffset] != -1) {
     List<double> end = [0.0, 0.0, 0.0];
     int childId = mesh.boneChildrenIds[childOffset];
-    end[0] = mesh.finalBoneTransforms[childId][12];
-    end[1] = mesh.finalBoneTransforms[childId][13];
-    end[2] = mesh.finalBoneTransforms[childId][14];
+    end[0] = mesh.globalBoneTransforms[childId][12] * _skeletonScale;
+    end[1] = mesh.globalBoneTransforms[childId][13] * _skeletonScale;
+    end[2] = mesh.globalBoneTransforms[childId][14] * _skeletonScale;
     _debugDrawManager.addLine(new vec3.raw(origin[0],
                                            origin[1],
                                            origin[2]),
                               new vec3.raw(end[0], end[1], end[2]),
                               new vec4.raw(1.0, 1.0, 1.0, 1.0));
-    _drawSkinnedBones(mesh, childId);
+    _drawSkinnedBones(mesh, childId, depth+1);
     childOffset++;
   }
 }
@@ -186,7 +197,9 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  _drawSkinnedBones(_skinnedMesh, 0);
+  _skinnedMesh.update(1.0/60.0);
+  _drawSkinnedBones(_skinnedMesh, 0, 0);
+  return;
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);
