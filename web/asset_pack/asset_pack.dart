@@ -24,6 +24,8 @@ bool _circleDrawn = false;
 
 void gameFrame(GameLoop gameLoop) {
   double dt = gameLoop.dt;
+  cameraController.forwardVelocity = 25.0;
+  cameraController.strafeVelocity = 25.0;
   cameraController.forward =
       gameLoop.keyboard.buttons[GameLoopKeyboard.W].down;
   cameraController.backward =
@@ -150,9 +152,9 @@ int _depthGuard = 100;
 double _skeletonScale = 1.0;
 void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   List<double> origin = [0.0, 0.0, 0.0];
-  origin[0] = mesh.globalBoneTransforms[id][12] * _skeletonScale;
-  origin[1] = mesh.globalBoneTransforms[id][13] * _skeletonScale;
-  origin[2] = mesh.globalBoneTransforms[id][14] * _skeletonScale;
+  origin[0] = mesh.skinningBoneTransforms[id][12] * _skeletonScale;
+  origin[1] = mesh.skinningBoneTransforms[id][13] * _skeletonScale;
+  origin[2] = mesh.skinningBoneTransforms[id][14] * _skeletonScale;
   int childOffset = mesh.boneChildrenOffsets[id];
   if (id == 0) {
     _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
@@ -167,9 +169,9 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   while (mesh.boneChildrenIds[childOffset] != -1) {
     List<double> end = [0.0, 0.0, 0.0];
     int childId = mesh.boneChildrenIds[childOffset];
-    end[0] = mesh.globalBoneTransforms[childId][12] * _skeletonScale;
-    end[1] = mesh.globalBoneTransforms[childId][13] * _skeletonScale;
-    end[2] = mesh.globalBoneTransforms[childId][14] * _skeletonScale;
+    end[0] = mesh.skinningBoneTransforms[childId][12] * _skeletonScale;
+    end[1] = mesh.skinningBoneTransforms[childId][13] * _skeletonScale;
+    end[2] = mesh.skinningBoneTransforms[childId][14] * _skeletonScale;
     _debugDrawManager.addLine(new vec3.raw(origin[0],
                                            origin[1],
                                            origin[2]),
@@ -197,9 +199,8 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  _skinnedMesh.update(1.0/60.0);
+  //_skinnedMesh.update(1.0/60.0);
   _drawSkinnedBones(_skinnedMesh, 0, 0);
-  return;
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);

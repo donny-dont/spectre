@@ -103,6 +103,29 @@ class Float32ListHelpers {
     out[15] = 1.0;
   }
 
+  static void zero(Float32List out) {
+    out[0] = 0.0;
+    out[1] = 0.0;
+    out[2] = 0.0;
+    out[3] = 0.0;
+
+    out[4] = 0.0;
+    out[5] = 0.0;
+    out[6] = 0.0;
+    out[7] = 0.0;
+
+    out[8] = 0.0;
+    out[9] = 0.0;
+    out[10] = 0.0;
+    out[11] = 0.0;
+
+    out[12] = 0.0;
+    out[13] = 0.0;
+    out[14] = 0.0;
+    out[15] = 0.0;
+  }
+
+
   static void translate(Float32List out, Float32List v) {
     var x = v[0], y = v[1], z = v[2];
     out[12] = out[0] * x + out[4] * y + out[8] * z + out[12];
@@ -147,6 +170,35 @@ class Float32ListHelpers {
     out[13] = v[vIndex+1];
     out[14] = v[vIndex+2];
     out[15] = 1.0;
+  }
+
+  static void transform(out, int oi,
+                             a, int ii,
+                             m) {
+    var x = a[ii+0], y = a[ii+1], z = a[ii+2], w = a[ii+3];
+    out[oi+0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+    out[oi+1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+    out[oi+2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+    out[oi+3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+  }
+
+  static void addScale44(out, input, scale) {
+    out[0] += input[0] * scale;
+    out[1] += input[1] * scale;
+    out[2] += input[2] * scale;
+    out[3] += input[3] * scale;
+    out[4] += input[4] * scale;
+    out[5] += input[5] * scale;
+    out[6] += input[6] * scale;
+    out[7] += input[7] * scale;
+    out[8] += input[8] * scale;
+    out[9] += input[9] * scale;
+    out[10] += input[10] * scale;
+    out[11] += input[11] * scale;
+    out[12] += input[12] * scale;
+    out[13] += input[13] * scale;
+    out[14] += input[14] * scale;
+    out[15] += input[15] * scale;
   }
 }
 
@@ -269,14 +321,18 @@ class SkinnedMesh extends SpectreMesh {
     super._destroyDeviceState();
   }
 
-  Float32List baseVertexData; // The unanimated reference data.
-  Float32List vertexData; // The animated vertex data.
-
+  Float32Array baseVertexData; // The unanimated reference data.
+  Float32Array vertexData; // The animated vertex data.
+  int _floatsPerVertex;
   final Float32List globalInverseTransform = new Float32List(16);
 
   // These are indexed together.
   Float32List weightData;
   Int16List boneData;
+
+  // index: vertex id
+  // output: index into boneData and weightData.
+  Int32List vertexSkinningOffsets;
 
   // These are indexed together.
   final Map<String, int> boneNameMapping = new Map<String, int>();
@@ -349,10 +405,10 @@ class SkinnedMesh extends SpectreMesh {
     // globalInverseTransform * fullTransorm * boneOffset
     final Float32List skinningTransform = skinningBoneTransforms[boneIndex];
     Float32ListHelpers.mul44(skinningTransform,
-                             boneOffsetTransforms[boneIndex],
-                             globalTransform);
-    Float32ListHelpers.mul44(skinningTransform, boneOffsetTransforms[0],
-        skinningTransform);
+                             globalTransform,
+                             boneOffsetTransforms[boneIndex]);
+    //Float32ListHelpers.mul44(skinningTransform, boneOffsetTransforms[0],
+    //                         skinningTransform);
     // Recursively iterate over children bones, updating them.
     int childOffset = boneChildrenOffsets[boneIndex];
     int childIndex = boneChildrenIds[childOffset++];
@@ -366,10 +422,24 @@ class SkinnedMesh extends SpectreMesh {
 
   // Transform baseVertexData into vertexData based on bone hierarchy.
   void _updateVertices() {
-    return;
-    // temporary copy here until actual animation data is computed.
-    for (int i = 0; i < baseVertexData.length; i++) {
-      vertexData[i] = baseVertexData[i];
+    int numVertices = baseVertexData.length~/_floatsPerVertex;
+    int vertexBase = 0;
+    Float32List m = new Float32List(16);
+    for (int v = 0; v < numVertices; v++) {
+      for (int i = 4; i < _floatsPerVertex; i++) {
+        vertexData[vertexBase+i] = baseVertexData[vertexBase+i];
+      }
+      int skinningDataOffset = vertexSkinningOffsets[v];
+      Float32ListHelpers.zero(m);
+      while (boneData[skinningDataOffset] != -1) {
+        final int boneId = boneData[skinningDataOffset];
+        final double weight = weightData[skinningDataOffset];
+        Float32ListHelpers.addScale44(m, skinningBoneTransforms[boneId], weight);
+        skinningDataOffset++;
+      }
+      Float32ListHelpers.transform(vertexData, vertexBase,
+                                   baseVertexData, vertexBase, m);
+      vertexBase += _floatsPerVertex;
     }
     vertexArray.uploadSubData(0, vertexData);
   }
@@ -421,6 +491,13 @@ void importAnimation(SkinnedMesh mesh, Map json) {
   });
 }
 
+class SkinnedVertex {
+  final int vertexId;
+  final List<int> bones = new List<int>();
+  final List<double> weights = new List<double>();
+  SkinnedVertex(this.vertexId);
+}
+
 SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   SkinnedMesh mesh = new SkinnedMesh(name, device);
   List attributes = json['attributes'];
@@ -434,11 +511,16 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   attributes.forEach((a) {
     importAttribute(mesh, a);
   });
+  int attributeStride = attributes[0]['stride']~/4;
+  mesh._floatsPerVertex = attributeStride;
+  print('attribute stride: ${attributeStride}');
   meshes.forEach((m) {
     importMesh(mesh, m);
   });
   mesh._createDeviceState();
-  mesh.vertexArray.uploadData(new Float32Array.fromList(json['vertices']),
+  mesh.baseVertexData = new Float32Array.fromList(json['vertices']);
+  mesh.vertexData = new Float32Array.fromList(json['vertices']);
+  mesh.vertexArray.uploadData(mesh.baseVertexData,
                               SpectreBuffer.UsageDynamic);
   mesh.indexArray.uploadData(new Uint16Array.fromList(json['indices']),
                              SpectreBuffer.UsageStatic);
@@ -456,7 +538,7 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     numChildren += children.length + 1;
     int id = mesh.boneOffsetTransforms.length;
     mesh.boneNameMapping[name] = id;
-    print('mapping $name -> $id');
+    //print('mapping $name -> $id');
     mesh.boneOffsetTransforms.add(new Float32List(16));
     for (int i = 0; i < 16; i++) {
       mesh.boneOffsetTransforms[id][i] = offsetTransform[i].toDouble();
@@ -489,6 +571,66 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     mesh.boneChildrenIds[boneChildrenIdCursor++] = -1; // sentinal
   });
   Expect.equals(numChildren, boneChildrenIdCursor);
+  Map<int, SkinnedVertex> skinnedVertices = new Map<int, SkinnedVertex>();
+  bones.forEach((b) {
+    final String boneName = b['name'];
+    final List vertices = b['vertices'];
+    final List weights = b['weights'];
+    if (vertices == null || weights == null) {
+      print('no weight data for bone ${boneName}');
+      return;
+    }
+    Expect.equals(vertices.length, weights.length);
+    final int boneId = mesh.boneNameMapping[boneName];
+    Expect.isNotNull(boneId);
+    for (int i = 0; i < vertices.length; i++) {
+      final int vertexId = vertices[i].toInt();
+      final double vertexWeight = weights[i].toDouble();
+      SkinnedVertex sv = skinnedVertices[vertexId];
+      if (sv == null) {
+        sv = new SkinnedVertex(vertexId);
+        skinnedVertices[vertexId] = sv;
+      }
+      sv.bones.add(boneId);
+      sv.weights.add(vertexWeight);
+    }
+  });
+  List perVertexWeights = skinnedVertices.values.toList();
+  perVertexWeights.sort((a, b) => a.vertexId - b.vertexId);
+  {
+    List<int> boneId = new List<int>();
+    List<double> weights = new List<double>();
+    mesh.vertexSkinningOffsets = new Int32List(mesh.vertexData.length~/attributeStride);
+    int outputIndex = 0;
+    perVertexWeights.forEach((sv) {
+      final int vertexId = sv.vertexId;
+      int dataCursor = boneId.length;
+      while (outputIndex < vertexId) {
+        boneId.add(-1);
+        weights.add(0.0);
+        mesh.vertexSkinningOffsets[outputIndex] = dataCursor++;
+        outputIndex++;
+      }
+      mesh.vertexSkinningOffsets[outputIndex] = dataCursor;
+      for (int i = 0; i < sv.bones.length; i++) {
+        //print('${vertexId} has ${sv.bones.length} influencers.');
+        boneId.add(sv.bones[i]);
+        weights.add(sv.weights[i]);
+        dataCursor++;
+      }
+      boneId.add(-1);
+      weights.add(0.0);
+      outputIndex++;
+    });
+    Expect.equals(outputIndex, mesh.vertexSkinningOffsets.length);
+    Expect.equals(boneId.length, weights.length);
+    mesh.boneData = new Int16List(boneId.length);
+    mesh.weightData = new Float32List(boneId.length);
+    for (int i = 0; i < boneId.length; i++) {
+      mesh.boneData[i] = boneId[i];
+      mesh.weightData[i] = weights[i];
+    }
+  }
   // verify children indices:
   boneIndex = 0;
   bones.forEach((b) {
@@ -517,5 +659,6 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   });
   // animation ends.
   // update the bone matrices.
+  mesh.update(0.0);
   return mesh;
 }
