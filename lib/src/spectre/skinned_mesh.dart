@@ -103,6 +103,20 @@ class Float32ListHelpers {
     out[15] = 1.0;
   }
 
+  static void normalize4(Float32List a) {
+    var x = a[0],
+        y = a[1],
+        z = a[2],
+        w = a[3];
+    var len = x*x + y*y + z*z + w*w;
+    if (len > 0) {
+        len = 1.0 / Math.sqrt(len);
+        a[0] = a[0] * len;
+        a[1] = a[1] * len;
+        a[2] = a[2] * len;
+        a[3] = a[3] * len;
+    }
+  }
   static void zero(Float32List out) {
     out[0] = 0.0;
     out[1] = 0.0;
@@ -126,8 +140,8 @@ class Float32ListHelpers {
   }
 
 
-  static void translate(Float32List out, Float32List v) {
-    var x = v[0], y = v[1], z = v[2];
+  static void translate(Float32List out, Float32List v, int offset) {
+    var x = v[offset+0], y = v[offset+1], z = v[offset+2];
     out[12] = out[0] * x + out[4] * y + out[8] * z + out[12];
     out[13] = out[1] * x + out[5] * y + out[9] * z + out[13];
     out[14] = out[2] * x + out[6] * y + out[10] * z + out[14];
@@ -172,14 +186,52 @@ class Float32ListHelpers {
     out[15] = 1.0;
   }
 
+  static void fromQuat(Float32List out, Float32List q, int offset) {
+    var x = q[offset+0], y = q[offset+1], z = q[offset+2], w = q[offset+3],
+        x2 = x + x,
+        y2 = y + y,
+        z2 = z + z,
+
+        xx = x * x2,
+        xy = x * y2,
+        xz = x * z2,
+        yy = y * y2,
+        yz = y * z2,
+        zz = z * z2,
+        wx = w * x2,
+        wy = w * y2,
+        wz = w * z2;
+
+    out[0] = 1.0 - (yy + zz);
+    out[1] = xy + wz;
+    out[2] = xz - wy;
+    out[3] = 0.0;
+
+    out[4] = xy - wz;
+    out[5] = 1.0 - (xx + zz);
+    out[6] = yz + wx;
+    out[7] = 0.0;
+
+    out[8] = xz + wy;
+    out[9] = yz - wx;
+    out[10] = 1.0 - (xx + yy);
+    out[11] = 0.0;
+
+    out[12] = 0.0;
+    out[13] = 0.0;
+    out[14] = 0.0;
+    out[15] = 1.0;
+
+  }
+
   static void transform(out, int oi,
-                             a, int ii,
-                             m) {
+                        a, int ii,
+                        m, scale) {
     var x = a[ii+0], y = a[ii+1], z = a[ii+2], w = a[ii+3];
-    out[oi+0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
-    out[oi+1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
-    out[oi+2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
-    out[oi+3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+    out[oi+0] += (m[0] * x + m[4] * y + m[8] * z + m[12] * w) * scale;
+    out[oi+1] += (m[1] * x + m[5] * y + m[9] * z + m[13] * w) * scale;
+    out[oi+2] += (m[2] * x + m[6] * y + m[10] * z + m[14] * w) * scale;
+    out[oi+3] += (m[3] * x + m[7] * y + m[11] * z + m[15] * w) * scale;
   }
 
   static void addScale44(out, input, scale) {
@@ -199,6 +251,10 @@ class Float32ListHelpers {
     out[13] += input[13] * scale;
     out[14] += input[14] * scale;
     out[15] += input[15] * scale;
+//    out[12] += input[12];
+//    out[13] += input[13];
+//    out[14] += input[14];
+//    out[15] += input[15];
   }
 }
 
@@ -321,7 +377,7 @@ class SkinnedMesh extends SpectreMesh {
     super._destroyDeviceState();
   }
 
-  Float32Array baseVertexData; // The unanimated reference data.
+  Float32List baseVertexData; // The unanimated reference data.
   Float32Array vertexData; // The animated vertex data.
   int _floatsPerVertex;
   final Float32List globalInverseTransform = new Float32List(16);
@@ -368,17 +424,33 @@ class SkinnedMesh extends SpectreMesh {
     parentTransform[5] = 1.0;
     parentTransform[10] = 1.0;
     parentTransform[15] = 1.0;
-    _updateBones(0, parentTransform);
+    _updateGlobalBoneTransforms(0, parentTransform);
+    _updateSkinningBoneTransforms();
     _updateVertices();
   }
 
+  void _updateSkinningBoneTransforms() {
+    for (int i = 0; i < skinningBoneTransforms.length; i++) {
+      final Float32List globalTransform = globalBoneTransforms[i];
+      final Float32List skinningTransform = skinningBoneTransforms[i];
+      final Float32List offsetTransform = boneOffsetTransforms[i];
+
+      Float32ListHelpers.mul44(skinningTransform, offsetTransform, globalTransform);
+      print('${i} ${skinningTransform}');
+
+      //Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
+      //Float32ListHelpers.mul44(skinningTransform, skinningTransform, globalInverseTransform);
+    }
+  }
+
   final Float32List _scratchMatrix = new Float32List(16);
-  // Updates the bone hierarchy to match the current animation and time.
-  void _updateBones(final int boneIndex, final Float32List parentTransform) {
+  void _updateGlobalBoneTransforms(final int boneIndex, final Float32List parentTransform) {
     if (boneIndex < 0 || boneIndex >= localBoneTransforms.length) {
       return;
     }
     final Float32List nodeTransform = _scratchMatrix;
+    final Float32List globalTransform = globalBoneTransforms[boneIndex];
+
     if (_currentAnimation._boneData[boneIndex] != null) {
       _AnimationBoneData boneData = _currentAnimation._boneData[boneIndex];
       final Float32List positions = boneData._positions;
@@ -389,33 +461,17 @@ class SkinnedMesh extends SpectreMesh {
       int scaleIndex = boneData._findScaleIndex(_currentTime);
       Expect.isTrue(positionIndex >= 0);
       Expect.isTrue(rotationIndex >= 0);
-      Float32ListHelpers.rotateTranslate(nodeTransform,
-                                         positions, positionIndex,
-                                         rotations, rotationIndex);
+      Float32ListHelpers.fromQuat(nodeTransform, rotations, rotationIndex);
+      Float32ListHelpers.translate(nodeTransform, positions, positionIndex);
     } else {
-      // no bone animation data.
-      // copy bone transform
       Float32ListHelpers.copy(nodeTransform, localBoneTransforms[boneIndex]);
     }
-    // Compute bone's full transform by computing:
-    // Node * Parent.
-    final Float32List globalTransform = globalBoneTransforms[boneIndex];
     Float32ListHelpers.mul44(globalTransform, parentTransform, nodeTransform);
-    // Compute bone's final transform by computing:
-    // globalInverseTransform * fullTransorm * boneOffset
-    final Float32List skinningTransform = skinningBoneTransforms[boneIndex];
-    Float32ListHelpers.mul44(skinningTransform,
-                             globalTransform,
-                             boneOffsetTransforms[boneIndex]);
-    //Float32ListHelpers.mul44(skinningTransform, boneOffsetTransforms[0],
-    //                         skinningTransform);
-    // Recursively iterate over children bones, updating them.
+    //print('${boneIndex} ${globalTransform}');
     int childOffset = boneChildrenOffsets[boneIndex];
     int childIndex = boneChildrenIds[childOffset++];
     while (childIndex != -1) {
-      // We pass in fullTransform (this node's transform) as the new
-      // parent transformation.
-      _updateBones(childIndex, globalTransform);
+      _updateGlobalBoneTransforms(childIndex, globalTransform);
       childIndex = boneChildrenIds[childOffset++];
     }
   }
@@ -425,20 +481,28 @@ class SkinnedMesh extends SpectreMesh {
     int numVertices = baseVertexData.length~/_floatsPerVertex;
     int vertexBase = 0;
     Float32List m = new Float32List(16);
+
     for (int v = 0; v < numVertices; v++) {
+      // Zero vertices.
+      vertexData[vertexBase+0] = 0.0;
+      vertexData[vertexBase+1] = 0.0;
+      vertexData[vertexBase+2] = 0.0;
+      vertexData[vertexBase+3] = 0.0;
       for (int i = 4; i < _floatsPerVertex; i++) {
         vertexData[vertexBase+i] = baseVertexData[vertexBase+i];
       }
+
       int skinningDataOffset = vertexSkinningOffsets[v];
       Float32ListHelpers.zero(m);
       while (boneData[skinningDataOffset] != -1) {
         final int boneId = boneData[skinningDataOffset];
         final double weight = weightData[skinningDataOffset];
-        Float32ListHelpers.addScale44(m, skinningBoneTransforms[boneId], weight);
+        Float32ListHelpers.transform(vertexData, vertexBase,
+            baseVertexData, vertexBase, skinningBoneTransforms[boneId], weight);
         skinningDataOffset++;
       }
-      Float32ListHelpers.transform(vertexData, vertexBase,
-                                   baseVertexData, vertexBase, m);
+      // The bob mesh respects this, box doesn't. ??
+      //Expect.approxEquals(1.0, vertexData[vertexBase+3]);
       vertexBase += _floatsPerVertex;
     }
     vertexArray.uploadSubData(0, vertexData);
@@ -506,7 +570,10 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   List meshes = json['meshes'];
   List bones = json['bones'];
   List animations = json['animations'];
-
+  List inverseRootTransform = json['inverseRootTransform'];
+  for (int i = 0; i < inverseRootTransform.length; i++) {
+    mesh.globalInverseTransform[i] = inverseRootTransform[i].toDouble();
+  }
   // static mesh data begins.
   attributes.forEach((a) {
     importAttribute(mesh, a);
@@ -518,9 +585,12 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     importMesh(mesh, m);
   });
   mesh._createDeviceState();
-  mesh.baseVertexData = new Float32Array.fromList(json['vertices']);
   mesh.vertexData = new Float32Array.fromList(json['vertices']);
-  mesh.vertexArray.uploadData(mesh.baseVertexData,
+  mesh.baseVertexData = new Float32List(mesh.vertexData.length);
+  for (int i = 0; i < mesh.vertexData.length; i++) {
+    mesh.baseVertexData[i] = mesh.vertexData[i];
+  }
+  mesh.vertexArray.uploadData(mesh.vertexData,
                               SpectreBuffer.UsageDynamic);
   mesh.indexArray.uploadData(new Uint16Array.fromList(json['indices']),
                              SpectreBuffer.UsageStatic);
@@ -612,12 +682,15 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
         outputIndex++;
       }
       mesh.vertexSkinningOffsets[outputIndex] = dataCursor;
+      double totalWeight = 0.0;
       for (int i = 0; i < sv.bones.length; i++) {
         //print('${vertexId} has ${sv.bones.length} influencers.');
         boneId.add(sv.bones[i]);
         weights.add(sv.weights[i]);
+        totalWeight += sv.weights[i];
         dataCursor++;
       }
+      //Expect.approxEquals(1.0, totalWeight);
       boneId.add(-1);
       weights.add(0.0);
       outputIndex++;

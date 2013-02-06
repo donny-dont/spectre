@@ -27,6 +27,7 @@ library spectre;
 import 'dart:html';
 import 'dart:json' as JSON;
 import 'dart:async';
+import 'dart:math' as Math;
 import 'dart:scalarlist';
 import 'package:vector_math/vector_math_browser.dart';
 import 'package:marker_prof/profiler.dart';

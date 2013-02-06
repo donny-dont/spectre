@@ -152,9 +152,11 @@ int _depthGuard = 100;
 double _skeletonScale = 1.0;
 void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   List<double> origin = [0.0, 0.0, 0.0];
-  origin[0] = mesh.skinningBoneTransforms[id][12] * _skeletonScale;
-  origin[1] = mesh.skinningBoneTransforms[id][13] * _skeletonScale;
-  origin[2] = mesh.skinningBoneTransforms[id][14] * _skeletonScale;
+  final matrices = mesh.skinningBoneTransforms;
+  //final matrices = mesh.globalBoneTransforms;
+  origin[0] = matrices[id][12] * _skeletonScale;
+  origin[1] = matrices[id][13] * _skeletonScale;
+  origin[2] = matrices[id][14] * _skeletonScale;
   int childOffset = mesh.boneChildrenOffsets[id];
   if (id == 0) {
     _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
@@ -169,9 +171,9 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   while (mesh.boneChildrenIds[childOffset] != -1) {
     List<double> end = [0.0, 0.0, 0.0];
     int childId = mesh.boneChildrenIds[childOffset];
-    end[0] = mesh.skinningBoneTransforms[childId][12] * _skeletonScale;
-    end[1] = mesh.skinningBoneTransforms[childId][13] * _skeletonScale;
-    end[2] = mesh.skinningBoneTransforms[childId][14] * _skeletonScale;
+    end[0] = matrices[childId][12] * _skeletonScale;
+    end[1] = matrices[childId][13] * _skeletonScale;
+    end[2] = matrices[childId][14] * _skeletonScale;
     _debugDrawManager.addLine(new vec3.raw(origin[0],
                                            origin[1],
                                            origin[2]),
@@ -186,7 +188,7 @@ void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager.assets.litdiffuse;
   assert(_skinnedShaderProgram.linked == true);
   _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
-                                   _assetManager.assets.bob);
+                                   _assetManager.assets.box);
   _skinnedInputLayout = _graphicsDevice.createInputLayout('skinned.il');
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -199,8 +201,9 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  //_skinnedMesh.update(1.0/60.0);
+  _skinnedMesh.update(1.0/60.0);
   _drawSkinnedBones(_skinnedMesh, 0, 0);
+  return;
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);
@@ -219,12 +222,13 @@ void _drawSkinnedCharacter() {
   context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
   context.setInputLayout(_skinnedInputLayout);
 
-  //context.drawIndexed(3081, 0);
-  //int count;
-  //int offset;
-
-  // Draw with body texture
   context.setTextures(0, [_assetManager.assets.guard_body]);
+  for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
+    context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
+  }
+  return;
+  // Draw with body texture
+
   context.drawIndexed(_skinnedMesh.meshes[0]['count'], _skinnedMesh.meshes[0]['offset']);
   context.drawIndexed(_skinnedMesh.meshes[5]['count'], _skinnedMesh.meshes[5]['offset']);
 
