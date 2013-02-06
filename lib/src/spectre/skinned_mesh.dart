@@ -436,7 +436,7 @@ class SkinnedMesh extends SpectreMesh {
       final Float32List offsetTransform = boneOffsetTransforms[i];
 
       Float32ListHelpers.mul44(skinningTransform, offsetTransform, globalTransform);
-      print('${i} ${skinningTransform}');
+      //print('${i} ${skinningTransform}');
 
       //Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
       //Float32ListHelpers.mul44(skinningTransform, skinningTransform, globalInverseTransform);
@@ -732,6 +732,5 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   });
   // animation ends.
   // update the bone matrices.
-  mesh.update(0.0);
   return mesh;
 }

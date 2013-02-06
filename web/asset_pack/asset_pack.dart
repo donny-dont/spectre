@@ -203,7 +203,6 @@ void _setupSkinnedCharacter() {
 void _drawSkinnedCharacter() {
   _skinnedMesh.update(1.0/60.0);
   _drawSkinnedBones(_skinnedMesh, 0, 0);
-  return;
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);
