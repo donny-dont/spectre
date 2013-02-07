@@ -188,7 +188,7 @@ void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager.assets.litdiffuse;
   assert(_skinnedShaderProgram.linked == true);
   _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
-                                   _assetManager.assets.box);
+                                   _assetManager.assets.bob);
   _skinnedInputLayout = _graphicsDevice.createInputLayout('skinned.il');
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -222,10 +222,10 @@ void _drawSkinnedCharacter() {
   context.setInputLayout(_skinnedInputLayout);
 
   context.setTextures(0, [_assetManager.assets.guard_body]);
-  for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
-    context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
-  }
-  return;
+  //for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
+  //  context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
+  //}
+  //return;
   // Draw with body texture
 
   context.drawIndexed(_skinnedMesh.meshes[0]['count'], _skinnedMesh.meshes[0]['offset']);
