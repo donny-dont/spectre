@@ -435,8 +435,10 @@ class SkinnedMesh extends SpectreMesh {
       final Float32List skinningTransform = skinningBoneTransforms[i];
       final Float32List offsetTransform = boneOffsetTransforms[i];
 
-      Float32ListHelpers.mul44(skinningTransform, globalTransform,
-                               offsetTransform);
+      Float32ListHelpers.mul44(skinningTransform,
+                               globalTransform,
+                               offsetTransform
+                               );
 
       // Unsure if this must be factored in:
       //Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
