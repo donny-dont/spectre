@@ -435,9 +435,10 @@ class SkinnedMesh extends SpectreMesh {
       final Float32List skinningTransform = skinningBoneTransforms[i];
       final Float32List offsetTransform = boneOffsetTransforms[i];
 
-      Float32ListHelpers.mul44(skinningTransform, offsetTransform, globalTransform);
-      //print('${i} ${skinningTransform}');
+      Float32ListHelpers.mul44(skinningTransform, globalTransform,
+                               offsetTransform);
 
+      // Unsure if this must be factored in:
       //Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
       //Float32ListHelpers.mul44(skinningTransform, skinningTransform, globalInverseTransform);
     }
@@ -467,7 +468,6 @@ class SkinnedMesh extends SpectreMesh {
       Float32ListHelpers.copy(nodeTransform, localBoneTransforms[boneIndex]);
     }
     Float32ListHelpers.mul44(globalTransform, parentTransform, nodeTransform);
-    //print('${boneIndex} ${globalTransform}');
     int childOffset = boneChildrenOffsets[boneIndex];
     int childIndex = boneChildrenIds[childOffset++];
     while (childIndex != -1) {
@@ -501,8 +501,7 @@ class SkinnedMesh extends SpectreMesh {
             baseVertexData, vertexBase, skinningBoneTransforms[boneId], weight);
         skinningDataOffset++;
       }
-      // The bob mesh respects this, box doesn't. ??
-      //Expect.approxEquals(1.0, vertexData[vertexBase+3]);
+      Expect.approxEquals(1.0, vertexData[vertexBase+3]);
       vertexBase += _floatsPerVertex;
     }
     vertexArray.uploadSubData(0, vertexData);
