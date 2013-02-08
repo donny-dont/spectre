@@ -464,12 +464,16 @@ class SkinnedMesh extends SpectreMesh {
       int scaleIndex = boneData._findScaleIndex(_currentTime);
       Expect.isTrue(positionIndex >= 0);
       Expect.isTrue(rotationIndex >= 0);
-      Float32ListHelpers.fromQuat(nodeTransform, rotations, rotationIndex);
-      Float32ListHelpers.translate(nodeTransform, positions, positionIndex);
+      //Float32ListHelpers.fromQuat(nodeTransform, rotations, rotationIndex);
+      //Float32ListHelpers.translate(nodeTransform, positions, positionIndex);
+      Float32ListHelpers.rotateTranslate(nodeTransform,
+                                         positions, positionIndex,
+                                         rotations, rotationIndex);
     } else {
       Float32ListHelpers.copy(nodeTransform, localBoneTransforms[boneIndex]);
     }
     Float32ListHelpers.mul44(globalTransform, parentTransform, nodeTransform);
+    //Float32ListHelpers.mul44(globalTransform, nodeTransform, parentTransform);
     int childOffset = boneChildrenOffsets[boneIndex];
     int childIndex = boneChildrenIds[childOffset++];
     while (childIndex != -1) {

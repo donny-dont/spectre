@@ -222,11 +222,12 @@ void _drawSkinnedCharacter() {
   context.setInputLayout(_skinnedInputLayout);
 
   context.setTextures(0, [_assetManager.assets.guard_body]);
-  //for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
-  //  context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
-  //}
-  //return;
-  // Draw with body texture
+  if (false) {
+    for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
+      context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
+    }
+    return;
+  }
 
   context.drawIndexed(_skinnedMesh.meshes[0]['count'], _skinnedMesh.meshes[0]['offset']);
   context.drawIndexed(_skinnedMesh.meshes[5]['count'], _skinnedMesh.meshes[5]['offset']);
