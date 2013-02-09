@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'dart:math';
-import 'package:vector_math/vector_math_browser.dart';
+import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
@@ -10,7 +10,6 @@ final String _canvasId = '#backbuffer';
 
 GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
-ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
 
 GameLoop _gameLoop;
@@ -262,9 +261,6 @@ main() {
   print(_graphicsDevice.capabilities);
   // Get a reference to the GraphicsContext
   _graphicsContext = _graphicsDevice.context;
-  // Create a resource manager and set it's base URL
-  _resourceManager = new ResourceManager();
-  _resourceManager.setBaseURL(baseUrl);
   // Create a debug draw manager and initialize it
   _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 

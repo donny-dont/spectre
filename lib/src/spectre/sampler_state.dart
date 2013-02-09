@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,10 +16,17 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
+<<<<<<< HEAD
 /// Contains sampler state, which determines how to sample texture data.
+=======
+part of spectre;
+
+/// SamplerState defines how a texture is sampled
+/// Create using [Device.createSamplerState]
+/// Set using [immediateContext.setSamplerStates]
+>>>>>>> upstream/master
 class SamplerState extends DeviceChild {
   //---------------------------------------------------------------------
   // Serialization names

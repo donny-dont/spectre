@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,6 +18,8 @@ part of spectre;
   3. This notice may not be removed or altered from any source distribution.
 
 */
+
+part of spectre;
 
 /// Defines color blending factors.
 class Blend {
