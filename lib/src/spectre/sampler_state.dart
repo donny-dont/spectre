@@ -18,15 +18,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-<<<<<<< HEAD
-/// Contains sampler state, which determines how to sample texture data.
-=======
 part of spectre;
 
-/// SamplerState defines how a texture is sampled
-/// Create using [Device.createSamplerState]
-/// Set using [immediateContext.setSamplerStates]
->>>>>>> upstream/master
+/// Contains sampler state, which determines how to sample texture data.
 class SamplerState extends DeviceChild {
   //---------------------------------------------------------------------
   // Serialization names
@@ -51,6 +45,10 @@ class SamplerState extends DeviceChild {
   int _addressU = TextureAddressMode.Clamp;
   /// The texture-address mode for the v-coordinate.
   int _addressV = TextureAddressMode.Clamp;
+  /// The minification filter to use.
+  int _minFilter;
+  /// The magnification filter to use.
+  int _magFilter;
   /// The maximum anisotropy.
   ///
   /// The default value is 1.
@@ -63,20 +61,6 @@ class SamplerState extends DeviceChild {
   /// Creates an instance of [SamplerState] with default values.
   SamplerState(String name, GraphicsDevice device)
     : super._internal(name, device);
-
-
-  static const int TextureMagFilterLinear = WebGLRenderingContext.LINEAR;
-  static const int TextureMagFilterNearest = WebGLRenderingContext.NEAREST;
-
-  static const int TextureMinFilterLinear = WebGLRenderingContext.LINEAR;
-  static const int TextureMinFilterNearest = WebGLRenderingContext.NEAREST;
-  static const int TextureMinFilterNearestMipmapNearest = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
-  static const int TextureMinFilterNearestMipmapLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
-  static const int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
-  static const int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
-
-  int magFilter = TextureMagFilterLinear;
-  int minFilter = TextureMinFilterNearestMipmapLinear;
 
   //---------------------------------------------------------------------
   // Properties
@@ -102,6 +86,33 @@ class SamplerState extends DeviceChild {
     _addressU = value;
   }
 
+  /// The minification filter to use.
+  ///
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [TextureMinFilter].
+  int get minFilter => _minFilter;
+  set minFilter(int value) {
+    if (!TextureMinFilter.isValid(value)) {
+      throw new ArgumentError('minFilter must be an enumeration within TextureMinFilter.');
+    }
+
+    _minFilter = value;
+  }
+
+  /// The magnification filter to use.
+  ///
+  /// If the [Texture] does not contain mipmaps, such as non-power of two textures,
+  /// then the only valid values are [Texture.Linear] and [Texture.Point].
+  ///
+  /// Throws [ArgumentError] if the [value] is not an enumeration within [TextureMinFilter].
+  int get magFilter => _magFilter;
+  set magFilter(int value) {
+    if (!TextureMagFilter.isValid(value)) {
+      throw new ArgumentError('magFilter must be an enumeration within TextureMagFilter.');
+    }
+
+    _magFilter = value;
+  }
+
   /// The maximum anisotropy.
   ///
   /// Anisotropic filtering is only available through an extension to WebGL.
@@ -116,7 +127,7 @@ class SamplerState extends DeviceChild {
       throw new ArgumentError('maxAnisotropy must be a positive number');
     }
 
-    _maxAnisotropy = value;
+    _maxAnisotropy = Math.max(value, device.capabilities.maxAnisotropyLevel);
   }
 
   //---------------------------------------------------------------------
@@ -129,6 +140,9 @@ class SamplerState extends DeviceChild {
 
     json[_addressUName] = TextureAddressMode.stringify(_addressU);
     json[_addressVName] = TextureAddressMode.stringify(_addressV);
+
+    json[_minFilterName] = TextureMinFilter.stringify(_minFilter);
+    json[_magFilterName] = TextureMagFilter.stringify(_magFilter);
 
     json[_maxAnisotropyName] = _maxAnisotropy;
 
@@ -146,6 +160,12 @@ class SamplerState extends DeviceChild {
 
     value = values[_addressVName];
     _addressV = (value != null) ? TextureAddressMode.parse(value) : _addressV;
+
+    value = values[_minFilterName];
+    _minFilter = (value != null) ? TextureMinFilter.parse(value) : _minFilter;
+
+    value = values[_magFilterName];
+    _magFilter = (value != null) ? TextureMagFilter.parse(value) : _magFilter;
 
     value = values[_maxAnisotropyName];
     _maxAnisotropy = (value != null) ? value : _maxAnisotropy;
