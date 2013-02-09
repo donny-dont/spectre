@@ -67,8 +67,8 @@ class SamplerState extends DeviceChild {
   static const int TextureMinFilterLinearMipmapNearest = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
   static const int TextureMinFilterLinearMipmapLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
 
-  int magFilter = TextureMinFilterNearestMipmapLinear;
-  int minFilter = TextureMagFilterLinear;
+  int magFilter = TextureMagFilterLinear;
+  int minFilter = TextureMinFilterNearestMipmapLinear;
 
   //---------------------------------------------------------------------
   // Properties
