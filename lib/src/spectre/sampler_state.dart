@@ -32,6 +32,10 @@ class SamplerState extends DeviceChild {
   static const String _addressUName = 'addressU';
   /// Serialization name for [wrapV].
   static const String _addressVName = 'addressV';
+  /// Serialization name for [minFilter].
+  static const String _minFilterName = 'minFilter';
+  /// Serialization name for [magFilter].
+  static const String _magFilterName = 'magFilter';
   /// Serialization name for [maxAnisotropy].
   static const String _maxAnisotropyName = 'maxAnisotropy';
 
@@ -98,7 +102,8 @@ class SamplerState extends DeviceChild {
   ///
   /// Anisotropic filtering is only available through an extension to WebGL.
   /// The maximum acceptable value is dependent on the graphics hardware, and
-  /// can be queried within [GraphicsDeviceCapabilites].
+  /// can be queried within [GraphicsDeviceCapabilites]. When setting the value
+  /// the anisotropy level will be capped to the range 1 < [GraphicsDeviceCapabilities.maxAnisotropyLevel]
   ///
   /// Throws [ArgumentError] if [value] is not a positive number.
   int get maxAnisotropy => _maxAnisotropy;
