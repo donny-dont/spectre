@@ -117,10 +117,10 @@ class SpectreTexture extends DeviceChild {
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_S,
-                            sampler.wrapS);
+                            sampler.addressU);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_T,
-                            sampler.wrapT);
+                            sampler.addressV);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_MIN_FILTER,
                             sampler.minFilter);
