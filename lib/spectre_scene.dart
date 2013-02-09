@@ -25,6 +25,7 @@
 library spectre_scene;
 
 import 'dart:html';
+import 'dart:collection';
 import 'package:vector_math/vector_math_browser.dart';
 import 'spectre.dart';
 
