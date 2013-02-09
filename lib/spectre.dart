@@ -67,6 +67,8 @@ part 'src/spectre/surface_format.dart';
 part 'src/spectre/texture.dart';
 part 'src/spectre/texture_address_mode.dart';
 part 'src/spectre/texture_cube.dart';
+part 'src/spectre/texture_min_filter.dart';
+part 'src/spectre/texture_mag_filter.dart';
 part 'src/spectre/texture_2d.dart';
 part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';
