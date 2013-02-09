@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -63,8 +63,8 @@ part 'src/spectre/surface_format.dart';
 part 'src/spectre/texture.dart';
 part 'src/spectre/texture_address_mode.dart';
 part 'src/spectre/texture_cube.dart';
-part 'src/spectre/texture_min_filter.dart';
 part 'src/spectre/texture_mag_filter.dart';
+part 'src/spectre/texture_min_filter.dart';
 part 'src/spectre/texture_2d.dart';
 part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';

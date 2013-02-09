@@ -42,13 +42,13 @@ class SamplerState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// The texture-address mode for the u-coordinate.
-  int _addressU = TextureAddressMode.Clamp;
+  int _addressU = TextureAddressMode.Wrap;
   /// The texture-address mode for the v-coordinate.
-  int _addressV = TextureAddressMode.Clamp;
+  int _addressV = TextureAddressMode.Wrap;
   /// The minification filter to use.
-  int _minFilter;
+  int _minFilter = TextureMinFilter.Linear;
   /// The magnification filter to use.
-  int _magFilter;
+  int _magFilter = TextureMagFilter.Linear;
   /// The maximum anisotropy.
   ///
   /// The default value is 1.
@@ -61,6 +61,86 @@ class SamplerState extends DeviceChild {
   /// Creates an instance of [SamplerState] with default values.
   SamplerState(String name, GraphicsDevice device)
     : super._internal(name, device);
+
+  /// Initializes an instance of [SamplerState] with anisotropic filtering and texture coordinate clamping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Clamp;
+  ///     addressV = TextureAddressMode.Clamp;
+  ///     maxAnisotropy = 4;
+  SamplerState.anisotropicClamp(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Clamp
+    , _addressV = TextureAddressMode.Clamp
+    , _maxAnisotropy = 4;
+
+  /// Initializes an instance of [SamplerState] with anisotropic filtering and texture coordinate wrapping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Wrap;
+  ///     addressV = TextureAddressMode.Wrap;
+  ///     maxAnisotropy = 4;
+  SamplerState.anisotropicWrap(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Wrap
+    , _addressV = TextureAddressMode.Wrap
+    , _maxAnisotropy = 4;
+
+  /// Initializes an instance of [SamplerState] with linear filtering and texture coordinate clamping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Clamp;
+  ///     addressV = TextureAddressMode.Clamp;
+  ///     minFilter = TextureMinFilter.Linear;
+  ///     magFilter = TextureMagFilter.Linear;
+  SamplerState.linearClamp(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Clamp
+    , _addressV = TextureAddressMode.Clamp
+    , _minFilter = TextureMinFilter.Linear
+    , _magFilter = TextureMagFilter.Linear;
+
+  /// Initializes an instance of [SamplerState] with linear filtering and texture coordinate wrapping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Wrap;
+  ///     addressV = TextureAddressMode.Wrap;
+  ///     minFilter = TextureMinFilter.Linear;
+  ///     magFilter = TextureMagFilter.Linear;
+  SamplerState.linearWrap(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Wrap
+    , _addressV = TextureAddressMode.Wrap
+    , _minFilter = TextureMinFilter.Linear
+    , _magFilter = TextureMagFilter.Linear;
+
+  /// Initializes an instance of [SamplerState] with point filtering and texture coordinate clamping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Clamp;
+  ///     addressV = TextureAddressMode.Clamp;
+  ///     minFilter = TextureMinFilter.Point;
+  ///     magFilter = TextureMagFilter.Point;
+  SamplerState.pointClamp(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Clamp
+    , _addressV = TextureAddressMode.Clamp
+    , _minFilter = TextureMinFilter.Point
+    , _magFilter = TextureMagFilter.Point;
+
+  /// Initializes an instance of [SamplerState] with point filtering and texture coordinate wrapping.
+  ///
+  /// The state object has the following settings.
+  ///     addressU = TextureAddressMode.Wrap;
+  ///     addressV = TextureAddressMode.Wrap;
+  ///     minFilter = TextureMinFilter.Point;
+  ///     magFilter = TextureMagFilter.Point;
+  SamplerState.pointWrap(String name, GraphicsDevice device)
+    : super._internal(name, device)
+    , _addressU = TextureAddressMode.Wrap
+    , _addressV = TextureAddressMode.Wrap
+    , _minFilter = TextureMinFilter.Point
+    , _magFilter = TextureMagFilter.Point;
 
   //---------------------------------------------------------------------
   // Properties
