@@ -15,4 +15,8 @@ dependencies:
     git: https://github.com/johnmccutchan/asset_pack.git
   property_map:
     git: https://github.com/sethillgard/property_map.git
+<<<<<<< HEAD
   bot: ">=0.12.0"
+=======
+  bot: ">=0.13.0"
+>>>>>>> 7e58eedb6fd3983696eee1d13f627fd488cfce02
