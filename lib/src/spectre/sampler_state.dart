@@ -163,7 +163,7 @@ class SamplerState extends DeviceChild {
       throw new ArgumentError('addressU must be an enumeration within TextureAddressMode.');
     }
 
-    _addressU = value;
+    _addressV = value;
   }
 
   /// The minification filter to use.
@@ -247,7 +247,8 @@ class SamplerState extends DeviceChild {
     value = values[_magFilterName];
     _magFilter = (value != null) ? TextureMagFilter.parse(value) : _magFilter;
 
+    // Use the property so the anisotropy is clamped properly
     value = values[_maxAnisotropyName];
-    _maxAnisotropy = (value != null) ? value : _maxAnisotropy;
+    maxAnisotropy = (value != null) ? value : _maxAnisotropy;
   }
 }
