@@ -64,6 +64,7 @@ part 'src/spectre/shader_program.dart';
 part 'src/spectre/stencil_state.dart';
 part 'src/spectre/surface_format.dart';
 part 'src/spectre/texture.dart';
+part 'src/spectre/texture_address_mode.dart';
 part 'src/spectre/texture_cube.dart';
 part 'src/spectre/texture_2d.dart';
 part 'src/spectre/vertex_buffer.dart';
