@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,7 +28,7 @@ import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:math' as Math;
 import 'dart:scalarlist';
-import 'package:vector_math/vector_math_browser.dart';
+import 'package:vector_math/vector_math.dart';
 import 'package:marker_prof/profiler.dart';
 import 'package:property_map/property_map.dart';
 
@@ -44,6 +43,7 @@ part 'src/spectre/cull_mode.dart';
 part 'src/spectre/debug_draw_manager.dart';
 part 'src/spectre/depth_state.dart';
 part 'src/spectre/device_children.dart';
+part 'src/spectre/shader.dart';
 part 'src/spectre/fragment_shader.dart';
 part 'src/spectre/front_face.dart';
 part 'src/spectre/graphics_context.dart';
@@ -55,11 +55,7 @@ part 'src/spectre/mouse_keyboard_camera_controller.dart';
 part 'src/spectre/rasterizer_state.dart';
 part 'src/spectre/render_buffer.dart';
 part 'src/spectre/render_target.dart';
-part 'src/spectre/resource.dart';
-part 'src/spectre/resource_loader.dart';
-part 'src/spectre/resource_manager.dart';
 part 'src/spectre/sampler_state.dart';
-part 'src/spectre/shader.dart';
 part 'src/spectre/shader_program.dart';
 part 'src/spectre/stencil_state.dart';
 part 'src/spectre/texture.dart';

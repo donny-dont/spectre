@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 class Float32ListHelpers {
   static void copy(Float32List dst, Float32List src) {
@@ -224,14 +222,14 @@ class Float32ListHelpers {
 
   }
 
-  static void transform(out, int oi,
+  static void transform(out,
                         a, int ii,
-                        m, scale) {
+                        m) {
     var x = a[ii+0], y = a[ii+1], z = a[ii+2], w = a[ii+3];
-    out[oi+0] += (m[0] * x + m[4] * y + m[8] * z + m[12] * w) * scale;
-    out[oi+1] += (m[1] * x + m[5] * y + m[9] * z + m[13] * w) * scale;
-    out[oi+2] += (m[2] * x + m[6] * y + m[10] * z + m[14] * w) * scale;
-    out[oi+3] += (m[3] * x + m[7] * y + m[11] * z + m[15] * w) * scale;
+    out[0] += (m[0] * x + m[4] * y + m[8] * z + m[12] * w);
+    out[1] += (m[1] * x + m[5] * y + m[9] * z + m[13] * w);
+    out[2] += (m[2] * x + m[6] * y + m[10] * z + m[14] * w);
+    out[3] += (m[3] * x + m[7] * y + m[11] * z + m[15] * w);
   }
 
   static void addScale44(out, input, scale) {
@@ -251,10 +249,6 @@ class Float32ListHelpers {
     out[13] += input[13] * scale;
     out[14] += input[14] * scale;
     out[15] += input[15] * scale;
-//    out[12] += input[12];
-//    out[13] += input[13];
-//    out[14] += input[14];
-//    out[15] += input[15];
   }
 }
 
@@ -487,9 +481,23 @@ class SkinnedMesh extends SpectreMesh {
     int numVertices = baseVertexData.length~/_floatsPerVertex;
     int vertexBase = 0;
     Float32List m = new Float32List(16);
+    Float32List vertex = new Float32List(_floatsPerVertex);
+
+    Stopwatch sw = new Stopwatch();
+    sw.start();
+    // 80 ms
 
     for (int v = 0; v < numVertices; v++) {
       // Zero vertices.
+      vertex[0] = 0.0;
+      vertex[1] = 0.0;
+      vertex[2] = 0.0;
+      vertex[3] = 0.0;
+      for (int i = 4; i < _floatsPerVertex; i++) {
+        vertex[i] = baseVertexData[vertexBase+i];
+      }
+      /*
+       * // 30 ms
       vertexData[vertexBase+0] = 0.0;
       vertexData[vertexBase+1] = 0.0;
       vertexData[vertexBase+2] = 0.0;
@@ -497,19 +505,28 @@ class SkinnedMesh extends SpectreMesh {
       for (int i = 4; i < _floatsPerVertex; i++) {
         vertexData[vertexBase+i] = baseVertexData[vertexBase+i];
       }
+      */
 
       int skinningDataOffset = vertexSkinningOffsets[v];
       Float32ListHelpers.zero(m);
       while (boneData[skinningDataOffset] != -1) {
         final int boneId = boneData[skinningDataOffset];
         final double weight = weightData[skinningDataOffset];
-        Float32ListHelpers.transform(vertexData, vertexBase,
-            baseVertexData, vertexBase, skinningBoneTransforms[boneId], weight);
+        Float32ListHelpers.addScale44(m, skinningBoneTransforms[boneId], weight);
         skinningDataOffset++;
       }
-      Expect.approxEquals(1.0, vertexData[vertexBase+3]);
+      Float32ListHelpers.transform(vertex,
+          baseVertexData, vertexBase, m);
+
+      for (int i = 0; i < _floatsPerVertex; i++) {
+        vertexData[vertexBase+i] = vertex[i];
+      }
+
+      //Expect.approxEquals(1.0, vertexData[vertexBase+3]);
       vertexBase += _floatsPerVertex;
     }
+    sw.stop();
+    print(sw.elapsedMilliseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
 }
