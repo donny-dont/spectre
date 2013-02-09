@@ -255,12 +255,9 @@ main() {
   print(baseUrl);
   CanvasElement canvas = query(_canvasId);
   assert(canvas != null);
-  WebGLRenderingContext gl = canvas.getContext('experimental-webgl');
-
-  assert(gl != null);
 
   // Create a GraphicsDevice
-  _graphicsDevice = new GraphicsDevice(gl);
+  _graphicsDevice = new GraphicsDevice(canvas);
   // Print out GraphicsDeviceCapabilities
   print(_graphicsDevice.capabilities);
   // Get a reference to the GraphicsContext

@@ -163,12 +163,9 @@ main() {
   final String baseUrl = "${window.location.href.substring(0, window.location.href.length - "engine.html".length)}web/resources";
   CanvasElement canvas = query(_canvasId);
   assert(canvas != null);
-  WebGLRenderingContext gl = canvas.getContext('experimental-webgl');
-
-  assert(gl != null);
 
   // Create a GraphicsDevice
-  _graphicsDevice = new GraphicsDevice(gl);
+  _graphicsDevice = new GraphicsDevice(canvas);
   // Get a reference to the GraphicsContext
   _graphicsContext = _graphicsDevice.context;
   // Create a resource manager and set it's base URL

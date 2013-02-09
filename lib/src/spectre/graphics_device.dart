@@ -283,8 +283,14 @@ class GraphicsDevice {
   }
 
   /// Constructs a GPU device
-  GraphicsDevice(WebGLRenderingContext gl) {
-    _gl = gl;
+  GraphicsDevice(CanvasElement canvas) {
+    assert(canvas != null);
+
+    // Get the WebGL context.
+    // A stencil buffer is not created by default so request that be
+    // created. Other than that the defaults are fine.
+    _gl = canvas.getContext3d(stencil: true);
+
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
     /*

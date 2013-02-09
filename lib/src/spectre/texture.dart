@@ -147,4 +147,11 @@ class SpectreTexture extends DeviceChild {
     }
     _deviceTexture = null;
   }
+
+  /// Determines whether a [value] is a power of two.
+  ///
+  /// Assumes that the given value will always be positive.
+  static bool _isPowerOfTwo(int value) {
+    return (value & (value - 1)) == 0;
+  }
 }
