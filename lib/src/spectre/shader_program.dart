@@ -102,16 +102,14 @@ class ShaderProgram extends DeviceChild {
 
   ShaderProgram(String name, GraphicsDevice device) :
     super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
     _program = device.gl.createProgram();
   }
 
-  void _destroyDeviceState() {
+  void finalizer() {
     fragmentShader = null;
     vertexShader = null;
     device.gl.deleteProgram(_program);
+    _program = null;
   }
 
   /** Detach [shader] from ShaderProgram. */

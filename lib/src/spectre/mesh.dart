@@ -50,25 +50,13 @@ class SpectreMeshAttribute {
   String toString() => '$name $componentType$componentCount $offset $stride';
 }
 
-class SpectreMesh extends DeviceChild {
+abstract class SpectreMesh extends DeviceChild {
   final Map<String, SpectreMeshAttribute> attributes =
       new Map<String, SpectreMeshAttribute>();
-
   int count = 0;
   int primitiveTopology = GraphicsContext.PrimitiveTopologyTriangles;
-
   SpectreMesh(String name, GraphicsDevice device)
       : super._internal(name, device);
-
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
-  }
 }
 
 class SingleArrayMesh extends SpectreMesh {
@@ -76,22 +64,13 @@ class SingleArrayMesh extends SpectreMesh {
   VertexBuffer get vertexArray => _deviceVertexBuffer;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
+    _deviceVertexBuffer = new VertexBuffer(name, device);
   }
 
-
-  void _createDeviceState() {
-    super._createDeviceState();
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-  }
-
-
-  void _destroyDeviceState() {
-    if (_deviceVertexBuffer != null) {
-      _deviceVertexBuffer._destroyDeviceState();
-    }
+  void finalizer() {
+    _deviceVertexBuffer.dispose();
     _deviceVertexBuffer = null;
     count = 0;
-    super._destroyDeviceState();
   }
 }
 
@@ -103,26 +82,13 @@ class SingleArrayIndexedMesh extends SpectreMesh {
 
   SingleArrayIndexedMesh(String name, GraphicsDevice device)
       : super(name, device) {
+    _deviceVertexBuffer = new VertexBuffer(name, device);
+    _deviceIndexBuffer = new IndexBuffer(name, device);
   }
 
-
-  void _createDeviceState() {
-    super._createDeviceState();
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
-  }
-
-
-  void _destroyDeviceState() {
-    if (_deviceVertexBuffer != null) {
-      device.deleteDeviceChild(_deviceVertexBuffer);
-      _deviceVertexBuffer = null;
-    }
-    if (_deviceIndexBuffer != null) {
-      device.deleteDeviceChild(_deviceIndexBuffer);
-      _deviceIndexBuffer = null;
-    }
+  void finalizer() {
+    _deviceVertexBuffer.dispose();
+    _deviceIndexBuffer.dispose();
     count = 0;
-    super._destroyDeviceState();
   }
 }

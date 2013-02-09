@@ -21,19 +21,18 @@
 part of spectre;
 
 class SpectreShader extends DeviceChild {
+  final int _type;
   String _source = '';
   WebGLShader _shader;
-  int _type;
 
-  SpectreShader(String name, GraphicsDevice device) :
-      super._internal(name, device);
-
-  void _createDeviceState() {
+  SpectreShader(String name, GraphicsDevice device, this._type) :
+      super._internal(name, device) {
     _shader = device.gl.createShader(_type);
   }
 
-  void _destroyDeviceState() {
+  void finalizer() {
     device.gl.deleteShader(_shader);
+    _shader = null;
   }
 
   /** Set shader source code. */

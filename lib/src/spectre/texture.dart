@@ -110,7 +110,9 @@ class SpectreTexture extends DeviceChild {
 
   SpectreTexture(String name, GraphicsDevice device, this._bindTarget,
                  this._bindingParam, this._textureTarget)
-      : super._internal(name, device);
+      : super._internal(name, device) {
+    _deviceTexture = device.gl.createTexture();
+  }
 
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,
@@ -135,14 +137,8 @@ class SpectreTexture extends DeviceChild {
     device.gl.bindTexture(_bindTarget, _deviceTexture);
   }
 
-  void _createDeviceState() {
-    _deviceTexture = device.gl.createTexture();
-  }
-
-  void _destroyDeviceState() {
-    if (_deviceTexture != null) {
-      device.gl.deleteTexture(_deviceTexture);
-    }
+  void finalizer() {
+    device.gl.deleteTexture(_deviceTexture);
     _deviceTexture = null;
   }
 

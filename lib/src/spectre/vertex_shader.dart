@@ -20,19 +20,9 @@
 
 part of spectre;
 
-/// A vertex shader
-/// Create using [Device.createVertexShader]
-/// Must be linked into a ShaderProgram before use
+/// VertexShader
 class VertexShader extends SpectreShader {
-  VertexShader(String name, GraphicsDevice device) : super(name, device) {
-    _type = WebGLRenderingContext.VERTEX_SHADER;
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  VertexShader(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.VERTEX_SHADER) {
   }
 }

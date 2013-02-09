@@ -20,20 +20,10 @@
 
 part of spectre;
 
-/// VertexBuffer defines storage for vertex attribute elements
-/// Create using [Device.createVertexBuffer]
-/// Set using [Device.setVertexBuffers]
+/// Defines storage for vertex data
 class VertexBuffer extends SpectreBuffer {
-  VertexBuffer(String name, GraphicsDevice device) : super(name, device) {
-    _bindTarget = WebGLRenderingContext.ARRAY_BUFFER;
-    _bindingParam = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  VertexBuffer(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.ARRAY_BUFFER,
+              WebGLRenderingContext.ARRAY_BUFFER_BINDING) {
   }
 }

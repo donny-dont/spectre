@@ -64,14 +64,12 @@ class RenderBuffer extends DeviceChild {
 
   RenderBuffer(String name, GraphicsDevice device) :
       super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
     _buffer = device.gl.createRenderbuffer();
   }
 
-  void _destroyDeviceState() {
+  void finalizer() {
     device.gl.deleteRenderbuffer(_buffer);
+    _buffer = null;
   }
 
   void _allocateStorage(int width, int height, int format) {
