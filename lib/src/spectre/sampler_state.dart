@@ -51,8 +51,8 @@ class SamplerState extends DeviceChild {
   int _magFilter = TextureMagFilter.Linear;
   /// The maximum anisotropy.
   ///
-  /// The default value is 1.
-  int _maxAnisotropy = 1;
+  /// The default value is 1.0.
+  double _maxAnisotropy = 1.0;
 
   //---------------------------------------------------------------------
   // Construction
@@ -72,7 +72,7 @@ class SamplerState extends DeviceChild {
     : super._internal(name, device)
     , _addressU = TextureAddressMode.Clamp
     , _addressV = TextureAddressMode.Clamp
-    , _maxAnisotropy = 4;
+    , _maxAnisotropy = 4.0;
 
   /// Initializes an instance of [SamplerState] with anisotropic filtering and texture coordinate wrapping.
   ///
@@ -84,7 +84,7 @@ class SamplerState extends DeviceChild {
     : super._internal(name, device)
     , _addressU = TextureAddressMode.Wrap
     , _addressV = TextureAddressMode.Wrap
-    , _maxAnisotropy = 4;
+    , _maxAnisotropy = 4.0;
 
   /// Initializes an instance of [SamplerState] with linear filtering and texture coordinate clamping.
   ///
@@ -201,10 +201,10 @@ class SamplerState extends DeviceChild {
   /// the anisotropy level will be capped to the range 1 < [GraphicsDeviceCapabilities.maxAnisotropyLevel]
   ///
   /// Throws [ArgumentError] if [value] is not a positive number.
-  int get maxAnisotropy => _maxAnisotropy;
-  set maxAnisotropy(int value) {
-    if (value < 0) {
-      throw new ArgumentError('maxAnisotropy must be a positive number');
+  double get maxAnisotropy => _maxAnisotropy;
+  set maxAnisotropy(double value) {
+    if (value < 1.0) {
+      throw new ArgumentError('maxAnisotropy must be >= 1.0');
     }
 
     _maxAnisotropy = Math.max(value, device.capabilities.maxAnisotropyLevel);

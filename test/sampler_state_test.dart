@@ -173,7 +173,7 @@ void main() {
     expect(samplerState0 == samplerState1, false);
     samplerState1.magFilter = samplerState0.magFilter;
 
-    samplerState0.maxAnisotropy = 4;
+    samplerState0.maxAnisotropy = 4.0;
     expect(samplerState0 == samplerState1, false);
     samplerState1.maxAnisotropy = samplerState0.maxAnisotropy;
   });
@@ -187,7 +187,7 @@ void main() {
     copy.addressV = TextureAddressMode.Clamp;
     copy.minFilter = TextureMinFilter.Point;
     copy.magFilter = TextureMagFilter.LinearMipLinear;
-    copy.maxAnisotropy = 4;
+    copy.maxAnisotropy = 4.0;
 
     Map json = original.toJson();
     copy.fromJson(json);
