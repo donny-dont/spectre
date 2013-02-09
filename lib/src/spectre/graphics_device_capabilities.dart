@@ -199,21 +199,21 @@ Max Vertex Shader Uniforms: $_maxVertexShaderUniforms
 Max Fragment Shader Uniforms: $_maxFragmentShaderUniforms
 
 Extensions
+ANGLE_instanced_arrays: $_instancedArrays
+EXT_draw_buffers: $_multipleRenderTargets
+EXT_texture_filter_anisotropic: $_anisotropicFiltering
+OES_element_index_uint: $_unsignedIntIndices
 OES_texture_float: $_floatTextures
 OES_texture_half_float: $_halfFloatTextures
 OES_standard_derivatives: $_standardDerivatives
 OES_vertex_array_object: $_vertexArrayObjects
-WEBGL_debug_renderer_info: $_debugRendererInfo
-WEBGL_debug_shaders: $_debugShaders
-OES_element_index_uint: $_unsignedIntIndices
-EXT_texture_filter_anisotropic: $_anisotropicFiltering
-WEBGL_lose_context: $_loseContext
 WEBGL_compressed_texture_s3tc: $_compressedTextureS3TC
-WEBGL_depth_texture: $_depthTextures
 WEBGL_compressed_texture_atc: $_compressedTextureATC
 WEBGL_compressed_texture_pvrtc: $_compressedTexturePVRTC
-ANGLE_instanced_arrays: $_instancedArrays
-EXT_draw_buffers: $_multipleRenderTargets
+WEBGL_debug_renderer_info: $_debugRendererInfo
+WEBGL_debug_shaders: $_debugShaders
+WEBGL_depth_texture: $_depthTextures
+WEBGL_lose_context: $_loseContext
         ''';
   }
 
