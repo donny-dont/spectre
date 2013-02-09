@@ -9,6 +9,15 @@ import 'package:bot/hop_tasks.dart';
 void main() {
   _assertKnownPath();
 
+  //
+  // Analyzer
+  //
+  addTask('analyze_lib', createDartAnalyzerTask(['lib/spectre.dart',
+                                                 'lib/spectre_asset_pack.dart',
+                                                 'lib/spectre_post.dart',
+                                                 'lib/spectre_scene.dart']));
+  addTask('analyze_test', createDartAnalyzerTask(['test/test_runner.dart']));
+
   addTask('docs', getCompileDocsFunc('gh-pages', 'packages/', _getLibs));
 
   runHopCore();
