@@ -22,19 +22,12 @@ part of spectre;
 
 /// A resource created by a device
 /// All resources have a [name]
-class DeviceChild implements Serializable {
+abstract class DeviceChild extends Disposable implements Serializable {
   final GraphicsDevice device;
   final String name;
   String toString() => name;
 
-  DeviceChild._internal(this.name, this.device) {
-  }
-
-  void _createDeviceState() {
-  }
-
-  void _destroyDeviceState() {
-  }
+  DeviceChild._internal(this.name, this.device);
 
   dynamic toJson() {
     return '';
@@ -42,6 +35,8 @@ class DeviceChild implements Serializable {
 
   void fromJson(dynamic a) {
   }
+
+  void finalizer();
 }
 
 

@@ -32,26 +32,20 @@ class SpectreBuffer extends DeviceChild {
   /** Hint that buffer data is used many times and never discarded. */
   static const UsageStatic = WebGLRenderingContext.STATIC_DRAW;
   WebGLBuffer _deviceBuffer;
-  int _bindTarget;
-  int _bindingParam;
+  final int _bindTarget;
+  final int _bindingParam;
   int _usage = UsageDynamic;
   int _size = 0;
 
-  SpectreBuffer(String name, GraphicsDevice device)
+  SpectreBuffer(String name, GraphicsDevice device,
+                this._bindTarget, this._bindingParam)
       : super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
     _deviceBuffer = device.gl.createBuffer();
   }
 
-  void _destroyDeviceState() {
-    if (_deviceBuffer != null) {
-      device.gl.deleteBuffer(_deviceBuffer);
-    }
+  void finalizer() {
+    device.gl.deleteBuffer(_deviceBuffer);
     _deviceBuffer = null;
-    super._destroyDeviceState();
   }
 
   WebGLBuffer _pushBind() {

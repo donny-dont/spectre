@@ -32,6 +32,8 @@ import 'package:vector_math/vector_math.dart';
 import 'package:marker_prof/profiler.dart';
 import 'package:property_map/property_map.dart';
 
+part 'src/spectre/disposable.dart';
+part 'src/spectre/device_child.dart';
 part 'src/spectre/blend.dart';
 part 'src/spectre/blend_operation.dart';
 part 'src/spectre/blend_state.dart';
@@ -42,7 +44,6 @@ part 'src/spectre/compare_function.dart';
 part 'src/spectre/cull_mode.dart';
 part 'src/spectre/debug_draw_manager.dart';
 part 'src/spectre/depth_state.dart';
-part 'src/spectre/device_children.dart';
 part 'src/spectre/shader.dart';
 part 'src/spectre/fragment_shader.dart';
 part 'src/spectre/front_face.dart';

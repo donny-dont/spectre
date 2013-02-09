@@ -69,4 +69,8 @@ class SamplerState extends DeviceChild {
     }
     return o;
   }
+
+  void finalizer() {
+    // Nothing to do.
+  }
 }

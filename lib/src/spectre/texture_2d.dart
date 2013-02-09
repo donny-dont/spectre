@@ -39,14 +39,6 @@ class Texture2D extends SpectreTexture {
                   int bindParam, int textureTarget) :
       super(name, device, bindTarget, bindParam, textureTarget);
 
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
-  }
-
   void _uploadPixelArray(int width, int height, dynamic array,
                          int pixelFormat, int pixelType) {
     device.gl.texImage2D(_textureTarget, 0, _textureFormat, width, height,

@@ -20,23 +20,10 @@
 
 part of spectre;
 
-/// IndexBuffer defines the storage for indexes used to construct primitives
-/// Create using [Device.createIndexBuffer]
-/// Set using [Device.setIndexBuffer]
+/// IndexBuffer
 class IndexBuffer extends SpectreBuffer {
-
-  IndexBuffer(String name, GraphicsDevice device) : super(name, device) {
-    _bindTarget = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER;
-    _bindingParam = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING;
-  }
-
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  IndexBuffer(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
+          WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING) {
   }
 }

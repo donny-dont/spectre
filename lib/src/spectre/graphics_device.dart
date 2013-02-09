@@ -305,7 +305,7 @@ class GraphicsDevice {
 
   /// Deletes the device child [child].
   void deleteDeviceChild(DeviceChild child) {
-    child._destroyDeviceState();
+    child.dispose();
     _children.remove(child);
   }
 
@@ -320,7 +320,6 @@ class GraphicsDevice {
   IndexBuffer createIndexBuffer(String name) {
     IndexBuffer ib = new IndexBuffer(name, this);
     _children.add(ib);
-    ib._createDeviceState();
     return ib;
   }
 
@@ -328,7 +327,6 @@ class GraphicsDevice {
   VertexBuffer createVertexBuffer(String name) {
     VertexBuffer vb = new VertexBuffer(name, this);
     _children.add(vb);
-    vb._createDeviceState();
     return vb;
   }
 
@@ -336,7 +334,6 @@ class GraphicsDevice {
   RenderBuffer createRenderBuffer(String name) {
     RenderBuffer rb = new RenderBuffer(name, this);
     _children.add(rb);
-    rb._createDeviceState();
     return rb;
   }
 
@@ -344,7 +341,6 @@ class GraphicsDevice {
   RenderTarget createRenderTarget(String name) {
     RenderTarget rt = new RenderTarget(name, this);
     _children.add(rt);
-    rt._createDeviceState();
     return rt;
   }
 
@@ -352,7 +348,6 @@ class GraphicsDevice {
   Texture2D createTexture2D(String name) {
     Texture2D tex = new Texture2D(name, this);
     _children.add(tex);
-    tex._createDeviceState();
     return tex;
   }
 
@@ -360,7 +355,6 @@ class GraphicsDevice {
   TextureCube createTextureCube(String name) {
     TextureCube tex = new TextureCube(name, this);
     _children.add(tex);
-    tex._createDeviceState();
     return tex;
   }
 
@@ -368,7 +362,6 @@ class GraphicsDevice {
   VertexShader createVertexShader(String name) {
     VertexShader vertexShader = new VertexShader(name, this);
     _children.add(vertexShader);
-    vertexShader._createDeviceState();
     return vertexShader;
   }
 
@@ -376,7 +369,6 @@ class GraphicsDevice {
   FragmentShader createFragmentShader(String name) {
     FragmentShader fragmentShader = new FragmentShader(name, this);
     _children.add(fragmentShader);
-    fragmentShader._createDeviceState();
     return fragmentShader;
   }
 
@@ -384,7 +376,6 @@ class GraphicsDevice {
   ShaderProgram createShaderProgram(String name) {
     ShaderProgram shaderProgram = new ShaderProgram(name, this);
     _children.add(shaderProgram);
-    shaderProgram._createDeviceState();
     return shaderProgram;
   }
 
@@ -392,7 +383,6 @@ class GraphicsDevice {
   SamplerState createSamplerState(String name) {
     SamplerState sampler = new SamplerState(name, this);
     _children.add(sampler);
-    sampler._createDeviceState();
     return sampler;
   }
 
@@ -400,7 +390,6 @@ class GraphicsDevice {
   Viewport createViewport(String name) {
     Viewport viewport = new Viewport(name, this);
     _children.add(viewport);
-    viewport._createDeviceState();
     return viewport;
   }
 
@@ -408,7 +397,6 @@ class GraphicsDevice {
   DepthState createDepthState(String name) {
     DepthState depthState = new DepthState(name, this);
     _children.add(depthState);
-    depthState._createDeviceState();
     return depthState;
   }
 
@@ -416,7 +404,6 @@ class GraphicsDevice {
   BlendState createBlendState(String name) {
     BlendState blendState = new BlendState(name, this);
     _children.add(blendState);
-    blendState._createDeviceState();
     return blendState;
   }
 
@@ -424,7 +411,6 @@ class GraphicsDevice {
   RasterizerState createRasterizerState(String name) {
     RasterizerState rasterizerState = new RasterizerState(name, this);
     _children.add(rasterizerState);
-    rasterizerState._createDeviceState();
     return rasterizerState;
   }
 
@@ -432,7 +418,6 @@ class GraphicsDevice {
   InputLayout createInputLayout(String name) {
     InputLayout il = new InputLayout(name, this);
     _children.add(il);
-    il._createDeviceState();
     return il;
   }
 
@@ -440,7 +425,6 @@ class GraphicsDevice {
   SingleArrayMesh createSingleArrayMesh(String name) {
     SingleArrayMesh arrayMesh = new SingleArrayMesh(name, this);
     _children.add(arrayMesh);
-    arrayMesh._createDeviceState();
     return arrayMesh;
   }
 
@@ -448,7 +432,6 @@ class GraphicsDevice {
   SingleArrayIndexedMesh createSingleArrayIndexedMesh(String name) {
     SingleArrayIndexedMesh indexedMesh = new SingleArrayIndexedMesh(name, this);
     _children.add(indexedMesh);
-    indexedMesh._createDeviceState();
     return indexedMesh;
   }
 }

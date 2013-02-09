@@ -76,10 +76,6 @@ class TextureCube extends SpectreTexture {
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z);
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
     _positiveX._deviceTexture = _deviceTexture;
     _positiveY._deviceTexture = _deviceTexture;
     _positiveZ._deviceTexture = _deviceTexture;
@@ -88,14 +84,14 @@ class TextureCube extends SpectreTexture {
     _negativeZ._deviceTexture = _deviceTexture;
   }
 
-  void _destroyDeviceState() {
+  void finalizer() {
     _positiveX._deviceTexture = null;
     _positiveY._deviceTexture = null;
     _positiveZ._deviceTexture = null;
     _negativeX._deviceTexture = null;
     _negativeY._deviceTexture = null;
     _negativeZ._deviceTexture = null;
-    super._destroyDeviceState();
+    super.finalizer();
   }
 
   void _generateMipmap() {

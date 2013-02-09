@@ -212,4 +212,8 @@ class RasterizerState extends DeviceChild {
     value = values[_scissorTestEnabledName];
     _scissorTestEnabled = (value != null) ? value : _scissorTestEnabled;
   }
+
+  void finalizer() {
+    // Nothing to do.
+  }
 }

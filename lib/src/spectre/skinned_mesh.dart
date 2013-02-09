@@ -350,25 +350,17 @@ class SkinnedMesh extends SpectreMesh {
   final List<Map> meshes = new List<Map>();
 
   SkinnedMesh(String name, GraphicsDevice device) :
-      super(name, device);
-
-  void _createDeviceState() {
-    super._createDeviceState();
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
+      super(name, device) {
+    _deviceVertexBuffer = new VertexBuffer(name, device);
+    _deviceIndexBuffer = new IndexBuffer(name, device);
   }
 
-  void _destroyDeviceState() {
-    if (_deviceVertexBuffer != null) {
-      device.deleteDeviceChild(_deviceVertexBuffer);
-      _deviceVertexBuffer = null;
-    }
-    if (_deviceIndexBuffer != null) {
-      device.deleteDeviceChild(_deviceIndexBuffer);
-      _deviceIndexBuffer = null;
-    }
+  void finalizer() {
+    _deviceVertexBuffer.dispose();
+    _deviceIndexBuffer.dispose();
+    _deviceVertexBuffer = null;
+    _deviceIndexBuffer = null;
     count = 0;
-    super._destroyDeviceState();
   }
 
   Float32List baseVertexData; // The unanimated reference data.
@@ -428,15 +420,11 @@ class SkinnedMesh extends SpectreMesh {
       final Float32List globalTransform = globalBoneTransforms[i];
       final Float32List skinningTransform = skinningBoneTransforms[i];
       final Float32List offsetTransform = boneOffsetTransforms[i];
-
       Float32ListHelpers.mul44(skinningTransform,
                                globalTransform,
                                offsetTransform
                                );
-
-      // Unsure if this must be factored in:
-      //Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
-      //Float32ListHelpers.mul44(skinningTransform, skinningTransform, globalInverseTransform);
+      Float32ListHelpers.mul44(skinningTransform, globalInverseTransform, skinningTransform);
     }
   }
 
@@ -458,8 +446,6 @@ class SkinnedMesh extends SpectreMesh {
       int scaleIndex = boneData._findScaleIndex(_currentTime);
       Expect.isTrue(positionIndex >= 0);
       Expect.isTrue(rotationIndex >= 0);
-      //Float32ListHelpers.fromQuat(nodeTransform, rotations, rotationIndex);
-      //Float32ListHelpers.translate(nodeTransform, positions, positionIndex);
       Float32ListHelpers.rotateTranslate(nodeTransform,
                                          positions, positionIndex,
                                          rotations, rotationIndex);
@@ -467,7 +453,6 @@ class SkinnedMesh extends SpectreMesh {
       Float32ListHelpers.copy(nodeTransform, localBoneTransforms[boneIndex]);
     }
     Float32ListHelpers.mul44(globalTransform, parentTransform, nodeTransform);
-    //Float32ListHelpers.mul44(globalTransform, nodeTransform, parentTransform);
     int childOffset = boneChildrenOffsets[boneIndex];
     int childIndex = boneChildrenIds[childOffset++];
     while (childIndex != -1) {
@@ -606,7 +591,6 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   meshes.forEach((m) {
     importMesh(mesh, m);
   });
-  mesh._createDeviceState();
   mesh.vertexData = new Float32Array.fromList(json['vertices']);
   mesh.baseVertexData = new Float32List(mesh.vertexData.length);
   for (int i = 0; i < mesh.vertexData.length; i++) {

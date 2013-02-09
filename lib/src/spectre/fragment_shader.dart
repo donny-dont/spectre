@@ -20,19 +20,9 @@
 
 part of spectre;
 
-/// A fragment shader
-/// Create using [Device.createFragmentShader]
-/// Must be linked into a ShaderProgram before use
+/// FragmentShader
 class FragmentShader extends SpectreShader {
-  FragmentShader(String name, GraphicsDevice device) : super(name, device) {
-    _type = WebGLRenderingContext.FRAGMENT_SHADER;
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  FragmentShader(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.FRAGMENT_SHADER) {
   }
 }

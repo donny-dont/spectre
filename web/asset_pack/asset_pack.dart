@@ -151,7 +151,6 @@ int _depthGuard = 100;
 double _skeletonScale = 1.0;
 void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   List<double> origin = [0.0, 0.0, 0.0];
-  //final matrices = mesh.skinningBoneTransforms;
   final matrices = mesh.globalBoneTransforms;
   origin[0] = matrices[id][12] * _skeletonScale;
   origin[1] = matrices[id][13] * _skeletonScale;
