@@ -91,12 +91,16 @@ class GraphicsDeviceCapabilities {
   bool _compressedTextureATC;
   /// Whether PVRTC compressed textures can be used.
   bool _compressedTexturePVRTC;
+  /// Whether multiple render targets can be used.
+  bool _multipleRenderTargets;
+  /// Whether instanced arrays can be used.
+  bool _instancedArrays;
 
   //---------------------------------------------------------------------
   // Construction
   //---------------------------------------------------------------------
 
-
+  /// Queries the device capabilities in the [WebGLRenderingContext].
   GraphicsDeviceCapabilities._fromContext(WebGLRenderingContext gl) {
     _queryDeviceInfo(gl);
     _queryExtensionInfo(gl);
@@ -165,6 +169,10 @@ class GraphicsDeviceCapabilities {
   bool get hasCompressedTextureATC => _compressedTextureATC;
   /// Whether PVRTC compressed textures can be used.
   bool get hasCompressedTexturePVRTC => _compressedTexturePVRTC;
+  /// Whether multiple render targets can be used.
+  bool get hasMultipleRenderTargets => _multipleRenderTargets;
+  /// Whether instanced arrays can be used.
+  bool get hasInstancedArrays => _instancedArrays;
 
   //---------------------------------------------------------------------
   // Public methods
@@ -204,6 +212,8 @@ WEBGL_compressed_texture_s3tc: $_compressedTextureS3TC
 WEBGL_depth_texture: $_depthTextures
 WEBGL_compressed_texture_atc: $_compressedTextureATC
 WEBGL_compressed_texture_pvrtc: $_compressedTexturePVRTC
+ANGLE_instanced_arrays: $_instancedArrays
+EXT_draw_buffers: $_multipleRenderTargets
         ''';
   }
 
@@ -224,10 +234,13 @@ WEBGL_compressed_texture_pvrtc: $_compressedTexturePVRTC
     // Approved
     _floatTextures = _hasExtension(gl, 'OES_texture_float');
     _halfFloatTextures = _hasExtension(gl, 'OES_texture_half_float');
+    _loseContext = _hasExtension(gl, 'WEBGL_lose_context');
     _standardDerivatives = _hasExtension(gl, 'OES_standard_derivatives');
     _vertexArrayObjects = _hasExtension(gl, 'OES_vertex_array_object');
     _debugRendererInfo = _hasExtension(gl, 'WEBGL_debug_renderer_info');
     _debugShaders = _hasExtension(gl, 'WEBGL_debug_shaders');
+    _compressedTextureS3TC = _hasExtension(gl, 'WEBGL_compressed_texture_s3tc');
+    _depthTextures = _hasExtension(gl, 'WEBGL_depth_texture');
     // \todo This call is crashing on me. See if its just my machine.
     _unsignedIntIndices = false; //_hasExtension(gl, 'OES_element_index_uint');
 
@@ -241,11 +254,10 @@ WEBGL_compressed_texture_pvrtc: $_compressedTexturePVRTC
     }
 
     // Draft
-    _loseContext = _hasExtension(gl, 'WEBGL_lose_context');
-    _compressedTextureS3TC = _hasExtension(gl, 'WEBGL_compressed_texture_s3tc');
-    _depthTextures = _hasExtension(gl, 'WEBGL_depth_texture');
     _compressedTextureATC = _hasExtension(gl, 'WEBGL_compressed_texture_atc');
+    _instancedArrays = _hasExtension(gl, 'ANGLE_instanced_arrays');
     _compressedTexturePVRTC = _hasExtension(gl, 'WEBGL_compressed_texture_pvrtc');
+    _multipleRenderTargets = _hasExtension(gl, 'EXT_draw_buffers');
   }
 
   //---------------------------------------------------------------------
