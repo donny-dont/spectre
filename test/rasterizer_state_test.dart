@@ -20,8 +20,9 @@
 
 library rasterizer_state_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
 
 void testConstructor(RasterizerState rasterizerState, int cullMode, int frontFace) {
   expect(rasterizerState.cullMode , cullMode);
@@ -95,29 +96,34 @@ void main() {
     RasterizerState rasterizerState1 = new RasterizerState('RasterizerState1', null);
 
     // Check identical
-    expect(rasterizerState0, rasterizerState0);
-    expect(rasterizerState0, rasterizerState1);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState0), true);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     // Check inequality
     rasterizerState0.cullMode = CullMode.Front;
-    expect(rasterizerState0 == rasterizerState1, false);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
     rasterizerState1.cullMode = rasterizerState0.cullMode;
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     rasterizerState0.frontFace = FrontFace.Clockwise;
-    expect(rasterizerState0 == rasterizerState1, false);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
     rasterizerState1.frontFace = rasterizerState0.frontFace;
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     rasterizerState0.depthBias = 1.0;
-    expect(rasterizerState0 == rasterizerState1, false);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
     rasterizerState1.depthBias = rasterizerState0.depthBias;
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     rasterizerState0.slopeScaleDepthBias = 1.0;
-    expect(rasterizerState0 == rasterizerState1, false);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
     rasterizerState1.depthBias = rasterizerState0.depthBias;
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     rasterizerState0.scissorTestEnabled = true;
-    expect(rasterizerState0 == rasterizerState1, false);
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
     rasterizerState1.scissorTestEnabled = rasterizerState0.scissorTestEnabled;
+    expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
   });
 
   // Serialization
@@ -134,8 +140,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    return;
-    // TODO: Fix equality testing.
-    expect(original, copy);
+    expect(rasterizerStateEqual(original, copy), true);
   });
 }

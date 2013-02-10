@@ -76,3 +76,24 @@ bool depthStateEqual(DepthState depthState0, DepthState depthState1) {
           (depthState0.depthBufferWriteEnabled == depthState1.depthBufferWriteEnabled) &&
           (depthState0.depthBufferFunction     == depthState1.depthBufferFunction));
 }
+
+/// Compares two [RasterizerState]s for equality.
+bool rasterizerStateEqual(RasterizerState rasterizerState0, RasterizerState rasterizerState1) {
+  if (identical(rasterizerState0, rasterizerState1)) {
+    return true;
+  }
+
+  if (rasterizerState0.cullMode != rasterizerState1.cullMode) {
+    return false;
+  }
+
+  if (rasterizerState0.frontFace != rasterizerState1.frontFace) {
+    return false;
+  }
+
+  if ((rasterizerState0.depthBias != rasterizerState1.depthBias) || (rasterizerState0.slopeScaleDepthBias != rasterizerState1.slopeScaleDepthBias)) {
+    return false;
+  }
+
+  return rasterizerState0.scissorTestEnabled == rasterizerState1.scissorTestEnabled;
+}
