@@ -191,58 +191,72 @@ void main() {
     blendState0.alphaBlendOperation = BlendOperation.ReverseSubtract;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaBlendOperation = blendState0.alphaBlendOperation;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.alphaDestinationBlend = Blend.BlendFactor;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaDestinationBlend = blendState0.alphaDestinationBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.alphaSourceBlend = Blend.BlendFactor;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaSourceBlend = blendState0.alphaSourceBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorBlendOperation = BlendOperation.ReverseSubtract;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorBlendOperation = blendState0.colorBlendOperation;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorDestinationBlend = Blend.BlendFactor;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorDestinationBlend = blendState0.colorDestinationBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorSourceBlend = Blend.BlendFactor;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorSourceBlend = blendState0.colorSourceBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorRed = 0.0;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorRed = blendState0.blendFactorRed;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorGreen = 0.0;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorGreen = blendState0.blendFactorGreen;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorBlue = 0.0;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorBlue = blendState0.blendFactorBlue;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorAlpha = 0.0;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorAlpha = blendState0.blendFactorAlpha;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetRed = false;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetRed = blendState0.writeRenderTargetRed;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetGreen = false;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetGreen = blendState0.writeRenderTargetGreen;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetBlue = false;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetBlue = blendState0.writeRenderTargetBlue;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetAlpha = false;
     expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetAlpha = blendState0.writeRenderTargetAlpha;
+    expect(blendStateEqual(blendState0, blendState1), true);
   });
 
   // Serialization
