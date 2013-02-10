@@ -23,9 +23,12 @@ library viewport_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'device_child_equality.dart';
+import 'mock_graphics_device.dart';
+
+GraphicsDevice _graphicsDevice;
 
 void testDimensionSetter(String testName, dynamic function) {
-  Viewport viewport = new Viewport('ViewportTest', null);
+  Viewport viewport = new Viewport('Viewport_$testName', _graphicsDevice);
 
   test(testName, () {
     expect(function(viewport,    0), 0);
@@ -36,7 +39,7 @@ void testDimensionSetter(String testName, dynamic function) {
 }
 
 void testDepthRangeSetter(String testName, dynamic function) {
-  Viewport viewport = new Viewport('ViewportTest', null);
+  Viewport viewport = new Viewport('Viewport_$testName', _graphicsDevice);
 
   test(testName, () {
     expect(function(viewport, 0.0), 0.0);
@@ -66,14 +69,16 @@ void testConstructor(Viewport viewport, int x, int y, int width, int height) {
 }
 
 void main() {
+  _graphicsDevice = new MockGraphicsDevice.useMock();
+
   // Construction
   test('construction', () {
     // Default constructor
-    Viewport defaultViewport = new Viewport('ViewportDefault', null);
+    Viewport defaultViewport = new Viewport('ViewportDefault', _graphicsDevice);
     testConstructor(defaultViewport, 0, 0, 640, 480);
 
     // Viewport.bounds
-    Viewport bounds = new Viewport.bounds('ViewportBounds', null, 160, 120, 320, 240);
+    Viewport bounds = new Viewport.bounds('ViewportBounds', _graphicsDevice, 160, 120, 320, 240);
     testConstructor(bounds, 160, 120, 320, 240);
   });
 
@@ -101,8 +106,8 @@ void main() {
 
   // Equality
   test('equality', () {
-    Viewport viewport0 = new Viewport('Viewport0', null);
-    Viewport viewport1 = new Viewport('Viewport1', null);
+    Viewport viewport0 = new Viewport('Viewport0', _graphicsDevice);
+    Viewport viewport1 = new Viewport('Viewport1', _graphicsDevice);
 
     // Check identical
     expect(viewportEqual(viewport0, viewport0), true);
@@ -142,9 +147,9 @@ void main() {
 
   // Serialization
   test('serialization', () {
-    Viewport original = new Viewport('ViewportOriginal', null);
+    Viewport original = new Viewport('ViewportOriginal', _graphicsDevice);
 
-    Viewport copy = new Viewport('ViewportCopy', null);
+    Viewport copy = new Viewport('ViewportCopy', _graphicsDevice);
     copy.x = 160;
     copy.y = 120;
     copy.width = 320;

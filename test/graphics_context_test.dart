@@ -31,13 +31,13 @@ import 'dart:html';
 // GraphicsContext testing utility functions
 //---------------------------------------------------------------------
 
-void verifyInitialPipelineState(MockWebGLRenderingContext gl) {
+void verifyInitialPipelineState(GraphicsDevice graphicsDevice, MockWebGLRenderingContext gl) {
   int calls = 0;
 
-  calls += verifyInitialViewport(gl);
-  calls += verifyInitialBlendState(gl);
-  calls += verifyInitialDepthState(gl);
-  calls += verifyInitialRasterizerState(gl);
+  calls += verifyInitialViewport(graphicsDevice, gl);
+  calls += verifyInitialBlendState(graphicsDevice, gl);
+  calls += verifyInitialDepthState(graphicsDevice, gl);
+  calls += verifyInitialRasterizerState(graphicsDevice, gl);
 
   // Number of GL calls in GraphicsContext._initializeState
   expect(gl.log.logs.length, calls);
@@ -47,8 +47,8 @@ void verifyInitialPipelineState(MockWebGLRenderingContext gl) {
 // Viewport testing utility functions
 //---------------------------------------------------------------------
 
-int verifyInitialViewport(MockWebGLRenderingContext gl) {
-  Viewport viewport = new Viewport('Viewport', null);
+int verifyInitialViewport(GraphicsDevice graphicsDevice, MockWebGLRenderingContext gl) {
+  Viewport viewport = new Viewport('Viewport', graphicsDevice);
 
   // Make sure initial Viewport was used
   gl.getLogs(callsTo('viewport')).verify(happenedOnce);
@@ -82,8 +82,8 @@ void copyBlendState(BlendState original, BlendState copy) {
   copy.writeRenderTargetAlpha = original.writeRenderTargetAlpha;
 }
 
-int verifyInitialBlendState(MockWebGLRenderingContext gl) {
-  BlendState blendState = new BlendState.opaque('InitialBlendState', null);
+int verifyInitialBlendState(GraphicsDevice graphicsDevice, MockWebGLRenderingContext gl) {
+  BlendState blendState = new BlendState.opaque('InitialBlendState', graphicsDevice);
 
   // Make sure BlendState.opaque was used
   gl.getLogs(callsTo('disable', WebGLRenderingContext.BLEND)).verify(happenedOnce);
@@ -249,14 +249,14 @@ void testBlendStateTransitions(bool blendEnabled) {
   MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
   GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
-  // Passing null will reset the values
+  // Passing  will reset the values
   graphicsContext.setBlendState(null);
-  verifyInitialBlendState(gl);
+  verifyInitialBlendState(graphicsDevice, gl);
 
   gl.clearLogs();
 
   // Create the initial blend state
-  BlendState blendState = new BlendState('BlendState', null);
+  BlendState blendState = new BlendState('BlendState', graphicsDevice);
 
   blendState.enabled = blendEnabled;
   blendState.alphaBlendOperation = BlendOperation.ReverseSubtract;
@@ -298,7 +298,7 @@ void testBlendStateTransitions(bool blendEnabled) {
   gl.clearLogs();
 
   // Create another BlendState to provide a comparison
-  BlendState blendStateLast = new BlendState('BlendStateLast', null);
+  BlendState blendStateLast = new BlendState('BlendStateLast', graphicsDevice);
   copyBlendState(blendState, blendStateLast);
 
   // Set the same state values again
@@ -409,8 +409,8 @@ void copyDepthState(DepthState original, DepthState copy) {
   copy.depthBufferFunction     = original.depthBufferFunction;
 }
 
-int verifyInitialDepthState(MockWebGLRenderingContext gl) {
-  DepthState depthState = new DepthState.depthWrite('InitialDepthState', null);
+int verifyInitialDepthState(GraphicsDevice graphicsDevice, MockWebGLRenderingContext gl) {
+  DepthState depthState = new DepthState.depthWrite('InitialDepthState', graphicsDevice);
 
   // Make sure DepthState.cullClockwise was used
   gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
@@ -466,14 +466,14 @@ void testDepthStateTransitions(bool depthBufferEnabled) {
   MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
   GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
-  // Passing null will reset the values
+  // Passing  will reset the values
   graphicsContext.setDepthState(null);
-  verifyInitialRasterizerState(gl);
+  verifyInitialDepthState(graphicsDevice, gl);
 
   gl.clearLogs();
 
   // Create the initial depth state
-  DepthState depthState = new DepthState('DepthState', null);
+  DepthState depthState = new DepthState('DepthState', graphicsDevice);
 
   depthState.depthBufferEnabled = depthBufferEnabled;
   depthState.depthBufferWriteEnabled = false;
@@ -501,7 +501,7 @@ void testDepthStateTransitions(bool depthBufferEnabled) {
   gl.clearLogs();
 
   // Create another RasterizerState to provide a comparison
-  DepthState depthStateLast = new DepthState('DepthStateLast', null);
+  DepthState depthStateLast = new DepthState('DepthStateLast', graphicsDevice);
   copyDepthState(depthState, depthStateLast);
 
   // Set the same state values again
@@ -546,8 +546,8 @@ void copyRasterizerState(RasterizerState original, RasterizerState copy) {
   copy.scissorTestEnabled = original.scissorTestEnabled;
 }
 
-int verifyInitialRasterizerState(MockWebGLRenderingContext gl) {
-  RasterizerState rasterizerState = new RasterizerState.cullClockwise('InitialRasterizerState', null);
+int verifyInitialRasterizerState(GraphicsDevice graphicsDevice, MockWebGLRenderingContext gl) {
+  RasterizerState rasterizerState = new RasterizerState.cullClockwise('InitialRasterizerState', graphicsDevice);
 
   // Make sure RasterizerState.cullClockwise was used
   gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
@@ -643,14 +643,14 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   MockGraphicsDevice graphicsDevice = new MockGraphicsDevice(gl);
   GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
-  // Passing null will reset the values
+  // Passing  will reset the values
   graphicsContext.setRasterizerState(null);
-  verifyInitialRasterizerState(gl);
+  verifyInitialRasterizerState(graphicsDevice, gl);
 
   gl.clearLogs();
 
   // Create the initial rasterizer state
-  RasterizerState rasterizerState = new RasterizerState('RasterizerState', null);
+  RasterizerState rasterizerState = new RasterizerState('RasterizerState', graphicsDevice);
 
   rasterizerState.cullMode = (cullEnabled) ? CullMode.Front : CullMode.None;
   rasterizerState.frontFace = FrontFace.Clockwise;
@@ -685,7 +685,7 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   gl.clearLogs();
 
   // Create another RasterizerState to provide a comparison
-  RasterizerState rasterizerStateLast = new RasterizerState('RasterizerStateLast', null);
+  RasterizerState rasterizerStateLast = new RasterizerState('RasterizerStateLast', graphicsDevice);
   copyRasterizerState(rasterizerState, rasterizerStateLast);
 
   // Set the same state values again
@@ -750,7 +750,7 @@ void main() {
     GraphicsContext graphicsContext = new GraphicsContext(graphicsDevice);
 
     // Make sure reset was called
-    verifyInitialPipelineState(gl);
+    verifyInitialPipelineState(graphicsDevice, gl);
   });
 
   testBlendState();

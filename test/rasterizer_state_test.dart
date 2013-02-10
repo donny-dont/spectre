@@ -23,6 +23,9 @@ library rasterizer_state_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'device_child_equality.dart';
+import 'mock_graphics_device.dart';
+
+GraphicsDevice _graphicsDevice;
 
 void testConstructor(RasterizerState rasterizerState, int cullMode, int frontFace) {
   expect(rasterizerState.cullMode , cullMode);
@@ -35,28 +38,30 @@ void testConstructor(RasterizerState rasterizerState, int cullMode, int frontFac
 }
 
 void main() {
+  _graphicsDevice = new MockGraphicsDevice.useMock();
+
   // Construction
   test('construction', () {
     // Default constructor
-    RasterizerState defaultState = new RasterizerState('RasterizerStateDefault', null);
+    RasterizerState defaultState = new RasterizerState('RasterizerStateDefault', _graphicsDevice);
     testConstructor(defaultState, CullMode.Back, FrontFace.CounterClockwise);
 
     // RasterizerState.cullClockwise
-    RasterizerState cullClockwise = new RasterizerState.cullClockwise('RasterizerStateCullClockwise', null);
+    RasterizerState cullClockwise = new RasterizerState.cullClockwise('RasterizerStateCullClockwise', _graphicsDevice);
     testConstructor(cullClockwise, CullMode.Back, FrontFace.CounterClockwise);
 
     // RasterizerState.cullCounterClockwise
-    RasterizerState cullCounterClockwise = new RasterizerState.cullCounterClockwise('RasterizerStateCullClockwise', null);
+    RasterizerState cullCounterClockwise = new RasterizerState.cullCounterClockwise('RasterizerStateCullClockwise', _graphicsDevice);
     testConstructor(cullCounterClockwise, CullMode.Back, FrontFace.Clockwise);
 
     // RasterizerState.cullNone
-    RasterizerState cullNone = new RasterizerState.cullNone('RasterizerStateCullNone', null);
+    RasterizerState cullNone = new RasterizerState.cullNone('RasterizerStateCullNone', _graphicsDevice);
     testConstructor(cullNone, CullMode.None, FrontFace.CounterClockwise);
   });
 
   // Enumeration setters
   test('cullMode', () {
-    RasterizerState rasterizerState = new RasterizerState('RasterizerStateTest', null);
+    RasterizerState rasterizerState = new RasterizerState('RasterizerStateTest', _graphicsDevice);
 
     dynamic function = (rasterizerState, value) {
       rasterizerState.cullMode = value;
@@ -73,7 +78,7 @@ void main() {
   });
 
   test('frontFace', () {
-    RasterizerState rasterizerState = new RasterizerState('RasterizerStateTest', null);
+    RasterizerState rasterizerState = new RasterizerState('RasterizerStateTest', _graphicsDevice);
 
     dynamic function = (rasterizerState, value) {
       rasterizerState.frontFace = value;
@@ -92,8 +97,8 @@ void main() {
   test('equality', () {
     // TODO: Fix equality testing.
     return;
-    RasterizerState rasterizerState0 = new RasterizerState('RasterizerState0', null);
-    RasterizerState rasterizerState1 = new RasterizerState('RasterizerState1', null);
+    RasterizerState rasterizerState0 = new RasterizerState('RasterizerState0', _graphicsDevice);
+    RasterizerState rasterizerState1 = new RasterizerState('RasterizerState1', _graphicsDevice);
 
     // Check identical
     expect(rasterizerStateEqual(rasterizerState0, rasterizerState0), true);
@@ -128,9 +133,9 @@ void main() {
 
   // Serialization
   test('serialization', () {
-    RasterizerState original = new RasterizerState('RasterizerStateOriginal', null);
+    RasterizerState original = new RasterizerState('RasterizerStateOriginal', _graphicsDevice);
 
-    RasterizerState copy = new RasterizerState('RasterizerStateCopy', null);
+    RasterizerState copy = new RasterizerState('RasterizerStateCopy', _graphicsDevice);
     copy.cullMode = CullMode.Front;
     copy.frontFace = FrontFace.Clockwise;
     copy.depthBias = 1.0;
