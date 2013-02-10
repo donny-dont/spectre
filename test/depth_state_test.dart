@@ -20,8 +20,9 @@
 
 library depth_state_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
 
 void testCompareFunctionSetter(String testName, dynamic function) {
   DepthState depthState = new DepthState('DepthStateTest', null);
@@ -79,21 +80,24 @@ void main() {
     DepthState depthState1 = new DepthState('DepthState1', null);
 
     // Check equality
-    expect(depthState0, depthState0);
-    expect(depthState0, depthState1);
+    expect(depthStateEqual(depthState0, depthState0), true);
+    expect(depthStateEqual(depthState0, depthState1), true);
 
     // Check inequality
     depthState0.depthBufferEnabled = false;
-    expect(depthState0 == depthState1, false);
+    expect(depthStateEqual(depthState0, depthState1), false);
     depthState1.depthBufferEnabled = depthState0.depthBufferEnabled;
+    expect(depthStateEqual(depthState0, depthState1), true);
 
     depthState0.depthBufferWriteEnabled = true;
-    expect(depthState0 == depthState1, false);
+    expect(depthStateEqual(depthState0, depthState1), false);
     depthState1.depthBufferWriteEnabled = depthState0.depthBufferWriteEnabled;
+    expect(depthStateEqual(depthState0, depthState1), true);
 
     depthState0.depthBufferFunction = CompareFunction.Always;
-    expect(depthState0 == depthState1, false);
+    expect(depthStateEqual(depthState0, depthState1), false);
     depthState1.depthBufferFunction = depthState0.depthBufferFunction;
+    expect(depthStateEqual(depthState0, depthState1), true);
   });
 
   // Serialization
@@ -108,6 +112,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    expect(original, copy);
+    expect(depthStateEqual(original, copy), true);
   });
 }

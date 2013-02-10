@@ -18,50 +18,61 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-library device_child_equality;
+library devicedepthState0.childdepthState0.equality;
 
 import 'package:spectre/spectre.dart';
 
-bool blendStateEqual(BlendState blend0, BlendState blend1) {
-  if (identical(blend0, blend1)) {
+/// Compares two [BlendState]s for equality.
+bool blendStateEqual(BlendState blendState0, BlendState blendState1) {
+  if (identical(blendState0, blendState1)) {
     return true;
   }
 
-  if (blend0.enabled != blend1.enabled) {
+  if (blendState0.enabled != blendState1.enabled) {
     return false;
   }
 
-  if ((blend0.blendFactorRed   != blend1.blendFactorRed)   ||
-      (blend0.blendFactorGreen != blend1.blendFactorGreen) ||
-      (blend0.blendFactorBlue  != blend1.blendFactorBlue)  ||
-      (blend0.blendFactorAlpha != blend1.blendFactorAlpha))
+  if ((blendState0.blendFactorRed   != blendState1.blendFactorRed)   ||
+      (blendState0.blendFactorGreen != blendState1.blendFactorGreen) ||
+      (blendState0.blendFactorBlue  != blendState1.blendFactorBlue)  ||
+      (blendState0.blendFactorAlpha != blendState1.blendFactorAlpha))
   {
     return false;
   }
 
-  if (blend0.alphaBlendOperation != blend1.alphaBlendOperation) {
+  if (blendState0.alphaBlendOperation != blendState1.alphaBlendOperation) {
     return false;
   }
-  if (blend0.alphaDestinationBlend != blend1.alphaDestinationBlend) {
+  if (blendState0.alphaDestinationBlend != blendState1.alphaDestinationBlend) {
     return false;
   }
-  if (blend0.alphaSourceBlend != blend1.alphaSourceBlend) {
-    return false;
-  }
-
-  if (blend0.colorBlendOperation != blend1.colorBlendOperation) {
-    return false;
-  }
-  if (blend0.colorDestinationBlend != blend1.colorDestinationBlend) {
-    return false;
-  }
-  if (blend0.colorSourceBlend != blend1.colorSourceBlend) {
+  if (blendState0.alphaSourceBlend != blendState1.alphaSourceBlend) {
     return false;
   }
 
-  return ((blend0.writeRenderTargetRed   == blend1.writeRenderTargetRed)   &&
-          (blend0.writeRenderTargetGreen == blend1.writeRenderTargetGreen) &&
-          (blend0.writeRenderTargetBlue  == blend1.writeRenderTargetBlue)  &&
-          (blend0.writeRenderTargetAlpha == blend1.writeRenderTargetAlpha));
+  if (blendState0.colorBlendOperation != blendState1.colorBlendOperation) {
+    return false;
+  }
+  if (blendState0.colorDestinationBlend != blendState1.colorDestinationBlend) {
+    return false;
+  }
+  if (blendState0.colorSourceBlend != blendState1.colorSourceBlend) {
+    return false;
+  }
+
+  return ((blendState0.writeRenderTargetRed   == blendState1.writeRenderTargetRed)   &&
+          (blendState0.writeRenderTargetGreen == blendState1.writeRenderTargetGreen) &&
+          (blendState0.writeRenderTargetBlue  == blendState1.writeRenderTargetBlue)  &&
+          (blendState0.writeRenderTargetAlpha == blendState1.writeRenderTargetAlpha));
 }
 
+/// Compares two [DepthState]s for equality.
+bool depthStateEqual(DepthState depthState0, DepthState depthState1) {
+  if (identical(depthState0, depthState1)) {
+    return true;
+  }
+
+  return ((depthState0.depthBufferEnabled      == depthState1.depthBufferEnabled)      &&
+          (depthState0.depthBufferWriteEnabled == depthState1.depthBufferWriteEnabled) &&
+          (depthState0.depthBufferFunction     == depthState1.depthBufferFunction));
+}

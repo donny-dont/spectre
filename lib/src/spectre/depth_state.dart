@@ -101,21 +101,6 @@ class DepthState extends DeviceChild {
   }
 
   //---------------------------------------------------------------------
-  // Equality
-  //---------------------------------------------------------------------
-/*
-  /// Compares two [DepthState]s for equality.
-  bool operator== (DepthState other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    return ((_depthBufferEnabled      == other._depthBufferEnabled)      &&
-            (_depthBufferWriteEnabled == other._depthBufferWriteEnabled) &&
-            (_depthBufferFunction     == other._depthBufferFunction));
-  }
-*/
-  //---------------------------------------------------------------------
   // Serialization
   //---------------------------------------------------------------------
 
