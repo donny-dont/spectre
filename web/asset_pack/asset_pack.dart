@@ -101,9 +101,9 @@ BlendState _skyboxBlendState;
 RasterizerState _skyboxRasterizerState;
 
 void _setupSkybox() {
-  _skyboxShaderProgram = _assetManager.assets.skyBoxShader;
+  _skyboxShaderProgram = _assetManager.root.demoAssets.skyBoxShader;
   assert(_skyboxShaderProgram.linked == true);
-  _skyboxMesh = _assetManager.assets.skyBox;
+  _skyboxMesh = _assetManager.root.demoAssets.skyBox;
   _skyboxInputLayout = _graphicsDevice.createInputLayout('skybox.il');
   _skyboxInputLayout.mesh = _skyboxMesh;
   _skyboxInputLayout.shaderProgram = _skyboxShaderProgram;
@@ -124,7 +124,7 @@ void _drawSkybox() {
   context.setInputLayout(_skyboxInputLayout);
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skyboxShaderProgram);
-  context.setTextures(0, [_assetManager.assets.space]);
+  context.setTextures(0, [_assetManager.root.demoAssets.space]);
   context.setSamplers(0, [_skyboxSampler]);
   {
     mat4 P = camera.projectionMatrix;
@@ -183,10 +183,10 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
 }
 
 void _setupSkinnedCharacter() {
-  _skinnedShaderProgram = _assetManager.assets.litdiffuse;
+  _skinnedShaderProgram = _assetManager.root.demoAssets.litdiffuse;
   assert(_skinnedShaderProgram.linked == true);
   _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
-                                   _assetManager.assets.hellknight);
+                                   _assetManager.root.demoAssets.hellknight);
   _skinnedInputLayout = _graphicsDevice.createInputLayout('skinned.il');
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -219,7 +219,7 @@ void _drawSkinnedCharacter() {
   context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
   context.setInputLayout(_skinnedInputLayout);
 
-  context.setTextures(0, [_assetManager.assets.hellknight_body]);
+  context.setTextures(0, [_assetManager.root.demoAssets.hellknight_body]);
   if (true) {
     for (int i = 0; i < _skinnedMesh.meshes.length; i++) {
       context.drawIndexed(_skinnedMesh.meshes[i]['count'], _skinnedMesh.meshes[i]['offset']);
@@ -231,19 +231,19 @@ void _drawSkinnedCharacter() {
   context.drawIndexed(_skinnedMesh.meshes[5]['count'], _skinnedMesh.meshes[5]['offset']);
 
   // Draw with face texture
-  context.setTextures(0, [_assetManager.assets.guard_face]);
+  context.setTextures(0, [_assetManager.root.demoAssets.guard_face]);
   context.drawIndexed(_skinnedMesh.meshes[1]['count'], _skinnedMesh.meshes[1]['offset']);
 
   // Draw with helmet texture
-  context.setTextures(0, [_assetManager.assets.guard_helmet]);
+  context.setTextures(0, [_assetManager.root.demoAssets.guard_helmet]);
   context.drawIndexed(_skinnedMesh.meshes[2]['count'], _skinnedMesh.meshes[2]['offset']);
 
   // Draw with iron grill texture
-  context.setTextures(0, [_assetManager.assets.iron_grill]);
+  context.setTextures(0, [_assetManager.root.demoAssets.iron_grill]);
   context.drawIndexed(_skinnedMesh.meshes[3]['count'], _skinnedMesh.meshes[3]['offset']);
 
   // Draw with round grill texture
-  context.setTextures(0, [_assetManager.assets.round_grill]);
+  context.setTextures(0, [_assetManager.root.demoAssets.round_grill]);
   context.drawIndexed(_skinnedMesh.meshes[4]['count'], _skinnedMesh.meshes[4]['offset']);
 
 }
@@ -285,7 +285,7 @@ main() {
   _gameLoop.onUpdate = gameFrame;
   _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
-  _assetManager.loadPack('assets', '$baseUrl/assets.pack').then((assetPack) {
+  _assetManager.loadPack('demoAssets', '$baseUrl/assets.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
     _setupSkinnedCharacter();
