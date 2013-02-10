@@ -115,12 +115,18 @@ class Texture2D extends SpectreTexture {
     device.gl.generateMipmap(_textureTarget);
   }
 
-  /** Generate Mipmap data for texture. This must be done before the texture
-   * can be used for rendering.
-   */
+
+  /// Generate mipmaps for the [Texture2D].
+  ///
+  /// This must be done before the texture is used for rendering.
+  ///
+  /// A call to this method will only generate mipmap data if the
+  /// texture is a power of two. If not then this call is ignored.
   void generateMipmap() {
-    var oldBind = _pushBind();
-    _generateMipmap();
-    _popBind(oldBind);
+    if (SpectreTexture._isPowerOfTwo(_width) && SpectreTexture._isPowerOfTwo(_height)) {
+      var oldBind = _pushBind();
+      _generateMipmap();
+      _popBind(oldBind);
+    }
   }
 }

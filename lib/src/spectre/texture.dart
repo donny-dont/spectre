@@ -117,10 +117,10 @@ class SpectreTexture extends DeviceChild {
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_S,
-                            sampler.wrapS);
+                            sampler.addressU);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_T,
-                            sampler.wrapT);
+                            sampler.addressV);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_MIN_FILTER,
                             sampler.minFilter);
@@ -140,5 +140,12 @@ class SpectreTexture extends DeviceChild {
   void finalizer() {
     device.gl.deleteTexture(_deviceTexture);
     _deviceTexture = null;
+  }
+
+  /// Determines whether a [value] is a power of two.
+  ///
+  /// Assumes that the given value will always be positive.
+  static bool _isPowerOfTwo(int value) {
+    return (value & (value - 1)) == 0;
   }
 }
