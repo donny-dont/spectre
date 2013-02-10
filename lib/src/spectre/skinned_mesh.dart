@@ -355,7 +355,7 @@ class SkinnedMesh extends SpectreMesh {
     _deviceIndexBuffer = new IndexBuffer(name, device);
   }
 
-  void finalizer() {
+  void finalize() {
     _deviceVertexBuffer.dispose();
     _deviceIndexBuffer.dispose();
     _deviceVertexBuffer = null;

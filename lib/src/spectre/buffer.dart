@@ -43,7 +43,7 @@ class SpectreBuffer extends DeviceChild {
     _deviceBuffer = device.gl.createBuffer();
   }
 
-  void finalizer() {
+  void finalize() {
     device.gl.deleteBuffer(_deviceBuffer);
     _deviceBuffer = null;
   }

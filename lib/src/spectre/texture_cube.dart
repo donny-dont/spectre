@@ -84,14 +84,14 @@ class TextureCube extends SpectreTexture {
     _negativeZ._deviceTexture = _deviceTexture;
   }
 
-  void finalizer() {
+  void finalize() {
     _positiveX._deviceTexture = null;
     _positiveY._deviceTexture = null;
     _positiveZ._deviceTexture = null;
     _negativeX._deviceTexture = null;
     _negativeY._deviceTexture = null;
     _negativeZ._deviceTexture = null;
-    super.finalizer();
+    super.finalize();
   }
 
   void _generateMipmap() {

@@ -30,7 +30,7 @@ class SpectreShader extends DeviceChild {
     _shader = device.gl.createShader(_type);
   }
 
-  void finalizer() {
+  void finalize() {
     device.gl.deleteShader(_shader);
     _shader = null;
   }

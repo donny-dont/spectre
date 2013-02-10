@@ -37,7 +37,7 @@ import 'texture_min_filter_test.dart' as texture_min_filter_test;
 import 'viewport_test.dart' as viewport_test;
 
 void main() {
-  useHtmlEnhancedConfiguration();
+  //useHtmlEnhancedConfiguration();
 
   group('Blend tests', blend_test.main);
   group('BlendOperation tests', blend_operation_test.main);

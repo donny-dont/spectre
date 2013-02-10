@@ -99,7 +99,7 @@ class InputLayout extends DeviceChild {
       : super._internal(name, device) {
   }
 
-  void finalizer() {
+  void finalize() {
     // Nothing to do.
   }
 }

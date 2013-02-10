@@ -21,7 +21,7 @@
 part of spectre;
 
 /** An abstract class for a disposable object.
- * You must implement [finalizer]
+ * You must implement [finalize]
  */
 abstract class Disposable {
   int _referenceCount = 1;
@@ -59,5 +59,5 @@ abstract class Disposable {
   }
 
   /** Clean up any object state here. */
-  void finalizer();
+  void finalize();
 }

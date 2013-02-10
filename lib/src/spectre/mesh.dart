@@ -67,7 +67,7 @@ class SingleArrayMesh extends SpectreMesh {
     _deviceVertexBuffer = new VertexBuffer(name, device);
   }
 
-  void finalizer() {
+  void finalize() {
     _deviceVertexBuffer.dispose();
     _deviceVertexBuffer = null;
     count = 0;
@@ -86,7 +86,7 @@ class SingleArrayIndexedMesh extends SpectreMesh {
     _deviceIndexBuffer = new IndexBuffer(name, device);
   }
 
-  void finalizer() {
+  void finalize() {
     _deviceVertexBuffer.dispose();
     _deviceIndexBuffer.dispose();
     count = 0;
