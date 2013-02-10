@@ -38,7 +38,7 @@
     },
     "name":"guard1_face",
     "url":"/tex2d/guard1_face.png",
-    "type":"fill_me_in",
+    "type":"",
     "importArguments":{
 
     }
@@ -60,7 +60,7 @@
     },
     "name":"guard1_helmet",
     "url":"/tex2d/guard1_helmet.png",
-    "type":"fill_me_in",
+    "type":"",
     "importArguments":{
 
     }
@@ -181,7 +181,7 @@
     },
     "name":"cylinder",
     "url":"/json/cylinder.json",
-    "type":"fill-me-in",
+    "type":"",
     "importArguments":{
 
     }
@@ -313,7 +313,7 @@
     },
     "name":"guard1_body",
     "url":"/tex2d/guard1_body.png",
-    "type":"fill_me_in",
+    "type":"",
     "importArguments":{
 
     }
