@@ -20,11 +20,15 @@
 
 library blend_state_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
+import 'mock_graphics_device.dart';
+
+GraphicsDevice _graphicsDevice;
 
 void testBlendSetter(String testName, dynamic function) {
-  BlendState blendState = new BlendState('BlendStateTest', null);
+  BlendState blendState = new BlendState('BlendState_$testName', _graphicsDevice);
 
   test(testName, () {
     // Shouldn't throw
@@ -48,7 +52,7 @@ void testBlendSetter(String testName, dynamic function) {
 }
 
 void testBlendOperationSetter(String testName, dynamic function) {
-  BlendState blendState = new BlendState('BlendStateTest', null);
+  BlendState blendState = new BlendState('BlendState_$testName', _graphicsDevice);
 
   test(testName, () {
     // Shouldn't throw
@@ -62,7 +66,7 @@ void testBlendOperationSetter(String testName, dynamic function) {
 }
 
 void testColorSetter(String testName, dynamic function) {
-  BlendState blendState = new BlendState('BlendStateTest', null);
+  BlendState blendState = new BlendState('BlendState_$testName', _graphicsDevice);
 
   test(testName, () {
     expect(function(blendState, 0.0), 0.0);
@@ -102,27 +106,34 @@ void testConstructor(BlendState blendState, bool enabled, int alphaDestinationBl
 }
 
 void main() {
+  _graphicsDevice = new MockGraphicsDevice.useMock();
+
   // Construction
   test('construction', () {
     // Default constructor
-    BlendState defaultState = new BlendState('BlendStateDefault', null);
+    BlendState defaultState = new BlendState('BlendStateDefault', _graphicsDevice);
     testConstructor(defaultState, true, Blend.One, Blend.One, Blend.One, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.additive
-    BlendState additive = new BlendState.additive('BlendStateAdditive', null);
+    BlendState additive = new BlendState.additive('BlendStateAdditive', _graphicsDevice);
     testConstructor(additive, true, Blend.One, Blend.SourceAlpha, Blend.One, Blend.SourceAlpha);
+    expect(() { BlendState constructWithNull = new BlendState.additive('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.alphaBlend
-    BlendState alphaBlend = new BlendState.alphaBlend('BlendStateAlphaBlend', null);
+    BlendState alphaBlend = new BlendState.alphaBlend('BlendStateAlphaBlend', _graphicsDevice);
     testConstructor(alphaBlend, true, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState.alphaBlend('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.nonPremultiplied
-    BlendState nonPremultiplied = new BlendState.nonPremultiplied('BlendStateNonPremultiplied', null);
+    BlendState nonPremultiplied = new BlendState.nonPremultiplied('BlendStateNonPremultiplied', _graphicsDevice);
     testConstructor(nonPremultiplied, true, Blend.InverseSourceAlpha, Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.SourceAlpha);
+    expect(() { BlendState constructWithNull = new BlendState.nonPremultiplied('BlendStateNull', null); }, throwsArgumentError);
 
     // Blend.opaque
-    BlendState opaque = new BlendState.opaque('BlendStateOpaque', null);
+    BlendState opaque = new BlendState.opaque('BlendStateOpaque', _graphicsDevice);
     testConstructor(opaque, false, Blend.Zero, Blend.One, Blend.Zero, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState.opaque('BlendStateNull', null); }, throwsArgumentError);
   });
 
   // Enumeration setters
@@ -179,78 +190,90 @@ void main() {
 
   // Equality
   test('equality', () {
-    // TODO: Fix equality testing.
-    return;
-    BlendState blendState0 = new BlendState('BlendState0', null);
-    BlendState blendState1 = new BlendState('BlendState1', null);
+    BlendState blendState0 = new BlendState('BlendState0', _graphicsDevice);
+    BlendState blendState1 = new BlendState('BlendState1', _graphicsDevice);
 
     // Check equality
-    expect(blendState0, blendState0);
-    expect(blendState0, blendState1);
+    expect(blendStateEqual(blendState0, blendState0), true);
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     // Check inequality
     blendState0.alphaBlendOperation = BlendOperation.ReverseSubtract;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaBlendOperation = blendState0.alphaBlendOperation;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.alphaDestinationBlend = Blend.BlendFactor;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaDestinationBlend = blendState0.alphaDestinationBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.alphaSourceBlend = Blend.BlendFactor;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.alphaSourceBlend = blendState0.alphaSourceBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorBlendOperation = BlendOperation.ReverseSubtract;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorBlendOperation = blendState0.colorBlendOperation;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorDestinationBlend = Blend.BlendFactor;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorDestinationBlend = blendState0.colorDestinationBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.colorSourceBlend = Blend.BlendFactor;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.colorSourceBlend = blendState0.colorSourceBlend;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorRed = 0.0;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorRed = blendState0.blendFactorRed;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorGreen = 0.0;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorGreen = blendState0.blendFactorGreen;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorBlue = 0.0;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorBlue = blendState0.blendFactorBlue;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.blendFactorAlpha = 0.0;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.blendFactorAlpha = blendState0.blendFactorAlpha;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetRed = false;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetRed = blendState0.writeRenderTargetRed;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetGreen = false;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetGreen = blendState0.writeRenderTargetGreen;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetBlue = false;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetBlue = blendState0.writeRenderTargetBlue;
+    expect(blendStateEqual(blendState0, blendState1), true);
 
     blendState0.writeRenderTargetAlpha = false;
-    expect(blendState0 == blendState1, false);
+    expect(blendStateEqual(blendState0, blendState1), false);
     blendState1.writeRenderTargetAlpha = blendState0.writeRenderTargetAlpha;
+    expect(blendStateEqual(blendState0, blendState1), true);
   });
 
   // Serialization
   test('serialization', () {
-    BlendState original = new BlendState('BlendStateOriginal', null);
+    BlendState original = new BlendState('BlendStateOriginal', _graphicsDevice);
 
-    BlendState copy = new BlendState('BlendStateCopy', null);
+    BlendState copy = new BlendState('BlendStateCopy', _graphicsDevice);
     copy.alphaBlendOperation = BlendOperation.ReverseSubtract;
     copy.alphaDestinationBlend = Blend.BlendFactor;
     copy.alphaSourceBlend = Blend.BlendFactor;
@@ -269,8 +292,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    // TODO: Fix equality testing.
-    return;
-    expect(original, copy);
+    expect(blendStateEqual(original, copy), true);
   });
 }

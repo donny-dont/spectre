@@ -27,7 +27,11 @@ abstract class DeviceChild extends Disposable implements Serializable {
   final String name;
   String toString() => name;
 
-  DeviceChild._internal(this.name, this.device);
+  DeviceChild._internal(this.name, this.device) {
+    if (device == null) {
+      throw new ArgumentError('device cannot be null');
+    }
+  }
 
   dynamic toJson() {
     return '';
@@ -38,6 +42,3 @@ abstract class DeviceChild extends Disposable implements Serializable {
 
   void finalize();
 }
-
-
-

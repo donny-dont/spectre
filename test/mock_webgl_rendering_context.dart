@@ -18,12 +18,11 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of graphics_context_test;
+library mock_webgl_rendering_context;
 
-class MockGraphicsDevice extends Mock implements GraphicsDevice {
-  WebGLRenderingContext gl;
-  MockGraphicsDevice(WebGLRenderingContext this.gl);
-}
+import 'dart:html';
+import 'package:unittest/unittest.dart';
+import 'package:unittest/mock.dart';
 
 class MockWebGLRenderingContext extends Mock implements WebGLRenderingContext {
   MockWebGLRenderingContext() {
