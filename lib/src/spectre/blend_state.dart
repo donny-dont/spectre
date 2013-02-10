@@ -299,56 +299,6 @@ class BlendState extends DeviceChild {
   set writeRenderTargetAlpha(bool value) { _writeRenderTargetAlpha = value; }
 
   //---------------------------------------------------------------------
-  // Equality
-  //---------------------------------------------------------------------
-
-  /// Compares two [BlendState]s for equality.
-  /*
-  bool operator== (BlendState other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (_enabled != other._enabled) {
-      return false;
-    }
-
-    if ((_blendFactorRed   != other._blendFactorRed)   ||
-        (_blendFactorGreen != other._blendFactorGreen) ||
-        (_blendFactorBlue  != other._blendFactorBlue)  ||
-        (_blendFactorAlpha != other._blendFactorAlpha))
-    {
-      return false;
-    }
-
-    if (_alphaBlendOperation != other._alphaBlendOperation) {
-      return false;
-    }
-    if (_alphaDestinationBlend != other._alphaDestinationBlend) {
-      return false;
-    }
-    if (_alphaSourceBlend != other._alphaSourceBlend) {
-      return false;
-    }
-
-    if (_colorBlendOperation != other._colorBlendOperation) {
-      return false;
-    }
-    if (_colorDestinationBlend != other._colorDestinationBlend) {
-      return false;
-    }
-    if (_colorSourceBlend != other._colorSourceBlend) {
-      return false;
-    }
-
-    return ((_writeRenderTargetRed   == other._writeRenderTargetRed)   &&
-            (_writeRenderTargetGreen == other._writeRenderTargetGreen) &&
-            (_writeRenderTargetBlue  == other._writeRenderTargetBlue)  &&
-            (_writeRenderTargetAlpha == other._writeRenderTargetAlpha));
-  }
-  */
-
-  //---------------------------------------------------------------------
   // Serialization
   //---------------------------------------------------------------------
 
