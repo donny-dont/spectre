@@ -20,8 +20,9 @@
 
 library viewport_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
 
 void testDimensionSetter(String testName, dynamic function) {
   Viewport viewport = new Viewport('ViewportTest', null);
@@ -104,33 +105,39 @@ void main() {
     Viewport viewport1 = new Viewport('Viewport1', null);
 
     // Check identical
-    expect(viewport0, viewport0);
-    expect(viewport0, viewport1);
+    expect(viewportEqual(viewport0, viewport0), true);
+    expect(viewportEqual(viewport0, viewport1), true);
 
     // Check inequality
     viewport0.x = 160;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.x = viewport0.x;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.y = 120;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.y = viewport0.y;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.width = 320;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.width = viewport0.width;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.height = 240;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.height = viewport0.height;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.minDepth = 0.1;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.minDepth = viewport0.minDepth;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.maxDepth = 0.9;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.maxDepth = viewport0.maxDepth;
+    expect(viewportEqual(viewport0, viewport1), true);
   });
 
   // Serialization
@@ -148,6 +155,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    expect(original, copy);
+    expect(viewportEqual(original, copy), true);
   });
 }

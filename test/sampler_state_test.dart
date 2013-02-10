@@ -20,8 +20,12 @@
 
 library sampler_state_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
+import 'mock_graphics_device.dart';
+
+GraphicsDevice _graphicsDevice;
 
 void testConstructor(SamplerState samplerState, int addressU, int addressV, int minFilter, int magFilter, int maxAnisotropy) {
   expect(samplerState.addressU, addressU);
@@ -34,7 +38,7 @@ void testConstructor(SamplerState samplerState, int addressU, int addressV, int 
 }
 
 void testTextureAddressModeSetter(String testName, dynamic function) {
-  SamplerState samplerState = new SamplerState('SamplerStateTest', null);
+  SamplerState samplerState = new SamplerState('SamplerState_$testName', _graphicsDevice);
 
   test(testName, () {
     // Shouldn't throw
@@ -48,34 +52,36 @@ void testTextureAddressModeSetter(String testName, dynamic function) {
 }
 
 void main() {
+  _graphicsDevice = new MockGraphicsDevice.useMock();
+
   // Construction
   test('construction', () {
     // Default constructor
-    SamplerState defaultState = new SamplerState('SamplerStateDefault', null);
+    SamplerState defaultState = new SamplerState('SamplerStateDefault', _graphicsDevice);
     testConstructor(defaultState, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
 
     // SamplerState.anisotropicClamp
-    SamplerState anisotropicClamp = new SamplerState.anisotropicClamp('SamplerStateAnisotropicClamp', null);
+    SamplerState anisotropicClamp = new SamplerState.anisotropicClamp('SamplerStateAnisotropicClamp', _graphicsDevice);
     testConstructor(anisotropicClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Linear, TextureMagFilter.Linear, 4);
 
     // SamplerState.anisotropicClamp
-    SamplerState anisotropicWrap = new SamplerState.anisotropicWrap('SamplerStateAnisotropicWrap', null);
+    SamplerState anisotropicWrap = new SamplerState.anisotropicWrap('SamplerStateAnisotropicWrap', _graphicsDevice);
     testConstructor(anisotropicWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 4);
 
     // SamplerState.linearClamp
-    SamplerState linearClamp = new SamplerState.linearClamp('SamplerStateLinearClamp', null);
+    SamplerState linearClamp = new SamplerState.linearClamp('SamplerStateLinearClamp', _graphicsDevice);
     testConstructor(linearClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
 
     // SamplerState.linearWrap
-    SamplerState linearWrap = new SamplerState.linearWrap('SamplerStateLinearWrap', null);
+    SamplerState linearWrap = new SamplerState.linearWrap('SamplerStateLinearWrap', _graphicsDevice);
     testConstructor(linearWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
 
     // SamplerState.pointClamp
-    SamplerState pointClamp = new SamplerState.pointClamp('SamplerStatePointClamp', null);
+    SamplerState pointClamp = new SamplerState.pointClamp('SamplerStatePointClamp', _graphicsDevice);
     testConstructor(pointClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Point, TextureMagFilter.Point, 1);
 
     // SamplerState.pointWrap
-    SamplerState pointWrap = new SamplerState.pointWrap('SamplerStatePointWrap', null);
+    SamplerState pointWrap = new SamplerState.pointWrap('SamplerStatePointWrap', _graphicsDevice);
     testConstructor(pointWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Point, TextureMagFilter.Point, 1);
   });
 
@@ -91,7 +97,7 @@ void main() {
   });
 
   test('minFilter', () {
-    SamplerState samplerState = new SamplerState('SamplerStateTest', null);
+    SamplerState samplerState = new SamplerState('SamplerStateTest', _graphicsDevice);
 
     dynamic function = (samplerState, value) {
       samplerState.minFilter = value;
@@ -107,7 +113,7 @@ void main() {
   });
 
   test('magFilter', () {
-    SamplerState samplerState = new SamplerState('SamplerStateTest', null);
+    SamplerState samplerState = new SamplerState('SamplerStateTest', _graphicsDevice);
 
     dynamic function = (samplerState, value) {
       samplerState.magFilter = value;
@@ -127,7 +133,7 @@ void main() {
   });
 
   test('maxAnisotropy', () {
-    SamplerState samplerState = new SamplerState('SamplerStateTest', null);
+    SamplerState samplerState = new SamplerState('SamplerStateTest', _graphicsDevice);
 
     dynamic function = (samplerState, value) {
       samplerState.maxAnisotropy = value;
@@ -135,54 +141,58 @@ void main() {
     };
 
     // Shouldn't throw
-    expect(function(samplerState, 1), 1);
-    expect(function(samplerState, 4), 4);
+    expect(function(samplerState, 1.0), 1.0);
+    expect(function(samplerState, 4.0), 4.0);
 
     // Should clamp
-    // \todo ADD
+    expect(function(samplerState, 1024.0), _graphicsDevice.capabilities.maxAnisotropyLevel);
 
     // Should throw
-    expect(() { function(samplerState,  0); }, throwsArgumentError);
-    expect(() { function(samplerState, -1); }, throwsArgumentError);
+    expect(() { function(samplerState,  0.0); }, throwsArgumentError);
+    expect(() { function(samplerState, -1.0); }, throwsArgumentError);
   });
 
   // Equality
   test('equality', () {
-    // TODO: Fix equality testing.
-    SamplerState samplerState0 = new SamplerState('SamplerState0', null);
-    SamplerState samplerState1 = new SamplerState('SamplerState1', null);
+    SamplerState samplerState0 = new SamplerState('SamplerState0', _graphicsDevice);
+    SamplerState samplerState1 = new SamplerState('SamplerState1', _graphicsDevice);
 
     // Check identical
-    expect(samplerState0, samplerState0);
-    expect(samplerState0, samplerState1);
+    expect(samplerStateEqual(samplerState0, samplerState0), true);
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
 
     // Check inequality
     samplerState0.addressU = TextureAddressMode.Clamp;
-    expect(samplerState0 == samplerState1, false);
+    expect(samplerStateEqual(samplerState0, samplerState1), false);
     samplerState1.addressU = samplerState0.addressU;
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
 
     samplerState0.addressV = TextureAddressMode.Clamp;
-    expect(samplerState0 == samplerState1, false);
+    expect(samplerStateEqual(samplerState0, samplerState1), false);
     samplerState1.addressV = samplerState0.addressV;
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
 
     samplerState0.minFilter = TextureMinFilter.Point;
-    expect(samplerState0 == samplerState1, false);
+    expect(samplerStateEqual(samplerState0, samplerState1), false);
     samplerState1.minFilter = samplerState0.minFilter;
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
 
     samplerState0.magFilter = TextureMagFilter.LinearMipLinear;
-    expect(samplerState0 == samplerState1, false);
+    expect(samplerStateEqual(samplerState0, samplerState1), false);
     samplerState1.magFilter = samplerState0.magFilter;
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
 
     samplerState0.maxAnisotropy = 4.0;
-    expect(samplerState0 == samplerState1, false);
+    expect(samplerStateEqual(samplerState0, samplerState1), false);
     samplerState1.maxAnisotropy = samplerState0.maxAnisotropy;
+    expect(samplerStateEqual(samplerState0, samplerState1), true);
   });
 
   // Serialization
   test('serialization', () {
-    SamplerState original = new SamplerState('SamplerStateOriginal', null);
+    SamplerState original = new SamplerState('SamplerStateOriginal', _graphicsDevice);
 
-    SamplerState copy = new SamplerState('SamplerStateCopy', null);
+    SamplerState copy = new SamplerState('SamplerStateCopy', _graphicsDevice);
     copy.addressU = TextureAddressMode.Clamp;
     copy.addressV = TextureAddressMode.Clamp;
     copy.minFilter = TextureMinFilter.Point;
@@ -192,7 +202,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    // TODO: Fix equality testing.
-    expect(original, copy);
+    expect(samplerStateEqual(original, copy), true);
   });
 }

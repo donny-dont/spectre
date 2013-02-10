@@ -97,3 +97,45 @@ bool rasterizerStateEqual(RasterizerState rasterizerState0, RasterizerState rast
 
   return rasterizerState0.scissorTestEnabled == rasterizerState1.scissorTestEnabled;
 }
+
+/// Compares two [SamplerState]s for equality.
+bool samplerStateEqual(SamplerState samplerState0, SamplerState samplerState1) {
+  if (identical(samplerState0, samplerState1)) {
+    return true;
+  }
+
+  if (samplerState0.addressU != samplerState1.addressU) {
+    return false;
+  }
+
+  if (samplerState0.addressV != samplerState1.addressV) {
+    return false;
+  }
+
+  if (samplerState0.minFilter != samplerState1.minFilter) {
+    return false;
+  }
+
+  if (samplerState0.magFilter != samplerState1.magFilter) {
+    return false;
+  }
+
+  return samplerState0.maxAnisotropy == samplerState1.maxAnisotropy;
+}
+
+/// Compares two [Viewport]s for equality.
+bool viewportEqual(Viewport viewport0, Viewport viewport1) {
+  if (identical(viewport0, viewport1)) {
+    return true;
+  }
+
+  if ((viewport0.x != viewport1.x) || (viewport0.y != viewport1.y)) {
+    return false;
+  }
+
+  if ((viewport0.width != viewport1.width) || (viewport0.height != viewport1.height)) {
+    return false;
+  }
+
+  return ((viewport0.minDepth == viewport1.minDepth) && (viewport0.maxDepth == viewport1.maxDepth));
+}

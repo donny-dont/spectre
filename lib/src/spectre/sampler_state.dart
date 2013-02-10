@@ -207,7 +207,7 @@ class SamplerState extends DeviceChild {
       throw new ArgumentError('maxAnisotropy must be >= 1.0');
     }
 
-    _maxAnisotropy = Math.max(value, device.capabilities.maxAnisotropyLevel);
+    _maxAnisotropy = Math.min(value, device.capabilities.maxAnisotropyLevel);
   }
 
   //---------------------------------------------------------------------

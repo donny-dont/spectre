@@ -72,27 +72,6 @@ class Viewport extends DeviceChild {
     : super._internal(name, device);
 
   //---------------------------------------------------------------------
-  // Equality
-  //---------------------------------------------------------------------
-/*
-  /// Compares two [Viewport]s for equality.
-  bool operator== (Viewport other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if ((_x != other._x) || (_y != other._y)) {
-      return false;
-    }
-
-    if ((_width != other._width) || (_height != other._height)) {
-      return false;
-    }
-
-    return ((_minDepth == other._minDepth) && (_maxDepth == other._maxDepth));
-  }
-*/
-  //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
