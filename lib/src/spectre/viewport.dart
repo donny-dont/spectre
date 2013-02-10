@@ -195,7 +195,7 @@ class Viewport extends DeviceChild {
     _maxDepth = (value != null) ? value : _maxDepth;
   }
 
-  void finalizer() {
+  void finalize() {
     // Nothing to do.
   }
 }

@@ -252,7 +252,7 @@ class SamplerState extends DeviceChild {
     maxAnisotropy = (value != null) ? value : _maxAnisotropy;
   }
 
-  void finalizer() {
+  void finalize() {
     // Nothing to do.
   }
 }

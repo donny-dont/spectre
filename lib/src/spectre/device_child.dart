@@ -36,7 +36,7 @@ abstract class DeviceChild extends Disposable implements Serializable {
   void fromJson(dynamic a) {
   }
 
-  void finalizer();
+  void finalize();
 }
 
 

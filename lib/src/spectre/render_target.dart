@@ -55,7 +55,7 @@ class RenderTarget extends DeviceChild {
     RenderTarget._systemRenderTarget._renderable = true;
   }
 
-  void finalizer() {
+  void finalize() {
     device.gl.deleteFramebuffer(_deviceFramebuffer);
     _deviceFramebuffer = null;
     _renderable = false;

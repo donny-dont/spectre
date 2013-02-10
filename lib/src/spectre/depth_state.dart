@@ -146,7 +146,7 @@ class DepthState extends DeviceChild {
     _depthBufferFunction = (value != null) ? CompareFunction.parse(value) : _depthBufferFunction;
   }
 
-  void finalizer() {
+  void finalize() {
     // Nothing to do.
   }
 }

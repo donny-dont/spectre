@@ -24,7 +24,7 @@ class StencilState extends DeviceChild {
   StencilState(String name, GraphicsDevice device)
       : super._internal(name, device);
 
-  void finalizer() {
+  void finalize() {
     // Nothing to do.
   }
 }

@@ -105,7 +105,7 @@ class ShaderProgram extends DeviceChild {
     _program = device.gl.createProgram();
   }
 
-  void finalizer() {
+  void finalize() {
     fragmentShader = null;
     vertexShader = null;
     device.gl.deleteProgram(_program);
