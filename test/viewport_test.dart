@@ -20,11 +20,15 @@
 
 library viewport_test;
 
-import "package:unittest/unittest.dart";
-import "package:spectre/spectre.dart";
+import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
+import 'device_child_equality.dart';
+import 'mock_graphics_device.dart';
+
+GraphicsDevice _graphicsDevice;
 
 void testDimensionSetter(String testName, dynamic function) {
-  Viewport viewport = new Viewport('ViewportTest', null);
+  Viewport viewport = new Viewport('Viewport_$testName', _graphicsDevice);
 
   test(testName, () {
     expect(function(viewport,    0), 0);
@@ -35,7 +39,7 @@ void testDimensionSetter(String testName, dynamic function) {
 }
 
 void testDepthRangeSetter(String testName, dynamic function) {
-  Viewport viewport = new Viewport('ViewportTest', null);
+  Viewport viewport = new Viewport('Viewport_$testName', _graphicsDevice);
 
   test(testName, () {
     expect(function(viewport, 0.0), 0.0);
@@ -65,15 +69,19 @@ void testConstructor(Viewport viewport, int x, int y, int width, int height) {
 }
 
 void main() {
+  _graphicsDevice = new MockGraphicsDevice.useMock();
+
   // Construction
   test('construction', () {
     // Default constructor
-    Viewport defaultViewport = new Viewport('ViewportDefault', null);
+    Viewport defaultViewport = new Viewport('ViewportDefault', _graphicsDevice);
     testConstructor(defaultViewport, 0, 0, 640, 480);
+    expect(() { Viewport constructWithNull = new Viewport('ViewportNull', null); }, throwsArgumentError);
 
     // Viewport.bounds
-    Viewport bounds = new Viewport.bounds('ViewportBounds', null, 160, 120, 320, 240);
+    Viewport bounds = new Viewport.bounds('ViewportBounds', _graphicsDevice, 160, 120, 320, 240);
     testConstructor(bounds, 160, 120, 320, 240);
+    expect(() { Viewport constructWithNull = new Viewport.bounds('ViewportNull', null, 160, 120, 320, 240); }, throwsArgumentError);
   });
 
   // Dimension setters
@@ -100,44 +108,50 @@ void main() {
 
   // Equality
   test('equality', () {
-    Viewport viewport0 = new Viewport('Viewport0', null);
-    Viewport viewport1 = new Viewport('Viewport1', null);
+    Viewport viewport0 = new Viewport('Viewport0', _graphicsDevice);
+    Viewport viewport1 = new Viewport('Viewport1', _graphicsDevice);
 
     // Check identical
-    expect(viewport0, viewport0);
-    expect(viewport0, viewport1);
+    expect(viewportEqual(viewport0, viewport0), true);
+    expect(viewportEqual(viewport0, viewport1), true);
 
     // Check inequality
     viewport0.x = 160;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.x = viewport0.x;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.y = 120;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.y = viewport0.y;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.width = 320;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.width = viewport0.width;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.height = 240;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.height = viewport0.height;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.minDepth = 0.1;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.minDepth = viewport0.minDepth;
+    expect(viewportEqual(viewport0, viewport1), true);
 
     viewport0.maxDepth = 0.9;
-    expect(viewport0 == viewport1, false);
+    expect(viewportEqual(viewport0, viewport1), false);
     viewport1.maxDepth = viewport0.maxDepth;
+    expect(viewportEqual(viewport0, viewport1), true);
   });
 
   // Serialization
   test('serialization', () {
-    Viewport original = new Viewport('ViewportOriginal', null);
+    Viewport original = new Viewport('ViewportOriginal', _graphicsDevice);
 
-    Viewport copy = new Viewport('ViewportCopy', null);
+    Viewport copy = new Viewport('ViewportCopy', _graphicsDevice);
     copy.x = 160;
     copy.y = 120;
     copy.width = 320;
@@ -148,6 +162,6 @@ void main() {
     Map json = original.toJson();
     copy.fromJson(json);
 
-    expect(original, copy);
+    expect(viewportEqual(original, copy), true);
   });
 }
