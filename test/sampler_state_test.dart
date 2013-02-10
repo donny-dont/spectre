@@ -59,30 +59,37 @@ void main() {
     // Default constructor
     SamplerState defaultState = new SamplerState('SamplerStateDefault', _graphicsDevice);
     testConstructor(defaultState, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
+    expect(() { SamplerState constructWithNull = new SamplerState('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.anisotropicClamp
     SamplerState anisotropicClamp = new SamplerState.anisotropicClamp('SamplerStateAnisotropicClamp', _graphicsDevice);
     testConstructor(anisotropicClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Linear, TextureMagFilter.Linear, 4);
+    expect(() { SamplerState constructWithNull = new SamplerState.anisotropicClamp('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.anisotropicClamp
     SamplerState anisotropicWrap = new SamplerState.anisotropicWrap('SamplerStateAnisotropicWrap', _graphicsDevice);
     testConstructor(anisotropicWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 4);
+    expect(() { SamplerState constructWithNull = new SamplerState.anisotropicWrap('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.linearClamp
     SamplerState linearClamp = new SamplerState.linearClamp('SamplerStateLinearClamp', _graphicsDevice);
     testConstructor(linearClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
+    expect(() { SamplerState constructWithNull = new SamplerState.linearClamp('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.linearWrap
     SamplerState linearWrap = new SamplerState.linearWrap('SamplerStateLinearWrap', _graphicsDevice);
     testConstructor(linearWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Linear, TextureMagFilter.Linear, 1);
+    expect(() { SamplerState constructWithNull = new SamplerState.linearWrap('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.pointClamp
     SamplerState pointClamp = new SamplerState.pointClamp('SamplerStatePointClamp', _graphicsDevice);
     testConstructor(pointClamp, TextureAddressMode.Clamp, TextureAddressMode.Clamp, TextureMinFilter.Point, TextureMagFilter.Point, 1);
+    expect(() { SamplerState constructWithNull = new SamplerState('SamplerStateNull', null); }, throwsArgumentError);
 
     // SamplerState.pointWrap
     SamplerState pointWrap = new SamplerState.pointWrap('SamplerStatePointWrap', _graphicsDevice);
     testConstructor(pointWrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureMinFilter.Point, TextureMagFilter.Point, 1);
+    expect(() { SamplerState constructWithNull = new SamplerState.pointWrap('SamplerStateNull', null); }, throwsArgumentError);
   });
 
   // Enumeration setters

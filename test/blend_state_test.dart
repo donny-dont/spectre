@@ -113,22 +113,27 @@ void main() {
     // Default constructor
     BlendState defaultState = new BlendState('BlendStateDefault', _graphicsDevice);
     testConstructor(defaultState, true, Blend.One, Blend.One, Blend.One, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.additive
     BlendState additive = new BlendState.additive('BlendStateAdditive', _graphicsDevice);
     testConstructor(additive, true, Blend.One, Blend.SourceAlpha, Blend.One, Blend.SourceAlpha);
+    expect(() { BlendState constructWithNull = new BlendState.additive('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.alphaBlend
     BlendState alphaBlend = new BlendState.alphaBlend('BlendStateAlphaBlend', _graphicsDevice);
     testConstructor(alphaBlend, true, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState.alphaBlend('BlendStateNull', null); }, throwsArgumentError);
 
     // BlendState.nonPremultiplied
     BlendState nonPremultiplied = new BlendState.nonPremultiplied('BlendStateNonPremultiplied', _graphicsDevice);
     testConstructor(nonPremultiplied, true, Blend.InverseSourceAlpha, Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.SourceAlpha);
+    expect(() { BlendState constructWithNull = new BlendState.nonPremultiplied('BlendStateNull', null); }, throwsArgumentError);
 
     // Blend.opaque
     BlendState opaque = new BlendState.opaque('BlendStateOpaque', _graphicsDevice);
     testConstructor(opaque, false, Blend.Zero, Blend.One, Blend.Zero, Blend.One);
+    expect(() { BlendState constructWithNull = new BlendState.opaque('BlendStateNull', null); }, throwsArgumentError);
   });
 
   // Enumeration setters

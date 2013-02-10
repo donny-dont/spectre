@@ -76,10 +76,12 @@ void main() {
     // Default constructor
     Viewport defaultViewport = new Viewport('ViewportDefault', _graphicsDevice);
     testConstructor(defaultViewport, 0, 0, 640, 480);
+    expect(() { Viewport constructWithNull = new Viewport('ViewportNull', null); }, throwsArgumentError);
 
     // Viewport.bounds
     Viewport bounds = new Viewport.bounds('ViewportBounds', _graphicsDevice, 160, 120, 320, 240);
     testConstructor(bounds, 160, 120, 320, 240);
+    expect(() { Viewport constructWithNull = new Viewport.bounds('ViewportNull', null, 160, 120, 320, 240); }, throwsArgumentError);
   });
 
   // Dimension setters

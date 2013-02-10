@@ -45,18 +45,22 @@ void main() {
     // Default constructor
     RasterizerState defaultState = new RasterizerState('RasterizerStateDefault', _graphicsDevice);
     testConstructor(defaultState, CullMode.Back, FrontFace.CounterClockwise);
+    expect(() { RasterizerState constructWithNull = new RasterizerState('RasterizerStateNull', null); }, throwsArgumentError);
 
     // RasterizerState.cullClockwise
     RasterizerState cullClockwise = new RasterizerState.cullClockwise('RasterizerStateCullClockwise', _graphicsDevice);
     testConstructor(cullClockwise, CullMode.Back, FrontFace.CounterClockwise);
+    expect(() { RasterizerState constructWithNull = new RasterizerState.cullClockwise('RasterizerStateNull', null); }, throwsArgumentError);
 
     // RasterizerState.cullCounterClockwise
     RasterizerState cullCounterClockwise = new RasterizerState.cullCounterClockwise('RasterizerStateCullClockwise', _graphicsDevice);
     testConstructor(cullCounterClockwise, CullMode.Back, FrontFace.Clockwise);
+    expect(() { RasterizerState constructWithNull = new RasterizerState.cullCounterClockwise('RasterizerStateNull', null); }, throwsArgumentError);
 
     // RasterizerState.cullNone
     RasterizerState cullNone = new RasterizerState.cullNone('RasterizerStateCullNone', _graphicsDevice);
     testConstructor(cullNone, CullMode.None, FrontFace.CounterClockwise);
+    expect(() { RasterizerState constructWithNull = new RasterizerState.cullNone('RasterizerStateNull', null); }, throwsArgumentError);
   });
 
   // Enumeration setters
@@ -95,8 +99,6 @@ void main() {
 
   // Equality
   test('equality', () {
-    // TODO: Fix equality testing.
-    return;
     RasterizerState rasterizerState0 = new RasterizerState('RasterizerState0', _graphicsDevice);
     RasterizerState rasterizerState1 = new RasterizerState('RasterizerState1', _graphicsDevice);
 
@@ -122,7 +124,7 @@ void main() {
 
     rasterizerState0.slopeScaleDepthBias = 1.0;
     expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), false);
-    rasterizerState1.depthBias = rasterizerState0.depthBias;
+    rasterizerState1.slopeScaleDepthBias = rasterizerState0.slopeScaleDepthBias;
     expect(rasterizerStateEqual(rasterizerState0, rasterizerState1), true);
 
     rasterizerState0.scissorTestEnabled = true;

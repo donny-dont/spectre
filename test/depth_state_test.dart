@@ -59,18 +59,22 @@ void main() {
     // Default constructor
     DepthState defaultState = new DepthState('DepthStateDefault', _graphicsDevice);
     testConstructor(defaultState, true, false);
+    expect(() { DepthState constructWithNull = new DepthState('DepthStateNull', null); }, throwsArgumentError);
 
     // DepthState.depthWrite
     DepthState depthWrite = new DepthState.depthWrite('DepthStateDepthWrite', _graphicsDevice);
     testConstructor(depthWrite, true, true);
+    expect(() { DepthState constructWithNull = new DepthState.depthWrite('DepthStateNull', null); }, throwsArgumentError);
 
     // DepthState.depthRead
     DepthState depthRead = new DepthState.depthRead('DepthStateDepthRead', _graphicsDevice);
     testConstructor(depthRead, true, false);
+    expect(() { DepthState constructWithNull = new DepthState.depthRead('DepthStateNull', null); }, throwsArgumentError);
 
     // DepthState.depthRead
     DepthState none = new DepthState.none('DepthStateNone', _graphicsDevice);
     testConstructor(none, false, false);
+    expect(() { DepthState constructWithNull = new DepthState.none('DepthStateNull', null); }, throwsArgumentError);
   });
 
   // Enumeration setters
