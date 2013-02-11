@@ -68,7 +68,7 @@ class Material {
       });
       textures.forEach((k, v) {
         int textureUnit = shader.samplers[k].textureUnit;
-        Texture texture = renderer.assetManager.getAssetAtPath(v);
+        MaterialTexture texture = renderer.assetManager.getAssetAtPath(v);
         _textures[textureUnit] = texture.texture;
         _samplers[textureUnit] = texture.sampler;
       });

@@ -18,20 +18,14 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-library spectre_retained;
+part of spectre_retained;
 
-import 'dart:html';
-import 'dart:async';
-import 'package:vector_math/vector_math.dart';
-import 'package:asset_pack/asset_pack.dart';
-import 'package:spectre/spectre.dart';
-import 'package:spectre/spectre_post.dart';
-
-part 'src/spectre_retained/global_resources.dart';
-part 'src/spectre_retained/material.dart';
-part 'src/spectre_retained/material_constant.dart';
-part 'src/spectre_retained/material_texture.dart';
-part 'src/spectre_retained/renderable.dart';
-part 'src/spectre_retained/layer.dart';
-part 'src/spectre_retained/renderer.dart';
-part 'src/spectre_retained/asset_pack.dart';
+class MaterialTexture {
+  final Renderer renderer;
+  final String name;
+  SpectreTexture texture;
+  SamplerState sampler;
+  MaterialTexture(this.renderer, this.name, this.texture) {
+    sampler = renderer.device.createSamplerState(name);
+  }
+}
