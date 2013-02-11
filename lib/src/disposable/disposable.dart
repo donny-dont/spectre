@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre;
+part of disposable;
 
 /** An abstract class for a disposable object.
  * You must implement [finalize]
@@ -54,6 +54,7 @@ abstract class Disposable {
     }
     _referenceCount--;
     if (_referenceCount == 0) {
+      finalize();
       _disposed = true;
     }
   }
