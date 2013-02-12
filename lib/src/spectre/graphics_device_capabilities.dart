@@ -60,6 +60,19 @@ class GraphicsDeviceCapabilities {
   int _maxFragmentShaderUniforms;
 
   //---------------------------------------------------------------------
+  // Buffer information
+  //---------------------------------------------------------------------
+
+  /// Whether a depth buffer is available.
+  bool _depthBuffer;
+  /// Whether a stencil buffer is available.
+  bool _stencilBuffer;
+  /// The size of the depth buffer in bits.
+  int _depthBufferSize;
+  /// The size of the stencil buffer in bits.
+  int _stencilBufferSize;
+
+  //---------------------------------------------------------------------
   // Extension information
   //---------------------------------------------------------------------
 
@@ -100,6 +113,7 @@ class GraphicsDeviceCapabilities {
 
   /// Queries the device capabilities in the [WebGLRenderingContext].
   GraphicsDeviceCapabilities._fromContext(WebGLRenderingContext gl) {
+    _queryDeviceContext(gl);
     _queryDeviceInfo(gl);
     _queryExtensionInfo(gl);
 
@@ -122,6 +136,10 @@ class GraphicsDeviceCapabilities {
   String get vendor => _vendor;
   /// The renderer
   String get renderer => _renderer;
+  /// Whether a depth buffer is available.
+  bool get depthBuffer => _depthBuffer;
+  /// Whether a stencil buffer is available.
+  bool get stencilBuffer => _stencilBuffer;
   /// The number of texture units available.
   int get textureUnits => _textureUnits;
   /// The number of texture units available in the vertex shader
@@ -185,6 +203,10 @@ class GraphicsDeviceCapabilities {
 Vendor: $vendorString
 Renderer: $rendererString
 
+Buffer Size
+Depth: $_depthBufferSize
+Stencil: $_stencilBufferSize
+
 Device stats
 Texture Units: $_textureUnits
 Vertex Texture Units: $_vertexShaderTextureUnits
@@ -215,7 +237,15 @@ WEBGL_lose_context: $_loseContext
         ''';
   }
 
-  /// Queries device infor using the [WebGLRenderingContext].
+  /// Queries context info using the [WebGLRenderingContext].
+  void _queryDeviceContext(WebGLRenderingContext gl) {
+    WebGLContextAttributes attributes = gl.getContextAttributes();
+
+    _depthBuffer = attributes.depth;
+    _stencilBuffer = attributes.stencil;
+  }
+
+  /// Queries device info using the [WebGLRenderingContext].
   void _queryDeviceInfo(WebGLRenderingContext gl) {
     _textureUnits = gl.getParameter(WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS);
     _vertexShaderTextureUnits = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
@@ -225,6 +255,9 @@ WEBGL_lose_context: $_loseContext
     _maxVaryingVectors = gl.getParameter(WebGLRenderingContext.MAX_VARYING_VECTORS);
     _maxVertexShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS);
     _maxFragmentShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS);
+
+    _depthBufferSize = gl.getParameter(WebGLRenderingContext.DEPTH_BITS);
+    _stencilBufferSize = gl.getParameter(WebGLRenderingContext.STENCIL_BITS);
   }
 
   /// Queries extensions using the [WebGLRenderingContext].
