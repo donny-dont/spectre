@@ -1,4 +1,7 @@
 # Spectre
+
+[![Build Status](https://drone.io/github.com/johnmccutchan/spectre/status.png)](https://drone.io/github.com/johnmccutchan/spectre)
+
 ## A modern graphics API for WebGL development with Dart
 
 __Spectre__ is a modern graphics API aimed at developers creating games and other interactive 3D applications. It is designed for performance while retaining a developer friendly interface.
