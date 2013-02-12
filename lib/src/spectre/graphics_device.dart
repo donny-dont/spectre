@@ -97,23 +97,11 @@ class GraphicsDevice {
     // Get the WebGL context.
     // A stencil buffer is not created by default so request that be
     // created. Other than that the defaults are fine.
-    //_gl = canvas.getContext3d(stencil: true);
-    _gl = canvas.getContext('experimental-webgl');
+    _gl = canvas.getContext3d(stencil: true);
 
     _context = new GraphicsContext(this);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
-    /*
-     var _fallbackTexture = createTexture2D('Device.Fallback');
-     {
-      CanvasElement canvas = new CanvasElement();
-      canvas.width = 512;
-      canvas.height = 512;
-      CanvasRenderingContext2D context2d = canvas.getContext('2d');
-      _drawGrid(context2d, 512, 512, 8, 8);
-      _fallbackTexture.uploadElement(canvas);
-      _fallbackTexture.generateMipmap();
-    }
-    */
+
     RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget');
     RenderTarget._systemRenderTarget._makeSystemTarget();
