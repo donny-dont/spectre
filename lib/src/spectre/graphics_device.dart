@@ -90,17 +90,26 @@ class GraphicsDevice {
     }
   }
 
-  /// Constructs a GPU device
-  GraphicsDevice(CanvasElement canvas) {
-    assert(canvas != null);
+  /// Initializes an instance of the [GraphicsDevice] class.
+  ///
+  /// A [WebGLRenderingContext] is created from the given [surface]. Additionally an
+  /// optional instance of [GraphicsDeviceConfig] can be passed in to control the creation
+  /// of the underlying frame buffer.
+  GraphicsDevice(CanvasElement surface, [GraphicsDeviceConfig config = null]) {
+    assert(surface != null);
 
-    // Get the WebGL context.
-    // A stencil buffer is not created by default so request that be
-    // created. Other than that the defaults are fine.
-    _gl = canvas.getContext3d(stencil: true);
+    // Get the WebGL context
+    if (config == null) {
+      config = new GraphicsDeviceConfig();
+    }
 
-    _context = new GraphicsContext(this);
+    _gl = surface.getContext3d(stencil: config.stencilBuffer);
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
+
+    print(_capabilities);
+
+    // Create the associated GraphicsContext
+    _context = new GraphicsContext(this);
 
     RenderTarget._systemRenderTarget = createRenderTarget(
         'SystemProvidedRenderTarget');
