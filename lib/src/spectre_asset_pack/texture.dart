@@ -21,11 +21,11 @@
 
 part of spectre_asset_pack;
 
-class _AssetImporterTex2D extends AssetImporter {
+class Tex2DImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterTex2D(this.device);
+  Tex2DImporter(this.device);
 
   Texture2D _processImageElement(AssetRequest request, ImageElement pixels) {
     Texture2D tex2d = device.createTexture2D(request.name);
@@ -50,11 +50,11 @@ class _AssetImporterTex2D extends AssetImporter {
   }
 }
 
-class _AssetImporterTexCube extends AssetImporter {
+class TexCubeImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterTexCube(this.device);
+  TexCubeImporter(this.device);
 
   TextureCube _processImageElements(String name, List<ImageElement> sides) {
     TextureCube texCube = device.createTextureCube(name);
@@ -95,7 +95,8 @@ class _AssetImporterTexCube extends AssetImporter {
 
 class _ImagePackLoader extends AssetLoader {
   Future<dynamic> load(AssetRequest request) {
-    AssetLoaderText loader = new AssetLoaderText();
+    TextLoader loader = new TextLoader();
+    ImageLoader imgLoader = new ImageLoader();
     Future<String> futureText = loader.load(request);
     Completer completer = new Completer();
     futureText.then((text) {
@@ -103,7 +104,6 @@ class _ImagePackLoader extends AssetLoader {
         List parsed = JSON.parse(text);
         List<Future<ImageElement>> futureImages = new List();
         parsed.forEach((String imgSrc) {
-          AssetLoaderImage imgLoader = new AssetLoaderImage();
           AssetRequest imgRequest = new AssetRequest(imgSrc, request.baseURL,
                                                      imgSrc, request.type,
                                                      request.loadArguments,

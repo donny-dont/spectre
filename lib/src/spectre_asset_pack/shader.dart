@@ -21,11 +21,11 @@
 
 part of spectre_asset_pack;
 
-class _AssetImporterVertexShader extends AssetImporter {
+class VertexShaderImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterVertexShader(this.device);
+  VertexShaderImporter(this.device);
 
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {
@@ -48,11 +48,11 @@ class _AssetImporterVertexShader extends AssetImporter {
   }
 }
 
-class _AssetImporterFragmentShader extends AssetImporter {
+class FragmentShaderImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterFragmentShader(this.device);
+  FragmentShaderImporter(this.device);
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {
       return new Future.immediate(fallback);
@@ -76,20 +76,19 @@ class _AssetImporterFragmentShader extends AssetImporter {
 
 class _TextListLoader extends AssetLoader {
   Future<dynamic> load(AssetRequest request) {
-    AssetLoaderText loader = new AssetLoaderText();
+    TextLoader loader = new TextLoader();
     Future<String> futureText = loader.load(request);
     Completer completer = new Completer();
     futureText.then((text) {
       try {
         List parsed = JSON.parse(text);
         List<Future<String>> futureTexts = new List();
-        AssetLoaderText textLoader = new AssetLoaderText();
         parsed.forEach((String textSrc) {
           AssetRequest textRequest = new AssetRequest(textSrc, request.baseURL,
                                                       textSrc, request.type,
                                                       request.loadArguments,
                                                       request.importArguments);
-          var futureText = textLoader.load(textRequest);
+          var futureText = loader.load(textRequest);
           futureTexts.add(futureText);
         });
         Future.wait(futureTexts).then((text) {
@@ -106,11 +105,11 @@ class _TextListLoader extends AssetLoader {
   }
 }
 
-class _AssetImporterShaderProgram extends AssetImporter {
+class ShaderProgramImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterShaderProgram(this.device);
+  ShaderProgramImporter(this.device);
 
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {

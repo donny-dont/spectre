@@ -21,11 +21,11 @@
 
 part of spectre_asset_pack;
 
-class _AssetImporterMesh extends AssetImporter {
+class MeshImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterMesh(this.device);
+  MeshImporter(this.device);
 
   SpectreMesh _processMeshes(AssetRequest request, List meshes) {
     final String name = request.name;
