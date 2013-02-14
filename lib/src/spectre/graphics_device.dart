@@ -66,6 +66,14 @@ class GraphicsDevice {
 
   final Set<DeviceChild> _children = new Set<DeviceChild>();
 
+  void _addChild(DeviceChild child) {
+    _children.add(child);
+  }
+
+  void _removeChild(DeviceChild child) {
+    _children.remove(child);
+  }
+
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
     context2d.save();
     context2d.beginPath();
@@ -115,7 +123,6 @@ class GraphicsDevice {
         'SystemProvidedRenderTarget');
     RenderTarget._systemRenderTarget._makeSystemTarget();
   }
-
 
   /// Deletes the device child [child].
   void deleteDeviceChild(DeviceChild child) {

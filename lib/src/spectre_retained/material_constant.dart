@@ -64,11 +64,10 @@ class MaterialConstant {
     _value = _constructValue(type);
   }
 
-  /** Clone this material constant */
-  MaterialConstant clone() {
-    MaterialConstant cloned = new MaterialConstant(name, type);
-    _copyValue(cloned, this);
-    throw new FallThroughError();
+  MaterialConstant.clone(MaterialConstant other)
+    : name = other.name, type = other.type {
+    _value = _constructValue(other.type);
+    _copyValue(this, other);
   }
 
   /** Returns a JSON map describing this constant */

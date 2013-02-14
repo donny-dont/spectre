@@ -25,10 +25,12 @@ class Material {
     final String name;
     final Renderer renderer;
     final ShaderProgram shader;
+    /// Key shader constant variable.
     final Map<String, MaterialConstant> constants =
         new Map<String, MaterialConstant>();
-    /// Map from shader texture name to asset path.
-    final Map<String, String> textures = new Map<String, String>();
+    /// Key shader sampler variable.
+    final Map<String, MaterialTexture> textures =
+        new Map<String, MaterialTexture>();
     final List<SpectreTexture> _textures = new List<SpectreTexture>();
     final List<SamplerState> _samplers = new List<SamplerState>();
 
@@ -40,9 +42,9 @@ class Material {
     BlendState get blendState => _blendState;
 
     Material(this.renderer, this.name, this.shader) {
-      _depthState = renderer.device.createDepthState('$name[DS]');
-      _blendState = renderer.device.createBlendState('$name[BS]');
-      _rasterizerState = renderer.device.createRasterizerState('$name[RS]');
+      _depthState = new DepthState(name, renderer.device);
+      _blendState = new BlendState(name, renderer.device);
+      _rasterizerState = new RasterizerState(name, renderer.device);
       while (_textures.length < shader.samplers.length) {
         _textures.add(null);
         _samplers.add(null);
@@ -50,11 +52,19 @@ class Material {
       _link();
     }
 
-    /** Clone the material the cloned material will be named [cloneName]. */
-    Material clone(String cloneName) {
-      Material cloned = new Material(renderer, cloneName, shader);
-      // TODO(johnmccutchan): Clone material data.
-      return cloned;
+    Material.clone(Material other)
+      : renderer = other.renderer, name = other.name, shader = other.shader {
+      _depthState = new DepthState(name, renderer.device);
+      _blendState = new BlendState(name, renderer.device);
+      _rasterizerState = new RasterizerState(name, renderer.device);
+      while (_textures.length < shader.samplers.length) {
+        _textures.add(null);
+        _samplers.add(null);
+      }
+      _depthState.fromJson(other._depthState.toJson());
+      _blendState.fromJson(other._blendState.toJson());
+      _rasterizerState.fromJson(other._rasterizerState.toJson());
+      _cloneLink(other);
     }
 
     /** Apply this material to be used for rendering */
@@ -67,19 +77,32 @@ class Material {
         device.context.setConstant(k, v.value);
       });
       textures.forEach((k, v) {
-        int textureUnit = shader.samplers[k].textureUnit;
-        MaterialTexture texture = renderer.assetManager.getAssetAtPath(v);
-        _textures[textureUnit] = texture.texture;
-        _samplers[textureUnit] = texture.sampler;
+        int textureUnit = v.textureUnit;
+        _textures[textureUnit] = v.texture;
+        _samplers[textureUnit] = v.sampler;
       });
       device.context.setSamplers(0, _samplers);
       device.context.setTextures(0, _textures);
     }
 
+    void _cloneLink(Material other) {
+      constants.clear();
+      other.constants.forEach((k, v) {
+        constants[k] = new MaterialConstant.clone(v);
+      });
+      textures.clear();
+      other.textures.forEach((k, v) {
+        textures[k] = new MaterialTexture.clone(v);
+      });
+    }
     void _link() {
       constants.clear();
       shader.uniforms.forEach((k, v) {
         constants[k] = new MaterialConstant(k, v.type);
+      });
+      textures.clear();
+      shader.samplers.forEach((k, v) {
+        textures[k] = new MaterialTexture(renderer, k, '', v.textureUnit);
       });
     }
 

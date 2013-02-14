@@ -23,9 +23,50 @@ part of spectre_retained;
 class MaterialTexture {
   final Renderer renderer;
   final String name;
-  SpectreTexture texture;
+  final int textureUnit;
+  String _texturePath;
+
+  /** The asset path used when linking the texture */
+  String get texturePath => _texturePath;
+  set texturePath(String path) {
+    _texturePath = path;
+    link();
+  }
+
+  SpectreTexture _texture;
+  SpectreTexture get texture => _texture;
   SamplerState sampler;
-  MaterialTexture(this.renderer, this.name, this.texture) {
-    sampler = renderer.device.createSamplerState(name);
+
+  /** Construct a new texture */
+  MaterialTexture(this.renderer, this.name, this._texturePath,
+                  this.textureUnit) {
+    sampler = new SamplerState(name, renderer.device);
+    link();
+  }
+
+  /** Construct a clone of [other] */
+  MaterialTexture.clone(MaterialTexture other)
+      : renderer = other.renderer,
+        name = other.name,
+        textureUnit = other.textureUnit {
+    sampler = new SamplerState(name, renderer.device);
+    sampler.fromJson(sampler.toJson());
+    link();
+  }
+
+  /** Link this texture. A texture must be linked before it can be used. */
+  link() {
+    var texture = renderer.assetManager.root.getImportedAtPath(_texturePath);
+    // TODO(johnmccutchan): Use fallback texture if it can't be found.
+    _texture = texture;
+  }
+
+  /** Returns a JSON map describing this texture */
+  Map toJson() {
+    Map json = new Map();
+    json['name'] = name;
+    json['textureUnit'] = textureUnit;
+    json['_texturePath'] = texturePath;
+    return json;
   }
 }
