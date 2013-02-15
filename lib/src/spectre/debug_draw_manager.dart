@@ -122,7 +122,7 @@ class _DebugDrawLineManager {
     _maxVertices = vboSize;
     _vboUsed = 0;
     _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
-    _lineMesh = device.createSingleArrayMesh(name);
+    _lineMesh = new SingleArrayMesh(name, device);
     _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
     _lineMesh.vertexArray.allocate(vboSize*DebugDrawVertexSize*4,
                                    SpectreBuffer.UsageDynamic);
@@ -132,7 +132,7 @@ class _DebugDrawLineManager {
     _lineMesh.attributes['vColor'] = new SpectreMeshAttribute('vColor',
                                                               'float', 4,
                                                               12, 28, false);
-    _lineMeshInputLayout = device.createInputLayout('$name Layout');
+    _lineMeshInputLayout = new InputLayout('$name Layout', device);
     _lineMeshInputLayout.shaderProgram = lineShaderHandle;
     _lineMeshInputLayout.mesh = _lineMesh;
   }
@@ -215,19 +215,19 @@ class DebugDrawManager {
 
   /** Construct and initialize a DebugDrawManager. */
   DebugDrawManager(this.device, {int vboSize: 16384}) {
-    _depthEnabled = device.createDepthState(_depthStateEnabledName);
+    _depthEnabled = new DepthState(_depthStateEnabledName, device);
     _depthEnabled.depthBufferEnabled = true;
     _depthEnabled.depthBufferWriteEnabled = true;
     _depthEnabled.depthBufferFunction = CompareFunction.LessEqual;
-    _depthDisabled = device.createDepthState(_depthStateDisabledName);
+    _depthDisabled = new DepthState(_depthStateDisabledName, device);
     _depthDisabled.depthBufferEnabled = false;
     _depthDisabled.depthBufferWriteEnabled = false;
-    _blend = device.createBlendState(_blendStateName);
-    _rasterizer = device.createRasterizerState(_rasterizerStateName);
+    _blend = new BlendState(_blendStateName, device);
+    _rasterizer = new RasterizerState(_rasterizerStateName, device);
     _rasterizer.cullMode = CullMode.Back;
-    _lineVertexShader = device.createVertexShader(_lineVertexShaderName);
-    _lineFragmentShader = device.createFragmentShader(_lineFragmentShaderName);
-    _lineShaderProgram = device.createShaderProgram(_lineShaderProgramName);
+    _lineVertexShader = new VertexShader(_lineVertexShaderName, device);
+    _lineFragmentShader = new FragmentShader(_lineFragmentShaderName, device);
+    _lineShaderProgram = new ShaderProgram(_lineShaderProgramName, device);
     _lineVertexShader.source = _debugLineVertexShader;
     _lineFragmentShader.source = _debugLineFragmentShader;
     _lineShaderProgram.vertexShader = _lineVertexShader;

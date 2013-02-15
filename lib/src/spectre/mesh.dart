@@ -57,6 +57,9 @@ abstract class SpectreMesh extends DeviceChild {
   int primitiveTopology = GraphicsContext.PrimitiveTopologyTriangles;
   SpectreMesh(String name, GraphicsDevice device)
       : super._internal(name, device);
+  void finalize() {
+    super.finalize();
+  }
 }
 
 class SingleArrayMesh extends SpectreMesh {
@@ -68,6 +71,7 @@ class SingleArrayMesh extends SpectreMesh {
   }
 
   void finalize() {
+    super.finalize();
     _deviceVertexBuffer.dispose();
     _deviceVertexBuffer = null;
     count = 0;
@@ -87,6 +91,7 @@ class SingleArrayIndexedMesh extends SpectreMesh {
   }
 
   void finalize() {
+    super.finalize();
     _deviceVertexBuffer.dispose();
     _deviceIndexBuffer.dispose();
     count = 0;

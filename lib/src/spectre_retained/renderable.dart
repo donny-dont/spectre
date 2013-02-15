@@ -48,12 +48,12 @@ class Renderable {
   // Bounding Box.
 
   Renderable(this.renderer, this.name, this.meshPath, this.materialPath) {
-    _inputLayout = renderer.device.createInputLayout('$name[IL]');
+    _inputLayout = new InputLayout('$name[IL]', renderer.device);
     _link();
   }
 
   void cleanup() {
-    renderer.device.deleteDeviceChild(_inputLayout);
+    _inputLayout.dispose();
   }
 
   SpectreMesh get mesh => _mesh;

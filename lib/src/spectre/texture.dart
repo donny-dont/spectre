@@ -138,6 +138,7 @@ class SpectreTexture extends DeviceChild {
   }
 
   void finalize() {
+    super.finalize();
     device.gl.deleteTexture(_deviceTexture);
     _deviceTexture = null;
   }

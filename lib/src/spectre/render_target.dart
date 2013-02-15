@@ -50,12 +50,13 @@ class RenderTarget extends DeviceChild {
     _deviceFramebuffer = device.gl.createFramebuffer();
   }
 
-  void _makeSystemTarget() {
-    RenderTarget._systemRenderTarget.dispose();
-    RenderTarget._systemRenderTarget._renderable = true;
+  RenderTarget.systemTarget(String name, GraphicsDevice device) :
+      super._internal(name, device) {
+    _renderable = true;
   }
 
   void finalize() {
+    super.finalize();
     device.gl.deleteFramebuffer(_deviceFramebuffer);
     _deviceFramebuffer = null;
     _renderable = false;

@@ -31,6 +31,7 @@ abstract class DeviceChild extends Disposable implements Serializable {
     if (device == null) {
       throw new ArgumentError('device cannot be null');
     }
+    device._addChild(this);
   }
 
   dynamic toJson() {
@@ -40,5 +41,8 @@ abstract class DeviceChild extends Disposable implements Serializable {
   void fromJson(dynamic a) {
   }
 
-  void finalize();
+  void finalize() {
+    print('Finalizing ${this.runtimeType} $name.');
+    device._removeChild(this);
+  }
 }

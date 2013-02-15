@@ -32,7 +32,7 @@ class VertexShaderImporter extends AssetImporter {
       return new Future.immediate(fallback);
     }
     String shaderSource = payload;
-    VertexShader vs = device.createVertexShader(request.name);
+    VertexShader vs = new VertexShader(request.name, device);
     vs.source = shaderSource;
     vs.compile();
     print('Compiled vertex shader ${request.name}: ${vs.compileLog}');
@@ -44,7 +44,7 @@ class VertexShaderImporter extends AssetImporter {
       return;
     }
     print('Deleting vertex shader ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
@@ -58,7 +58,7 @@ class FragmentShaderImporter extends AssetImporter {
       return new Future.immediate(fallback);
     }
     String shaderSource = payload;
-    FragmentShader fs = device.createFragmentShader(request.name);
+    FragmentShader fs = new FragmentShader(request.name, device);
     fs.source = shaderSource;
     fs.compile();
     print('Compiled fragment shader ${request.name}: ${fs.compileLog}');
@@ -70,7 +70,7 @@ class FragmentShaderImporter extends AssetImporter {
       return;
     }
     print('Deleting fragment shader ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
@@ -121,15 +121,15 @@ class ShaderProgramImporter extends AssetImporter {
     if (vertexShaderSource == null || fragmentShaderSource == null) {
       return new Future.immediate(fallback);
     }
-    VertexShader vs = device.createVertexShader(request.name);
+    VertexShader vs = new VertexShader(request.name, device);
     vs.source = vertexShaderSource;
     vs.compile();
     print('Compiled vertex shader ${request.name}: ${vs.compileLog}');
-    FragmentShader fs = device.createFragmentShader(request.name);
+    FragmentShader fs = new FragmentShader(request.name, device);
     fs.source = fragmentShaderSource;
     fs.compile();
     print('Compiled fragment shader ${request.name}: ${fs.compileLog}');
-    ShaderProgram sp = device.createShaderProgram(request.name);
+    ShaderProgram sp = new ShaderProgram(request.name, device);
     sp.vertexShader = vs;
     sp.fragmentShader = fs;
     sp.link();
@@ -142,8 +142,8 @@ class ShaderProgramImporter extends AssetImporter {
       return;
     }
     print('Deleting shader program ${imported.name}');
-    device.deleteDeviceChild(imported.vertexShader);
-    device.deleteDeviceChild(imported.fragmentShader);
-    device.deleteDeviceChild(imported);
+    imported.vertexShader.dispose();
+    imported.fragmentShader.dispose();
+    imported.dispose();
   }
 }

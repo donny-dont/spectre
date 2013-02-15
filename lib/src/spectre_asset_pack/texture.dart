@@ -28,7 +28,7 @@ class Tex2DImporter extends AssetImporter {
   Tex2DImporter(this.device);
 
   Texture2D _processImageElement(AssetRequest request, ImageElement pixels) {
-    Texture2D tex2d = device.createTexture2D(request.name);
+    var tex2d = new Texture2D(request.name, device);
     tex2d.uploadElement(pixels);
     // TODO (johnmccutchan): Support an import argument specifying mipmap logic.
     // For now, always generate them.
@@ -46,7 +46,7 @@ class Tex2DImporter extends AssetImporter {
   void delete(dynamic imported) {
     assert(imported is Texture2D);
     print('Deleting ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
@@ -57,7 +57,7 @@ class TexCubeImporter extends AssetImporter {
   TexCubeImporter(this.device);
 
   TextureCube _processImageElements(String name, List<ImageElement> sides) {
-    TextureCube texCube = device.createTextureCube(name);
+    var texCube = new TextureCube(name, device);
     texCube.positiveX.uploadElement(sides[0]);
     texCube.negativeX.uploadElement(sides[1]);
     texCube.positiveY.uploadElement(sides[2]);
@@ -89,7 +89,7 @@ class TexCubeImporter extends AssetImporter {
   void delete(dynamic imported) {
     assert(imported is TextureCube);
     print('Deleting ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 

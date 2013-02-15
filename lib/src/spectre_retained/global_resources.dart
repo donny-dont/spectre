@@ -31,15 +31,15 @@ class GlobalResources {
 
   void _clearTargets() {
     _colorTargets.forEach((_, t) {
-      renderer.device.deleteDeviceChild(t);
+      t.dispose();
     });
     _colorTargets.clear();
     _depthTargets.forEach((_, t) {
-      renderer.device.deleteDeviceChild(t);
+      t.dispose();
     });
     _depthTargets.clear();
     _renderTargets.forEach((t) {
-      renderer.device.deleteDeviceChild(t);
+      t.dispose();
     });
     _renderTargets.clear();
   }
@@ -47,7 +47,7 @@ class GlobalResources {
   void _makeColorTarget(Map target) {
     String name = target['name'];
     assert(name != null);
-    Texture2D buffer = renderer.device.createTexture2D(name);
+    Texture2D buffer = new Texture2D(name, renderer.device);
     int width = target['width'];
     int height = target['height'];
     buffer.uploadPixelArray(width, height, null);
@@ -58,7 +58,7 @@ class GlobalResources {
   void _makeDepthTarget(Map target) {
     String name = target['name'];
     assert(name != null);
-    RenderBuffer buffer = renderer.device.createRenderBuffer(name);
+    RenderBuffer buffer = new RenderBuffer(name, renderer.device);
     int width = target['width'];
     int height = target['height'];
     buffer.allocateStorage(width, height, RenderBuffer.FormatDepth);
@@ -110,7 +110,7 @@ class GlobalResources {
     if (depthBuffer != null) {
       name = '$name DB: ${depthBuffer.name}';
     }
-    RenderTarget renderTarget = renderer.device.createRenderTarget(name);
+    RenderTarget renderTarget = new RenderTarget(name, renderer.device);
     renderTarget.colorTarget = colorBuffer;
     renderTarget.depthTarget = depthBuffer;
     assert(renderTarget != null);

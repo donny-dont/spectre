@@ -80,4 +80,20 @@ class MaterialConstant {
     }
     return json;
   }
+
+  /** Deep equality check */
+  bool equals(MaterialConstant other) {
+    if (type != other.type) {
+      return false;
+    }
+    if (name != other.name) {
+      return false;
+    }
+    for (int i = 0; i < _value.length; i++) {
+      if (_value[i] != value[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

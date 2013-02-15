@@ -68,6 +68,7 @@ class RenderBuffer extends DeviceChild {
   }
 
   void finalize() {
+    super.finalize();
     device.gl.deleteRenderbuffer(_buffer);
     _buffer = null;
   }

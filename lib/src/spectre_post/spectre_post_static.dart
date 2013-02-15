@@ -34,17 +34,17 @@ class SpectrePost {
   static void init(GraphicsDevice device) {
     if (_device == null) {
       _device = device;
-      _rasterizerState = _device.createRasterizerState('SpectrePost.RS');
+      _rasterizerState = new RasterizerState('SpectrePost.RS', _device);
       _rasterizerState.cullMode = CullMode.None;
-      _depthState = _device.createDepthState('SpectrePost.DS');
-      _blendState = _device.createBlendState('SpectrePost.PS');
+      _depthState = new DepthState('SpectrePost.DS', _device);
+      _blendState = new BlendState('SpectrePost.PS', _device);
       _blendState.enabled = true;
       _blendState.colorSourceBlend = Blend.SourceColor;
       _blendState.colorDestinationBlend = Blend.InverseSourceAlpha;
       _blendState.alphaSourceBlend = Blend.SourceAlpha;
       _blendState.alphaDestinationBlend = Blend.InverseDestinationAlpha;
       _passes = new Map<String, SpectrePostPass>();
-      _arrayMesh = _device.createSingleArrayMesh('SpectrePost.Mesh');
+      _arrayMesh = new SingleArrayMesh('SpectrePost.Mesh', _device);
       const int numFloats = 6 * (3+2);
       Float32Array verts = new Float32Array(6*(3+2));
       int index = 0;
@@ -105,7 +105,7 @@ class SpectrePost {
                                                                     'float',
                                                                     2, 12, 20,
                                                                     false);
-      _vertexShader = _device.createVertexShader('SpectrePost.VS');
+      _vertexShader = new VertexShader('SpectrePost.VS', _device);
       _vertexShader.source = '''
 precision highp float;
 
@@ -172,11 +172,11 @@ void main() {
       v.cleanup(_device);
     });
     _passes.clear();
-    _device.deleteDeviceChild(_arrayMesh);
-    _device.deleteDeviceChild(_vertexShader);
-    _device.deleteDeviceChild(_rasterizerState);
-    _device.deleteDeviceChild(_blendState);
-    _device.deleteDeviceChild(_depthState);
+    _arrayMesh.dispose();
+    _vertexShader.dispose();
+    _rasterizerState.dispose();
+    _blendState.dispose();
+    _depthState.dispose();
   }
 
   static void addPass(String name, SpectrePostPass pass) {
@@ -193,17 +193,17 @@ void main() {
       return;
     }
     FragmentShader fragmentShader;
-    fragmentShader = _device.createFragmentShader('SpectrePost.FS[$name]');
+    fragmentShader = new FragmentShader('SpectrePost.FS[$name]', _device);
     fragmentShader.source = fragmentSource;
     ShaderProgram passProgram;
-    passProgram = _device.createShaderProgram('SpectrePost.Program[$name]');
+    passProgram = new ShaderProgram('SpectrePost.Program[$name]', _device);
     passProgram.vertexShader = _vertexShader;
     passProgram.fragmentShader = fragmentShader;
     passProgram.link();
     assert(passProgram.linked == true);
     SpectrePostFragment spf;
     InputLayout inputLayout;
-    inputLayout = _device.createInputLayout('SpectrePost.IL[$name]');
+    inputLayout = new InputLayout('SpectrePost.IL[$name]', _device);
     inputLayout.shaderProgram = passProgram;
     inputLayout.mesh = _arrayMesh;
     spf = new SpectrePostFragment(_device, name, passProgram, inputLayout);

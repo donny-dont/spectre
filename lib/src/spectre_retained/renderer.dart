@@ -119,7 +119,7 @@ class Renderer {
     _layerConfig = new LayerConfig(this);
     SpectrePost.init(device);
     _npotSampler = new SamplerState.pointClamp('_npotSampler', device);
-    _frontBufferViewport = device.createViewport('Renderer.Viewport');
+    _frontBufferViewport = new Viewport('Renderer.Viewport', device);
     _frontBufferViewport.width = frontBuffer.width;
     _frontBufferViewport.height = frontBuffer.height;
   }

@@ -104,16 +104,16 @@ void _setupSkybox() {
   _skyboxShaderProgram = _assetManager.root.demoAssets.skyBoxShader;
   assert(_skyboxShaderProgram.linked == true);
   _skyboxMesh = _assetManager.root.demoAssets.skyBox;
-  _skyboxInputLayout = _graphicsDevice.createInputLayout('skybox.il');
+  _skyboxInputLayout = new InputLayout('Skybox', _graphicsDevice);
   _skyboxInputLayout.mesh = _skyboxMesh;
   _skyboxInputLayout.shaderProgram = _skyboxShaderProgram;
 
   assert(_skyboxInputLayout.ready == true);
-  _skyboxSampler = _graphicsDevice.createSamplerState('skybox.ss');
-  _skyboxDepthState = _graphicsDevice.createDepthState('skybox.ds');
-  _skyboxBlendState = _graphicsDevice.createBlendState('skybox.bs');
+  _skyboxSampler = new SamplerState('Skybox', _graphicsDevice);
+  _skyboxDepthState = new DepthState('Skybox', _graphicsDevice);
+  _skyboxBlendState = new BlendState('Skybox', _graphicsDevice);
   _skyboxBlendState.enabled = false;
-  _skyboxRasterizerState = _graphicsDevice.createRasterizerState('skybox.rs');
+  _skyboxRasterizerState = new RasterizerState('skybox.rs', _graphicsDevice);
   _skyboxRasterizerState.cullMode = CullMode.None;
 }
 
@@ -187,12 +187,12 @@ void _setupSkinnedCharacter() {
   assert(_skinnedShaderProgram.linked == true);
   _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
                                    _assetManager.root.demoAssets.hellknight);
-  _skinnedInputLayout = _graphicsDevice.createInputLayout('skinned.il');
+  _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
-  _skinnedRasterizerState = _graphicsDevice.createRasterizerState('skinned.rs');
+  _skinnedRasterizerState = new RasterizerState('skinned.rs', _graphicsDevice);
   _skinnedRasterizerState.cullMode = CullMode.Back;
-  _skinnedDepthState = _graphicsDevice.createDepthState('skinned.ds');
+  _skinnedDepthState = new DepthState('skinned.ds', _graphicsDevice);
   _skinnedDepthState.depthBufferEnabled = true;
   _skinnedDepthState.depthBufferWriteEnabled = true;
   _skinnedDepthState.depthBufferFunction = CompareFunction.LessEqual;
@@ -268,7 +268,7 @@ main() {
   canvas.height = canvas.clientHeight;
 
   // Create the viewport
-  _viewport = _graphicsDevice.createViewport('view');
+  _viewport = new Viewport('view', _graphicsDevice);
   _viewport.x = 0;
   _viewport.y = 0;
   _viewport.width = canvas.width;
