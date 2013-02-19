@@ -78,27 +78,25 @@ class _TextListLoader extends AssetLoader {
   Future<dynamic> load(AssetRequest request) {
     TextLoader loader = new TextLoader();
     Future<String> futureText = loader.load(request);
-    Completer completer = new Completer();
-    futureText.then((text) {
+    return futureText.then((text) {
+      List parsed;
       try {
-        List parsed = JSON.parse(text);
-        List<Future<String>> futureTexts = new List();
-        parsed.forEach((String textSrc) {
-          AssetRequest textRequest = new AssetRequest(textSrc, request.baseURL,
-                                                      textSrc, request.type,
-                                                      request.loadArguments,
-                                                      request.importArguments);
-          var futureText = loader.load(textRequest);
-          futureTexts.add(futureText);
-        });
-        Future.wait(futureTexts).then((text) {
-          completer.complete(text);
-        });
+        parsed = JSON.parse(text);
       } catch (e) {
-        completer.complete(null);
+        return new Future.immediate(null);
       }
+      List<Future<String>> futureTexts = new List();
+      parsed.forEach((String textSrc) {
+        AssetRequest textRequest = new AssetRequest(textSrc, request.baseURL,
+            textSrc, request.type,
+            request.loadArguments,
+            request.importArguments,
+            request.trace);
+        var futureText = loader.load(textRequest);
+        futureTexts.add(futureText);
+      });
+      return Future.wait(futureTexts);
     });
-    return completer.future;
   }
 
   void delete(dynamic arg) {

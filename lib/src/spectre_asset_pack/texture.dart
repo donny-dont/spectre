@@ -98,27 +98,25 @@ class _ImagePackLoader extends AssetLoader {
     TextLoader loader = new TextLoader();
     ImageLoader imgLoader = new ImageLoader();
     Future<String> futureText = loader.load(request);
-    Completer completer = new Completer();
-    futureText.then((text) {
+    return futureText.then((text) {
+      List parsed;
       try {
-        List parsed = JSON.parse(text);
-        List<Future<ImageElement>> futureImages = new List();
-        parsed.forEach((String imgSrc) {
-          AssetRequest imgRequest = new AssetRequest(imgSrc, request.baseURL,
-                                                     imgSrc, request.type,
-                                                     request.loadArguments,
-                                                     request.importArguments);
-          Future futureImg = imgLoader.load(imgRequest);
-          futureImages.add(futureImg);
-        });
-        Future.wait(futureImages).then((images) {
-          completer.complete(images);
-        });
+        parsed = JSON.parse(text);
       } catch (e) {
-        completer.complete(null);
+        return new Future.immediate(null);
       }
+      var futureImages = new List<Future<ImageElement>>();
+      parsed.forEach((String imgSrc) {
+        AssetRequest imgRequest = new AssetRequest(imgSrc, request.baseURL,
+                                                   imgSrc, request.type,
+                                                   request.loadArguments,
+                                                   request.importArguments,
+                                                   request.trace);
+        Future futureImg = imgLoader.load(imgRequest);
+        futureImages.add(futureImg);
+      });
+      return Future.wait(futureImages);
     });
-    return completer.future;
   }
 
   void delete(dynamic arg) {
