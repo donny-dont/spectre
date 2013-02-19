@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+part of spectre_renderer;
 
 /** A material describes how a mesh is rendered. */
 class Material {

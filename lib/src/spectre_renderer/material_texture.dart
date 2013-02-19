@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+part of spectre_renderer;
 
 class MaterialTexture {
   final Renderer renderer;
@@ -54,6 +54,12 @@ class MaterialTexture {
     link();
   }
 
+  MaterialTexture.json(this.renderer, Map json) :
+      name = json['name'],
+      textureUnit = json['textureUnit'] {
+    fromJson(json);
+  }
+
   /** Link this texture. A texture must be linked before it can be used. */
   link() {
     var texture = renderer.assetManager.root.getImportedAtPath(_texturePath);
@@ -68,5 +74,9 @@ class MaterialTexture {
     json['textureUnit'] = textureUnit;
     json['_texturePath'] = texturePath;
     return json;
+  }
+
+  void fromJson(dynamic json) {
+    texturePath = json['texturePath'];
   }
 }

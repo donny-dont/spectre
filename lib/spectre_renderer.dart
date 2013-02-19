@@ -18,17 +18,19 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+library spectre_renderer;
 
-/** Register the [javelin] renderer with the [asset_pack] asset manager. */
+import 'dart:html';
+import 'dart:async';
+import 'package:vector_math/vector_math.dart';
+import 'package:asset_pack/asset_pack.dart';
+import 'package:spectre/spectre.dart';
+import 'package:spectre/spectre_post.dart';
 
-bool _registered = false;
-void registerJavelinRendererWithAssetManager(Renderer renderer,
-                                             AssetManager assetManager) {
-  if (_registered == true) {
-    return;
-  }
-  _registered = true;
-  // Texture loader.
-  // Material loader.
-}
+part 'src/spectre_renderer/material.dart';
+part 'src/spectre_renderer/material_constant.dart';
+part 'src/spectre_renderer/material_texture.dart';
+part 'src/spectre_renderer/renderable.dart';
+part 'src/spectre_renderer/layer.dart';
+part 'src/spectre_renderer/renderer.dart';
+part 'src/spectre_renderer/asset_pack.dart';

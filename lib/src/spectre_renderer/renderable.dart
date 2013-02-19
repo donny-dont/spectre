@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+part of spectre_renderer;
 
 /**
  * The renderable class contains everything needed to render a mesh instance.
@@ -26,6 +26,8 @@ part of spectre_retained;
 class Renderable {
   final Renderer renderer;
   final String name;
+  final Map<String, String> _materialPaths;
+  final Map<String, Material> materials;
   mat4 T = new mat4.identity();
 
   /// Path to mesh asset.
@@ -48,7 +50,13 @@ class Renderable {
   // Bounding Box.
 
   Renderable(this.renderer, this.name, this.meshPath, this.materialPath) {
-    _inputLayout = new InputLayout('$name[IL]', renderer.device);
+    _inputLayout = new InputLayout(name, renderer.device);
+    _link();
+  }
+
+  Renderable.json(this.renderer, Map json) : name = json['name'] {
+    fromJson(json);
+    _inputLayout = new InputLayout(name, renderer.device);
     _link();
   }
 
@@ -95,5 +103,21 @@ class Renderable {
     _material.apply(renderer.device);
     renderer.device.context.setInputLayout(_inputLayout);
     renderer.device.context.drawIndexedMesh(_mesh);
+  }
+
+  void fromJson(Map json) {
+    meshPath = json['meshPath'];
+    materialPath = json['materialPath'];
+    T.copyFromArray(json['T']);
+  }
+
+  dynamic toJson() {
+    Map map = new Map();
+    map['name'] = name;
+    map['meshPath'] = meshPath;
+    map['materialPath'] = materialPath;
+    map['T'] = new List<num>();
+    T.copyIntoArray(map['T']);
+    return map;
   }
 }

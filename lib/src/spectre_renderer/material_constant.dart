@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+part of spectre_renderer;
 
 class MaterialConstant {
   /** The constant name. This is the same name used in GLSL. */
@@ -70,6 +70,18 @@ class MaterialConstant {
     _copyValue(this, other);
   }
 
+  MaterialConstant.json(Map json) : name = json['name'], type = json['type'] {
+    _value = _constructValue(type);
+    fromJson(json);
+
+  }
+
+  void fromJson(Map json) {
+    for (int i = 0; i < _value.length; i++) {
+      _value[i] = json['value'][i];
+    }
+  }
+
   /** Returns a JSON map describing this constant */
   Map toJson() {
     Map json = new Map();
@@ -81,7 +93,7 @@ class MaterialConstant {
     return json;
   }
 
-  /** Deep equality check */
+  /** Equality check */
   bool equals(MaterialConstant other) {
     if (type != other.type) {
       return false;

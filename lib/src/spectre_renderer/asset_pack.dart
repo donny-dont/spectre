@@ -18,14 +18,17 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-part of spectre_retained;
+part of spectre_renderer;
 
-class World {
-  final Renderer renderer;
-  final List<Renderable> renderables = new List<Renderable>();
-  World(this.renderer);
+/** Register the [javelin] renderer with the [asset_pack] asset manager. */
 
-  void render(Camera camera, Viewport viewport) {
-    renderer.render(renderables, camera, viewport);
+bool _registered = false;
+void registerJavelinRendererWithAssetManager(Renderer renderer,
+                                             AssetManager assetManager) {
+  if (_registered == true) {
+    return;
   }
+  _registered = true;
+  // Texture loader.
+  // Material loader.
 }
