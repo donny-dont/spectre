@@ -44,7 +44,7 @@ class DdsFile {
   //---------------------------------------------------------------------
 
   /// View over the [ArrayBuffer] for accessing the structure.
-  Uint8Array _reader;
+  Uint32Array _reader;
   /// The offset to the data section of the file.
   int _dataOffset;
   /// The header for the DDS file.
@@ -69,7 +69,7 @@ class DdsFile {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    _reader = new Uint8Array.fromBuffer(buffer);
+    _reader = new Uint32Array.fromBuffer(buffer);
 
     // Check the magic number
     if (_reader[0] != _magicNumber) {
@@ -108,6 +108,11 @@ class DdsFile {
   // Properties
   //---------------------------------------------------------------------
 
+  /// The width of the compressed texture.
+  int get width => _header.width;
+  /// The height of the compressed texture.
+  int get height => _header.height;
+
   //---------------------------------------------------------------------
   // Public methods
   //---------------------------------------------------------------------
@@ -134,7 +139,7 @@ class DdsHeader {
   //---------------------------------------------------------------------
 
   /// The offset in bytes to the DDS_HEADER struct within the file.
-  static const int _byteOffset = 76;
+  static const int _byteOffset = 4;
   /// The size of the DDS_HEADER struct.
   static const int _structSize = 124;
 
@@ -169,7 +174,7 @@ class DdsHeader {
   //---------------------------------------------------------------------
 
   /// View over the [ArrayBuffer] for accessing the structure.
-  Uint8Array _reader;
+  Uint32Array _reader;
 
   //---------------------------------------------------------------------
   // Constructor
@@ -177,7 +182,7 @@ class DdsHeader {
 
   /// Creates an instance of the [DdsHeader] class.
   DdsHeader._internal(ArrayBuffer buffer)
-    : _reader = new Uint8Array.fromBuffer(buffer, _byteOffset);
+    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
 
   //---------------------------------------------------------------------
   // Properties
@@ -243,7 +248,7 @@ class DdsPixelFormat {
   //---------------------------------------------------------------------
 
   /// View over the [ArrayBuffer] for accessing the structure.
-  Uint8Array _reader;
+  Uint32Array _reader;
 
   //---------------------------------------------------------------------
   // Constructor
@@ -251,7 +256,7 @@ class DdsPixelFormat {
 
   /// Creates an instance of the [DdsPixelFormat] class.
   DdsPixelFormat._internal(ArrayBuffer buffer)
-    : _reader = new Uint8Array.fromBuffer(buffer, _byteOffset);
+    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
 
   //---------------------------------------------------------------------
   // Properties
@@ -298,7 +303,7 @@ class DdsExtendedHeader {
   //---------------------------------------------------------------------
 
   /// View over the [ArrayBuffer] for accessing the structure.
-  Uint8Array _reader;
+  Uint32Array _reader;
 
   //---------------------------------------------------------------------
   // Constructor
@@ -306,7 +311,7 @@ class DdsExtendedHeader {
 
   /// Creates an instance of the [DdsPixelFormat] class.
   DdsExtendedHeader._internal(ArrayBuffer buffer)
-    : _reader = new Uint8Array.fromBuffer(buffer, _byteOffset);
+    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
 
   //---------------------------------------------------------------------
   // Properties
