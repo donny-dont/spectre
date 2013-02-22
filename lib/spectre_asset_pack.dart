@@ -29,7 +29,8 @@ import 'dart:async';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 
-part 'src/spectre_asset_pack/texture.dart';
-part 'src/spectre_asset_pack/shader.dart';
+part 'src/spectre_asset_pack/dds_file.dart';
 part 'src/spectre_asset_pack/mesh.dart';
+part 'src/spectre_asset_pack/shader.dart';
 part 'src/spectre_asset_pack/spectre_asset_pack.dart';
+part 'src/spectre_asset_pack/texture.dart';
