@@ -90,6 +90,8 @@ class DdsFile {
       throw new ArgumentError('Invalid DDS file');
     }
 
+    int test = _pixelFormat.resourceFormat;
+
     // See if the extended header is present
     if (_pixelFormat.characterCode == DdsPixelFormat._dx10CharacterCode) {
       if (buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
@@ -108,10 +110,34 @@ class DdsFile {
   // Properties
   //---------------------------------------------------------------------
 
-  /// The width of the compressed texture.
+  /// The width of the compressed texture(s).
   int get width => _header.width;
-  /// The height of the compressed texture.
+  /// The height of the compressed texture(s).
   int get height => _header.height;
+  /// The depth of the compressed texture(s).
+  int get depth => _header.depth;
+  /// The number of mipmaps within the texture(s).
+  int get mipMapCount => _header.mipMapCount;
+
+  /// Whether the DDS file contains a cube map.
+  bool get isCubeMap {
+    if (_extendedHeader != null) {
+
+    }
+
+    return (_header.surfaceDetail & DdsHeader.isCubeMap) == DdsHeader.isCubeMap;
+  }
+
+  /// Whether all faces within a cube map are present.
+  bool get hasAllCubeMapFaces {
+    return (_header.surfaceDetail & DdsHeader.hasAllCubeMapFaces) == DdsHeader.hasAllCubeMapFaces;
+  }
+
+  /// Whether the DDS file contains a volume texture.
+  bool get isVolumeTexture {
+
+    return (_header.surfaceDetail & DdsHeader.isVolumeTexture) == DdsHeader.isVolumeTexture;
+  }
 
   //---------------------------------------------------------------------
   // Public methods
@@ -228,6 +254,42 @@ class DdsPixelFormat {
   /// The size of the DDS_PIXELFORMAT struct.
   static const int _structSize = 32;
 
+  //---------------------------------------------------------------------
+  // Flags
+  //---------------------------------------------------------------------
+
+  /// Texture contains alpha data
+  static const int _hasAlphaData = 0x1;
+  /// Texture contains alpha data (legacy).
+  static const int _hasAlphaDataLegacy = 0x2;
+  /// Texture contains compressed data, floating point data, or some exotic format.
+  ///
+  /// If the flag is present the value in [characterCode] is valid.
+  static const int _hasCharacterCode = 0x4;
+  /// Texture contains uncompressed RGB data.
+  ///
+  /// The values in [bitCount] and the RGB masks [redBitMask], [greenBitMask], [blueBitMask] contain valid data.
+  static const int _hasRgbValues = 0x40;
+  /// Texture contains YUV compressed data.
+  ///
+  /// The value in [bitCount] contains the YUV bit count. The Y mask is within [redBitMask]. The U mask is
+  /// within [greenBitMask]. The V mask is within [blueBitMask].
+  static const int _hasYuvValues = 0x200;
+  /// Texture contains luminance data or some other single channel color.
+  ///
+  /// The value in [bitCount] contains the luminance channel bit count. The channel mask is contained in
+  /// [redBitMask]. It can be combined with [_hasAlpha] for a two channel DDS file.
+  static const int _hasLuminanceValues = 0x20000;
+  /// Texture contains uncompressed RGBA data.
+  ///
+  /// The values in [bitCount] and the RGB masks [redBitMask], [greenBitMask], [blueBitMask], and [alphaBitMask]
+  /// contain valid data.
+  static const int _hasRgbaValues = _hasAlphaData | _hasRgbValues;
+
+  //---------------------------------------------------------------------
+  // Character codes
+  //---------------------------------------------------------------------
+
   /// The DXT1 character code, 'DXT1'.
   static const int _dxt1CharacterCode = 827611204;
   /// The DXT2 character code, 'DXT2'.
@@ -238,6 +300,25 @@ class DdsPixelFormat {
   static const int _dxt4CharacterCode = 877942852;
   /// The DXT5 character code, 'DXT5'.
   static const int _dxt5CharacterCode = 894720068;
+
+
+  /// 16-bit R floating point character code.
+  static const int _floatR16CharacterCode = 111;
+  /// 32-bit RG floating point character code.
+  static const int _floatR16G16CharacterCode = 112;
+  /// 64-bit RGBA floating point character code.
+  static const int _floatR16G16B16A16CharacterCode = 113;
+  /// 32-bit R floating point character code.
+  static const int _floatR32CharacterCode = 114;
+  /// 64-bit RG floating point character code.
+  static const int _floatR32G32CharacterCode = 115;
+  /// 128-bit RGBA floating point character code.
+  static const int _floatR32G32B32A32CharacterCode = 116;
+
+
+
+
+
   /// The DX10 character code, 'DX10'.
   ///
   /// Means that the extended header DX10 is present.
@@ -247,38 +328,109 @@ class DdsPixelFormat {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// View over the [ArrayBuffer] for accessing the structure.
-  Uint32Array _reader;
+  /// The size of the structure
+  int _size;
+  /// Flags to indicate what type of data is in the surface.
+  int _flags;
+  /// Character code for specifying compressed or custom format.
+  int _characterCode;
+  /// Number of bits in an RGB (possibly including alpha) format.
+  int _rgbBitCount;
+  /// Red (or lumiannce or Y) mask for reading color data.
+  int _redBitMask;
+  /// Green (or U) mask for reading color data.
+  int _greenBitMask;
+  /// Blue (or V) mask for reading color data.
+  int _blueBitMask;
+  /// Alpha mask for reading alpha data.
+  int _alphaBitMask;
 
   //---------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsPixelFormat] class.
-  DdsPixelFormat._internal(ArrayBuffer buffer)
-    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsPixelFormat._internal(ArrayBuffer buffer) {
+    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+
+    _size          = reader[0];
+    _flags         = reader[1];
+    _characterCode = reader[2];
+    _rgbBitCount   = reader[3];
+    _redBitMask    = reader[4];
+    _greenBitMask  = reader[5];
+    _blueBitMask   = reader[6];
+    _alphaBitMask  = reader[7];
+  }
 
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
-  /// The size of the structure.
-  int get size => _reader[0];
+  /// The size of the structure
+  int get size => _size;
   /// Flags to indicate what type of data is in the surface.
-  int get flags => _reader[1];
-  /// Character code for specifying compressed or custorm formats.
-  int get characterCode => _reader[2];
+  int get flags => _flags;
+  /// Character code for specifying compressed or custom format.
+  int get characterCode => _characterCode;
+  /// Number of bits in an RGB (possibly including alpha) format.
+  int get rgbBitCount => _rgbBitCount;
+  /// Red (or lumiannce or Y) mask for reading color data.
+  int get redBitMask => _redBitMask;
+  /// Green (or U) mask for reading color data.
+  int get greenBitMask => _greenBitMask;
+  /// Blue (or V) mask for reading color data.
+  int get blueBitMask => _blueBitMask;
+  /// Alpha mask for reading alpha data.
+  int get alphaBitMask => _alphaBitMask;
 
-/*
-  DWORD dwSize;
-  DWORD dwFlags;
-  DWORD dwFourCC;
-  DWORD dwRGBBitCount;
-  DWORD dwRBitMask;
-  DWORD dwGBitMask;
-  DWORD dwBBitMask;
-  DWORD dwABitMask;
-*/
+  /// Gets the resource format.
+  ///
+  /// If the [DdsExtendedHeader] is present then this value should be ignored.
+  int get resourceFormat {
+    // Check for types encoded in a character code
+    //
+    // Some of these formats should be in the extended header but not all DDS
+    // writers, including Microsoft's DirectX Texture Tool, use the extended header.
+    if ((_flags & _hasCharacterCode) == _hasCharacterCode) {
+      switch (_characterCode) {
+        case _dxt1CharacterCode             : print('DXT1'); return 0;
+        case _dxt2CharacterCode             : print('DXT2'); return 0;
+        case _dxt3CharacterCode             : print('DXT3'); return 0;
+        case _dxt4CharacterCode             : print('DXT4'); return 0;
+        case _dxt5CharacterCode             : print('DXT5'); return 0;
+        case _floatR16CharacterCode         : print('DXGI_FORMAT_R16_FLOAT'); return 0;
+        case _floatR16G16CharacterCode      : print('DXGI_FORMAT_R16G16_FLOAT'); return 0;
+        case _floatR16G16B16A16CharacterCode: print('DXGI_FORMAT_R16G16B16A16_FLOAT'); return 0;
+        case _floatR32CharacterCode         : print('DXGI_FORMAT_R32_FLOAT'); return 0;
+        case _floatR32G32CharacterCode      : print('DXGI_FORMAT_R32G32_FLOAT'); return 0;
+        case _floatR32G32B32A32CharacterCode: print('DXGI_FORMAT_R32G32B32A32_FLOAT'); return 0;
+        case _dx10CharacterCode             : print('DX10'); return 0;
+      }
+    }
+
+    // Check for RGB formats
+    if (_rgbBitCount == 32) {
+      if ((_flags & _hasRgbaValues) == _hasRgbaValues) {
+        if ((_redBitMask == 0x000000ff) && (_greenBitMask == 0x0000ff00) && (_blueBitMask == 0x00ff0000) && (_alphaBitMask == 0xff000000)) {
+          print('DXGI_FORMAT_R8G8B8A8_UNORM');
+        } else if ((_redBitMask == 0x00ff0000) && (_greenBitMask == 0x0000ff00) && (_blueBitMask == 0x000000ff) && (_alphaBitMask == 0xff000000)) {
+          print('D3DFMT_A8R8G8B8');
+        } else if ((_redBitMask == 0x3ff00000) && (_greenBitMask == 0x000ffc00) && (_blueBitMask == 0x000003ff) && (_alphaBitMask == 0x00c00000)) {
+          print('D3DFMT_A2R10G10B10');
+        }
+      } else if ((_flags & _hasRgbValues) == _hasRgbValues) {
+
+      }
+    } else if (_rgbBitCount == 16) {
+
+    } else if (_rgbBitCount == 8) {
+
+    }
+
+    // Unknown format
+    return 0;
+  }
 }
 
 /// The extended header for the DDS file format.
@@ -302,20 +454,39 @@ class DdsExtendedHeader {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// View over the [ArrayBuffer] for accessing the structure.
-  Uint32Array _reader;
+  /// The resource format.
+  int _resourceFormat;
+  /// The dimensionality of the resource.
+  int _dimension;
+  /// Identifies other less common options.
+  int _flags;
+  /// The number of elements present in the array.
+  int _arraySize;
 
   //---------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsPixelFormat] class.
-  DdsExtendedHeader._internal(ArrayBuffer buffer)
-    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsExtendedHeader._internal(ArrayBuffer buffer) {
+    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+
+    _resourceFormat = reader[0];
+    _dimension = reader[1];
+    _flags = reader[2];
+    _arraySize = reader[3];
+  }
 
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
-
+  /// The resource format.
+  int get resourceFormat => _resourceFormat;
+  /// The dimensionality of the resource.
+  int get dimension => _dimension;
+  /// Identifies other less common options.
+  int get flags => _flags;
+  /// The number of elements present in the array.
+  int get arraySize => _arraySize;
 }
