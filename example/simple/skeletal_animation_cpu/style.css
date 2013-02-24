@@ -16,17 +16,18 @@ body {
   width: 200px;
   height:100%;
   position:absolute;
-  left:0px;
+  left:-200px;
   top:0px;
   z-index:1;
+  transition:left 1.0s;
 }
 
 #ui_wrap.hide {
-
+  left:-200px;
 }
 
 #ui_wrap.show {
-
+  left:0px;
 }
 
 #ui {
@@ -96,7 +97,6 @@ cursor: pointer;
   cursor: auto;
   pointer-events:none;
 }
-
 
 canvas {
 position:absolute;
