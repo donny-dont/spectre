@@ -133,17 +133,29 @@ class Application {
   double _strafeVelocity = 25.0;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
+  /// [Float32Array] storage for the Model-View matrix.
+  Float32Array _modelViewMatrixArray;
   /// [Float32Array] storage for the Model-View-Projection matrix.
-  ///
-  /// The [mat4] needs to be copied into a [Float32Array] to be passed into WebGL.
   Float32Array _modelViewProjectionMatrixArray;
+  /// [Float32Array] storage for the normal matrix.
+  Float32Array _normalMatrixArray;
 
   //---------------------------------------------------------------------
   // Mesh drawing variables
   //---------------------------------------------------------------------
 
-  /// The [SkinnedMesh] to animate and draw to the screen.
-  SkinnedMesh _mesh;
+  /// The [ShaderProgram] to use to draw the mesh.
+  ///
+  /// The models all contain a normal and specular map. The [ShaderProgram] uses the
+  /// normal map to add additional detail to the surface, and the specular map to
+  /// provide a variable shininess, which is used in Phong lighting, across the mesh.
+  ShaderProgram _shaderProgram;
+  /// The [InputLayout] of the mesh.
+  InputLayout _inputLayout;
+  /// The [SkinnedMesh]es being used by the application.
+  List<SkinnedMesh> _meshes;
+  /// The index of the [SkinnedMesh] to draw.
+  int _meshIndex = 0;
 
   //---------------------------------------------------------------------
   // Construction
@@ -176,6 +188,9 @@ class Application {
 
     // Call the onResize method which will update the viewport and camera
     onResize(width, height);
+
+    // Start loading the resources
+    _loadResources();
   }
 
   /// Creates the [GraphicsDevice] and attaches the [AssetManager].
@@ -190,6 +205,13 @@ class Application {
     _assetManager = new AssetManager();
     registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
 
+    // Attach additional importer/loaders to the AssetManager
+    //
+    // The application uses config files to define behavior. These files
+    // are just json data. So associate a TextLoader and a PropertyMapImporter
+    // to a 'config'
+    _assetManager.loaders['config'] = new TextLoader();
+    _assetManager.importers['config'] = new PropertyMapImporter();
   }
 
   /// Creates the rendering state.
@@ -229,12 +251,98 @@ class Application {
   void _createCamera() {
     // Create the Camera
     _camera = new Camera();
+    _camera.position = new vec3.raw(150.0, 60.0, 0.0);
+    _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
 
     // Create the CameraController
     _cameraController = new MouseKeyboardCameraController();
     _cameraController.forwardVelocity = _forwardVelocity;
     _cameraController.strafeVelocity = _strafeVelocity;
+
+    // Create the mat4 holding the Model-View-Projection matrix
+    _modelViewProjectionMatrix = new mat4();
+
+    // Create the Float32Arrays that store the constant values for the matrices
+    _modelViewMatrixArray = new Float32Array(16);
+    _modelViewProjectionMatrixArray = new Float32Array(16);
+    _normalMatrixArray = new Float32Array(16);
   }
+
+  /// Load the resources held in the .pack files.
+  void _loadResources() {
+    // Load the base pack
+    _assetManager.loadPack('base', 'assets/base.pack').then((assetPack) {
+      // Get the ShaderProgram
+      //
+      // Any uniforms that are constant throughout running the program
+      // should be set after the ShaderProgram is created. The ShaderProgram
+      // retains the state so there isn't a need to set them each time the
+      // program is run. In fact its a drain on performance if the constants
+      // are set to the same value each run
+      _shaderProgram = assetPack.normalMapShader;
+
+      // Load the individual models
+      //
+      // The configuration specifies the models to load within the application.
+      // Each model is contained within a pack file.
+      List models = assetPack.config.models;
+      int modelCount = models.length;
+
+      List<Future> requests = new List<Future>(modelCount);
+
+      for (int i = 0; i < modelCount; ++i) {
+        PropertyMap modelRequest = models[i];
+
+        // Load the individual pack files containing the models
+        requests[i] = _assetManager.loadPack(modelRequest.name, modelRequest.pack);
+      }
+
+      // Wait on all requests to be loaded
+      Future.wait(requests).then((_) {
+        // Create the list that holds the SkinnedMeshes
+        _meshes = new List<SkinnedMesh>(modelCount);
+
+        for (int i = 0; i < modelCount; ++i) {
+          // Get the matching AssetPack
+          PropertyMap modelRequest = models[i];
+          String modelName = modelRequest.name;
+          AssetPack modelPack = _assetManager.root[modelName];
+
+          // Add the UI elements for the model
+          print(modelPack.config.name);
+
+          _applicationControls.addModel(modelPack.config.name, 'assets/bob/icon.png');
+
+          // Import the mesh
+          _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack.mesh);
+        }
+
+        // Setup the vertex layout
+        _inputLayout = new InputLayout('InputLayout', _graphicsDevice);
+        _inputLayout.shaderProgram = _shaderProgram;
+        _inputLayout.mesh = _meshes[0];
+
+        // Start the loop and show the UI
+        _gameLoop.start();
+        _applicationControls.show();
+      });
+    });
+  }
+
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// The index of the [SkinnedMesh] to draw.
+  int get meshIndex => _meshIndex;
+  set meshIndex(int value) { _meshIndex = value; }
+
+  /// Whether debugging information should be drawn.
+  ///
+  /// If the debugging information is turned on in this sample the
+  /// mesh's skeleton will be displayed.
+  bool get drawDebugInformation => _drawDebugInformation;
+  set drawDebugInformation(bool value) { _drawDebugInformation = value; }
 
   //---------------------------------------------------------------------
   // Public methods
@@ -282,8 +390,14 @@ class Application {
     // passed in as a constant to the ShaderProgram.
     _modelViewProjectionMatrix.copyIntoArray(_modelViewProjectionMatrixArray);
 
+    // Copy the View matrix from the camera into the Float32Array.
+    _camera.copyViewMatrixIntoArray(_modelViewMatrixArray);
+
+    // Copy the Normal matrix from the camera into the Float32Array.
+    _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
+
     // Update the mesh
-    //_mesh.update(dt);
+    _meshes[_meshIndex].update(dt);
   }
 
   /// Renders the scene.
@@ -304,6 +418,34 @@ class Application {
     _graphicsContext.setViewport(_viewport);
     _graphicsContext.setBlendState(_blendState);
     _graphicsContext.setSamplers(0, _samplers);
+
+    // Set the shader program
+    _graphicsContext.setShaderProgram(_shaderProgram);
+
+    // The matrices are the same for the drawing of each part of the mesh so
+    // they only need to be set once.
+    _graphicsContext.setConstant('uModelViewMatrix', _modelViewMatrixArray);
+    _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
+    _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
+
+    // Set the mesh
+    //
+    // Each submesh is contained within the same vertex buffer object and index
+    // buffer object. This means the VBO and IBO only needs to be set once
+    SkinnedMesh mesh = _meshes[_meshIndex];
+    _graphicsContext.setVertexBuffers(0, [mesh.vertexArray]);
+    _graphicsContext.setIndexBuffer(mesh.indexArray);
+    _graphicsContext.setInputLayout(_inputLayout);
+    _graphicsContext.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+
+    // Draw each part of the mesh
+    int meshCount = mesh.meshes.length;
+
+    for (int i = 0; i < meshCount; ++i) {
+      Map meshData = mesh.meshes[i];
+
+      _graphicsContext.drawIndexed(meshData['count'], meshData['offset']);
+    }
 
     // Render debugging information if requested
     if (_drawDebugInformation) {
@@ -334,7 +476,7 @@ class Application {
 //---------------------------------------------------------------------
 
 /// Instance of the [Application].
-Application _instance;
+Application _application;
 /// Instance of the [ApplicationControls].
 ApplicationControls _applicationControls;
 /// Instance of the [GameLoop] controlling the application flow.
@@ -348,17 +490,17 @@ final String _canvasId = '#backBuffer';
 
 /// Callback for when the application should be updated.
 void onFrame(GameLoop gameLoop) {
-  _instance.onUpdate(gameLoop.dt);
+  _application.onUpdate(gameLoop.dt);
 }
 
 /// Callback for when the application should render.
 void onRender(GameLoop gameLoop) {
-  _instance.onRender();
+  _application.onRender();
 }
 
 /// Callback for when the canvas is resized.
 void onResize(GameLoop gameLoop) {
-  _instance.onResize(gameLoop.width, gameLoop.height);
+  _application.onResize(gameLoop.width, gameLoop.height);
 }
 
 /// Callback for when the pointer lock changes.
@@ -378,11 +520,11 @@ void main() {
   CanvasElement canvas = query(_canvasId);
 
   // Create the application
-  _instance = new Application(canvas);
+  _application = new Application(canvas);
 
   // Create the application controls
   _applicationControls = new ApplicationControls();
-  _applicationControls.show();
+  //_applicationControls.show();
 
   // Hook up the game loop
   // The loop isn't started until the start method is called.
@@ -392,5 +534,5 @@ void main() {
   _gameLoop.onRender = onRender;
   _gameLoop.onPointerLockChange = onPointerLockChange;
 
-  _gameLoop.start();
+  //_gameLoop.start();
 }
