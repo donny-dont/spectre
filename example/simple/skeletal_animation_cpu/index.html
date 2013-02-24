@@ -3,24 +3,43 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Skeletal animation cpu</title>
+    <title>Spectre Sample: Skeletal Animation (CPU)</title>
     <link rel="stylesheet" href="style.css">
     <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
   </head>
   <body>
     <div id="ui_wrap">
       <div id="ui">
-        <div>
+        <div class="ui_group">
           <h2>Models</h2>
           <div id="model_selection">
             <div class="option selected">
-              Hellknight
+              <img src="images/hellknight.png" />
+              <div>Hellknight</div>
             </div>
-            <div class="option">Bob</div>
+            <div class="option">
+              <img src="images/hellknight.png" />
+              <div>Bob</div>
+            </div>
           </div>
+        </div>
+        <div class="ui_group">
+          <h2>Animation</h2>
+          <div class="option">
+            <input id="show_skeleton" type="checkbox" />
+            <div>Show skeleton</div>
+          </div>
+        </div>
+        <div class="ui_group bottom">
           <h2>Controls</h2>
-          <div>Test1</div>
-          <div>Test2</div>
+          <div class="control_info">
+            <div class="input">W,A,S,D</div>
+            <div class="input_explanation">Movement</div>
+          </div>
+          <div class="control_info">
+            <div class="input">Escape</div>
+            <div class="input_explanation">Release mouse pointer</div>
+          </div>
         </div>
       </div>
     </div>
