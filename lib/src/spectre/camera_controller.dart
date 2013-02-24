@@ -23,5 +23,5 @@ part of spectre;
 */
 
 abstract class CameraController {
-  void UpdateCamera(num seconds, Camera cam);
+  void updateCamera(num seconds, Camera cam);
 }

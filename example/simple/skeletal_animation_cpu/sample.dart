@@ -101,6 +101,20 @@ class Application {
 
   /// The [Viewport] to draw to.
   Viewport _viewport;
+  /// The [BlendState] to use during rendering.
+  ///
+  /// Some of the meshes contained within the models have textures with
+  /// alpha values. Alpha blending is disabled by default so a BlendState will
+  /// need to be applied to the pipeline.
+  BlendState _blendState;
+  /// The [SamplerState] to use during rendering.
+  ///
+  /// All the texture coordinates on the models are in the range [0,1].
+  /// Because of this a single SamplerState can be applied to all the
+  /// Textures being used.
+  SamplerState _samplerState;
+  /// An array of [SamplerState]s to use during rendering.
+  List<SamplerState> _samplers;
 
   //---------------------------------------------------------------------
   // Camera member variables
@@ -117,6 +131,12 @@ class Application {
   double _forwardVelocity = 25.0;
   /// The velocity with which the [CameraController] moves the camera left/right.
   double _strafeVelocity = 25.0;
+  /// The Model-View-Projection matrix.
+  mat4 _modelViewProjectionMatrix;
+  /// [Float32Array] storage for the Model-View-Projection matrix.
+  ///
+  /// The [mat4] needs to be copied into a [Float32Array] to be passed into WebGL.
+  Float32Array _modelViewProjectionMatrixArray;
 
   //---------------------------------------------------------------------
   // Mesh drawing variables
@@ -133,25 +153,6 @@ class Application {
   ///
   /// The application is hosted within the [CanvasElement] specified in [canvas].
   Application(CanvasElement canvas) {
-    // Create the GraphicsDevice using the CanvasElement
-    _graphicsDevice = new GraphicsDevice(canvas);
-
-    // Get the GraphicsContext from the GraphicsDevice
-    _graphicsContext = _graphicsDevice.context;
-
-    // Create the AssetManager and register Spectre specific resource loading
-    _assetManager = new AssetManager();
-    registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
-
-    // Create the Camera and the CameraController
-    _camera = new Camera();
-    _cameraController = new MouseKeyboardCameraController();
-    _cameraController.forwardVelocity = _forwardVelocity;
-    _cameraController.strafeVelocity = _strafeVelocity;
-
-    // Create the viewport
-    _viewport = new Viewport('Viewport', _graphicsDevice);
-
     // Resize the canvas using the offsetWidth/offsetHeight.
     //
     // The canvas width/height is not being explictly specified in the markup,
@@ -164,8 +165,75 @@ class Application {
     canvas.width = width;
     canvas.height = height;
 
+    // Create the GraphicsDevice and attaches the AssetManager
+    _createGraphicsDevice(canvas);
+
+    // Create the rendering state
+    _createRendererState();
+
+    // Create the Camera and the CameraController
+    _createCamera();
+
     // Call the onResize method which will update the viewport and camera
     onResize(width, height);
+  }
+
+  /// Creates the [GraphicsDevice] and attaches the [AssetManager].
+  void _createGraphicsDevice(CanvasElement canvas) {
+    // Create the GraphicsDevice using the CanvasElement
+    _graphicsDevice = new GraphicsDevice(canvas);
+
+    // Get the GraphicsContext from the GraphicsDevice
+    _graphicsContext = _graphicsDevice.context;
+
+    // Create the AssetManager and register Spectre specific resource loading
+    _assetManager = new AssetManager();
+    registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
+
+  }
+
+  /// Creates the rendering state.
+  void _createRendererState() {
+    // Create the Viewport
+    _viewport = new Viewport('Viewport', _graphicsDevice);
+
+    // Create the BlendState
+    //
+    // Blending should be enabled since there are some meshes whose textures
+    // have alpha values. If there is no alpha blending then it should be turned
+    // off. Enabling blending when there is no alpha values to blend causes the
+    // graphics hardware to do work that isn't required.
+    _blendState = new BlendState.alphaBlend('BlendState', _graphicsDevice);
+
+    // Create the SamplerState
+    //
+    // All the models have texture coordinates that are clamped to [0,1].
+    // Because of this a single SamplerState can be applied to all the
+    // Textures being used.
+    //
+    // The ShaderProgram being used takes three textures, so create a list
+    // containing the same SamplerState at all three locations.
+    _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
+    _samplers = [_samplerState, _samplerState, _samplerState];
+
+    // By default the rendering pipeline has the depth buffer enabled and
+    // set to writeable. Because of this there is no reason to create and
+    // explcitly apply a DepthState while rendering.
+
+    // By default the rendering pipeline has back facing polygons being
+    // culled. Because of this there is no reason to create and explicitly
+    // apply a RasterizerState while rendering.
+  }
+
+  /// Create the [Camera] and the [CameraController] to position it.
+  void _createCamera() {
+    // Create the Camera
+    _camera = new Camera();
+
+    // Create the CameraController
+    _cameraController = new MouseKeyboardCameraController();
+    _cameraController.forwardVelocity = _forwardVelocity;
+    _cameraController.strafeVelocity = _strafeVelocity;
   }
 
   //---------------------------------------------------------------------
@@ -191,6 +259,29 @@ class Application {
       _cameraController.accumDY = mouse.dy;
     }
 
+    _cameraController.updateCamera(dt, _camera);
+
+    // Get the current model-view-projection matrix
+    //
+    // Start off by copying the projection matrix into the matrix.
+    _camera.copyProjectionMatrix(_modelViewProjectionMatrix);
+
+    // Multiply the projection matrix by the view matrix to combine them.
+    //
+    // The mathematical operators in Dart Vector Math will end up creating
+    // a new object. Rather than using * a self multiply is used. This is to
+    // avoid creating additional objects. As a general rule with a garbage
+    // collected language objects should be reused whenever possible.
+    _modelViewProjectionMatrix.multiply(_camera.lookAtMatrix);
+
+    // At this point we actually have the Model-View-Projection matrix. This
+    // is because the model matrix is currently the identity matrix. The model
+    // has no rotation, no scaling, and is sitting at (0, 0, 0).
+
+    // Copy the Model-View-Projection matrix into a Float32Array so it can be
+    // passed in as a constant to the ShaderProgram.
+    _modelViewProjectionMatrix.copyIntoArray(_modelViewProjectionMatrixArray);
+
     // Update the mesh
     //_mesh.update(dt);
   }
@@ -211,6 +302,8 @@ class Application {
 
     // Set the renderer state
     _graphicsContext.setViewport(_viewport);
+    _graphicsContext.setBlendState(_blendState);
+    _graphicsContext.setSamplers(0, _samplers);
 
     // Render debugging information if requested
     if (_drawDebugInformation) {
