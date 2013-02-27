@@ -127,10 +127,6 @@ class Application {
   /// A [MouseKeyboardCameraController] provides a way to move the camera in the
   /// same way that a free-look FPS operates.
   MouseKeyboardCameraController _cameraController;
-  /// The velocity with which the [CameraController] moves the camera forward/backward.
-  double _forwardVelocity = 25.0;
-  /// The velocity with which the [CameraController] moves the camera left/right.
-  double _strafeVelocity = 25.0;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
   /// [Float32Array] storage for the Model-View matrix.
@@ -154,6 +150,11 @@ class Application {
   InputLayout _inputLayout;
   /// The [SkinnedMesh]es being used by the application.
   List<SkinnedMesh> _meshes;
+  /// The [Texture]s to use on the meshes.
+  ///
+  /// Each mesh and their respective submeshes have [Texture]s to be set within the
+  /// pipeline. Each submesh has a diffuse map, a normal map, and a specular map.
+  List<List<List<Texture2D>>> _textures;
   /// The index of the [SkinnedMesh] to draw.
   int _meshIndex = 0;
 
@@ -254,10 +255,10 @@ class Application {
     _camera.position = new vec3.raw(150.0, 60.0, 0.0);
     _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
 
-    // Create the CameraController
+    // Create the CameraController and set the velocity of the movement
     _cameraController = new MouseKeyboardCameraController();
-    _cameraController.forwardVelocity = _forwardVelocity;
-    _cameraController.strafeVelocity = _strafeVelocity;
+    _cameraController.forwardVelocity = 250.0;
+    _cameraController.strafeVelocity = 250.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4();
@@ -281,6 +282,9 @@ class Application {
       // are set to the same value each run
       _shaderProgram = assetPack.normalMapShader;
 
+      // Apply the shader program and set the locations of the textures
+      _graphicsContext.setShaderProgram(_shaderProgram);
+
       // Load the individual models
       //
       // The configuration specifies the models to load within the application.
@@ -301,6 +305,8 @@ class Application {
       Future.wait(requests).then((_) {
         // Create the list that holds the SkinnedMeshes
         _meshes = new List<SkinnedMesh>(modelCount);
+        // Create the list that holds the Textures
+        _textures = new List<List<List<Texture2D>>>();
 
         for (int i = 0; i < modelCount; ++i) {
           // Get the matching AssetPack
@@ -309,12 +315,34 @@ class Application {
           AssetPack modelPack = _assetManager.root[modelName];
 
           // Add the UI elements for the model
-          print(modelPack.config.name);
-
-          _applicationControls.addModel(modelPack.config.name, 'assets/bob/icon.png');
+          _applicationControls.addModel(modelPack.config.name, 'assets/${modelName}/icon.png');
 
           // Import the mesh
           _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack.mesh);
+
+          // Get the textures to use on the mesh.
+          //
+          // The configuration file references the textures to use when drawing
+          // each part of the mesh
+          List<List<Texture2D>> modelTextures = new List<List<Texture2D>>();
+          List modelTextureConfig = modelPack.config.textures;
+
+          int meshCount = modelTextureConfig.length;
+
+          for (int i = 0; i < meshCount; ++i) {
+            PropertyMap meshConfig = modelTextureConfig[i];
+            List<Texture2D> meshTextures = new List<Texture2D>(3);
+
+            meshTextures[0] = modelPack[meshConfig.diffuse];
+            meshTextures[1] = modelPack[meshConfig.specular];
+            meshTextures[2] = modelPack[meshConfig.specular];
+
+            print(meshConfig.specular);
+
+            modelTextures.add(meshTextures);
+          }
+
+          _textures.add(modelTextures);
         }
 
         // Setup the vertex layout
@@ -440,10 +468,12 @@ class Application {
 
     // Draw each part of the mesh
     int meshCount = mesh.meshes.length;
+    List<List<Texture2D>> meshTextures = _textures[_meshIndex];
 
     for (int i = 0; i < meshCount; ++i) {
       Map meshData = mesh.meshes[i];
 
+      _graphicsContext.setTextures(0, meshTextures[i]);
       _graphicsContext.drawIndexed(meshData['count'], meshData['offset']);
     }
 
@@ -524,7 +554,6 @@ void main() {
 
   // Create the application controls
   _applicationControls = new ApplicationControls();
-  //_applicationControls.show();
 
   // Hook up the game loop
   // The loop isn't started until the start method is called.
