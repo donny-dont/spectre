@@ -26,13 +26,13 @@ void gameFrame(GameLoop gameLoop) {
   cameraController.forwardVelocity = 25.0;
   cameraController.strafeVelocity = 25.0;
   cameraController.forward =
-      gameLoop.keyboard.buttons[GameLoopKeyboard.W].down;
+      gameLoop.keyboard.buttons[Keyboard.W].down;
   cameraController.backward =
-      gameLoop.keyboard.buttons[GameLoopKeyboard.S].down;
+      gameLoop.keyboard.buttons[Keyboard.S].down;
   cameraController.strafeLeft =
-      gameLoop.keyboard.buttons[GameLoopKeyboard.A].down;
+      gameLoop.keyboard.buttons[Keyboard.A].down;
   cameraController.strafeRight =
-      gameLoop.keyboard.buttons[GameLoopKeyboard.D].down;
+      gameLoop.keyboard.buttons[Keyboard.D].down;
   if (gameLoop.pointerLock.locked) {
     cameraController.accumDX = gameLoop.mouse.dx;
     cameraController.accumDY = gameLoop.mouse.dy;
