@@ -51,7 +51,7 @@ class MouseKeyboardCameraController extends CameraController {
     mouseSensitivity = 360.0;
   }
 
-  void UpdateCamera(num seconds, Camera cam) {
+  void updateCamera(num seconds, Camera cam) {
     _MoveFloat(seconds, up, down, cam);
     _MoveStrafe(seconds, strafeRight, strafeLeft, cam);
     _MoveForward(seconds, forward, backward, cam);
