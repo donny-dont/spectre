@@ -511,7 +511,7 @@ class SkinnedMesh extends SpectreMesh {
       vertexBase += _floatsPerVertex;
     }
     sw.stop();
-    print(sw.elapsedMilliseconds);
+    //print(sw.elapsedMilliseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
 }
