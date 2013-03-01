@@ -591,7 +591,7 @@ class DebugDrawManager {
   /// Render debug primitives for [Camera] [cam]
   void render(Camera cam) {
     mat4 pm = cam.projectionMatrix;
-    mat4 la = cam.lookAtMatrix;
+    mat4 la = cam.viewMatrix;
     pm.multiply(la);
     pm.copyIntoArray(_cameraMatrix);
     device.context.setShaderProgram(_lineShaderProgram);

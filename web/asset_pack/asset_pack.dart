@@ -37,7 +37,7 @@ void gameFrame(GameLoop gameLoop) {
     cameraController.accumDX = gameLoop.mouse.dx;
     cameraController.accumDY = gameLoop.mouse.dy;
   }
-  cameraController.UpdateCamera(gameLoop.dt, camera);
+  cameraController.updateCamera(gameLoop.dt, camera);
   // Update the debug draw manager state
   _debugDrawManager.update(dt);
 }
@@ -128,7 +128,7 @@ void _drawSkybox() {
   context.setSamplers(0, [_skyboxSampler]);
   {
     mat4 P = camera.projectionMatrix;
-    mat4 LA = makeLookAt(new vec3.zero(),
+    mat4 LA = makeViewMatrix(new vec3.zero(),
         camera.frontDirection,
         new vec3(0.0, 1.0, 0.0));
     P.multiply(LA);
@@ -207,7 +207,7 @@ void _drawSkinnedCharacter() {
   context.setSamplers(0, [_skyboxSampler]);
   {
     mat4 P = camera.projectionMatrix;
-    mat4 LA = camera.lookAtMatrix;
+    mat4 LA = camera.viewMatrix;
     P.multiply(LA);
     P.copyIntoArray(_cameraTransform, 0);
   }

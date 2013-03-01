@@ -111,12 +111,12 @@ class Material {
         // TODO(johnmccutchan): Do we have a default camera setup?
       }
       mat4 projectionMatrix = camera.projectionMatrix;
-      mat4 viewMatrix = camera.lookAtMatrix;
+      mat4 viewMatrix = camera.viewMatrix;
       mat4 projectionViewMatrix = camera.projectionMatrix;
       projectionViewMatrix.multiply(viewMatrix);
-      mat4 viewRotationMatrix = makeLookAt(new vec3.zero(),
-                                           camera.frontDirection,
-                                           new vec3.raw(0.0, 1.0, 0.0));
+      mat4 viewRotationMatrix = makeViewMatrix(new vec3.zero(),
+                                               camera.frontDirection,
+                                               new vec3.raw(0.0, 1.0, 0.0));
       mat4 projectionViewRotationMatrix = camera.projectionMatrix;
       projectionViewRotationMatrix.multiply(viewRotationMatrix);
       MaterialConstant constant;

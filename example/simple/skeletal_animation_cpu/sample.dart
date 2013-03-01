@@ -408,7 +408,7 @@ class Application {
     // a new object. Rather than using * a self multiply is used. This is to
     // avoid creating additional objects. As a general rule with a garbage
     // collected language objects should be reused whenever possible.
-    _modelViewProjectionMatrix.multiply(_camera.lookAtMatrix);
+    _modelViewProjectionMatrix.multiply(_camera.viewMatrix);
 
     // At this point we actually have the Model-View-Projection matrix. This
     // is because the model matrix is currently the identity matrix. The model
