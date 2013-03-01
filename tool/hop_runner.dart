@@ -1,5 +1,6 @@
 library hop_runner;
 
+import 'dart:io';
 import 'package:bot/hop.dart';
 import 'package:bot/hop_tasks.dart';
 
