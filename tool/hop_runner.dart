@@ -29,3 +29,10 @@ void _assertKnownPath() {
   final thisFile = new File('tool/hop_runner.dart');
   assert(thisFile.existsSync());
 }
+
+Future<List<String>> _getLibs() {
+  return new Directory('lib').list()
+      .where((FileSystemEntity fse) => fse is File)
+      .map((File file) => file.name)
+      .toList();
+}
