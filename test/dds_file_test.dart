@@ -52,7 +52,7 @@ void testStandardTexture(String url, int width, int height, int mipMapCount) {
 
     expect(ddsFile.width, width);
     expect(ddsFile.height, height);
-    expect(ddsFile.depth, 0);
+    expect(ddsFile.depth, 1);
     expect(ddsFile.mipMapCount, mipMapCount);
     expect(ddsFile.isCubeMap, false);
     expect(ddsFile.hasAllCubeMapFaces, false);
@@ -64,11 +64,41 @@ void testCubeMap(String url, int width, int height, int mipMapCount) {
 
 }
 
+void testFormats(bool dx10) {
+  List formats = [
+    'R32G32B32A32_FLOAT',
+    'R32G32B32A32_UINT'
+  ];
+
+  String testPrefix;
+  String directory;
+
+  if (dx10) {
+    testPrefix = 'DX 10';
+    directory = 'dds/formats/dx10/';
+  } else {
+    testPrefix = 'DX 9';
+    directory = 'dds/formats/dx9/';
+  }
+
+  for (int i = 0; i < formats.length; ++i) {
+    String format = formats[i];
+
+    test('Format ${testPrefix} ${format}', () {
+      String url = '${directory}lena_${format}.dds';
+
+      testStandardTexture(url, 32, 32, 1);
+    });
+  }
+}
+
 void main() {
+  testFormats(true);
+/*
   test('invalid file', () {
     testStandardTexture('dds/lena.dds', 512, 512, 0);
   });
-/*
+
   // Format tests
   test('32-bit unsigned int', () {
     testStandardTexture('dds/lena_a8r8g8b8_dx9.dds', 512, 512, 0);

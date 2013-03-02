@@ -199,43 +199,74 @@ class DdsHeader {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// View over the [ArrayBuffer] for accessing the structure.
-  Uint32Array _reader;
+  /// The size of the structure.
+  int _size;
+  /// Flags to indicate which members contain valid data.
+  int _flags;
+  /// The height of the compressed texture.
+  int _height;
+  /// The width of the compressed texture.
+  int _width;
+
+  int _pitchOrLinearSize;
+  /// The depth of the compressed texture.
+  int _depth;
+  /// The number of mipmap levels.
+  int _mipMapCount;
+  /// Gets the surface complexity.
+  int _surfaceComplexity;
+  /// Gets details about the surface being stored.
+  ///
+  /// Stores flags signifying that a cubemap or volume texture is being
+  /// used. If the extended header is present then that data takes
+  /// precedence.
+  int _surfaceDetail;
 
   //---------------------------------------------------------------------
   // Constructor
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsHeader] class.
-  DdsHeader._internal(ArrayBuffer buffer)
-    : _reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsHeader._internal(ArrayBuffer buffer) {
+    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+
+    _size              = reader[0];
+    _flags             = reader[1];
+    _height            = reader[2];
+    _width             = reader[3];
+    _pitchOrLinearSize = reader[4];
+    _depth             = reader[5];
+    _mipMapCount       = reader[6];
+    _surfaceComplexity = reader[26];
+    _surfaceDetail     = reader[27];
+  }
 
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
   /// The size of the structure.
-  int get size => _reader[0];
+  int get size => _size;
   /// Flags to indicate which members contain valid data.
-  int get flags => _reader[1];
+  int get flags => _flags;
   /// The height of the compressed texture.
-  int get height => _reader[2];
+  int get height => _height;
   /// The width of the compressed texture.
-  int get width => _reader[3];
+  int get width => _width;
 
-  int get pitchOrLinearSize => _reader[4];
+  int get pitchOrLinearSize => _pitchOrLinearSize;
   /// The depth of the compressed texture.
-  int get depth => _reader[5];
+  int get depth => _depth;
   /// The number of mipmap levels.
-  int get mipMapCount => _reader[6];
+  int get mipMapCount => _mipMapCount;
   /// Gets the surface complexity.
-  int get surfaceComplexity => _reader[26];
+  int get surfaceComplexity => _surfaceComplexity;
   /// Gets details about the surface being stored.
   ///
   /// Stores flags signifying that a cubemap or volume texture is being
   /// used. If the extended header is present then that data takes
   /// precedence.
-  int get surfaceDetail => _reader[27];
+  int get surfaceDetail => _surfaceDetail;
 }
 
 /// The surface pixel format.
