@@ -45,16 +45,16 @@ vec4 ads()
   vec3 s = normalize(lightPosition);
   vec3 v = normalize(-position);
   vec3 r = reflect(-s, n);
-  
+
   vec4 kd4 = texture2D(uDiffuse, texCoord);
   vec3 kd = kd4.rgb;
   vec3 ks = texture2D(uSpecular, texCoord).rgb;
 
-  vec3 result = lightIntensity * 
+  vec3 result = lightIntensity *
     (ka +
      kd * max(dot(s, n), 0.0) +
      ks * pow(max(dot(r, v), 0.0), shininess));
-     
+
   return vec4(result, kd4.a);
 }
 
