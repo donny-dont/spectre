@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /** A shader program uniform input */
 class ShaderProgramUniform {
@@ -104,16 +102,15 @@ class ShaderProgram extends DeviceChild {
 
   ShaderProgram(String name, GraphicsDevice device) :
     super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
     _program = device.gl.createProgram();
   }
 
-  void _destroyDeviceState() {
+  void finalize() {
+    super.finalize();
     fragmentShader = null;
     vertexShader = null;
     device.gl.deleteProgram(_program);
+    _program = null;
   }
 
   /** Detach [shader] from ShaderProgram. */

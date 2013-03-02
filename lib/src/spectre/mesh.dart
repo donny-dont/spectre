@@ -1,3 +1,23 @@
+/*
+  Copyright (C) 2013 Spectre Authors
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+*/
+
 part of spectre;
 
 class SpectreMeshAttribute {
@@ -30,24 +50,15 @@ class SpectreMeshAttribute {
   String toString() => '$name $componentType$componentCount $offset $stride';
 }
 
-class SpectreMesh extends DeviceChild {
+abstract class SpectreMesh extends DeviceChild {
   final Map<String, SpectreMeshAttribute> attributes =
       new Map<String, SpectreMeshAttribute>();
-
   int count = 0;
   int primitiveTopology = GraphicsContext.PrimitiveTopologyTriangles;
-
   SpectreMesh(String name, GraphicsDevice device)
       : super._internal(name, device);
-
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  void finalize() {
+    super.finalize();
   }
 }
 
@@ -56,22 +67,14 @@ class SingleArrayMesh extends SpectreMesh {
   VertexBuffer get vertexArray => _deviceVertexBuffer;
 
   SingleArrayMesh(String name, GraphicsDevice device) : super(name, device) {
+    _deviceVertexBuffer = new VertexBuffer(name, device);
   }
 
-
-  void _createDeviceState() {
-    super._createDeviceState();
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-  }
-
-
-  void _destroyDeviceState() {
-    if (_deviceVertexBuffer != null) {
-      _deviceVertexBuffer._destroyDeviceState();
-    }
+  void finalize() {
+    super.finalize();
+    _deviceVertexBuffer.dispose();
     _deviceVertexBuffer = null;
     count = 0;
-    super._destroyDeviceState();
   }
 }
 
@@ -83,26 +86,14 @@ class SingleArrayIndexedMesh extends SpectreMesh {
 
   SingleArrayIndexedMesh(String name, GraphicsDevice device)
       : super(name, device) {
+    _deviceVertexBuffer = new VertexBuffer(name, device);
+    _deviceIndexBuffer = new IndexBuffer(name, device);
   }
 
-
-  void _createDeviceState() {
-    super._createDeviceState();
-    _deviceVertexBuffer = device.createVertexBuffer('$name[VB]');
-    _deviceIndexBuffer = device.createIndexBuffer('$name[IB]');
-  }
-
-
-  void _destroyDeviceState() {
-    if (_deviceVertexBuffer != null) {
-      device.deleteDeviceChild(_deviceVertexBuffer);
-      _deviceVertexBuffer = null;
-    }
-    if (_deviceIndexBuffer != null) {
-      device.deleteDeviceChild(_deviceIndexBuffer);
-      _deviceIndexBuffer = null;
-    }
+  void finalize() {
+    super.finalize();
+    _deviceVertexBuffer.dispose();
+    _deviceIndexBuffer.dispose();
     count = 0;
-    super._destroyDeviceState();
   }
 }

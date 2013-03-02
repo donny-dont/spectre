@@ -1,39 +1,27 @@
-# Spectre #
+# Spectre
 
-## Introduction ##
-A low level 3D graphics library for Dart.
+[![Build Status](https://drone.io/github.com/johnmccutchan/spectre/status.png)](https://drone.io/github.com/johnmccutchan/spectre)
 
-Spectre is a modern graphics API wrapping WebGL. 
+## A modern graphics API for WebGL development with Dart
 
-A "modern graphics API" consists of:
+__Spectre__ is a modern graphics API aimed at developers creating games and other interactive 3D applications. It is designed for performance while retaining a developer friendly interface.
 
-Device - Manage vertex buffers, index buffers, textures, shaders, and other GPU objects
-ImmediateContext - Set GPU state and initiate draw calls
-ProgramBuilder - Build your rendering commands once
-Interpreter - Execute your prebuilt programs
-Resource - Resource types including images, meshes, shaders, and more
-ResourceManager - Manage and load resources 
+## Try It Now
+__Spectre__ is in a fully working state, but the API has not completely solidified and is subject to change. This will be the case until an official 1.0 release occurs, though as this approaches major revisions are unlikely. Because of this it is recommended to work against the master branch of the library. It is also recommended to have the latest released version of the Dart SDK before starting development.
 
-Spectre also includes a resource manager and a demo framework called 'Javeline'.
-
-
-## Status: Beta ##
-Stuff works but the API is not guaranteed yet.
-
-
-## Getting Started ##
-Create a Dart project and add a **pubspec.yaml** file to it
-
-```
+Add the __Spectre__ package to your `pubspec.yaml` file which references the main repository.
+```yaml
 dependencies:
   spectre:
     git: https://github.com/johnmccutchan/spectre.git
 ```
-and run **pub install** to install **spectre** (including its dependencies). Now add import
 
+Then within your application it can be imported using the following code
 ```
-#import('package:vector_math/vector_math_browser.dart'); 
-#import('package:spectre/spectre.dart');
-#import('package:spectre/spectre_scene.dart');
-#import('package:spectre/spectre_post.dart');
+import 'package:spectre/spectre.dart';
+import 'package:vector_math/vector_math.dart';
 ```
+
+## Documentation
+
+[API Reference](http://johnmccutchan.github.com/spectre/)

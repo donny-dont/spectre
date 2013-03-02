@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /** A [RenderTarget] specifies the buffers where color, depth, and stencil
  * are written to during a draw call.
@@ -49,25 +47,19 @@ class RenderTarget extends DeviceChild {
 
   RenderTarget(String name, GraphicsDevice device) :
     super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
     _deviceFramebuffer = device.gl.createFramebuffer();
   }
 
-  void _makeSystemTarget() {
-    RenderTarget._systemRenderTarget._destroyDeviceState();
-    RenderTarget._systemRenderTarget._renderable = true;
+  RenderTarget.systemTarget(String name, GraphicsDevice device) :
+      super._internal(name, device) {
+    _renderable = true;
   }
 
-  void _destroyDeviceState() {
-    if (_deviceFramebuffer != null) {
-      device.gl.deleteFramebuffer(_deviceFramebuffer);
-    }
+  void finalize() {
+    super.finalize();
+    device.gl.deleteFramebuffer(_deviceFramebuffer);
     _deviceFramebuffer = null;
     _renderable = false;
-    super._destroyDeviceState();
   }
 
 

@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /** A [SpectreBuffer] represents a buffer of memory on the GPU.
  * A [SpectreBuffer] can only be constructed by constructing an [IndexBuffer]
@@ -34,26 +32,21 @@ class SpectreBuffer extends DeviceChild {
   /** Hint that buffer data is used many times and never discarded. */
   static const UsageStatic = WebGLRenderingContext.STATIC_DRAW;
   WebGLBuffer _deviceBuffer;
-  int _bindTarget;
-  int _bindingParam;
+  final int _bindTarget;
+  final int _bindingParam;
   int _usage = UsageDynamic;
   int _size = 0;
 
-  SpectreBuffer(String name, GraphicsDevice device)
+  SpectreBuffer(String name, GraphicsDevice device,
+                this._bindTarget, this._bindingParam)
       : super._internal(name, device) {
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
     _deviceBuffer = device.gl.createBuffer();
   }
 
-  void _destroyDeviceState() {
-    if (_deviceBuffer != null) {
-      device.gl.deleteBuffer(_deviceBuffer);
-    }
+  void finalize() {
+    super.finalize();
+    device.gl.deleteBuffer(_deviceBuffer);
     _deviceBuffer = null;
-    super._destroyDeviceState();
   }
 
   WebGLBuffer _pushBind() {

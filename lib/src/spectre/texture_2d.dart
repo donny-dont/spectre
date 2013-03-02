@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /// Texture2D defines the storage for a 2D texture including Mipmaps
 /// Create using [Device.createTexture2D]
@@ -40,14 +38,6 @@ class Texture2D extends SpectreTexture {
   Texture2D._cube(String name, GraphicsDevice device, int bindTarget,
                   int bindParam, int textureTarget) :
       super(name, device, bindTarget, bindParam, textureTarget);
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
-  }
 
   void _uploadPixelArray(int width, int height, dynamic array,
                          int pixelFormat, int pixelType) {
@@ -107,11 +97,11 @@ class Texture2D extends SpectreTexture {
                                    pixelType: SpectreTexture.PixelTypeU8}) {
     ImageElement element = new ImageElement();
     Completer<Texture2D> completer = new Completer<Texture2D>();
-    element.on.error.add((event) {
+    element.onError.listen((event) {
       _loadError = true;
       completer.complete(this);
     });
-    element.on.load.add((event) {
+    element.onLoad.listen((event) {
       uploadElement(element, pixelFormat:pixelFormat, pixelType:pixelType);
       completer.complete(this);
     });
@@ -125,12 +115,18 @@ class Texture2D extends SpectreTexture {
     device.gl.generateMipmap(_textureTarget);
   }
 
-  /** Generate Mipmap data for texture. This must be done before the texture
-   * can be used for rendering.
-   */
+
+  /// Generate mipmaps for the [Texture2D].
+  ///
+  /// This must be done before the texture is used for rendering.
+  ///
+  /// A call to this method will only generate mipmap data if the
+  /// texture is a power of two. If not then this call is ignored.
   void generateMipmap() {
-    var oldBind = _pushBind();
-    _generateMipmap();
-    _popBind(oldBind);
+    if (SpectreTexture._isPowerOfTwo(_width) && SpectreTexture._isPowerOfTwo(_height)) {
+      var oldBind = _pushBind();
+      _generateMipmap();
+      _popBind(oldBind);
+    }
   }
 }

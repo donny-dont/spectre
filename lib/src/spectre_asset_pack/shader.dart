@@ -21,18 +21,18 @@
 
 part of spectre_asset_pack;
 
-class _AssetImporterVertexShader extends AssetImporter {
+class VertexShaderImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterVertexShader(this.device);
+  VertexShaderImporter(this.device);
 
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {
       return new Future.immediate(fallback);
     }
     String shaderSource = payload;
-    VertexShader vs = device.createVertexShader(request.name);
+    VertexShader vs = new VertexShader(request.name, device);
     vs.source = shaderSource;
     vs.compile();
     print('Compiled vertex shader ${request.name}: ${vs.compileLog}');
@@ -44,21 +44,21 @@ class _AssetImporterVertexShader extends AssetImporter {
       return;
     }
     print('Deleting vertex shader ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
-class _AssetImporterFragmentShader extends AssetImporter {
+class FragmentShaderImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterFragmentShader(this.device);
+  FragmentShaderImporter(this.device);
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {
       return new Future.immediate(fallback);
     }
     String shaderSource = payload;
-    FragmentShader fs = device.createFragmentShader(request.name);
+    FragmentShader fs = new FragmentShader(request.name, device);
     fs.source = shaderSource;
     fs.compile();
     print('Compiled fragment shader ${request.name}: ${fs.compileLog}');
@@ -70,47 +70,44 @@ class _AssetImporterFragmentShader extends AssetImporter {
       return;
     }
     print('Deleting fragment shader ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
 class _TextListLoader extends AssetLoader {
   Future<dynamic> load(AssetRequest request) {
-    AssetLoaderText loader = new AssetLoaderText();
+    TextLoader loader = new TextLoader();
     Future<String> futureText = loader.load(request);
-    Completer completer = new Completer();
-    futureText.then((text) {
+    return futureText.then((text) {
+      List parsed;
       try {
-        List parsed = JSON.parse(text);
-        List<Future<String>> futureTexts = new List();
-        AssetLoaderText textLoader = new AssetLoaderText();
-        parsed.forEach((String textSrc) {
-          AssetRequest textRequest = new AssetRequest(textSrc, request.baseURL,
-                                                      textSrc, request.type,
-                                                      request.loadArguments,
-                                                      request.importArguments);
-          var futureText = textLoader.load(textRequest);
-          futureTexts.add(futureText);
-        });
-        Future.wait(futureTexts).then((text) {
-          completer.complete(text);
-        });
+        parsed = JSON.parse(text);
       } catch (e) {
-        completer.complete(null);
+        return new Future.immediate(null);
       }
+      List<Future<String>> futureTexts = new List();
+      parsed.forEach((String textSrc) {
+        AssetRequest textRequest = new AssetRequest(textSrc, request.baseURL,
+            textSrc, request.type,
+            request.loadArguments,
+            request.importArguments,
+            request.trace);
+        var futureText = loader.load(textRequest);
+        futureTexts.add(futureText);
+      });
+      return Future.wait(futureTexts);
     });
-    return completer.future;
   }
 
   void delete(dynamic arg) {
   }
 }
 
-class _AssetImporterShaderProgram extends AssetImporter {
+class ShaderProgramImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterShaderProgram(this.device);
+  ShaderProgramImporter(this.device);
 
   Future<dynamic> import(dynamic payload, AssetRequest request) {
     if (payload == null) {
@@ -122,15 +119,15 @@ class _AssetImporterShaderProgram extends AssetImporter {
     if (vertexShaderSource == null || fragmentShaderSource == null) {
       return new Future.immediate(fallback);
     }
-    VertexShader vs = device.createVertexShader(request.name);
+    VertexShader vs = new VertexShader(request.name, device);
     vs.source = vertexShaderSource;
     vs.compile();
     print('Compiled vertex shader ${request.name}: ${vs.compileLog}');
-    FragmentShader fs = device.createFragmentShader(request.name);
+    FragmentShader fs = new FragmentShader(request.name, device);
     fs.source = fragmentShaderSource;
     fs.compile();
     print('Compiled fragment shader ${request.name}: ${fs.compileLog}');
-    ShaderProgram sp = device.createShaderProgram(request.name);
+    ShaderProgram sp = new ShaderProgram(request.name, device);
     sp.vertexShader = vs;
     sp.fragmentShader = fs;
     sp.link();
@@ -143,8 +140,8 @@ class _AssetImporterShaderProgram extends AssetImporter {
       return;
     }
     print('Deleting shader program ${imported.name}');
-    device.deleteDeviceChild(imported.vertexShader);
-    device.deleteDeviceChild(imported.fragmentShader);
-    device.deleteDeviceChild(imported);
+    imported.vertexShader.dispose();
+    imported.fragmentShader.dispose();
+    imported.dispose();
   }
 }

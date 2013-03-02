@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 class TextureCube extends SpectreTexture {
   Texture2D _positiveX;
@@ -78,10 +76,6 @@ class TextureCube extends SpectreTexture {
         WebGLRenderingContext.TEXTURE_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
         WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z);
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
     _positiveX._deviceTexture = _deviceTexture;
     _positiveY._deviceTexture = _deviceTexture;
     _positiveZ._deviceTexture = _deviceTexture;
@@ -90,14 +84,14 @@ class TextureCube extends SpectreTexture {
     _negativeZ._deviceTexture = _deviceTexture;
   }
 
-  void _destroyDeviceState() {
+  void finalize() {
     _positiveX._deviceTexture = null;
     _positiveY._deviceTexture = null;
     _positiveZ._deviceTexture = null;
     _negativeX._deviceTexture = null;
     _negativeY._deviceTexture = null;
     _negativeZ._deviceTexture = null;
-    super._destroyDeviceState();
+    super.finalize();
   }
 
   void _generateMipmap() {

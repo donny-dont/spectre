@@ -30,7 +30,7 @@ class SpectrePostFragment extends SpectrePostPass {
   }
 
   void cleanup(GraphicsDevice device) {
-    device.deleteDeviceChild(shaderProgram);
+    shaderProgram.dispose();
   }
 
   void setup(GraphicsDevice device, Map<String, dynamic> args) {

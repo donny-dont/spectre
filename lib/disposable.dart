@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,29 +19,6 @@ part of spectre;
 
 */
 
-/// A resource created by a device
-/// All resources have a [name]
-class DeviceChild implements Serializable {
-  final GraphicsDevice device;
-  final String name;
-  String toString() => name;
+library disposable;
 
-  DeviceChild._internal(this.name, this.device) {
-  }
-
-  void _createDeviceState() {
-  }
-
-  void _destroyDeviceState() {
-  }
-
-  dynamic toJson() {
-    return '';
-  }
-
-  void fromJson(dynamic a) {
-  }
-}
-
-
-
+part 'src/disposable/disposable.dart';

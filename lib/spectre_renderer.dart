@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,15 +16,21 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
-/** Spectre Scene Library */
-
-library spectre_scene;
+library spectre_renderer;
 
 import 'dart:html';
-import 'package:vector_math/vector_math_browser.dart';
-import 'spectre.dart';
+import 'dart:async';
+import 'package:vector_math/vector_math.dart';
+import 'package:asset_pack/asset_pack.dart';
+import 'package:spectre/spectre.dart';
+import 'package:spectre/spectre_post.dart';
 
-part 'src/spectre_scene/transform_graph.dart';
+part 'src/spectre_renderer/material.dart';
+part 'src/spectre_renderer/material_constant.dart';
+part 'src/spectre_renderer/material_texture.dart';
+part 'src/spectre_renderer/renderable.dart';
+part 'src/spectre_renderer/layer.dart';
+part 'src/spectre_renderer/renderer.dart';
+part 'src/spectre_renderer/asset_pack.dart';

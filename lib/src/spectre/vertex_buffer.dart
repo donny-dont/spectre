@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,23 +16,14 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
-/// VertexBuffer defines storage for vertex attribute elements
-/// Create using [Device.createVertexBuffer]
-/// Set using [Device.setVertexBuffers]
+part of spectre;
+
+/// Defines storage for vertex data
 class VertexBuffer extends SpectreBuffer {
-  VertexBuffer(String name, GraphicsDevice device) : super(name, device) {
-    _bindTarget = WebGLRenderingContext.ARRAY_BUFFER;
-    _bindingParam = WebGLRenderingContext.ARRAY_BUFFER_BINDING;
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  VertexBuffer(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.ARRAY_BUFFER,
+              WebGLRenderingContext.ARRAY_BUFFER_BINDING) {
   }
 }

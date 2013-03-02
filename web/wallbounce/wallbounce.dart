@@ -1,14 +1,13 @@
 import 'dart:html';
 import 'dart:math' as Math;
 import 'package:spectre/spectre.dart';
-import 'package:vector_math/vector_math_browser.dart';
+import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop.dart';
 
 final String _canvasId = '#backbuffer';
 
 GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
-ResourceManager _resourceManager;
 DebugDrawManager _debugDrawManager;
 
 GameLoop _gameLoop;
@@ -163,17 +162,11 @@ main() {
   final String baseUrl = "${window.location.href.substring(0, window.location.href.length - "engine.html".length)}web/resources";
   CanvasElement canvas = query(_canvasId);
   assert(canvas != null);
-  WebGLRenderingContext gl = canvas.getContext('experimental-webgl');
-
-  assert(gl != null);
 
   // Create a GraphicsDevice
-  _graphicsDevice = new GraphicsDevice(gl);
+  _graphicsDevice = new GraphicsDevice(canvas);
   // Get a reference to the GraphicsContext
   _graphicsContext = _graphicsDevice.context;
-  // Create a resource manager and set it's base URL
-  _resourceManager = new ResourceManager();
-  _resourceManager.setBaseURL(baseUrl);
   // Create a debug draw manager and initialize it
   _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
@@ -184,7 +177,7 @@ main() {
   _makeNormals();
 
   // Create the viewport
-  _viewport = _graphicsDevice.createViewport('view');
+  _viewport = new Viewport('view', _graphicsDevice);
   _viewport.x = 0;
   _viewport.y = 0;
   _viewport.width = canvas.width;

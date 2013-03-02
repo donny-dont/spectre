@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 class SpectreTexture extends DeviceChild {
   //static const int FormatR = WebGLRenderingContext.RED;
@@ -112,15 +110,17 @@ class SpectreTexture extends DeviceChild {
 
   SpectreTexture(String name, GraphicsDevice device, this._bindTarget,
                  this._bindingParam, this._textureTarget)
-      : super._internal(name, device);
+      : super._internal(name, device) {
+    _deviceTexture = device.gl.createTexture();
+  }
 
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_S,
-                            sampler.wrapS);
+                            sampler.addressU);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_WRAP_T,
-                            sampler.wrapT);
+                            sampler.addressV);
     device.gl.texParameteri(_textureTarget,
                             WebGLRenderingContext.TEXTURE_MIN_FILTER,
                             sampler.minFilter);
@@ -137,14 +137,16 @@ class SpectreTexture extends DeviceChild {
     device.gl.bindTexture(_bindTarget, _deviceTexture);
   }
 
-  void _createDeviceState() {
-    _deviceTexture = device.gl.createTexture();
+  void finalize() {
+    super.finalize();
+    device.gl.deleteTexture(_deviceTexture);
+    _deviceTexture = null;
   }
 
-  void _destroyDeviceState() {
-    if (_deviceTexture != null) {
-      device.gl.deleteTexture(_deviceTexture);
-    }
-    _deviceTexture = null;
+  /// Determines whether a [value] is a power of two.
+  ///
+  /// Assumes that the given value will always be positive.
+  static bool _isPowerOfTwo(int value) {
+    return (value & (value - 1)) == 0;
   }
 }

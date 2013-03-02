@@ -1,13 +1,21 @@
 library hop_runner;
 
-import 'dart:async';
 import 'dart:io';
-import 'package:bot/bot.dart';
 import 'package:bot/hop.dart';
 import 'package:bot/hop_tasks.dart';
 
 void main() {
   _assertKnownPath();
+
+  //
+  // Analyzer
+  //
+  addTask('analyze_lib', createDartAnalyzerTask(['lib/spectre.dart',
+                                                 'lib/spectre_post.dart',
+                                                 'lib/disposable.dart',
+                                                 'lib/spectre_asset_pack.dart',
+                                                 ]));
+  addTask('analyze_test', createDartAnalyzerTask(['test/test_runner.dart']));
 
   addTask('docs', getCompileDocsFunc('gh-pages', 'packages/', _getLibs));
 
@@ -23,33 +31,8 @@ void _assertKnownPath() {
 }
 
 Future<List<String>> _getLibs() {
-  final completer = new Completer<List<String>>();
-
-  final lister = new Directory('lib').list();
-  final libs = new List<String>();
-
-  lister.onFile = (String file) {
-    if(file.endsWith('.dart')) {
-      // DARTBUG: http://code.google.com/p/dart/issues/detail?id=7389
-      // still an issue with hop_tasks.
-      final forbidden = ['hop_tasks'].mappedBy((n) => '$n.dart');
-      if(forbidden.every((f) => !file.endsWith(f))) {
-        libs.add(file);
-      }
-    }
-  };
-
-  lister.onDone = (bool done) {
-    if(done) {
-      completer.complete(libs);
-    } else {
-      completer.completeError('did not finish');
-    }
-  };
-
-  lister.onError = (error) {
-    completer.completeError(error);
-  };
-
-  return completer.future;
+  return new Directory('lib').list()
+      .where((FileSystemEntity fse) => fse is File)
+      .map((File file) => file.name)
+      .toList();
 }

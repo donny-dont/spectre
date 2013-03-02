@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /// RasterizerState controls how the GPU rasterizer functions including primitive culling and width of rasterized lines
 /// Create using [Device.createRasterizerState]
@@ -148,33 +146,6 @@ class RasterizerState extends DeviceChild {
   /// The default is false.
   bool get scissorTestEnabled => _scissorTestEnabled;
   set scissorTestEnabled(bool value) { _scissorTestEnabled = value; }
-
-  //---------------------------------------------------------------------
-  // Equality
-  //---------------------------------------------------------------------
-
-  /// Compares two [RasterizerState]s for equality.
-  /*
-  bool operator== (RasterizerState other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (_cullMode != other._cullMode) {
-      return false;
-    }
-
-    if (_frontFace != other._frontFace) {
-      return false;
-    }
-
-    if ((_depthBias != other._depthBias) || (_slopeScaleDepthBias != other._slopeScaleDepthBias)) {
-      return false;
-    }
-
-    return _scissorTestEnabled == other._scissorTestEnabled;
-  }
-  */
 
   //---------------------------------------------------------------------
   // Serialization

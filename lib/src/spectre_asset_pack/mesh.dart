@@ -21,15 +21,15 @@
 
 part of spectre_asset_pack;
 
-class _AssetImporterMesh extends AssetImporter {
+class MeshImporter extends AssetImporter {
   final GraphicsDevice device;
   dynamic get fallback => null;
 
-  _AssetImporterMesh(this.device);
+  MeshImporter(this.device);
 
   SpectreMesh _processMeshes(AssetRequest request, List meshes) {
     final String name = request.name;
-    SingleArrayIndexedMesh mesh = device.createSingleArrayIndexedMesh(name);
+    SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
     var vertexArray = new Float32Array.fromList(meshes[0]['vertices']);
     var indexArray = new Uint16Array.fromList(meshes[0]['indices']);
     mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
@@ -84,6 +84,6 @@ class _AssetImporterMesh extends AssetImporter {
   }
   void delete(SpectreMesh imported) {
     print('Deleting ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }

@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,22 +16,13 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
-/// A fragment shader
-/// Create using [Device.createFragmentShader]
-/// Must be linked into a ShaderProgram before use
+part of spectre;
+
+/// FragmentShader
 class FragmentShader extends SpectreShader {
-  FragmentShader(String name, GraphicsDevice device) : super(name, device) {
-    _type = WebGLRenderingContext.FRAGMENT_SHADER;
-  }
-
-  void _createDeviceState() {
-    super._createDeviceState();
-  }
-
-  void _destroyDeviceState() {
-    super._destroyDeviceState();
+  FragmentShader(String name, GraphicsDevice device)
+      : super(name, device, WebGLRenderingContext.FRAGMENT_SHADER) {
   }
 }

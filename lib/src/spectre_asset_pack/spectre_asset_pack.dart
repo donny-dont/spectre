@@ -27,20 +27,20 @@ part of spectre_asset_pack;
  */
 void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
                                          AssetManager assetManager) {
-  assetManager.loaders['mesh'] = new AssetLoaderText();
-  assetManager.loaders['tex2d'] = new AssetLoaderImage();
+  assetManager.loaders['mesh'] = new TextLoader();
+  assetManager.loaders['tex2d'] = new ImageLoader();
   assetManager.loaders['texCube'] = new _ImagePackLoader();
-  assetManager.loaders['vertexShader'] = new AssetLoaderText();
-  assetManager.loaders['fragmentShader'] = new AssetLoaderText();
+  assetManager.loaders['vertexShader'] = new TextLoader();
+  assetManager.loaders['fragmentShader'] = new TextLoader();
   assetManager.loaders['shaderProgram'] = new _TextListLoader();
 
-  assetManager.importers['mesh'] = new _AssetImporterMesh(graphicsDevice);
-  assetManager.importers['tex2d'] = new _AssetImporterTex2D(graphicsDevice);
-  assetManager.importers['texCube'] = new _AssetImporterTexCube(graphicsDevice);
+  assetManager.importers['mesh'] = new MeshImporter(graphicsDevice);
+  assetManager.importers['tex2d'] = new Tex2DImporter(graphicsDevice);
+  assetManager.importers['texCube'] = new TexCubeImporter(graphicsDevice);
   assetManager.importers['vertexShader'] =
-      new _AssetImporterVertexShader(graphicsDevice);
+      new VertexShaderImporter(graphicsDevice);
   assetManager.importers['fragmentShader'] =
-      new _AssetImporterFragmentShader(graphicsDevice);
+      new FragmentShaderImporter(graphicsDevice);
   assetManager.importers['shaderProgram'] =
-      new _AssetImporterShaderProgram(graphicsDevice);
+      new ShaderProgramImporter(graphicsDevice);
 }

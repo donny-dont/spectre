@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 class MouseKeyboardCameraController extends CameraController {
   bool up;
@@ -53,7 +51,7 @@ class MouseKeyboardCameraController extends CameraController {
     mouseSensitivity = 360.0;
   }
 
-  void UpdateCamera(num seconds, Camera cam) {
+  void updateCamera(num seconds, Camera cam) {
     _MoveFloat(seconds, up, down, cam);
     _MoveStrafe(seconds, strafeRight, strafeLeft, cam);
     _MoveForward(seconds, forward, backward, cam);

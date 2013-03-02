@@ -1,8 +1,5 @@
-part of spectre;
-
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,8 +16,9 @@ part of spectre;
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 /// BlendState controls how output from your fragment shader is blended onto the framebuffer
 /// Create using [Device.createBlendState]
@@ -299,56 +297,6 @@ class BlendState extends DeviceChild {
   /// Whether the alpha channel is enabled for writing during color blending.
   bool get writeRenderTargetAlpha => _writeRenderTargetAlpha;
   set writeRenderTargetAlpha(bool value) { _writeRenderTargetAlpha = value; }
-
-  //---------------------------------------------------------------------
-  // Equality
-  //---------------------------------------------------------------------
-
-  /// Compares two [BlendState]s for equality.
-  /*
-  bool operator== (BlendState other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (_enabled != other._enabled) {
-      return false;
-    }
-
-    if ((_blendFactorRed   != other._blendFactorRed)   ||
-        (_blendFactorGreen != other._blendFactorGreen) ||
-        (_blendFactorBlue  != other._blendFactorBlue)  ||
-        (_blendFactorAlpha != other._blendFactorAlpha))
-    {
-      return false;
-    }
-
-    if (_alphaBlendOperation != other._alphaBlendOperation) {
-      return false;
-    }
-    if (_alphaDestinationBlend != other._alphaDestinationBlend) {
-      return false;
-    }
-    if (_alphaSourceBlend != other._alphaSourceBlend) {
-      return false;
-    }
-
-    if (_colorBlendOperation != other._colorBlendOperation) {
-      return false;
-    }
-    if (_colorDestinationBlend != other._colorDestinationBlend) {
-      return false;
-    }
-    if (_colorSourceBlend != other._colorSourceBlend) {
-      return false;
-    }
-
-    return ((_writeRenderTargetRed   == other._writeRenderTargetRed)   &&
-            (_writeRenderTargetGreen == other._writeRenderTargetGreen) &&
-            (_writeRenderTargetBlue  == other._writeRenderTargetBlue)  &&
-            (_writeRenderTargetAlpha == other._writeRenderTargetAlpha));
-  }
-  */
 
   //---------------------------------------------------------------------
   // Serialization
