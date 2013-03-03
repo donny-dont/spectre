@@ -139,6 +139,11 @@ class DdsFile {
     return (_header.surfaceDetail & DdsHeader.isVolumeTexture) == DdsHeader.isVolumeTexture;
   }
 
+  DdsHeader get header => _header;
+
+  /// Whether the DDS file has an extended header.
+  bool get hasExtendedHeader => _extendedHeader != null;
+
   //---------------------------------------------------------------------
   // Public methods
   //---------------------------------------------------------------------
