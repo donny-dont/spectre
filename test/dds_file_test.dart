@@ -25,6 +25,233 @@ import 'dart:html';
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 
+//---------------------------------------------------------------------
+// DDS Resource Formats
+//---------------------------------------------------------------------
+
+List dx9Formats = [
+  'FloatR32G32B32A32',
+//  'UintR32G32B32A32',
+//  'IntR32G32B32A32',
+//  'FloatR32G32B32',
+//  'UintR32G32B32',
+//  'IntR32G32B32',
+  'FloatR16G16B16A16',
+  'UnormR16G16B16A16',
+//  'UintR16G16B16A16',
+  'NormR16G16B16A16',
+//  'IntR16G16B16A16',
+  'FloatR32G32',
+//  'UintR32G32',
+//  'IntR32G32',
+//  'UnormR10G10B10A2',
+//  'UintR10G10B10A2',
+//  'FloatR11G11B10',
+  'UnormR8G8B8A8',
+//  'SrgbUnormR8G8B8A8',
+//  'UintR8G8B8A8',
+//  'NormR8G8B8A8',
+//  'IntR8G8B8A8',
+  'FloatR16G16',
+  'UnormR16G16',
+//  'UintR16G16',
+//  'NormR16G16',
+//  'IntR16G16',
+  'FloatR32',
+//  'UintR32',
+//  'IntR32',
+  'UnormR8G8',
+//  'UintR8G8',
+//  'NormR8G8',
+//  'IntR8G8',
+  'FloatR16',
+  'UnormR16',
+//  'UintR16',
+//  'NormR16',
+//  'IntR16',
+  'UnormR8',
+//  'UintR8',
+//  'NormR8',
+//  'IntR8',
+  'UnormA8',
+//  'SharedExpR9G9B9E5',
+  'UnormR8G8B8G8',
+  'UnormG8R8G8B8',
+  'UnormBc1',
+//  'SrgbUnormBc1',
+  'UnormBc2',
+//  'SrgbUnormBc2',
+  'UnormBc3',
+//  'SrgbUnormBc3',
+  'UnormBc4',
+  'NormBc4',
+  'UnormBc5',
+  'NormBc5',
+  'UnormB5G6R5',
+  'UnormB5G5R5A1',
+  'UnormB8G8R8A8',
+  'UnormB8G8R8X8',
+//  'XrBiasA2UnormR10G10B10',
+//  'SrgbUnormB8G8R8A8',
+//  'SrgbUnormB8G8R8X8',
+//  'Uf16Bc6h',
+//  'Sf16Bc6h',
+//  'UnormBc7',
+//  'SrgbUnormBc7'
+];
+
+List dx10Formats = [ 'IntR32G32B32A32' ];
+
+List dx10Formatss = [
+  'FloatR32G32B32A32',
+  'UintR32G32B32A32',
+  'IntR32G32B32A32',
+  'FloatR32G32B32',
+  'UintR32G32B32',
+  'IntR32G32B32',
+  'FloatR16G16B16A16',
+  'UnormR16G16B16A16',
+  'UintR16G16B16A16',
+  'NormR16G16B16A16',
+  'IntR16G16B16A16',
+  'FloatR32G32',
+  'UintR32G32',
+  'IntR32G32',
+  'UnormR10G10B10A2',
+  'UintR10G10B10A2',
+  'FloatR11G11B10',
+  'UnormR8G8B8A8',
+  'SrgbUnormR8G8B8A8',
+  'UintR8G8B8A8',
+  'NormR8G8B8A8',
+  'IntR8G8B8A8',
+  'FloatR16G16',
+  'UnormR16G16',
+  'UintR16G16',
+  'NormR16G16',
+  'IntR16G16',
+  'FloatR32',
+  'UintR32',
+  'IntR32',
+  'UnormR8G8',
+  'UintR8G8',
+  'NormR8G8',
+  'IntR8G8',
+  'FloatR16',
+  'UnormR16',
+  'UintR16',
+  'NormR16',
+  'IntR16',
+  'UnormR8',
+  'UintR8',
+  'NormR8',
+  'IntR8',
+  'UnormA8',
+  'SharedExpR9G9B9E5',
+  'UnormR8G8B8G8',
+  'UnormG8R8G8B8',
+  'UnormBc1',
+  'SrgbUnormBc1',
+  'UnormBc2',
+  'SrgbUnormBc2',
+  'UnormBc3',
+  'SrgbUnormBc3',
+  'UnormBc4',
+  'NormBc4',
+  'UnormBc5',
+  'NormBc5',
+  'UnormB5G6R5',
+  'UnormB5G5R5A1',
+  'UnormB8G8R8A8',
+  'UnormB8G8R8X8',
+  'XrBiasA2UnormR10G10B10',
+  'SrgbUnormB8G8R8A8',
+  'SrgbUnormB8G8R8X8',
+  'Uf16Bc6h',
+  'Sf16Bc6h',
+  'UnormBc7',
+  'SrgbUnormBc7'
+];
+
+//---------------------------------------------------------------------
+// DdsFile testing utility functions
+//---------------------------------------------------------------------
+
+int getDdsResourceFormat(String name) {
+  switch (name) {
+    case 'FloatR32G32B32A32'     : return DdsResourceFormat.FloatR32G32B32A32;
+    case 'UintR32G32B32A32'      : return DdsResourceFormat.UintR32G32B32A32;
+    case 'IntR32G32B32A32'       : return DdsResourceFormat.IntR32G32B32A32;
+    case 'FloatR32G32B32'        : return DdsResourceFormat.FloatR32G32B32;
+    case 'UintR32G32B32'         : return DdsResourceFormat.UintR32G32B32;
+    case 'IntR32G32B32'          : return DdsResourceFormat.IntR32G32B32;
+    case 'FloatR16G16B16A16'     : return DdsResourceFormat.FloatR16G16B16A16;
+    case 'UnormR16G16B16A16'     : return DdsResourceFormat.UnormR16G16B16A16;
+    case 'UintR16G16B16A16'      : return DdsResourceFormat.UintR16G16B16A16;
+    case 'NormR16G16B16A16'      : return DdsResourceFormat.NormR16G16B16A16;
+    case 'IntR16G16B16A16'       : return DdsResourceFormat.IntR16G16B16A16;
+    case 'FloatR32G32'           : return DdsResourceFormat.FloatR32G32;
+    case 'UintR32G32'            : return DdsResourceFormat.UintR32G32;
+    case 'IntR32G32'             : return DdsResourceFormat.IntR32G32;
+    case 'UnormR10G10B10A2'      : return DdsResourceFormat.UnormR10G10B10A2;
+    case 'UintR10G10B10A2'       : return DdsResourceFormat.UintR10G10B10A2;
+    case 'FloatR11G11B10'        : return DdsResourceFormat.FloatR11G11B10;
+    case 'UnormR8G8B8A8'         : return DdsResourceFormat.UnormR8G8B8A8;
+    case 'SrgbUnormR8G8B8A8'     : return DdsResourceFormat.SrgbUnormR8G8B8A8;
+    case 'UintR8G8B8A8'          : return DdsResourceFormat.UintR8G8B8A8;
+    case 'NormR8G8B8A8'          : return DdsResourceFormat.NormR8G8B8A8;
+    case 'IntR8G8B8A8'           : return DdsResourceFormat.IntR8G8B8A8;
+    case 'FloatR16G16'           : return DdsResourceFormat.FloatR16G16;
+    case 'UnormR16G16'           : return DdsResourceFormat.UnormR16G16;
+    case 'UintR16G16'            : return DdsResourceFormat.UintR16G16;
+    case 'NormR16G16'            : return DdsResourceFormat.NormR16G16;
+    case 'IntR16G16'             : return DdsResourceFormat.IntR16G16;
+    case 'FloatR32'              : return DdsResourceFormat.FloatR32;
+    case 'UintR32'               : return DdsResourceFormat.UintR32;
+    case 'IntR32'                : return DdsResourceFormat.IntR32;
+    case 'UnormR8G8'             : return DdsResourceFormat.UnormR8G8;
+    case 'UintR8G8'              : return DdsResourceFormat.UintR8G8;
+    case 'NormR8G8'              : return DdsResourceFormat.NormR8G8;
+    case 'IntR8G8'               : return DdsResourceFormat.IntR8G8;
+    case 'FloatR16'              : return DdsResourceFormat.FloatR16;
+    case 'UnormR16'              : return DdsResourceFormat.UnormR16;
+    case 'UintR16'               : return DdsResourceFormat.UintR16;
+    case 'NormR16'               : return DdsResourceFormat.NormR16;
+    case 'IntR16'                : return DdsResourceFormat.IntR16;
+    case 'UnormR8'               : return DdsResourceFormat.UnormR8;
+    case 'UintR8'                : return DdsResourceFormat.UintR8;
+    case 'NormR8'                : return DdsResourceFormat.NormR8;
+    case 'IntR8'                 : return DdsResourceFormat.IntR8;
+    case 'UnormA8'               : return DdsResourceFormat.UnormA8;
+    case 'SharedExpR9G9B9E5'     : return DdsResourceFormat.SharedExpR9G9B9E5;
+    case 'UnormR8G8B8G8'         : return DdsResourceFormat.UnormR8G8B8G8;
+    case 'UnormG8R8G8B8'         : return DdsResourceFormat.UnormG8R8G8B8;
+    case 'UnormBc1'              : return DdsResourceFormat.UnormBc1;
+    case 'SrgbUnormBc1'          : return DdsResourceFormat.SrgbUnormBc1;
+    case 'UnormBc2'              : return DdsResourceFormat.UnormBc2;
+    case 'SrgbUnormBc2'          : return DdsResourceFormat.SrgbUnormBc2;
+    case 'UnormBc3'              : return DdsResourceFormat.UnormBc3;
+    case 'SrgbUnormBc3'          : return DdsResourceFormat.SrgbUnormBc3;
+    case 'UnormBc4'              : return DdsResourceFormat.UnormBc4;
+    case 'NormBc4'               : return DdsResourceFormat.NormBc4;
+    case 'UnormBc5'              : return DdsResourceFormat.UnormBc5;
+    case 'NormBc5'               : return DdsResourceFormat.NormBc5;
+    case 'UnormB5G6R5'           : return DdsResourceFormat.UnormB5G6R5;
+    case 'UnormB5G5R5A1'         : return DdsResourceFormat.UnormB5G5R5A1;
+    case 'UnormB8G8R8A8'         : return DdsResourceFormat.UnormB8G8R8A8;
+    case 'UnormB8G8R8X8'         : return DdsResourceFormat.UnormB8G8R8X8;
+    case 'XrBiasA2UnormR10G10B10': return DdsResourceFormat.XrBiasA2UnormR10G10B10;
+    case 'SrgbUnormB8G8R8A8'     : return DdsResourceFormat.SrgbUnormB8G8R8A8;
+    case 'SrgbUnormB8G8R8X8'     : return DdsResourceFormat.SrgbUnormB8G8R8X8;
+    case 'Uf16Bc6h'              : return DdsResourceFormat.Uf16Bc6h;
+    case 'Sf16Bc6h'              : return DdsResourceFormat.Sf16Bc6h;
+    case 'UnormBc7'              : return DdsResourceFormat.UnormBc7;
+    case 'SrgbUnormBc7'          : return DdsResourceFormat.SrgbUnormBc7;
+  }
+
+  return DdsResourceFormat.Unknown;
+}
+
 Future<ArrayBuffer> getFile(String url) {
   Completer completer = new Completer();
 
@@ -44,113 +271,74 @@ Future<ArrayBuffer> getFile(String url) {
   return completer.future;
 }
 
-void testStandardTexture(String url, int width, int height, int mipMapCount) {
+void testStandardTexture(String url, int width, int height, int mipMapCount, int resourceFormat, bool hasExtendedHeader) {
   getFile(url).then(expectAsync1((buffer) {
     expect(buffer != null, true);
 
     DdsFile ddsFile = new DdsFile(buffer);
 
-    print(url);
-    print('Has extended header: ${ddsFile.hasExtendedHeader}');
-    print('Pitch/Linear size  : ${ddsFile.header.pitchOrLinearSize}');
-    print('');
-
     expect(ddsFile.width, width);
     expect(ddsFile.height, height);
     expect(ddsFile.depth, 1);
+    expect(ddsFile.arraySize, 1);
     expect(ddsFile.mipMapCount, mipMapCount);
     expect(ddsFile.isCubeMap, false);
     expect(ddsFile.hasAllCubeMapFaces, false);
     expect(ddsFile.isVolumeTexture, false);
+    expect(ddsFile.resourceFormat, resourceFormat);
+    expect(ddsFile.hasExtendedHeader, hasExtendedHeader);
   }));
 }
 
-void testCubeMap(String url, int width, int height, int mipMapCount) {
+void testCubeMapTexture(String url, int width, int height, int mipMapCount, int resourceFormat, bool hasExtendedHeader) {
+  getFile(url).then(expectAsync1((buffer) {
+    expect(buffer != null, true);
 
+    DdsFile ddsFile = new DdsFile(buffer);
+
+    expect(ddsFile.width, width);
+    expect(ddsFile.height, height);
+    expect(ddsFile.depth, 1);
+    //expect(ddsFile.arraySize, 6);
+    expect(ddsFile.mipMapCount, mipMapCount);
+    expect(ddsFile.isCubeMap, true);
+    expect(ddsFile.hasAllCubeMapFaces, true);
+    expect(ddsFile.isVolumeTexture, false);
+    expect(ddsFile.resourceFormat, resourceFormat);
+    expect(ddsFile.hasExtendedHeader, hasExtendedHeader);
+  }));
+}
+
+void testVolumeTexture(String url, int width, int height, int depth, int mipMapCount, int resourceFormat, bool hasExtendedHeader) {
+  getFile(url).then(expectAsync1((buffer) {
+    expect(buffer != null, true);
+
+    DdsFile ddsFile = new DdsFile(buffer);
+
+    expect(ddsFile.width, width);
+    expect(ddsFile.height, height);
+    expect(ddsFile.depth, depth);
+    expect(ddsFile.arraySize, 1);
+    expect(ddsFile.mipMapCount, mipMapCount);
+    expect(ddsFile.isCubeMap, false);
+    expect(ddsFile.hasAllCubeMapFaces, false);
+    expect(ddsFile.isVolumeTexture, true);
+    expect(ddsFile.resourceFormat, resourceFormat);
+    expect(ddsFile.hasExtendedHeader, hasExtendedHeader);
+  }));
 }
 
 void testFormats(bool dx10) {
-  List formats = [
-                  'R32G32B32A32_FLOAT',
-                  'R32G32B32A32_UINT',
-                  'R32G32B32A32_SINT',
-                  'R32G32B32_FLOAT',
-                  'R32G32B32_UINT',
-                  'R32G32B32_SINT',
-                  'R16G16B16A16_FLOAT',
-                  'R16G16B16A16_UNORM',
-                  'R16G16B16A16_UINT',
-                  'R16G16B16A16_SNORM',
-                  'R16G16B16A16_SINT',
-                  'R32G32_FLOAT',
-                  'R32G32_UINT',
-                  'R32G32_SINT',
-                  'R10G10B10A2_UNORM',
-                  'R10G10B10A2_UINT',
-                  'R11G11B10_FLOAT',
-
-                  'R8G8B8A8_UNORM',
-                  'R8G8B8A8_UNORM_SRGB',
-                  'R8G8B8A8_UINT',
-                  'R8G8B8A8_SNORM',
-                  'R8G8B8A8_SINT',
-                  'R16G16_FLOAT',
-                  'R16G16_UNORM',
-                  'R16G16_UINT',
-                  'R16G16_SNORM',
-                  'R16G16_SINT',
-
-                  'R32_FLOAT',
-                  'R32_UINT',
-                  'R32_SINT',
-                  'R8G8_UNORM',
-                  'R8G8_UINT',
-                  'R8G8_SNORM',
-                  'R8G8_SINT',
-                  'R16_FLOAT',
-                  'R16_UNORM',
-                  'R16_UINT',
-                  'R16_SNORM',
-                  'R16_SINT',
-                  'R8_UNORM',
-                  'R8_UINT',
-                  'R8_SNORM',
-                  'R8_SINT',
-                  'A8_UNORM',
-                  'R9G9B9E5_SHAREDEXP',
-                  'R8G8_B8G8_UNORM',
-                  'G8R8_G8B8_UNORM',
-                  'BC1_UNORM',
-                  'BC1_UNORM_SRGB',
-                  'BC2_UNORM',
-                  'BC2_UNORM_SRGB',
-                  'BC3_UNORM',
-                  'BC3_UNORM_SRGB',
-                  'BC4_UNORM',
-                  'BC4_SNORM',
-                  'BC5_UNORM',
-                  'BC5_SNORM',
-                  'B5G6R5_UNORM',
-                  'B5G5R5A1_UNORM',
-                  'B8G8R8A8_UNORM',
-                  'B8G8R8X8_UNORM',
-                  'R10G10B10_XR_BIAS_A2_UNORM',
-                  'B8G8R8A8_UNORM_SRGB',
-                  'B8G8R8X8_UNORM_SRGB',
-                  'BC6H_UF16',
-                  'BC6H_SF16',
-                  'BC7_UNORM',
-                  'BC7_UNORM_SRGB'
-                  ];
-
-
+  List formats;
   String testPrefix;
   String directory;
 
   if (dx10) {
+    formats = dx10Formats;
     testPrefix = 'DX 10';
     directory = 'dds/formats/dx10/';
   } else {
+    formats = dx9Formats;
     testPrefix = 'DX 9';
     directory = 'dds/formats/dx9/';
   }
@@ -161,69 +349,63 @@ void testFormats(bool dx10) {
     test('Format ${testPrefix} ${format}', () {
       String url = '${directory}lena_${format}.dds';
 
-      testStandardTexture(url, 32, 32, 1);
+      testStandardTexture(url, 32, 32, 1, getDdsResourceFormat(format), dx10);
+    });
+  }
+}
+
+void testMipMaps(int levels, bool dx10) {
+  String testPrefix;
+  String directory;
+
+  if (dx10) {
+    testPrefix = 'DX 10';
+    directory = 'dds/mipmaps/dx10/';
+  } else {
+    testPrefix = 'DX 9';
+    directory = 'dds/mipmaps/dx9/';
+  }
+
+  for (int i = 1; i <= levels; ++i) {
+    test('MipMap levels ${testPrefix} ${i}', () {
+      String url = '${directory}lena_MipMapLevels${i}.dds';
+
+      testStandardTexture(url, 32, 32, i, DdsResourceFormat.UnormBc1, dx10);
     });
   }
 }
 
 void main() {
-  testFormats(false);
+  // Test that DX9 and DX10 formats can be identified
+  //testFormats(false);
+  //testFormats(true);
+
+  // Test that mipmap levels can be identified
+  //testMipMaps(6, false);
+  //testMipMaps(6, true);
 /*
-  test('invalid file', () {
-    testStandardTexture('dds/lena.dds', 512, 512, 0);
+  // Test volume textures
+  test('Volume DX 9', () {
+    testVolumeTexture('dds/volume/dx9/lena_32x32x2.dds', 32, 32, 2, 1, DdsResourceFormat.UnormB8G8R8X8, false);
   });
 
-  // Format tests
-  test('32-bit unsigned int', () {
-    testStandardTexture('dds/lena_a8r8g8b8_dx9.dds', 512, 512, 0);
+  test('Volume DX 10', () {
+    testVolumeTexture('dds/volume/dx10/lena_32x32x2.dds', 32, 32, 2, 1, DdsResourceFormat.UnormB8G8R8X8, false);
   });
-  test('128-bit floating point A32B32G32R32', () {
-    testStandardTexture('dds/lena_float_a32b32g32r32_dx9.dds', 512, 512, 0);
+*/
+/*
+  // Test cubemaps
+  test('CubeMap DX 9', () {
+    testCubeMapTexture('dds/cubemaps/dx9/mountain_path.dds', 128, 128, 8, DdsResourceFormat.UnormBc1, false);
   });
-  test('DXT1', () {
-    testStandardTexture('dds/lena_dxt1_dx9.dds', 512, 512, 0);
+*/
+  test('CubeMap DX 10', () {
+    testCubeMapTexture('dds/cubemaps/dx10/mountain_path.dds', 128, 128, 8, DdsResourceFormat.UnormBc1, true);
   });
-
-  test('64-bit half-floating point A16B16G16R16', () {
-    testStandardTexture('dds/lena_float_a16b16g16r16_dx9.dds', 512, 512, 0);
-  });
-
+/*
   // Non power of two tests
   test('non-power of two texture', () {
     testStandardTexture('dds/lenna_npot.dds', 400, 200, 9);
   });
-
-  test('non-power of two texture', () {
-    testStandardTexture('dds/lenna_npot_no_mipmaps.dds', 400, 200, 0);
-  });
-
-  getFile('dds/lenna_npot.dds').then(expectAsync1((buffer) {
-      expect(buffer != null, true);
-      testStandardTexture(buffer, 400, 200, 9);
-    }));
-  });
-
-  test('non-power of two texture no mipmap', () {
-    getFile('dds/lenna_npot_no_mipmaps.dds').then(expectAsync1((buffer) {
-      expect(buffer != null, true);
-      testStandardTexture(buffer, 400, 200, 0);
-    }));
-  });
-
-  test('cube map', () {
-    getFile('dds/cube.dds').then(expectAsync1((buffer) {
-      expect(buffer != null, true);
-
-      DdsFile ddsFile = new DdsFile(buffer);
-
-      expect(ddsFile.width, 512);
-      expect(ddsFile.height, 512);
-      expect(ddsFile.depth, 0);
-      expect(ddsFile.mipMapCount, 10);
-      expect(ddsFile.isCubeMap, true);
-      expect(ddsFile.hasAllCubeMapFaces, true);
-      expect(ddsFile.isVolumeTexture, false);
-    }));
-  });
-  */
+*/
 }

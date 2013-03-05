@@ -46,7 +46,11 @@ class DdsFile {
   /// View over the [ArrayBuffer] for accessing the structure.
   Uint32Array _reader;
   /// The offset to the data section of the file.
-  int _dataOffset;
+  int _dataOffset = 0;
+  /// The [DdsResourceFormat] for the DDS file.
+  int _resourceFormat = DdsResourceFormat.Unknown;
+  /// The number of textures within the DDS file.
+  int _arraySize = 0;
   /// The header for the DDS file.
   DdsHeader _header;
   /// The pixel format of the texture data contained within the DDS file.
@@ -90,8 +94,6 @@ class DdsFile {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    int test = _pixelFormat.resourceFormat;
-
     // See if the extended header is present
     if (_pixelFormat.characterCode == DdsPixelFormat._dx10CharacterCode) {
       if (buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
@@ -101,8 +103,27 @@ class DdsFile {
       _extendedHeader = new DdsExtendedHeader._internal(buffer);
 
       _dataOffset = DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize;
+      _resourceFormat = _extendedHeader.resourceFormat;
+      _arraySize = _extendedHeader.arraySize;
     } else {
       _dataOffset = DdsExtendedHeader._byteOffset;
+      _resourceFormat = _pixelFormat.resourceFormat;
+
+      // Get the number of textures in the file
+      if (isCubeMap) {
+        int surfaceDetail = _header.surfaceDetail;
+
+        _arraySize  = ((surfaceDetail & DdsHeader.hasCubeMapPositiveX) == DdsHeader.hasCubeMapPositiveX) ? 1 : 0;
+        _arraySize += ((surfaceDetail & DdsHeader.hasCubeMapNegativeX) == DdsHeader.hasCubeMapNegativeX) ? 1 : 0;
+
+        _arraySize += ((surfaceDetail & DdsHeader.hasCubeMapPositiveY) == DdsHeader.hasCubeMapPositiveY) ? 1 : 0;
+        _arraySize += ((surfaceDetail & DdsHeader.hasCubeMapNegativeY) == DdsHeader.hasCubeMapNegativeY) ? 1 : 0;
+
+        _arraySize += ((surfaceDetail & DdsHeader.hasCubeMapPositiveZ) == DdsHeader.hasCubeMapPositiveZ) ? 1 : 0;
+        _arraySize += ((surfaceDetail & DdsHeader.hasCubeMapNegativeZ) == DdsHeader.hasCubeMapNegativeZ) ? 1 : 0;
+      } else {
+        _arraySize = 1;
+      }
     }
   }
 
@@ -117,12 +138,25 @@ class DdsFile {
   /// The depth of the compressed texture(s).
   int get depth => _header.depth;
   /// The number of mipmaps within the texture(s).
+  ///
+  /// The mipmap count includes the original texture. A mipmap count of
+  /// 1 means that there are no mipmaps actually present within the file.
   int get mipMapCount => _header.mipMapCount;
+  /// The [DdsResourceFormat] for the DDS file.
+  int get resourceFormat => _resourceFormat;
+  /// The number of textures within the DDS file.
+  int get arraySize => _arraySize;
+  /// The header for the DDS file.
+  DdsHeader get header => _header;
+  /// The pixel format of the texture data contained within the DDS file.
+  DdsPixelFormat get pixelFormat => _pixelFormat;
+  /// The extended header for the DDS file.
+  DdsExtendedHeader get extendedHeader => _extendedHeader;
 
   /// Whether the DDS file contains a cube map.
   bool get isCubeMap {
     if (_extendedHeader != null) {
-
+      return (_extendedHeader.flags & DdsExtendedHeader.isCubeMap) == DdsExtendedHeader.isCubeMap;
     }
 
     return (_header.surfaceDetail & DdsHeader.isCubeMap) == DdsHeader.isCubeMap;
@@ -130,16 +164,22 @@ class DdsFile {
 
   /// Whether all faces within a cube map are present.
   bool get hasAllCubeMapFaces {
+    if (_extendedHeader != null) {
+      // DX10 format always has all the cube map faces
+      return (_extendedHeader.flags & DdsExtendedHeader.isCubeMap) == DdsExtendedHeader.isCubeMap;
+    }
+
     return (_header.surfaceDetail & DdsHeader.hasAllCubeMapFaces) == DdsHeader.hasAllCubeMapFaces;
   }
 
   /// Whether the DDS file contains a volume texture.
   bool get isVolumeTexture {
+    if (_extendedHeader != null) {
+      return _extendedHeader.resourceFormat == DdsExtendedHeader.isTexture3d;
+    }
 
     return (_header.surfaceDetail & DdsHeader.isVolumeTexture) == DdsHeader.isVolumeTexture;
   }
-
-  DdsHeader get header => _header;
 
   /// Whether the DDS file has an extended header.
   bool get hasExtendedHeader => _extendedHeader != null;
@@ -150,14 +190,20 @@ class DdsFile {
 
   /// Gets the pixel data from the texture at the given [index] with the requested mipmap [level].
   ArrayBuffer getPixelData(int index, int level) {
+    if (_resourceFormat == DdsResourceFormat.Unknown) {
+      throw new ArgumentError('File contains an unknown resource format');
+    }
+
+    if (index >= _arraySize) {
+      throw new ArgumentError('File does not contain a texture at the given index');
+    }
+
+    if (level >= _header.mipMapCount) {
+      throw new ArgumentError('File does not contain a texture at the given level');
+    }
+
 
   }
-
-  //---------------------------------------------------------------------
-  // Class methods
-  //---------------------------------------------------------------------
-
-
 }
 
 /// The header for the DDS file format.
@@ -177,6 +223,15 @@ class DdsHeader {
   //---------------------------------------------------------------------
   // Member variables
   //---------------------------------------------------------------------
+
+  /// Flag within [flags] that signifies the textures have width.
+  static const int hasWidth = 0x4;
+  /// Flag within [flags] that signifies the textures have height.
+  static const int hasHeight = 0x2;
+  /// Flag within [flags] that signifies the textures have depth.
+  static const int hasDepth = 0x800000;
+  /// Flag within [flags] that signfies the textures have mipmaps.
+  static const int hasMipMaps = 0x20000;
 
   /// Flag within [surfaceDetail] that signifies a cube map is present.
   static const int isCubeMap = 0x200;
@@ -237,11 +292,23 @@ class DdsHeader {
 
     _size              = reader[0];
     _flags             = reader[1];
-    _height            = reader[2];
-    _width             = reader[3];
+    _height            = (_flags & hasHeight)  == hasHeight  ? reader[2] : 0;
+    _width             = (_flags & hasWidth)   == hasWidth   ? reader[3] : 0;
     _pitchOrLinearSize = reader[4];
-    _depth             = reader[5];
-    _mipMapCount       = reader[6];
+    _depth             = (_flags & hasDepth)   == hasDepth   ? reader[5] : 1;
+    _mipMapCount       = (_flags & hasMipMaps) == hasMipMaps ? reader[6] : 1;
+
+    // Check for a mip map count of 0
+    //
+    // Some writers, such as the DirectX Texture Tool, will write 0 for the mipmap count
+    // while others, such as texconv, will write 1 for the mipmap count.
+    //
+    // Standardize on a mipmap count of 1 meaning there are no actual mipmaps contained
+    // in the file.
+    if (_mipMapCount == 0) {
+      _mipMapCount = 1;
+    }
+
     _surfaceComplexity = reader[26];
     _surfaceDetail     = reader[27];
   }
@@ -321,6 +388,8 @@ class DdsPixelFormat {
   /// The values in [bitCount] and the RGB masks [redBitMask], [greenBitMask], [blueBitMask], and [alphaBitMask]
   /// contain valid data.
   static const int _hasRgbaValues = _hasAlphaData | _hasRgbValues;
+  /// Texture contains two channels.
+  static const int _hasTwoChannels = _hasAlphaData | _hasLuminanceValues;
 
   //---------------------------------------------------------------------
   // Character codes
@@ -336,8 +405,28 @@ class DdsPixelFormat {
   static const int _dxt4CharacterCode = 877942852;
   /// The DXT5 character code, 'DXT5'.
   static const int _dxt5CharacterCode = 894720068;
-
-
+  /// The BC4U character code, 'BC4U'.
+  static const int _bc4uCharacterCode = 1429488450;
+  /// The BC4S character code, 'BC4S'.
+  static const int _bc4sCharacterCode = 1395934018;
+  /// The ATI2 character code, 'ATI2'.
+  static const int _ati2CharacterCode = 843666497;
+  /// The BC5U character code, 'BC5U'.
+  static const int _bc5uCharacterCode = 1429553986;
+  /// The BC5S character code, 'BC5S'.
+  static const int _bc5sCharacterCode = 1395999554;
+  /// The RGBG character code, 'RGBG'.
+  static const int _rgbgCharacterCode = 1195525970;
+  /// The GRGB character code, 'GRGB'.
+  static const int _grbgCharacterCode = 1111970375;
+  /// The UYVY character code, 'UYVY'.
+  static const int _uyvyCharacterCode = 1498831189;
+  /// The YUY2 character code, 'YUY2'.
+  static const int _yuy2CharacterCode = 844715353;
+  /// 64-bit RGBA unsigned-normalized-integer character code.
+  static const int _unormR16G16B16A16CharacterCode = 36;
+  /// 64-bit RGBA signed-normalized-integer character code.
+  static const int _normR16G16B16A16CharacterCode = 110;
   /// 16-bit R floating point character code.
   static const int _floatR16CharacterCode = 111;
   /// 32-bit RG floating point character code.
@@ -350,11 +439,6 @@ class DdsPixelFormat {
   static const int _floatR32G32CharacterCode = 115;
   /// 128-bit RGBA floating point character code.
   static const int _floatR32G32B32A32CharacterCode = 116;
-
-
-
-
-
   /// The DX10 character code, 'DX10'.
   ///
   /// Means that the extended header DX10 is present.
@@ -430,18 +514,29 @@ class DdsPixelFormat {
     // writers, including Microsoft's DirectX Texture Tool, use the extended header.
     if ((_flags & _hasCharacterCode) == _hasCharacterCode) {
       switch (_characterCode) {
-        case _dxt1CharacterCode             : print('DXT1'); return 0;
-        case _dxt2CharacterCode             : print('DXT2'); return 0;
-        case _dxt3CharacterCode             : print('DXT3'); return 0;
-        case _dxt4CharacterCode             : print('DXT4'); return 0;
-        case _dxt5CharacterCode             : print('DXT5'); return 0;
-        case _floatR16CharacterCode         : print('DXGI_FORMAT_R16_FLOAT'); return 0;
-        case _floatR16G16CharacterCode      : print('DXGI_FORMAT_R16G16_FLOAT'); return 0;
-        case _floatR16G16B16A16CharacterCode: print('DXGI_FORMAT_R16G16B16A16_FLOAT'); return 0;
-        case _floatR32CharacterCode         : print('DXGI_FORMAT_R32_FLOAT'); return 0;
-        case _floatR32G32CharacterCode      : print('DXGI_FORMAT_R32G32_FLOAT'); return 0;
-        case _floatR32G32B32A32CharacterCode: print('DXGI_FORMAT_R32G32B32A32_FLOAT'); return 0;
-        case _dx10CharacterCode             : print('DX10'); return 0;
+        case _dxt1CharacterCode             : return DdsResourceFormat.UnormBc1;
+        case _dxt2CharacterCode             : return DdsResourceFormat.Unknown;
+        case _dxt3CharacterCode             : return DdsResourceFormat.UnormBc2;
+        case _dxt4CharacterCode             : return DdsResourceFormat.Unknown;
+        case _dxt5CharacterCode             : return DdsResourceFormat.UnormBc3;
+        case _bc4uCharacterCode             : return DdsResourceFormat.UnormBc4;
+        case _bc4sCharacterCode             : return DdsResourceFormat.NormBc4;
+        case _ati2CharacterCode             : return DdsResourceFormat.UnormBc4;
+        case _bc5uCharacterCode             : return DdsResourceFormat.UnormBc5;
+        case _bc5sCharacterCode             : return DdsResourceFormat.NormBc5;
+        case _rgbgCharacterCode             : return DdsResourceFormat.UnormR8G8B8G8;
+        case _grbgCharacterCode             : return DdsResourceFormat.UnormG8R8G8B8;
+        case _uyvyCharacterCode             : return DdsResourceFormat.Unknown;
+        case _yuy2CharacterCode             : return DdsResourceFormat.Unknown;
+        case _unormR16G16B16A16CharacterCode: return DdsResourceFormat.UnormR16G16B16A16;
+        case _normR16G16B16A16CharacterCode : return DdsResourceFormat.NormR16G16B16A16;
+        case _floatR16CharacterCode         : return DdsResourceFormat.FloatR16;
+        case _floatR16G16CharacterCode      : return DdsResourceFormat.FloatR16G16;
+        case _floatR16G16B16A16CharacterCode: return DdsResourceFormat.FloatR16G16B16A16;
+        case _floatR32CharacterCode         : return DdsResourceFormat.FloatR32;
+        case _floatR32G32CharacterCode      : return DdsResourceFormat.FloatR32G32;
+        case _floatR32G32B32A32CharacterCode: return DdsResourceFormat.FloatR32G32B32A32;
+        case _dx10CharacterCode             : return DdsResourceFormat.Unknown;
       }
     }
 
@@ -449,23 +544,54 @@ class DdsPixelFormat {
     if (_rgbBitCount == 32) {
       if ((_flags & _hasRgbaValues) == _hasRgbaValues) {
         if ((_redBitMask == 0x000000ff) && (_greenBitMask == 0x0000ff00) && (_blueBitMask == 0x00ff0000) && (_alphaBitMask == 0xff000000)) {
-          print('DXGI_FORMAT_R8G8B8A8_UNORM');
+          return DdsResourceFormat.UnormR8G8B8A8;
         } else if ((_redBitMask == 0x00ff0000) && (_greenBitMask == 0x0000ff00) && (_blueBitMask == 0x000000ff) && (_alphaBitMask == 0xff000000)) {
-          print('D3DFMT_A8R8G8B8');
+          return DdsResourceFormat.UnormB8G8R8A8;
+        } else if ((_redBitMask == 0x0000ffff) && (_greenBitMask == 0xffff0000)) {
+          // This is in the documentation but isn't an actual RGBA format
+          return DdsResourceFormat.UnormR16G16;
         } else if ((_redBitMask == 0x3ff00000) && (_greenBitMask == 0x000ffc00) && (_blueBitMask == 0x000003ff) && (_alphaBitMask == 0x00c00000)) {
-          print('D3DFMT_A2R10G10B10');
+          return DdsResourceFormat.UnormR10G10B10A2;
         }
       } else if ((_flags & _hasRgbValues) == _hasRgbValues) {
-
+        if ((_redBitMask == 0x0000ffff) && (_greenBitMask == 0xffff0000)) {
+          return DdsResourceFormat.UnormR16G16;
+        } else if ((_redBitMask == 0x00ff0000) && (_greenBitMask == 0x0000ff00) && (_blueBitMask == 0x000000ff)) {
+          return DdsResourceFormat.UnormB8G8R8X8;
+        }
       }
     } else if (_rgbBitCount == 16) {
-
+      if ((flags & _hasRgbaValues) == _hasRgbaValues) {
+        if ((_redBitMask == 0x7c00) && (_greenBitMask == 0x03e0) && (_blueBitMask == 0x001f) && (_alphaBitMask == 0x8000)) {
+          return DdsResourceFormat.UnormB5G5R5A1;
+        }
+      } else if ((_flags & _hasRgbValues) == _hasRgbValues) {
+        if ((_redBitMask == 0xf800) && (_greenBitMask == 0x07e0) && (_blueBitMask == 0x001f)) {
+          return DdsResourceFormat.UnormB5G6R5;
+        }
+      } else if ((_flags & _hasTwoChannels) == _hasTwoChannels) {
+        if ((_redBitMask == 0x00ff) && (_alphaBitMask == 0xff00)) {
+          return DdsResourceFormat.UnormR8G8;
+        }
+      } else if ((_flags & _hasLuminanceValues) == _hasLuminanceValues) {
+        if (_redBitMask == 0xffff) {
+          return DdsResourceFormat.UnormR16;
+        }
+      }
     } else if (_rgbBitCount == 8) {
-
+      if ((_flags & _hasLuminanceValues) == _hasLuminanceValues) {
+        if (_redBitMask == 0xff) {
+          return DdsResourceFormat.UnormR8;
+        }
+      } else if (((_flags & _hasAlphaData) == _hasAlphaData) || ((_flags & _hasAlphaDataLegacy) == _hasAlphaDataLegacy)) {
+        if (_alphaBitMask == 0xff) {
+          return DdsResourceFormat.UnormA8;
+        }
+      }
     }
 
     // Unknown format
-    return 0;
+    return DdsResourceFormat.Unknown;
   }
 }
 
@@ -485,6 +611,15 @@ class DdsExtendedHeader {
   static const int _byteOffset = DdsHeader._structSize + 4;
   /// The size of the DDS_HEADER_DX10 struct.
   static const int _structSize = 20;
+
+  /// Resource is a one dimensional texture.
+  static const int isTexture1d = 2;
+  /// Resource is a two dimensional texture.
+  static const int isTexture2d = 3;
+  /// Resource is a three dimensional texture.
+  static const int isTexture3d = 4;
+  /// Resource is a cube map
+  static const int isCubeMap = 4;
 
   //---------------------------------------------------------------------
   // Member variables
@@ -511,6 +646,8 @@ class DdsExtendedHeader {
     _dimension = reader[1];
     _flags = reader[2];
     _arraySize = reader[3];
+
+    print(reader[4]);
   }
 
   //---------------------------------------------------------------------

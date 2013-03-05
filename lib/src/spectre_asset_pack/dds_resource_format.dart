@@ -22,124 +22,247 @@ part of spectre_asset_pack;
 
 class DdsResourceFormat {
   /// An unknown format.
-  const int Unknown = 0;
+  static const int Unknown = 0;
 
 
-  //const int TypelessR32G32B32A32       = 1;
-  const int FloatR32G32B32A32 = 2;
-  const int UintR32G32B32A32           = 3;
-  const int IntR32G32B32A32            = 4;
-  //const int TypelessR32G32B32          = 5;
-  const int FloatR32G32B32             = 6;
-  const int UintR32G32B32              = 7;
-  const int IntR32G32B32               = 8;
-  //const int R16G16B16A16_TYPELESS       = 9;
-  const int FloatR16G16B16A16          = 10;
-  const int UnormR16G16B16A16          = 11;
-  const int UintR16G16B16A16           = 12;
-  const int NormR16G16B16A16           = 13;
-  const int IntR16G16B16A16            = 14;
-  //const int TypelessR32G32             = 15;
-  const int FloatR32G32                = 16;
-  const int UintR32G32                 = 17;
-  const int IntR32G32                  = 18;
-  //const int R32G8X24_TYPELESS           = 19;
-  //const int D32_FLOAT_S8X24_UINT        = 20;
-  //const int R32_FLOAT_X8X24_TYPELESS    = 21;
-  //const int X32_TYPELESS_G8X24_UINT     = 22;
-  //const int R10G10B10A2_TYPELESS        = 23;
-  const int UnormR10G10B10A2           = 24;
-  const int UintR10G10B10A2            = 25;
-  const int FloatR11G11B10             = 26;
-  //const int R8G8B8A8_TYPELESS           = 27;
-  const int UnormR8G8B8A8              = 28;
-  const int SrgbUnormR8G8B8A8          = 29;
-  const int UintR8G8B8A8               = 30;
-  const int NormR8G8B8A8               = 31;
-  const int IntR8G8B8A8                = 32;
-  //const int R16G16_TYPELESS             = 33;
-  const int FloatR16G16                = 34;
-  const int UnormR16G16                = 35;
-  const int UintR16G16                 = 36;
-  const int NormR16G16                 = 37;
-  const int IntR16G16                  = 38;
-  //const int R32_TYPELESS                = 39;
-  //const int D32_FLOAT                   = 40;
-  const int FloatR32                   = 41;
-  const int UintR32                    = 42;
-  const int IntR32                     = 43;
-  //const int R24G8_TYPELESS              = 44;
-  //const int D24_UNORM_S8_UINT           = 45;
-  //const int R24_UNORM_X8_TYPELESS       = 46;
-  //const int X24_TYPELESS_G8_UINT        = 47;
-  //const int R8G8_TYPELESS               = 48;
-  const int UnormR8G8                  = 49;
-  const int UintR8G8                   = 50;
-  const int NormR8G8                   = 51;
-  const int IntR8G8                    = 52;
-  //const int R16_TYPELESS                = 53;
-  const int FloatR16                   = 54;
-  //const int D16_UNORM                   = 55;
-  const int UnormR16                   = 56;
-  const int UintR16                    = 57;
-  const int NormR16                   = 58;
-  const int IntR16                    = 59;
-  //const int R8_TYPELESS                 = 60;
-  const int UnormR8                    = 61;
-  const int UintR8                     = 62;
-  const int NormR8                     = 63;
-  const int IntR8                      = 64;
-  const int UnormA8                    = 65;
-  //const int R1_UNORM                    = 66;
-  const int SharedExpR9G9B9E5          = 67;
-  const int UnormR8G8B8G8              = 68;
-  const int UnormG8R8G8B8              = 69;
-  //const int BC1_TYPELESS                = 70;
-  const int UnormBc1                   = 71;
-  const int SrgbUnormBc1               = 72;
-  //const int BC2_TYPELESS                = 73;
-  const int UnormBc2                   = 74;
-  const int SrgbUnormBc2               = 75;
-  //const int BC3_TYPELESS                = 76;
-  const int UnormBc3                   = 77;
-  const int SrgbUnormBc3               = 78;
-  //const int BC4_TYPELESS                = 79;
-  const int UnormBc4                   = 80;
-  const int NormBc4                   = 81;
-  //const int BC5_TYPELESS                = 82;
-  const int UnormBc5                   = 83;
-  const int NormBc5                    = 84;
-  const int UnormB5G6R5                = 85;
-  const int UnormB5G5R5A1              = 86;
-  const int UnormB8G8R8A8              = 87;
-  const int UnormB8G8R8X8              = 88;
-  const int XrBiasA2UnormR10G10B10    = 89;
-  //const int B8G8R8A8_TYPELESS           = 90;
-  const int SrgbUnormB8G8R8A8         = 91;
-  //const int B8G8R8X8_TYPELESS           = 92;
-  const int SrgbUnormB8G8R8X8         = 93;
-  //const int BC6H_TYPELESS               = 94;
-  const int Uf16Bc6h                   = 95;
-  const int Sf16Bc6h                   = 96;
-  //const int BC7_TYPELESS                = 97;
-  const int UnormBc7                   = 98;
-  const int SrgbUnormBc7              = 99;
+  //static const int TypelessR32G32B32A32       = 1;
+  static const int FloatR32G32B32A32 = 2;
+  static const int UintR32G32B32A32           = 3;
+  static const int IntR32G32B32A32            = 4;
+  //static const int TypelessR32G32B32          = 5;
+  static const int FloatR32G32B32             = 6;
+  static const int UintR32G32B32              = 7;
+  static const int IntR32G32B32               = 8;
+  //static const int R16G16B16A16_TYPELESS       = 9;
+  static const int FloatR16G16B16A16          = 10;
+  static const int UnormR16G16B16A16          = 11;
+  static const int UintR16G16B16A16           = 12;
+  static const int NormR16G16B16A16           = 13;
+  static const int IntR16G16B16A16            = 14;
+  //static const int TypelessR32G32             = 15;
+  static const int FloatR32G32                = 16;
+  static const int UintR32G32                 = 17;
+  static const int IntR32G32                  = 18;
+  //static const int R32G8X24_TYPELESS           = 19;
+  //static const int D32_FLOAT_S8X24_UINT        = 20;
+  //static const int R32_FLOAT_X8X24_TYPELESS    = 21;
+  //static const int X32_TYPELESS_G8X24_UINT     = 22;
+  //static const int R10G10B10A2_TYPELESS        = 23;
+  static const int UnormR10G10B10A2           = 24;
+  static const int UintR10G10B10A2            = 25;
+  static const int FloatR11G11B10             = 26;
+  //static const int R8G8B8A8_TYPELESS           = 27;
+  static const int UnormR8G8B8A8              = 28;
+  static const int SrgbUnormR8G8B8A8          = 29;
+  static const int UintR8G8B8A8               = 30;
+  static const int NormR8G8B8A8               = 31;
+  static const int IntR8G8B8A8                = 32;
+  //static const int R16G16_TYPELESS             = 33;
+  static const int FloatR16G16                = 34;
+  static const int UnormR16G16                = 35;
+  static const int UintR16G16                 = 36;
+  static const int NormR16G16                 = 37;
+  static const int IntR16G16                  = 38;
+  //static const int R32_TYPELESS                = 39;
+  //static const int D32_FLOAT                   = 40;
+  static const int FloatR32                   = 41;
+  static const int UintR32                    = 42;
+  static const int IntR32                     = 43;
+  //static const int R24G8_TYPELESS              = 44;
+  //static const int D24_UNORM_S8_UINT           = 45;
+  //static const int R24_UNORM_X8_TYPELESS       = 46;
+  //static const int X24_TYPELESS_G8_UINT        = 47;
+  //static const int R8G8_TYPELESS               = 48;
+  static const int UnormR8G8                  = 49;
+  static const int UintR8G8                   = 50;
+  static const int NormR8G8                   = 51;
+  static const int IntR8G8                    = 52;
+  //static const int R16_TYPELESS                = 53;
+  static const int FloatR16                   = 54;
+  //static const int D16_UNORM                   = 55;
+  static const int UnormR16                   = 56;
+  static const int UintR16                    = 57;
+  static const int NormR16                   = 58;
+  static const int IntR16                    = 59;
+  //static const int R8_TYPELESS                 = 60;
+  static const int UnormR8                    = 61;
+  static const int UintR8                     = 62;
+  static const int NormR8                     = 63;
+  static const int IntR8                      = 64;
+  static const int UnormA8                    = 65;
+  //static const int R1_UNORM                    = 66;
+  static const int SharedExpR9G9B9E5          = 67;
+  static const int UnormR8G8B8G8              = 68;
+  static const int UnormG8R8G8B8              = 69;
+  //static const int BC1_TYPELESS                = 70;
+  static const int UnormBc1                   = 71;
+  static const int SrgbUnormBc1               = 72;
+  //static const int BC2_TYPELESS                = 73;
+  static const int UnormBc2                   = 74;
+  static const int SrgbUnormBc2               = 75;
+  //static const int BC3_TYPELESS                = 76;
+  static const int UnormBc3                   = 77;
+  static const int SrgbUnormBc3               = 78;
+  //static const int BC4_TYPELESS                = 79;
+  static const int UnormBc4                   = 80;
+  static const int NormBc4                   = 81;
+  //static const int BC5_TYPELESS                = 82;
+  static const int UnormBc5                   = 83;
+  static const int NormBc5                    = 84;
+  static const int UnormB5G6R5                = 85;
+  static const int UnormB5G5R5A1              = 86;
+  static const int UnormB8G8R8A8              = 87;
+  static const int UnormB8G8R8X8              = 88;
+  static const int XrBiasA2UnormR10G10B10    = 89;
+  //static const int B8G8R8A8_TYPELESS           = 90;
+  static const int SrgbUnormB8G8R8A8         = 91;
+  //static const int B8G8R8X8_TYPELESS           = 92;
+  static const int SrgbUnormB8G8R8X8         = 93;
+  //static const int BC6H_TYPELESS               = 94;
+  static const int Uf16Bc6h                   = 95;
+  static const int Sf16Bc6h                   = 96;
+  //static const int BC7_TYPELESS                = 97;
+  static const int UnormBc7                   = 98;
+  static const int SrgbUnormBc7              = 99;
   /*
-  const int AYUV                        = 100;
-  const int Y410                        = 101;
-  const int Y416                        = 102;
-  const int NV12                        = 103;
-  const int P010                        = 104;
-  const int P016                        = 105;
-  const int 420_OPAQUE                  = 106;
-  const int YUY2                        = 107;
-  const int Y210                        = 108;
-  const int Y216                        = 109;
-  const int NV11                        = 110;
-  const int AI44                        = 111;
-  const int IA44                        = 112;
-  const int P8                          = 113;
-  const int A8P8                        = 114;
-  const int B4G4R4A4_UNORM              = 115;
+  static const int AYUV                        = 100;
+  static const int Y410                        = 101;
+  static const int Y416                        = 102;
+  static const int NV12                        = 103;
+  static const int P010                        = 104;
+  static const int P016                        = 105;
+  static const int 420_OPAQUE                  = 106;
+  static const int YUY2                        = 107;
+  static const int Y210                        = 108;
+  static const int Y216                        = 109;
+  static const int NV11                        = 110;
+  static const int AI44                        = 111;
+  static const int IA44                        = 112;
+  static const int P8                          = 113;
+  static const int A8P8                        = 114;
+  static const int B4G4R4A4_UNORM              = 115;
   */
+
+  static int getBitsPerPixel(int value) {
+    switch (value) {
+      case FloatR32G32B32A32     :
+      case UintR32G32B32A32      :
+      case IntR32G32B32A32       : return 128;
+      case FloatR32G32B32        :
+      case UintR32G32B32         :
+      case IntR32G32B32          : return 96;
+      case FloatR16G16B16A16     :
+      case UnormR16G16B16A16     :
+      case UintR16G16B16A16      :
+      case NormR16G16B16A16      :
+      case IntR16G16B16A16       :
+      case FloatR32G32           :
+      case UintR32G32            :
+      case IntR32G32             : return 64;
+      case UnormR10G10B10A2      :
+      case UintR10G10B10A2       :
+      case FloatR11G11B10        :
+      case UnormR8G8B8A8         :
+      case SrgbUnormR8G8B8A8     :
+      case UintR8G8B8A8          :
+      case NormR8G8B8A8          :
+      case IntR8G8B8A8           :
+      case FloatR16G16           :
+      case UnormR16G16           :
+      case UintR16G16            :
+      case NormR16G16            :
+      case IntR16G16             :
+      case FloatR32              :
+      case UintR32               :
+      case IntR32                : return 32;
+      case UnormR8G8             :
+      case UintR8G8              :
+      case NormR8G8              :
+      case IntR8G8               :
+      case FloatR16              :
+      case UnormR16              :
+      case UintR16               :
+      case NormR16               :
+      case IntR16                : return 16;
+      case UnormR8               :
+      case UintR8                :
+      case NormR8                :
+      case IntR8                 :
+      case UnormA8               : return 8;
+      case SharedExpR9G9B9E5     : return 32;
+      case UnormR8G8B8G8         :
+      case UnormG8R8G8B8         : return 0;
+      case UnormBc1              :
+      case SrgbUnormBc1          :
+      case UnormBc2              :
+      case SrgbUnormBc2          :
+      case UnormBc3              :
+      case SrgbUnormBc3          :
+      case UnormBc4              :
+      case NormBc4               :
+      case UnormBc5              :
+      case NormBc5               : return 0;
+      case UnormB5G6R5           :
+      case UnormB5G5R5A1         : return 16;
+      case UnormB8G8R8A8         :
+      case UnormB8G8R8X8         :
+      case XrBiasA2UnormR10G10B10: return 32;
+      case SrgbUnormB8G8R8A8     :
+      case SrgbUnormB8G8R8X8     : return 32;
+      case Uf16Bc6h              :
+      case Sf16Bc6h              :
+      case UnormBc7              :
+      case SrgbUnormBc7          : return 0;
+    }
+
+    return 0;
+  }
+
+  /// Determines whether the format is block compressed.
+  static bool isBlockCompressed(int value) {
+    switch (value) {
+      case UnormBc1    :
+      case SrgbUnormBc1:
+      case UnormBc2    :
+      case SrgbUnormBc2:
+      case UnormBc3    :
+      case SrgbUnormBc3:
+      case UnormBc4    :
+      case NormBc4     :
+      case UnormBc5    :
+      case NormBc5     :
+      case Uf16Bc6h    :
+      case Sf16Bc6h    :
+      case UnormBc7    :
+      case SrgbUnormBc7: return true;
+    }
+
+    return false;
+  }
+
+  /// Determine whether the format uses 32-bit floating point values.
+  static bool isFloatingPoint(int value) {
+    switch (value) {
+      case FloatR32G32B32A32:
+      case FloatR32G32B32   :
+      case FloatR32G32      :
+      case FloatR11G11B10   :
+      case FloatR32         : return true;
+    }
+
+    return false;
+  }
+
+  /// Determine whether the format uses 16-bit floating point values.
+  static bool isHalfFloatingPoint(int value) {
+    if (value == FloatR16G16B16A16) {
+      return true;
+    } else if (value == FloatR16G16) {
+      return true;
+    } else if (value == FloatR16) {
+      return true;
+    }
+
+    return false;
+  }
 }
