@@ -44,6 +44,5 @@ void main() {
   _renderer = new Renderer(_frontBuffer, _graphicsDevice, _assetManager);
   // Construction
   test('construction', () {
-
   });
 }

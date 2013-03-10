@@ -36,17 +36,9 @@ class Renderer {
 
   Viewport _frontBufferViewport;
   Viewport get frontBufferViewport => _frontBufferViewport;
-  LayerConfig _layerConfig;
-  LayerConfig get layerConfig => _layerConfig;
   SamplerState _npotSampler;
 
-  void _invalidateLayers() {
-    _layerConfig.layers.forEach((layer) {
-      layer.invalidate();
-    });
-  }
   void _clearTargets() {
-    _invalidateLayers();
     _colorTargets.forEach((_, t) {
       t.dispose();
     });
@@ -163,6 +155,7 @@ class Renderer {
   void _sortDrawables(List<Renderable> visibleSet, int sortMode) {
   }
 
+  /*
   void _renderPassLayer(Layer layer, List<Renderable> renderables,
                         Camera camera, Viewport viewport) {
     renderables.forEach((renderable) {
@@ -200,7 +193,7 @@ class Renderer {
       num v = layer.clearDepthValue;
       device.context.clearDepthBuffer(v);
     }
-  }
+  }*/
 
   void render(List<Renderable> renderables, Camera camera, Viewport viewport) {
     frontBufferViewport.width = frontBuffer.width;
@@ -208,6 +201,8 @@ class Renderer {
     device.context.setViewport(viewport);
     List<Renderable> visibleSet;
     visibleSet = _determineVisibleSet(renderables, camera);
+    return;
+    /*
     int numLayers = layerConfig.layers.length;
     for (int layerIndex = 0; layerIndex < numLayers; layerIndex++) {
       Layer layer = layerConfig.layers[layerIndex];
@@ -218,10 +213,10 @@ class Renderer {
         _renderFullscreenLayer(layer, renderables, camera, viewport);
       }
     }
+    */
   }
 
   Renderer(this.frontBuffer, this.device, this.assetManager) {
-    _layerConfig = new LayerConfig(this);
     SpectrePost.init(device);
     _npotSampler = new SamplerState.pointClamp('Renderer.NPOTSampler', device);
     _frontBufferViewport = new Viewport('Renderer.Viewport', device);
