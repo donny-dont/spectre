@@ -118,8 +118,13 @@ class Renderer {
     return renderTarget;
   }
 
-  void fromJson(Map config) {
+  /// Clear render targets.
+  void clear() {
     _clearTargets();
+  }
+
+  void fromJson(Map config) {
+    clear();
     List<Map> targets = config['targets'];
     targets.forEach((target) {
       if (target['type'] == 'color') {

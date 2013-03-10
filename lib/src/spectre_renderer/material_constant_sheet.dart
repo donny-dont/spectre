@@ -18,20 +18,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-library spectre_renderer;
+part of spectre_renderer;
 
-import 'dart:html';
-import 'dart:async';
-import 'package:vector_math/vector_math.dart';
-import 'package:asset_pack/asset_pack.dart';
-import 'package:spectre/spectre.dart';
-import 'package:spectre/spectre_post.dart';
+class MaterialConstantSheet {
 
-part 'src/spectre_renderer/material.dart';
-part 'src/spectre_renderer/material_constant.dart';
-part 'src/spectre_renderer/material_texture.dart';
-part 'src/spectre_renderer/material_constant_sheet.dart';
-part 'src/spectre_renderer/renderable.dart';
-part 'src/spectre_renderer/layer.dart';
-part 'src/spectre_renderer/renderer.dart';
-part 'src/spectre_renderer/asset_pack.dart';
+}
