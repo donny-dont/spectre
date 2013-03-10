@@ -29,31 +29,32 @@ class Renderer {
   final GraphicsDevice device;
   final CanvasElement frontBuffer;
   final AssetManager assetManager;
-  final Map<String, Texture2D> _colorTargets = new Map<String, Texture2D>();
-  final Map<String, RenderBuffer> _depthTargets =
+  final Map<String, Texture2D> colorBuffers = new Map<String, Texture2D>();
+  final Map<String, RenderBuffer> depthBuffers =
       new Map<String, RenderBuffer>();
-  final List<RenderTarget> _renderTargets = new List<RenderTarget>();
+  final Map<String, RenderTarget> renderTargets =
+      new Map<String, RenderTarget>();
 
   Viewport _frontBufferViewport;
   Viewport get frontBufferViewport => _frontBufferViewport;
   SamplerState _npotSampler;
 
-  void _clearTargets() {
-    _colorTargets.forEach((_, t) {
+  void _dispose() {
+    colorBuffers.forEach((_, t) {
       t.dispose();
     });
-    _colorTargets.clear();
-    _depthTargets.forEach((_, t) {
+    colorBuffers.clear();
+    depthBuffers.forEach((_, t) {
       t.dispose();
     });
-    _depthTargets.clear();
-    _renderTargets.forEach((t) {
+    depthBuffers.clear();
+    renderTargets.forEach((_, t) {
       t.dispose();
     });
-    _renderTargets.clear();
+    renderTargets.clear();
   }
 
-  void _makeColorTarget(Map target) {
+  void _makeColorBuffer(Map target) {
     String name = target['name'];
     int width = target['width'];
     int height = target['height'];
@@ -62,10 +63,10 @@ class Renderer {
     }
     Texture2D buffer = new Texture2D(name, device);
     buffer.uploadPixelArray(width, height, null);
-    _colorTargets[name] = buffer;
+    colorBuffers[name] = buffer;
   }
 
-  void _makeDepthTarget(Map target) {
+  void _makeDepthBuffer(Map target) {
     String name = target['name'];
     int width = target['width'];
     int height = target['height'];
@@ -74,7 +75,28 @@ class Renderer {
     }
     RenderBuffer buffer = new RenderBuffer(name, device);
     buffer.allocateStorage(width, height, RenderBuffer.FormatDepth);
-    _depthTargets[name] = buffer;
+    depthBuffers[name] = buffer;
+  }
+
+  void _makeRenderTarget(Map target) {
+    // TODO: Support stencil buffers.
+    var name = target['name'];
+    if (name == null) {
+      throw new ArgumentError('Render target requires a name.');
+    }
+    var colorBufferName = target['colorBuffer'];
+    var depthBufferName = target['depthBuffer'];
+    var stencilBufferName = target['stencilBuffer'];
+    var colorBuffer = colorBuffers[colorBufferName];
+    var depthBuffer = depthBuffers[depthBufferName];
+    //XXX var stencilBuffer = stencilBuffers[stencilTarget];
+    if (colorBuffer == null && depthBuffer == null) {
+      throw new ArgumentError('Render target needs a color or a depth buffer.');
+    }
+    RenderTarget renderTarget = new RenderTarget(name, device);
+    renderTarget.colorTarget = colorBuffer;
+    renderTarget.depthTarget = depthBuffer;
+    renderTargets[name]= renderTarget;
   }
 
   void _configureFrontBuffer(Map target) {
@@ -87,47 +109,33 @@ class Renderer {
     frontBuffer.height = height;
   }
 
-  RenderTarget _getRenderTarget(String colorTarget, String depthTarget,
-                                String stencilTarget) {
-    // TODO: Support stencil targets.
-    if (colorTarget == 'system') {
-      return RenderTarget.systemRenderTarget;
-    }
-    var colorBuffer = _colorTargets[colorTarget];
-    var depthBuffer = _depthTargets[depthTarget];
-    //var stencilBuffer = _stencilTargets[stencilTarget];
-    for (int i = 0; i < _renderTargets.length; i++) {
-      RenderTarget rt = _renderTargets[i];
-      if (rt.colorTarget == colorBuffer && rt.depthTarget == depthBuffer) {
-        return rt;
-      }
-    }
-    var name = '$colorTarget,$depthTarget,$stencilTarget';
-    RenderTarget renderTarget = new RenderTarget(name, device);
-    renderTarget.colorTarget = colorBuffer;
-    renderTarget.depthTarget = depthBuffer;
-    _renderTargets.add(renderTarget);
-    return renderTarget;
-  }
-
   /// Clear render targets.
   void clear() {
-    _clearTargets();
+    _dispose();
   }
 
   void fromJson(Map config) {
     clear();
+    List<Map> buffers = config['buffers'];
     List<Map> targets = config['targets'];
-    targets.forEach((target) {
-      if (target['type'] == 'color') {
-        _makeColorTarget(target);
-      } else if (target['type'] == 'depth') {
-        _makeDepthTarget(target);
-      } else {
-        assert(target['name'] == 'frontBuffer');
-        _configureFrontBuffer(target);
-      }
-    });
+    if (buffers != null) {
+      buffers.forEach((bufferDescription) {
+        if (bufferDescription['type'] == 'color') {
+          _makeColorBuffer(bufferDescription);
+        } else if (bufferDescription['type'] == 'depth') {
+          _makeDepthBuffer(bufferDescription);
+        }
+      });
+    }
+    if (targets != null) {
+      targets.forEach((target) {
+        if (target['name'] == 'frontBuffer') {
+          _configureFrontBuffer(target);
+        } else {
+          _makeRenderTarget(target);
+        }
+      });
+    }
   }
 
   dynamic toJson() {

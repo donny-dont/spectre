@@ -34,7 +34,89 @@ AssetManager _assetManager;
 CanvasElement _frontBuffer;
 
 void testFromJson() {
-  _renderer.fromJson();
+  Map renderer_config = {
+    'buffers': [
+      {
+        'name': 'depthBuffer',
+        'type': 'depth',
+        'width': 512,
+        'height': 512
+      },
+      {
+        'name': 'colorBuffer',
+        'type': 'color',
+        'width': 512,
+        'height': 512
+      },
+      {
+        'name': 'depthBuffer2',
+        'type': 'depth',
+        'width': 1024,
+        'height': 768
+      }
+    ],
+    'targets': [
+      {
+        'name': 'frontBuffer',
+        'width': 123,
+        'height': 456,
+      },
+      {
+        'name': 'backBuffer',
+        'depthBuffer': 'depthBuffer2',
+        'colorBuffer': 'colorBuffer',
+      },
+      {
+        'name': 'backBufferRenderable',
+        'depthbuffer': 'depthBuffer',
+        'colorBuffer': 'colorBuffer'
+      }
+    ]
+  };
+  _renderer.fromJson(renderer_config);
+  // Test counts.
+  expect(_renderer.colorBuffers.length, 1);
+  expect(_renderer.depthBuffers.length, 2);
+  expect(_renderer.renderTargets.length, 2);
+  // Test update of front buffer dimensions.
+  expect(_frontBuffer.clientWidth, 123);
+  expect(_frontBuffer.clientHeight, 456);
+  // Render target is _NOT_ renderable.
+  // This is because the attachments are not of the same dimensions.
+  expect(_renderer.renderTargets['backBuffer'].isRenderable, false);
+  // Render target is renderable.
+  expect(_renderer.renderTargets['backBufferRenderable'].isRenderable, true);
+  // Verify device children have been created.
+  expect(_graphicsDevice.children.where((child) {
+    return child is Texture2D && child.name == 'colorBuffer';
+  }).length, 1);
+  expect(_graphicsDevice.children.where((child) {
+    return child is RenderBuffer &&
+           (child.name == 'depthBuffer' || child.name == 'depthBuffer2');
+  }).length, 2);
+  expect(_graphicsDevice.children.where((child) {
+    return child is RenderTarget &&
+           (child.name == 'backBuffer' || child.name == 'backBufferRenderable');
+  }).length, 2);
+}
+
+void testClear() {
+  _renderer.clear();
+  expect(_renderer.colorBuffers.length, 0);
+  expect(_renderer.depthBuffers.length, 0);
+  expect(_renderer.renderTargets.length, 0);
+  // Verify device children are cleaned up.
+  expect(_graphicsDevice.children.where((child) {
+    return child is Texture2D && child.name == 'colorBuffer';
+  }).length, 0);
+  expect(_graphicsDevice.children.where((child) {
+    return child is RenderBuffer &&
+           (child.name == 'depthBuffer' || child.name == 'depthBuffer2');
+  }).length, 0);
+  expect(_graphicsDevice.children.where((child) {
+    return child is RenderTarget &&
+           (child.name == 'backBuffer' || child.name == 'backBufferRenderable');
+  }).length, 0);
 }
 
 void main() {
@@ -42,7 +124,12 @@ void main() {
   _graphicsDevice = new GraphicsDevice(_frontBuffer);
   _assetManager = new AssetManager();
   _renderer = new Renderer(_frontBuffer, _graphicsDevice, _assetManager);
-  // Construction
+  // Construction.
   test('construction', () {
+    testFromJson();
+  });
+  // Destruction, must be run immediately after testFromJson.
+  test('clear', () {
+    testClear();
   });
 }
