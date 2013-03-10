@@ -1,5 +1,6 @@
 library hop_runner;
 
+import 'dart:async';
 import 'dart:io';
 import 'package:bot/hop.dart';
 import 'package:bot/hop_tasks.dart';
@@ -17,9 +18,9 @@ void main() {
                                                  ]));
   addTask('analyze_test', createDartAnalyzerTask(['test/test_runner.dart']));
 
-  addTask('docs', getCompileDocsFunc('gh-pages', 'packages/', _getLibs));
+  addTask('docs', createDartDocTask(_getLibs));
 
-  runHopCore();
+  runHop();
 }
 
 void _assertKnownPath() {
@@ -33,6 +34,6 @@ void _assertKnownPath() {
 Future<List<String>> _getLibs() {
   return new Directory('lib').list()
       .where((FileSystemEntity fse) => fse is File)
-      .map((File file) => file.name)
+      .map((File file) => file.path)
       .toList();
 }
