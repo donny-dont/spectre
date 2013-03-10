@@ -43,8 +43,8 @@ class DdsFile {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// View over the [ArrayBuffer] for accessing the structure.
-  Uint32Array _reader;
+  /// The buffer holding the file contents.
+  ArrayBuffer _buffer;
   /// The offset to the data section of the file.
   int _dataOffset = 0;
   /// The [DdsResourceFormat] for the DDS file.
@@ -68,26 +68,28 @@ class DdsFile {
   /// construction an [ArgumentError] will be thrown if the [buffer] does not contain
   /// a valid DDS file.
   DdsFile(ArrayBuffer buffer) {
+    _buffer = buffer;
+
     // The header, including magic number, is 128 bytes of data
-    if (buffer.byteLength <= DdsExtendedHeader._byteOffset) {
+    if (_buffer.byteLength <= DdsExtendedHeader._byteOffset) {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    _reader = new Uint32Array.fromBuffer(buffer);
+    Uint32Array reader = new Uint32Array.fromBuffer(_buffer);
 
     // Check the magic number
-    if (_reader[0] != _magicNumber) {
+    if (reader[0] != _magicNumber) {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    _header = new DdsHeader._internal(buffer);
+    _header = new DdsHeader._internal(_buffer);
 
     // Check that the header size is 124 bytes
     if (_header.size != DdsHeader._structSize) {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    _pixelFormat = new DdsPixelFormat._internal(buffer);
+    _pixelFormat = new DdsPixelFormat._internal(_buffer);
 
     // Check that the pixel format size is 32 bytes
     if (_pixelFormat.size != DdsPixelFormat._structSize) {
@@ -96,7 +98,7 @@ class DdsFile {
 
     // See if the extended header is present
     if (_pixelFormat.characterCode == DdsPixelFormat._dx10CharacterCode) {
-      if (buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
+      if (_buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
         throw new ArgumentError('Invalid DDS file');
       }
 
@@ -105,6 +107,11 @@ class DdsFile {
       _dataOffset = DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize;
       _resourceFormat = _extendedHeader.resourceFormat;
       _arraySize = _extendedHeader.arraySize;
+
+      // The format can hold an array of cubemaps so increase the size
+      if (isCubeMap) {
+        _arraySize *= 6;
+      }
     } else {
       _dataOffset = DdsExtendedHeader._byteOffset;
       _resourceFormat = _pixelFormat.resourceFormat;
@@ -202,7 +209,119 @@ class DdsFile {
       throw new ArgumentError('File does not contain a texture at the given level');
     }
 
+    int offset = _getImageOffset(index) + _getMipMapLevelOffset(level);
 
+    int divisor = Math.pow(2, level);
+    int currentWidth = Math.max(1, width ~/ divisor);
+    int currentHeight = Math.max(1, height ~/ divisor);
+    int currentDepth = Math.max(1, depth ~/ divisor);
+
+    if (DdsResourceFormat.isBlockCompressed(_resourceFormat)) {
+      int blockSize = (_resourceFormat == DdsResourceFormat.UnormBc1) || (_resourceFormat == DdsResourceFormat.SrgbUnormBc1) ? 8 : 16;
+
+      return _buffer.slice(offset, offset + (currentDepth * _getCompressedSize(currentWidth, currentHeight, blockSize)));
+    } else {
+      int stride = _getStride(currentWidth, _resourceFormat);
+
+      // It's not clear what specifies whether the rows are 32-bit aligned or
+      // 8-bit aligned. It appears that MS tools are just byte aligned so the
+      // code to take this into account is turned off.
+      int padding = 0;//stride % 4;
+
+      int sliceSize = stride * currentHeight;
+
+      // Each row of the image has an expectation that it starts on a 32-bit boundary.
+      //
+      // If there is no padding the array can be sliced. Otherwise each individual
+      // row must be copied one at a time
+      if (padding == 0) {
+        return _buffer.slice(offset, offset + (currentDepth * sliceSize));
+      } else {
+        Uint8Array copyTo = new Uint8Array(currentDepth * sliceSize);
+        Uint8Array copyFrom = new Uint8Array.fromBuffer(_buffer, offset);
+        int toIndex = 0;
+        int fromIndex = 0;
+
+        // Update this code to copy more than one byte at a time if
+        // performance becomes an issue
+        for (int j = 0; j < currentDepth; ++j) {
+          for (int i = 0; i < stride; ++i) {
+            copyTo[toIndex] = copyFrom[fromIndex];
+
+            toIndex++;
+            fromIndex++;
+          }
+
+          fromIndex += padding;
+        }
+
+        return copyTo.buffer;
+      }
+    }
+  }
+
+  //---------------------------------------------------------------------
+  // Private methods
+  //---------------------------------------------------------------------
+
+  /// Get the offset to an image within the file.
+  int _getImageOffset(int index) {
+    return (index == 0) ? _dataOffset : (_getMipMapLevelOffset(mipMapCount) * index) + _dataOffset;
+  }
+
+  /// Get the offset to a mipmap level within the file.
+  int _getMipMapLevelOffset(int level) {
+    int offset = 0;
+    int currentWidth  = width;
+    int currentHeight = height;
+    int currentDepth  = depth;
+
+    for (int currentLevel = 0; currentLevel < level; ++currentLevel) {
+      int sliceSize;
+
+      if (DdsResourceFormat.isBlockCompressed(_resourceFormat)) {
+        int blockSize = (_resourceFormat == DdsResourceFormat.UnormBc1) || (_resourceFormat == DdsResourceFormat.SrgbUnormBc1) ? 8 : 16;
+
+        sliceSize = _getCompressedSize(currentWidth, currentHeight, blockSize);
+      } else {
+        int stride = _getStride(currentWidth, _resourceFormat);
+
+        // It's not clear what specifies whether the rows are 32-bit aligned or
+        // 8-bit aligned. It appears that MS tools are just byte aligned so the
+        // code to take this into account is turned off.
+        int padding = 0;//stride % 4;
+
+        sliceSize = (stride + padding) * currentHeight;
+      }
+
+      offset += sliceSize * currentDepth;
+
+      // Next mipmap level is half of the current
+      currentWidth  = Math.max(1, currentWidth  ~/ 2);
+      currentHeight = Math.max(1, currentHeight ~/ 2);
+      currentDepth  = Math.max(1, currentDepth  ~/ 2);
+    }
+
+    return offset;
+  }
+
+  /// Computes the size of a compressed texture.
+  static int _getCompressedSize(int width, int height, int blockSize) {
+    return Math.max(1, width ~/ 4) * Math.max(1, height ~/ 4) * blockSize;
+  }
+
+  /// Computes the stride of an image given its [width] and [format].
+  ///
+  /// The computed stride is not always at a 32-bit boundary. If this is the case
+  /// the image will require padding.
+  static int _getStride(int width, int format) {
+    if ((format == DdsResourceFormat.UnormR8G8B8G8) || (format == DdsResourceFormat.UnormG8R8G8B8)) {
+      return ((width + 1) >> 1) * 4;
+    } else {
+      int bitsPerPixel = DdsResourceFormat.getBitsPerPixel(format);
+
+      return ((width * bitsPerPixel) + 7) ~/ 8;
+    }
   }
 }
 
@@ -646,8 +765,6 @@ class DdsExtendedHeader {
     _dimension = reader[1];
     _flags = reader[2];
     _arraySize = reader[3];
-
-    print(reader[4]);
   }
 
   //---------------------------------------------------------------------
@@ -662,4 +779,20 @@ class DdsExtendedHeader {
   int get flags => _flags;
   /// The number of elements present in the array.
   int get arraySize => _arraySize;
+}
+
+/// The indices used when accessing a cube map.
+class DdsCubeMapFace {
+  /// Index of the positive x face.
+  const int PositiveX = 0;
+  /// Index of the negative x face.
+  const int NegativeX = 1;
+  /// Index of the positive y face.
+  const int PositiveY = 2;
+  /// Index of the negative y face.
+  const int NegativeY = 3;
+  /// Index of the positive z face.
+  const int PositiveZ = 4;
+  /// Index of the negative z face.
+  const int NegativeZ = 5;
 }

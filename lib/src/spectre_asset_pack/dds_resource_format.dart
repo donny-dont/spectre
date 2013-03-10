@@ -20,10 +20,18 @@
 
 part of spectre_asset_pack;
 
+/// Resource formats contained in DDS.
+///
+/// This mostly corresponds to the [DXGI_FORMAT](http://msdn.microsoft.com/en-us/library/windows/desktop/bb173059.aspx)
+/// but there are some additional formats added that correspond to [D3DFORMAT](http://msdn.microsoft.com/en-us/library/windows/desktop/bb172558.aspx).
+/// Formats that are not expected within a DDS file are not enumerated.
 class DdsResourceFormat {
   /// An unknown format.
   static const int Unknown = 0;
 
+  //---------------------------------------------------------------------
+  // 128-bit formats
+  //---------------------------------------------------------------------
 
   //static const int TypelessR32G32B32A32       = 1;
   static const int FloatR32G32B32A32 = 2;
@@ -33,6 +41,12 @@ class DdsResourceFormat {
   static const int FloatR32G32B32             = 6;
   static const int UintR32G32B32              = 7;
   static const int IntR32G32B32               = 8;
+
+  //---------------------------------------------------------------------
+  // 64-bit formats
+  //---------------------------------------------------------------------
+
+
   //static const int R16G16B16A16_TYPELESS       = 9;
   static const int FloatR16G16B16A16          = 10;
   static const int UnormR16G16B16A16          = 11;
@@ -48,6 +62,11 @@ class DdsResourceFormat {
   //static const int R32_FLOAT_X8X24_TYPELESS    = 21;
   //static const int X32_TYPELESS_G8X24_UINT     = 22;
   //static const int R10G10B10A2_TYPELESS        = 23;
+
+  //---------------------------------------------------------------------
+  // 32-bit formats
+  //---------------------------------------------------------------------
+
   static const int UnormR10G10B10A2           = 24;
   static const int UintR10G10B10A2            = 25;
   static const int FloatR11G11B10             = 26;
@@ -140,8 +159,12 @@ class DdsResourceFormat {
   static const int IA44                        = 112;
   static const int P8                          = 113;
   static const int A8P8                        = 114;
-  static const int B4G4R4A4_UNORM              = 115;
   */
+  //static const int B4G4R4A4_UNORM              = 115;
+
+
+
+  static const int UnormR8G8B8 = 116;
 
   static int getBitsPerPixel(int value) {
     switch (value) {
@@ -235,32 +258,6 @@ class DdsResourceFormat {
       case Sf16Bc6h    :
       case UnormBc7    :
       case SrgbUnormBc7: return true;
-    }
-
-    return false;
-  }
-
-  /// Determine whether the format uses 32-bit floating point values.
-  static bool isFloatingPoint(int value) {
-    switch (value) {
-      case FloatR32G32B32A32:
-      case FloatR32G32B32   :
-      case FloatR32G32      :
-      case FloatR11G11B10   :
-      case FloatR32         : return true;
-    }
-
-    return false;
-  }
-
-  /// Determine whether the format uses 16-bit floating point values.
-  static bool isHalfFloatingPoint(int value) {
-    if (value == FloatR16G16B16A16) {
-      return true;
-    } else if (value == FloatR16G16) {
-      return true;
-    } else if (value == FloatR16) {
-      return true;
     }
 
     return false;

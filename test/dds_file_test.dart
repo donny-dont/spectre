@@ -22,6 +22,7 @@ library dds_file_test;
 
 import 'dart:async';
 import 'dart:html';
+import 'dart:math' as Math;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 
@@ -42,7 +43,7 @@ List dx9Formats = [
   'NormR16G16B16A16',
 //  'IntR16G16B16A16',
   'FloatR32G32',
-//  'UintR32G32',
+//  'UintR32G32',=
 //  'IntR32G32',
 //  'UnormR10G10B10A2',
 //  'UintR10G10B10A2',
@@ -100,9 +101,7 @@ List dx9Formats = [
 //  'SrgbUnormBc7'
 ];
 
-List dx10Formats = [ 'IntR32G32B32A32' ];
-
-List dx10Formatss = [
+List dx10Formats = [
   'FloatR32G32B32A32',
   'UintR32G32B32A32',
   'IntR32G32B32A32',
@@ -284,9 +283,11 @@ void testStandardTexture(String url, int width, int height, int mipMapCount, int
     expect(ddsFile.mipMapCount, mipMapCount);
     expect(ddsFile.isCubeMap, false);
     expect(ddsFile.hasAllCubeMapFaces, false);
-    expect(ddsFile.isVolumeTexture, false);
+    //expect(ddsFile.isVolumeTexture, false);
     expect(ddsFile.resourceFormat, resourceFormat);
     expect(ddsFile.hasExtendedHeader, hasExtendedHeader);
+
+    ddsFile.getPixelData(0, 0);
   }));
 }
 
@@ -299,7 +300,7 @@ void testCubeMapTexture(String url, int width, int height, int mipMapCount, int 
     expect(ddsFile.width, width);
     expect(ddsFile.height, height);
     expect(ddsFile.depth, 1);
-    //expect(ddsFile.arraySize, 6);
+    expect(ddsFile.arraySize, 6);
     expect(ddsFile.mipMapCount, mipMapCount);
     expect(ddsFile.isCubeMap, true);
     expect(ddsFile.hasAllCubeMapFaces, true);
@@ -377,35 +378,317 @@ void testMipMaps(int levels, bool dx10) {
 
 void main() {
   // Test that DX9 and DX10 formats can be identified
-  //testFormats(false);
+  testFormats(false);
   //testFormats(true);
 
   // Test that mipmap levels can be identified
-  //testMipMaps(6, false);
-  //testMipMaps(6, true);
-/*
-  // Test volume textures
-  test('Volume DX 9', () {
-    testVolumeTexture('dds/volume/dx9/lena_32x32x2.dds', 32, 32, 2, 1, DdsResourceFormat.UnormB8G8R8X8, false);
-  });
+  testMipMaps(6, false);
+  testMipMaps(6, true);
 
-  test('Volume DX 10', () {
-    testVolumeTexture('dds/volume/dx10/lena_32x32x2.dds', 32, 32, 2, 1, DdsResourceFormat.UnormB8G8R8X8, false);
-  });
-*/
-/*
-  // Test cubemaps
+  // Test that cubemaps can be identified
   test('CubeMap DX 9', () {
     testCubeMapTexture('dds/cubemaps/dx9/mountain_path.dds', 128, 128, 8, DdsResourceFormat.UnormBc1, false);
   });
-*/
+
   test('CubeMap DX 10', () {
     testCubeMapTexture('dds/cubemaps/dx10/mountain_path.dds', 128, 128, 8, DdsResourceFormat.UnormBc1, true);
   });
-/*
-  // Non power of two tests
-  test('non-power of two texture', () {
-    testStandardTexture('dds/lenna_npot.dds', 400, 200, 9);
+
+  // Test that volume textures can be identified
+  test('Volume DX 9', () {
+    testVolumeTexture('dds/texture3d/dx9/lena_32x32x2.dds', 32, 32, 2, 1, DdsResourceFormat.UnormB8G8R8X8, false);
   });
-*/
+
+  // Test reading uncompressed 2D textures
+  test('Read 2D R8G8B8A data', () {
+    getFile('dds/texture2d/dx9/red_256x256_UnormR8G8B8A8.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 256);
+      expect(ddsFile.height, 256);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 1);
+      expect(ddsFile.mipMapCount, 9);
+      expect(ddsFile.isCubeMap, false);
+      expect(ddsFile.hasAllCubeMapFaces, false);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormR8G8B8A8);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 262144, 65536, 16384, 4096, 1024, 256, 64, 16, 4 ];
+      int read = 128;
+      int color = 0xff0000ff;
+      int levels = textureSize.length;
+
+      for (int i = 0; i < levels; ++i) {
+        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+
+        expect(texture.byteLength, textureSize[i]);
+
+        Uint32Array values = new Uint32Array.fromBuffer(texture);
+        int length = values.length;
+
+        for (int x = 0; x < length; ++x) {
+          expect(values[x], color);
+        }
+
+        read += texture.byteLength;
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
+
+  test('Read 2D B5G6R5 NPOT data', () {
+    getFile('dds/texture2d/dx9/red_31x31_UnormB5G6R5.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 31);
+      expect(ddsFile.height, 31);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 1);
+      expect(ddsFile.mipMapCount, 5);
+      expect(ddsFile.isCubeMap, false);
+      expect(ddsFile.hasAllCubeMapFaces, false);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormB5G6R5);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 1922, 450, 98, 18, 2 ];
+      int color = 0xf800;
+      int levels = textureSize.length;
+
+      for (int i = 0; i < levels; ++i) {
+        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+
+        expect(texture.byteLength, textureSize[i]);
+
+        Uint16Array values = new Uint16Array.fromBuffer(texture);
+        int length = values.length;
+
+        for (int x = 0; x < length; ++x) {
+          expect(values[x], color);
+        }
+      }
+    }));
+  });
+
+  // Test reading compressed 2D textures
+  test('Read 2D UnormBc1 data', () {
+    getFile('dds/texture2d/dx9/red_256x64_UnormBc1.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 256);
+      expect(ddsFile.height, 64);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 1);
+      expect(ddsFile.mipMapCount, 9);
+      expect(ddsFile.isCubeMap, false);
+      expect(ddsFile.hasAllCubeMapFaces, false);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormBc1);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 8192, 2048, 512, 128, 32, 16, 8, 8, 8 ];
+      int read = 128;
+      int levels = textureSize.length;
+
+      for (int i = 0; i < levels; ++i) {
+        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+
+        expect(texture.byteLength, textureSize[i]);
+
+        read += texture.byteLength;
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
+
+  test('Read 2D UnormBc3 data', () {
+    getFile('dds/texture2d/dx10/red_256x64_UnormBc3.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 256);
+      expect(ddsFile.height, 64);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 1);
+      expect(ddsFile.mipMapCount, 9);
+      expect(ddsFile.isCubeMap, false);
+      expect(ddsFile.hasAllCubeMapFaces, false);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormBc3);
+      expect(ddsFile.hasExtendedHeader, true);
+
+      List textureSize = [ 16384, 4096, 1024, 256, 64, 32, 16, 16, 16 ];
+      int read = 148;
+      int levels = textureSize.length;
+
+      for (int i = 0; i < levels; ++i) {
+        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+
+        expect(texture.byteLength, textureSize[i]);
+
+        read += texture.byteLength;
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
+
+  // Test reading an uncompressed cubemap texture
+  test('Read CubeMap UnormR8G8B8A8 data', () {
+    getFile('dds/cubemaps/dx9/solid_cube_256x256_UnormR8G8B8A8.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 256);
+      expect(ddsFile.height, 256);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 6);
+      expect(ddsFile.mipMapCount, 9);
+      expect(ddsFile.isCubeMap, true);
+      expect(ddsFile.hasAllCubeMapFaces, true);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormR8G8B8A8);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 262144, 65536, 16384, 4096, 1024, 256, 64, 16, 4 ];
+      List colors = [ 0xff0000ff, 0xff00ff00, 0xffff0000, 0xffff00ff, 0xffffff00, 0xffffffff ];
+      int read = 128;
+      int levels = textureSize.length;
+
+      for (int j = 0; j < 6; ++j) {
+        for (int i = 0; i < levels; ++i) {
+          ArrayBuffer texture = ddsFile.getPixelData(j, i);
+
+          expect(texture.byteLength, textureSize[i]);
+
+          Uint32Array values = new Uint32Array.fromBuffer(texture);
+          int length = values.length;
+
+          for (int x = 0; x < length; ++x) {
+            expect(values[x], colors[j]);
+          }
+
+          read += texture.byteLength;
+        }
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
+
+  // Test reading compressed cubemap textures
+  test('Read CubeMap UnormBc1 data', () {
+    getFile('dds/cubemaps/dx9/solid_cube_256x256_UnormBc1.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 256);
+      expect(ddsFile.height, 256);
+      expect(ddsFile.depth, 1);
+      expect(ddsFile.arraySize, 6);
+      expect(ddsFile.mipMapCount, 9);
+      expect(ddsFile.isCubeMap, true);
+      expect(ddsFile.hasAllCubeMapFaces, true);
+      expect(ddsFile.isVolumeTexture, false);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormBc1);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 32768, 8192, 2048, 512, 128, 32, 8, 8, 8 ];
+      int read = 128;
+      int levels = textureSize.length;
+
+      for (int j = 0; j < 6; ++j) {
+        for (int i = 0; i < levels; ++i) {
+          ArrayBuffer texture = ddsFile.getPixelData(j, i);
+
+          expect(texture.byteLength, textureSize[i]);
+
+          read += texture.byteLength;
+        }
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
+
+  // Test reading uncompressed volume textures
+  test('Read Volume R8G8B8A8 data', () {
+    getFile('dds/texture3d/dx9/solid_volume_64x64x4_UnormR8G8B8A8.dds').then(expectAsync1((buffer) {
+      expect(buffer != null, true);
+
+      DdsFile ddsFile = new DdsFile(buffer);
+
+      expect(ddsFile.width, 64);
+      expect(ddsFile.height, 64);
+      expect(ddsFile.depth, 4);
+      expect(ddsFile.arraySize, 1);
+      expect(ddsFile.mipMapCount, 7);
+      expect(ddsFile.isCubeMap, false);
+      expect(ddsFile.hasAllCubeMapFaces, false);
+      expect(ddsFile.isVolumeTexture, true);
+      expect(ddsFile.resourceFormat, DdsResourceFormat.UnormR8G8B8A8);
+      expect(ddsFile.hasExtendedHeader, false);
+
+      List textureSize = [ 65536, 8192, 1024, 256, 64, 16, 4 ];
+      List colors = [
+        [ 0xff0000ff, 0xff00ff00, 0xffff0000, 0xffff00ff ],
+        [ 0xff008080, 0xffff0080 ],
+        [ 0xff804080 ],
+        [ 0xff804080 ],
+        [ 0xff804080 ],
+        [ 0xff804080 ],
+        [ 0xff804080 ]
+      ];
+
+      int read = 128;
+      int levels = textureSize.length;
+      int width  = ddsFile.width;
+      int height = ddsFile.height;
+      int depth  = ddsFile.depth;
+
+      for (int i = 0; i < levels; ++i) {
+        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+
+        expect(texture.byteLength, textureSize[i]);
+
+        Uint32Array values = new Uint32Array.fromBuffer(texture);
+
+        int index = 0;
+
+        for (int y = 0; y < depth; ++y) {
+          int length = width * height;
+          for (int x = 0; x < length; ++x) {
+            expect(values[index++], colors[i][y]);
+          }
+        }
+
+        width  = Math.max(1, width  ~/ 2);
+        height = Math.max(1, height ~/ 2);
+        depth  = Math.max(1, depth  ~/ 2);
+
+        read += texture.byteLength;
+      }
+
+      // Verify that all bytes were read
+      expect(read, buffer.byteLength);
+    }));
+  });
 }
