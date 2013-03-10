@@ -32,58 +32,24 @@ import 'package:spectre/spectre_asset_pack.dart';
 
 List dx9Formats = [
   'FloatR32G32B32A32',
-//  'UintR32G32B32A32',
-//  'IntR32G32B32A32',
-//  'FloatR32G32B32',
-//  'UintR32G32B32',
-//  'IntR32G32B32',
   'FloatR16G16B16A16',
   'UnormR16G16B16A16',
-//  'UintR16G16B16A16',
   'NormR16G16B16A16',
-//  'IntR16G16B16A16',
   'FloatR32G32',
-//  'UintR32G32',=
-//  'IntR32G32',
-//  'UnormR10G10B10A2',
-//  'UintR10G10B10A2',
-//  'FloatR11G11B10',
   'UnormR8G8B8A8',
-//  'SrgbUnormR8G8B8A8',
-//  'UintR8G8B8A8',
-//  'NormR8G8B8A8',
-//  'IntR8G8B8A8',
   'FloatR16G16',
   'UnormR16G16',
-//  'UintR16G16',
-//  'NormR16G16',
-//  'IntR16G16',
   'FloatR32',
-//  'UintR32',
-//  'IntR32',
   'UnormR8G8',
-//  'UintR8G8',
-//  'NormR8G8',
-//  'IntR8G8',
   'FloatR16',
   'UnormR16',
-//  'UintR16',
-//  'NormR16',
-//  'IntR16',
   'UnormR8',
-//  'UintR8',
-//  'NormR8',
-//  'IntR8',
   'UnormA8',
-//  'SharedExpR9G9B9E5',
   'UnormR8G8B8G8',
   'UnormG8R8G8B8',
   'UnormBc1',
-//  'SrgbUnormBc1',
   'UnormBc2',
-//  'SrgbUnormBc2',
   'UnormBc3',
-//  'SrgbUnormBc3',
   'UnormBc4',
   'NormBc4',
   'UnormBc5',
@@ -92,13 +58,6 @@ List dx9Formats = [
   'UnormB5G5R5A1',
   'UnormB8G8R8A8',
   'UnormB8G8R8X8',
-//  'XrBiasA2UnormR10G10B10',
-//  'SrgbUnormB8G8R8A8',
-//  'SrgbUnormB8G8R8X8',
-//  'Uf16Bc6h',
-//  'Sf16Bc6h',
-//  'UnormBc7',
-//  'SrgbUnormBc7'
 ];
 
 List dx10Formats = [
@@ -379,7 +338,7 @@ void testMipMaps(int levels, bool dx10) {
 void main() {
   // Test that DX9 and DX10 formats can be identified
   testFormats(false);
-  //testFormats(true);
+  testFormats(true);
 
   // Test that mipmap levels can be identified
   testMipMaps(6, false);
