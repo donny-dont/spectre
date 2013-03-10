@@ -333,9 +333,11 @@ class Application {
             PropertyMap meshConfig = modelTextureConfig[i];
             List<Texture2D> meshTextures = new List<Texture2D>(3);
 
-            meshTextures[0] = modelPack[meshConfig.diffuse];
-            meshTextures[1] = modelPack[meshConfig.specular];
-            meshTextures[2] = modelPack[meshConfig.specular];
+            var diffuseIndex = _shaderProgram.samplers['uDiffuse'].textureUnit;
+            var specularIndex =
+                _shaderProgram.samplers['uSpecular'].textureUnit;
+            meshTextures[diffuseIndex] = modelPack[meshConfig.diffuse];
+            meshTextures[specularIndex] = modelPack[meshConfig.specular];
 
             print(meshConfig.specular);
 

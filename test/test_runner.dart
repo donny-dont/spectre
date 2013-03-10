@@ -25,6 +25,7 @@ import 'blend_operation_test.dart' as blend_operation_test;
 import 'blend_state_test.dart' as blend_state_test;
 import 'compare_function_test.dart' as compare_function_test;
 import 'cull_mode_test.dart' as cull_mode_test;
+import 'dds_file_test.dart' as dds_file_test;
 import 'depth_state_test.dart' as depth_state_test;
 import 'front_face_test.dart' as front_face_test;
 import 'graphics_context_test.dart' as graphics_context_test;
@@ -45,6 +46,7 @@ void main() {
   group('BlendState tests', blend_state_test.main);
   group('CompareFunction tests', compare_function_test.main);
   group('CullMode tests', cull_mode_test.main);
+  group('DdsFile tests', dds_file_test.main);
   group('DepthState tests', depth_state_test.main);
   group('FrontFace tests', front_face_test.main);
   group('GraphicsContext tests', graphics_context_test.main);
