@@ -29,6 +29,7 @@ class Renderer {
   final GraphicsDevice device;
   final CanvasElement frontBuffer;
   final AssetManager assetManager;
+  AssetPack _rendererPack;
   final Map<String, Texture2D> colorBuffers = new Map<String, Texture2D>();
   final Map<String, RenderBuffer> depthBuffers =
       new Map<String, RenderBuffer>();
@@ -40,6 +41,7 @@ class Renderer {
   SamplerState _npotSampler;
 
   void _dispose() {
+    _rendererPack.unload();
     colorBuffers.forEach((_, t) {
       t.dispose();
     });
@@ -64,6 +66,7 @@ class Renderer {
     Texture2D buffer = new Texture2D(name, device);
     buffer.uploadPixelArray(width, height, null);
     colorBuffers[name] = buffer;
+    _rendererPack.registerAsset(name, 'ColorBuffer', buffer);
   }
 
   void _makeDepthBuffer(Map target) {
@@ -76,6 +79,8 @@ class Renderer {
     RenderBuffer buffer = new RenderBuffer(name, device);
     buffer.allocateStorage(width, height, RenderBuffer.FormatDepth);
     depthBuffers[name] = buffer;
+    _rendererPack.registerAsset(name, 'DepthBuffer', buffer);
+
   }
 
   void _makeRenderTarget(Map target) {
@@ -97,6 +102,7 @@ class Renderer {
     renderTarget.colorTarget = colorBuffer;
     renderTarget.depthTarget = depthBuffer;
     renderTargets[name]= renderTarget;
+    _rendererPack.registerAsset(name, 'RenderTarget', renderTarget);
   }
 
   void _configureFrontBuffer(Map target) {
@@ -225,6 +231,7 @@ class Renderer {
   }
 
   Renderer(this.frontBuffer, this.device, this.assetManager) {
+    _rendererPack = assetManager.registerPack('renderer');
     SpectrePost.init(device);
     _npotSampler = new SamplerState.pointClamp('Renderer.NPOTSampler', device);
     _frontBufferViewport = new Viewport('Renderer.Viewport', device);

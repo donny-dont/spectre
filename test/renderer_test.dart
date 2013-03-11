@@ -98,6 +98,9 @@ void testFromJson() {
     return child is RenderTarget &&
            (child.name == 'backBuffer' || child.name == 'backBufferRenderable');
   }).length, 2);
+  // Test assetManager access
+  expect(_assetManager.root.renderer.depthBuffer.width, 512);
+  expect(_assetManager.root.renderer.depthBuffer.height, 512);
 }
 
 void testClear() {
@@ -117,6 +120,9 @@ void testClear() {
     return child is RenderTarget &&
            (child.name == 'backBuffer' || child.name == 'backBufferRenderable');
   }).length, 0);
+  expect(() => _assetManager.root.getAssetAtPath('renderer.depthBuffer'),
+         throws);
+  expect(() => _assetManager.root.testpack, throws);
 }
 
 void main() {

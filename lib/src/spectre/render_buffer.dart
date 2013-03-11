@@ -58,7 +58,9 @@ class RenderBuffer extends DeviceChild {
   final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
 
   int _width = 0;
+  int get width => _width;
   int _height = 0;
+  int get height => _height;
   int _format = FormatRGB;
   WebGLRenderbuffer _buffer;
 
