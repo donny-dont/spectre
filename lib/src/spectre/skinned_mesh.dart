@@ -530,7 +530,7 @@ void importAttribute(SkinnedMesh mesh, Map json) {
 
 void importAnimationFrames(Animation animation, int boneId, Map ba) {
   assert(boneId >= 0 && boneId < animation._boneData.length);
-  assert(animation._boneData[boneId] != null);
+  assert(animation._boneData[boneId] == null);
 
   List positions = ba['positions'];
   List rotations = ba['rotations'];
