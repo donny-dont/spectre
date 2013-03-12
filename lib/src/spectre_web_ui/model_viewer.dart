@@ -192,7 +192,7 @@ void main() {
   /// Camera
   Camera _camera;
   /// Camera controller
-  MouseKeyboardCameraController _cameraController;
+  FpsFlyCameraController _cameraController;
 
   /// Transformation for the mesh.
   mat4 _modelMatrix;
@@ -327,7 +327,7 @@ void main() {
 
     // Create the camera
     _camera = new Camera();
-    _cameraController = new MouseKeyboardCameraController();
+    _cameraController = new FpsFlyCameraController();
 
     // The camera is located -2.5 units along the Z axis.
     _camera.position = new vec3.raw(0.0, 0.0, -2.5);

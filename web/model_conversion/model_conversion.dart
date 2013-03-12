@@ -35,7 +35,7 @@ FileSystem _fileSystem;
 ///
 /// Using a temporary filesystem so the user doesn't have to be
 /// prompted.
-const int _maxModelSize = 2 * 1024 * 1024;
+const int _maxModelSize = 5 * 1024 * 1024;
 
 /// Convert the models.
 void _convertModel(_) {
@@ -90,6 +90,7 @@ void _startup() {
   // Request storage
   window.storageInfo.requestQuota(StorageInfo.TEMPORARY, _maxModelSize,
     (grantedBytes) {
+      print('Granted $grantedBytes bytes');
       // Request the file system
       window.requestFileSystem(StorageInfo.TEMPORARY, grantedBytes, _onFileSystemCreated, _onFileSystemError);
     },
