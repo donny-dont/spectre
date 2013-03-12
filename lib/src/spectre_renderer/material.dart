@@ -160,4 +160,33 @@ class Material {
         constant.value[3] = vp.height.toDouble();
       }
     }
+
+    dynamic toJson() {
+      Map json = new Map();
+      json['name'] = name;
+      json['depthState'] = depthState.toJson();
+      json['rasterizerState'] = rasterizerState.toJson();
+      json['blendState'] = blendState.toJson();
+      json['constants'] = {};
+      constants.forEach((k, v) {
+        json['constants'][k] = v.toJson();
+      });
+      json['textures'] = {};
+      textures.forEach((k, v) {
+        json['textures'][k] = v.toJson();
+      });
+      return json;
+    }
+
+    void fromJson(dynamic json) {
+      depthState.fromJson(json['depthState']);
+      rasterizerState.fromJson(json['rasterizerState']);
+      blendState.fromJson(json['blendState']);
+      constants.forEach((k, v) {
+        v.fromJson(json['constants'][k]);
+      });
+      textures.forEach((k, v) {
+        v.fromJson(json['textures'][k]);
+      });
+    }
 }
