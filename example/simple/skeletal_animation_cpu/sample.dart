@@ -122,11 +122,11 @@ class Application {
 
   /// The [Camera] being used to view the scene.
   Camera _camera;
-  /// The [MouseKeyboardCameraController] which allows the movement of the [Camera].
+  /// The [FpsFlyCameraController] which allows the movement of the [Camera].
   ///
-  /// A [MouseKeyboardCameraController] provides a way to move the camera in the
+  /// A [FpsFlyCameraController] provides a way to move the camera in the
   /// same way that a free-look FPS operates.
-  MouseKeyboardCameraController _cameraController;
+  FpsFlyCameraController _cameraController;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
   /// [Float32Array] storage for the Model-View matrix.
@@ -256,7 +256,7 @@ class Application {
     _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
 
     // Create the CameraController and set the velocity of the movement
-    _cameraController = new MouseKeyboardCameraController();
+    _cameraController = new FpsFlyCameraController();
     _cameraController.forwardVelocity = 250.0;
     _cameraController.strafeVelocity = 250.0;
 
@@ -499,7 +499,7 @@ class Application {
     _viewport.height = height;
 
     // Change the aspect ratio of the camera
-    _camera.aspectRatio = _viewport.aspectRation;
+    _camera.aspectRatio = _viewport.aspectRatio;
   }
 }
 

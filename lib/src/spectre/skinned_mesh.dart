@@ -399,7 +399,7 @@ class SkinnedMesh extends SpectreMesh {
   }
 
   void update(double dt) {
-    Expect.isNotNull(_currentAnimation);
+    assert(_currentAnimation != null);
     _currentTime += dt * _currentAnimation._timeScale;
     // Wrap.
     while (_currentTime >= _currentAnimation.runTime) {
@@ -444,8 +444,8 @@ class SkinnedMesh extends SpectreMesh {
       int positionIndex = boneData._findPositionIndex(_currentTime);
       int rotationIndex = boneData._findRotationIndex(_currentTime);
       int scaleIndex = boneData._findScaleIndex(_currentTime);
-      Expect.isTrue(positionIndex >= 0);
-      Expect.isTrue(rotationIndex >= 0);
+      assert(positionIndex >= 0);
+      assert(rotationIndex >= 0);
       Float32ListHelpers.rotateTranslate(nodeTransform,
                                          positions, positionIndex,
                                          rotations, rotationIndex);
@@ -529,8 +529,8 @@ void importAttribute(SkinnedMesh mesh, Map json) {
 }
 
 void importAnimationFrames(Animation animation, int boneId, Map ba) {
-  Expect.isTrue(boneId >= 0 && boneId < animation._boneData.length);
-  Expect.isNull(animation._boneData[boneId]);
+  assert(boneId >= 0 && boneId < animation._boneData.length);
+  assert(animation._boneData[boneId] == null);
 
   List positions = ba['positions'];
   List rotations = ba['rotations'];
@@ -544,12 +544,12 @@ void importAnimationFrames(Animation animation, int boneId, Map ba) {
 
 void importAnimation(SkinnedMesh mesh, Map json) {
   String name = json['name'];
-  Expect.isNotNull(name, 'animations require a name');
-  Expect.notEquals("", name, "Name cannot be empty string.");
+  assert(name != null);
+  assert(name != "");
   num ticksPerSecond = json['ticksPerSecond'];
   num duration = json['duration'];
-  Expect.isNotNull(ticksPerSecond);
-  Expect.isNotNull(duration);
+  assert(ticksPerSecond != null);
+  assert(duration != null);
   Animation animation = new Animation(name, mesh.boneParents.length);
   animation._runTime = duration.toDouble();
   animation._timeScale = ticksPerSecond.toDouble();
@@ -557,7 +557,7 @@ void importAnimation(SkinnedMesh mesh, Map json) {
   mesh._currentAnimation = mesh.animations[name];
   json['boneAnimations'].forEach((ba) {
     int id = mesh.boneNameMapping[ba['name']];
-    Expect.isNotNull(id);
+    assert(id != null);
     importAnimationFrames(animation, id, ba);
   });
 }
@@ -607,9 +607,9 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   bones.forEach((b) {
     String name = b['name'];
     List<double> transform = b['transform'];
-    Expect.equals(16, transform.length);
+    assert(16 == transform.length);
     List<double> offsetTransform = b['offsetTransform'];
-    Expect.equals(16, offsetTransform.length);
+    assert(16 == offsetTransform.length);
     List<String> children = b['children'];
     numChildren += children.length + 1;
     int id = mesh.boneOffsetTransforms.length;
@@ -640,13 +640,13 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     mesh.boneChildrenOffsets[boneId] = boneChildrenIdCursor;
     children.forEach((c) {
       int childId = mesh.boneNameMapping[c];
-      Expect.isNotNull(childId);
+      assert(childId != null);
       mesh.boneChildrenIds[boneChildrenIdCursor++] = childId;
       mesh.boneParents[childId] = boneId;
     });
     mesh.boneChildrenIds[boneChildrenIdCursor++] = -1; // sentinal
   });
-  Expect.equals(numChildren, boneChildrenIdCursor);
+  assert(numChildren == boneChildrenIdCursor);
   Map<int, SkinnedVertex> skinnedVertices = new Map<int, SkinnedVertex>();
   bones.forEach((b) {
     final String boneName = b['name'];
@@ -656,9 +656,9 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
       print('no weight data for bone ${boneName}');
       return;
     }
-    Expect.equals(vertices.length, weights.length);
+    assert(vertices.length == weights.length);
     final int boneId = mesh.boneNameMapping[boneName];
-    Expect.isNotNull(boneId);
+    assert(boneId != null);
     for (int i = 0; i < vertices.length; i++) {
       final int vertexId = vertices[i].toInt();
       final double vertexWeight = weights[i].toDouble();
@@ -701,8 +701,8 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
       weights.add(0.0);
       outputIndex++;
     });
-    Expect.equals(outputIndex, mesh.vertexSkinningOffsets.length);
-    Expect.equals(boneId.length, weights.length);
+    assert(outputIndex == mesh.vertexSkinningOffsets.length);
+    assert(boneId.length == weights.length);
     mesh.boneData = new Int16List(boneId.length);
     mesh.weightData = new Float32List(boneId.length);
     for (int i = 0; i < boneId.length; i++) {
@@ -724,12 +724,12 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     while (mesh.boneChildrenIds[offset] != -1) {
       int childId = mesh.boneChildrenIds[offset];
       // Verify parents
-      Expect.equals(mesh.boneParents[childId], boneId);
+      assert(mesh.boneParents[childId] == boneId);
       childCount++;
       offset++;
     }
     // Verify children count.
-    Expect.equals(children.length, childCount);
+    assert(children.length == childCount);
   });
   // bone hierarchy ends.
   // animation begins:

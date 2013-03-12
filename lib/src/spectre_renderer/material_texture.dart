@@ -68,15 +68,16 @@ class MaterialTexture {
   }
 
   /** Returns a JSON map describing this texture */
-  Map toJson() {
+  dynamic toJson() {
     Map json = new Map();
     json['name'] = name;
-    json['textureUnit'] = textureUnit;
     json['_texturePath'] = texturePath;
+    json['sampler'] = sampler.toJson();
     return json;
   }
 
   void fromJson(dynamic json) {
     texturePath = json['texturePath'];
+    sampler.fromJson(json['sampler']);
   }
 }

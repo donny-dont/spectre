@@ -118,7 +118,7 @@ class Viewport extends DeviceChild {
   }
 
   /// The aspect ratio used by the viewport.
-  double get aspectRation => width / height;
+  double get aspectRatio => width / height;
 
   /// The maximum depth of the viewport.
   /// Throws [ArgumentError] if [value] is not in the range [0, 1].

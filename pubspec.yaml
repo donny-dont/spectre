@@ -5,16 +5,15 @@ description: Graphics Library
 homepage: https://github.com/johnmccutchan/spectre
 documentation: http://johnmccutchan.github.com/spectre/
 dependencies:
-  asset_pack:
-    git: https://github.com/johnmccutchan/asset_pack.git
   unittest: any
-  bot: '>=0.13.0'
-  web_ui: any
-  property_map:
-    git: https://github.com/sethillgard/property_map.git
-  vector_math:
-    git: https://github.com/johnmccutchan/DartVectorMath.git
   marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
+  vector_math:
+    git: https://github.com/johnmccutchan/DartVectorMath.git
   game_loop:
     git: https://github.com/johnmccutchan/game_loop.git
+  asset_pack:
+    git: https://github.com/johnmccutchan/asset_pack.git
+  property_map:
+    git: https://github.com/sethillgard/property_map.git
+  bot: ">=0.15.0"

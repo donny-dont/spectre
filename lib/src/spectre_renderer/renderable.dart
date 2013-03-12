@@ -26,8 +26,8 @@ part of spectre_renderer;
 class Renderable {
   final Renderer renderer;
   final String name;
-  final Map<String, String> _materialPaths;
-  final Map<String, Material> materials;
+  Map<String, String> _materialPaths;
+  Map<String, Material> materials;
   mat4 T = new mat4.identity();
 
   /// Path to mesh asset.
@@ -49,7 +49,7 @@ class Renderable {
   InputLayout _inputLayout;
   // Bounding Box.
 
-  Renderable(this.renderer, this.name, this.meshPath, this.materialPath) {
+  Renderable(this.renderer, this.name, this.meshPath, this._materialPaths) {
     _inputLayout = new InputLayout(name, renderer.device);
     _link();
   }

@@ -48,12 +48,6 @@ class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat4 =
                     const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
 
-  // Dump all children.
-  void dumpChildren() {
-    _children.forEach((child) {
-      print('${child.name} ${child.runtimeType}');
-    });
-  }
 
   GraphicsContext _context;
   GraphicsContext get context => _context;
@@ -64,20 +58,19 @@ class GraphicsDevice {
   WebGLRenderingContext _gl;
   WebGLRenderingContext get gl => _gl;
 
-  final Set<DeviceChild> _children = new Set<DeviceChild>();
-
+  final Set<DeviceChild> children = new Set<DeviceChild>();
   void _addChild(DeviceChild child) {
-    if (_children.contains(child)) {
+    if (children.contains(child)) {
       throw new StateError('$child is already registered.');
     }
-    _children.add(child);
+    children.add(child);
   }
 
   void _removeChild(DeviceChild child) {
-    if (_children.contains(child) == false) {
+    if (children.contains(child) == false) {
       throw new StateError('$child is not registered');
     }
-    _children.remove(child);
+    children.remove(child);
   }
 
   void _drawSquare(CanvasRenderingContext2D context2d, int x, int y, int w, int h) {
