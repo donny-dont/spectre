@@ -85,27 +85,12 @@ class MaterialConstant {
   /** Returns a JSON map describing this constant */
   Map toJson() {
     Map json = new Map();
+    json['name'] = name;
     json['type'] = type;
     json['value'] = new List();
     for (int i = 0; i < _value.length; i++) {
       json['value'].add(_value[i]);
     }
     return json;
-  }
-
-  /** Equality check */
-  bool equals(MaterialConstant other) {
-    if (type != other.type) {
-      return false;
-    }
-    if (name != other.name) {
-      return false;
-    }
-    for (int i = 0; i < _value.length; i++) {
-      if (_value[i] != value[i]) {
-        return false;
-      }
-    }
-    return true;
   }
 }

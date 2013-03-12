@@ -30,7 +30,6 @@ import 'package:spectre/spectre_post.dart';
 part 'src/spectre_renderer/material.dart';
 part 'src/spectre_renderer/material_constant.dart';
 part 'src/spectre_renderer/material_texture.dart';
-part 'src/spectre_renderer/material_constant_sheet.dart';
 part 'src/spectre_renderer/renderable.dart';
 part 'src/spectre_renderer/layer.dart';
 part 'src/spectre_renderer/renderer.dart';

@@ -138,4 +138,12 @@ void main() {
   test('clear', () {
     testClear();
   });
+// Construction.
+  test('construction', () {
+    testFromJson();
+  });
+  // Destruction, must be run immediately after testFromJson.
+  test('clear', () {
+    testClear();
+  });
 }
