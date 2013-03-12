@@ -19,6 +19,7 @@
 */
 
 import 'dart:html';
+import 'dart:async';
 import 'package:web_ui/web_ui.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
@@ -55,8 +56,8 @@ class ModelViewerComponent extends WebComponent {
 precision highp float;
 
 // Vertex attributes
-attribute vec3 vPosition;
-attribute vec3 vNormal;
+attribute vec3 POSITION;
+attribute vec3 NORMAL;
 
 // Uniform variables
 uniform float uTime;
@@ -72,9 +73,9 @@ varying vec3 position;
 varying vec3 normal;
 
 void main() {
-  vec4 vPosition4 = vec4(vPosition, 1.0);
+  vec4 vPosition4 = vec4(POSITION, 1.0);
   position = vec3(uModelViewMatrix * vPosition4);
-  normal = normalize(mat3(uNormalMatrix) * vNormal);
+  normal = normalize(mat3(uNormalMatrix) * NORMAL);
   gl_Position = uModelViewProjectionMatrix * vPosition4;
 }
 ''';
@@ -153,7 +154,7 @@ void main() {
   /// Spectre graphics device.
   GraphicsDevice _graphicsDevice;
   /// Immediate rendering context.
-  GraphicsContext _context;
+  GraphicsContext _graphicsContext;
   /// [Viewport] for the window.
   Viewport _viewport;
   /// The [BlendState] to use when rendering the model.
@@ -172,6 +173,8 @@ void main() {
   InputLayout _inputLayout;
   /// The model to draw.
   SpectreMesh _model;
+  /// Whether the model is a skinned mesh or indexed mesh.
+  bool _isSkinnedMesh;
 
   /// Resource handler for the game.
   ///
@@ -179,7 +182,8 @@ void main() {
   /// go through the resource handler. This ensures that resources are not
   /// loaded redundantly.
   AssetManager _assetManager;
-  int _meshCount = 0;
+
+  String _modelAssetName = 'model';
 
   //---------------------------------------------------------------------
   // Transform variables
@@ -282,13 +286,13 @@ void main() {
     // Get the canvas
     _canvas = query('canvas');
 
+    // Create the Spectre device
+    _graphicsDevice = new GraphicsDevice(_canvas);
+    _graphicsContext = _graphicsDevice.context;
+
     // Create the asset manager
     _assetManager = new AssetManager();
     registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
-
-    // Create the Spectre device
-    _graphicsDevice = new GraphicsDevice(_canvas);
-    _context = _graphicsDevice.context;
 
     // Create the Spectre state information
     // Use the defaults in the pipeline
@@ -314,6 +318,7 @@ void main() {
 
     // Create the model
     _model = new SingleArrayIndexedMesh('Mesh', _graphicsDevice);
+    _isSkinnedMesh = false;
 
     // Create the input layout
     _inputLayout = new InputLayout('InputLayout', _graphicsDevice);
@@ -391,87 +396,66 @@ void main() {
   /// Should be called after the [update] method.
   void draw() {
     // Clear the buffers
-    _context.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
-    _context.clearDepthBuffer(1.0);
-    _context.reset();
+    _graphicsContext.clearColorBuffer(0.0, 0.0, 0.0, 1.0);
+    _graphicsContext.clearDepthBuffer(1.0);
+    _graphicsContext.reset();
 
     // Set the viewport
-    _context.setViewport(_viewport);
+    _graphicsContext.setViewport(_viewport);
 
     // Set associated state
-    _context.setBlendState(_blendState);
-    _context.setRasterizerState(_rasterizerState);
-    _context.setDepthState(_depthState);
+    _graphicsContext.setBlendState(_blendState);
+    _graphicsContext.setRasterizerState(_rasterizerState);
+    _graphicsContext.setDepthState(_depthState);
 
     // Set the shader program
-    _context.setShaderProgram(_shaderProgram);
+    _graphicsContext.setShaderProgram(_shaderProgram);
 
     // Set the uniforms
-    _context.setConstant('uTime', _lastFrameTime);
-    _context.setConstant('uModelMatrix', _modelMatrixArray);
-    _context.setConstant('uModelViewMatrix', _modelViewMatrixArray);
-    _context.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
-    _context.setConstant('uProjectionMatrix', _projectionMatrixArray);
-    _context.setConstant('uNormalMatrix', _normalMatrixArray);
+    _graphicsContext.setConstant('uTime', _lastFrameTime);
+    _graphicsContext.setConstant('uModelMatrix', _modelMatrixArray);
+    _graphicsContext.setConstant('uModelViewMatrix', _modelViewMatrixArray);
+    _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
+    _graphicsContext.setConstant('uProjectionMatrix', _projectionMatrixArray);
+    _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
+
+    // Set the input layout
+    _graphicsContext.setInputLayout(_inputLayout);
 
     // Draw the mesh
-    _context.setInputLayout(_inputLayout);
-    _context.setIndexedMesh(_model);
-    _context.drawIndexedMesh(_model);
+    if (_isSkinnedMesh) {
+
+    } else {
+      SingleArrayIndexedMesh model = _model as SingleArrayIndexedMesh;
+
+      _graphicsContext.setIndexedMesh(model);
+      _graphicsContext.drawIndexedMesh(model);
+    }
   }
 
   /// Loads the model at the specified [url].
   void loadModelFromUrl(String url) {
-    /*
-    _assetManager.register
-    ResourceBase meshResource = _resourceManager.registerResource(url);
-    //Asset asset = _assetManager.registerAssetAtPath();
+    if (_assetManager.root[_modelAssetName] != null) {
+      _assetManager.root.deregisterAsset(_modelAssetName);
+    }
 
+    Future<Asset> assetRequest = _assetManager.loadAndRegisterAsset(_modelAssetName, url, 'mesh', {}, {});
 
-    _resourceManager.addEventCallback(meshResource, ResourceEvents.TypeUpdate, (type, resource) {
-      MeshResource mesh = resource;
-
-      // Update the layout
-      Map layout = mesh.meshData['meshes'][0]['attributes'];
-
-      layout.forEach((key, value) {
-        String attributeName;
-
-        // Convert to the proper attribute names
-        switch (key) {
-          case 'POSITION' : attributeName = 'vPosition' ; break;
-          case 'NORMAL'   : attributeName = 'vNormal'   ; break;
-          case 'BITANGENT': attributeName = 'vBitangent'; break;
-          case 'TANGENT'  : attributeName = 'vTangent'  ; break;
-          case 'TEXCOORD0': attributeName = 'vTexCoord0'; break;
-          default: throw new FallThroughError();
-        }
-
-        // Create the associated MeshAttribute
-        SpectreMeshAttribute attribute =
-          new SpectreMeshAttribute(
-            attributeName,
-            value['type'],
-            value['numElements'],
-            value['offset'],
-            value['stride'],
-            value['normalized']
-          );
-
-        _model.attributes[attributeName] = attribute;
-      });
+    assetRequest.then((asset) {
+      if (asset == null) {
+        print('No model');
+        return;
+      }
 
       // Update the model
-      _model.vertexArray.uploadData(mesh.vertexArray, SpectreBuffer.UsageStatic);
-      _model.indexArray.uploadData(mesh.indexArray, SpectreBuffer.UsageStatic);
-      _model.count = mesh.numIndices;
+      _model = asset.imported;
+
+      // Get whether this is skinned or indexed
+      _isSkinnedMesh = _model is SkinnedMesh;
 
       // Reset the layout
       _inputLayout.mesh = _model;
     });
-
-    _resourceManager.loadResource(meshResource);
-    */
   }
 
   //---------------------------------------------------------------------

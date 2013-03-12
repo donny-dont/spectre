@@ -27,7 +27,8 @@ ModelViewerComponent _modelViewerComponent;
 /// URL to the conversion API.
 ///
 /// Currently using a server on Heroku.
-const String _convertUrl = 'http://evening-hamlet-7692.herokuapp.com/api/convert';
+//const String _convertUrl = 'http://evening-hamlet-7692.herokuapp.com/api/convert';
+const String _convertUrl = 'http://127.0.0.1:3000/api/convert';
 /// The [FileSystem] to write to.
 FileSystem _fileSystem;
 /// The largest model size to expect.
