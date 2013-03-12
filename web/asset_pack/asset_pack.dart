@@ -17,7 +17,7 @@ AssetManager _assetManager;
 
 Viewport _viewport;
 final Camera camera = new Camera();
-final cameraController = new MouseKeyboardCameraController();
+final cameraController = new FpsFlyCameraController();
 double _lastTime;
 bool _circleDrawn = false;
 

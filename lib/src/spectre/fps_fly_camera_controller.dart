@@ -20,7 +20,7 @@
 
 part of spectre;
 
-class MouseKeyboardCameraController extends CameraController {
+class FpsFlyCameraController extends CameraController {
   bool up;
   bool down;
   bool strafeLeft;
@@ -36,7 +36,7 @@ class MouseKeyboardCameraController extends CameraController {
   int accumDX;
   int accumDY;
 
-  MouseKeyboardCameraController() {
+  FpsFlyCameraController() {
     floatVelocity = 5.0;
     strafeVelocity = 5.0;
     forwardVelocity = 5.0;
@@ -111,7 +111,6 @@ class MouseKeyboardCameraController extends CameraController {
     scale = scale * dt * forwardVelocity;
 
     vec3 frontDirection = cam.frontDirection;
-    //print('$frontDirection');
     frontDirection.normalize();
     frontDirection.scale(scale);
     cam.focusPosition.add(frontDirection);
@@ -132,15 +131,15 @@ class MouseKeyboardCameraController extends CameraController {
 
     final num f_dot_up = frontDirection.dot(upDirection);
     final num pitchAngle = acos(f_dot_up);
-    final num pitchDegrees = degrees(pitchAngle);
-
     final num minPitchAngle = 0.785398163;
     final num maxPitchAngle = 2.35619449;
+    final num pitchDegrees = degrees(pitchAngle);
     final num minPitchDegrees = degrees(minPitchAngle);
     final num maxPitchDegrees = degrees(maxPitchAngle);
-
-    _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
-
+    if (pitchAngle+mousePitchDelta <= maxPitchAngle &&
+        pitchAngle+mousePitchDelta >= minPitchAngle) {
+      _RotateEyeAndLook(mousePitchDelta, strafeDirection, cam);
+    }
     _RotateEyeAndLook(mouseYawDelta, upDirection, cam);
   }
 
