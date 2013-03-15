@@ -36,3 +36,5 @@ part 'src/spectre_asset_pack/mesh.dart';
 part 'src/spectre_asset_pack/shader.dart';
 part 'src/spectre_asset_pack/spectre_asset_pack.dart';
 part 'src/spectre_asset_pack/texture.dart';
+part 'src/spectre_asset_pack/importers/texture_importer.dart';
+part 'src/spectre_asset_pack/loaders/texture_loader.dart';

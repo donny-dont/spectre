@@ -33,6 +33,7 @@ void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
   assetManager.loaders['vertexShader'] = new TextLoader();
   assetManager.loaders['fragmentShader'] = new TextLoader();
   assetManager.loaders['shaderProgram'] = new _TextListLoader();
+  assetManager.loaders['compressedTexture2D'] = new TextureLoader();
 
   assetManager.importers['mesh'] = new MeshImporter(graphicsDevice);
   assetManager.importers['tex2d'] = new Tex2DImporter(graphicsDevice);
@@ -43,4 +44,5 @@ void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
       new FragmentShaderImporter(graphicsDevice);
   assetManager.importers['shaderProgram'] =
       new ShaderProgramImporter(graphicsDevice);
+  assetManager.importers['compressedTexture2D'] = new TextureImporter(graphicsDevice);
 }
