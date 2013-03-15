@@ -209,10 +209,10 @@ class Application {
     // Attach additional importer/loaders to the AssetManager
     //
     // The application uses config files to define behavior. These files
-    // are just json data. So associate a TextLoader and a PropertyMapImporter
+    // are just json data. So associate a TextLoader and a JsonImporter
     // to a 'config'
     _assetManager.loaders['config'] = new TextLoader();
-    _assetManager.importers['config'] = new PropertyMapImporter();
+    _assetManager.importers['config'] = new JsonImporter();
   }
 
   /// Creates the rendering state.
@@ -280,7 +280,7 @@ class Application {
       // retains the state so there isn't a need to set them each time the
       // program is run. In fact its a drain on performance if the constants
       // are set to the same value each run
-      _shaderProgram = assetPack.normalMapShader;
+      _shaderProgram = assetPack['normalMapShader'];
 
       // Apply the shader program and set the locations of the textures
       _graphicsContext.setShaderProgram(_shaderProgram);
@@ -289,16 +289,16 @@ class Application {
       //
       // The configuration specifies the models to load within the application.
       // Each model is contained within a pack file.
-      List models = assetPack.config.models;
+      List models = assetPack['config']['models'];
       int modelCount = models.length;
 
       List<Future> requests = new List<Future>(modelCount);
 
       for (int i = 0; i < modelCount; ++i) {
-        PropertyMap modelRequest = models[i];
+        Map modelRequest = models[i];
 
         // Load the individual pack files containing the models
-        requests[i] = _assetManager.loadPack(modelRequest.name, modelRequest.pack);
+        requests[i] = _assetManager.loadPack(modelRequest['name'], modelRequest['pack']);
       }
 
       // Wait on all requests to be loaded
@@ -308,38 +308,40 @@ class Application {
         // Create the list that holds the Textures
         _textures = new List<List<List<Texture2D>>>();
 
+        // Get the indices of the samplers
+        //
+        // This specifies what unit to bind the textures to. This is decided during
+        // compilation so just query the actual values.
+        int diffuseIndex  = _shaderProgram.samplers['uDiffuse'].textureUnit;
+        int specularIndex = _shaderProgram.samplers['uSpecular'].textureUnit;
+
         for (int i = 0; i < modelCount; ++i) {
           // Get the matching AssetPack
-          PropertyMap modelRequest = models[i];
-          String modelName = modelRequest.name;
+          Map modelRequest = models[i];
+          String modelName = modelRequest['name'];
           AssetPack modelPack = _assetManager.root[modelName];
 
           // Add the UI elements for the model
-          _applicationControls.addModel(modelPack.config.name, 'assets/${modelName}/icon.png');
+          _applicationControls.addModel(modelPack['config']['name'], 'assets/${modelName}/icon.png');
 
           // Import the mesh
-          _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack.mesh);
+          _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack['mesh']);
 
           // Get the textures to use on the mesh.
           //
           // The configuration file references the textures to use when drawing
           // each part of the mesh
           List<List<Texture2D>> modelTextures = new List<List<Texture2D>>();
-          List modelTextureConfig = modelPack.config.textures;
+          List modelTextureConfig = modelPack['config']['textures'];
 
           int meshCount = modelTextureConfig.length;
 
           for (int i = 0; i < meshCount; ++i) {
-            PropertyMap meshConfig = modelTextureConfig[i];
+            Map meshConfig = modelTextureConfig[i];
             List<Texture2D> meshTextures = new List<Texture2D>(3);
 
-            var diffuseIndex = _shaderProgram.samplers['uDiffuse'].textureUnit;
-            var specularIndex =
-                _shaderProgram.samplers['uSpecular'].textureUnit;
-            meshTextures[diffuseIndex] = modelPack[meshConfig.diffuse];
-            meshTextures[specularIndex] = modelPack[meshConfig.specular];
-
-            print(meshConfig.specular);
+            meshTextures[diffuseIndex]  = modelPack[meshConfig['diffuse']];
+            meshTextures[specularIndex] = modelPack[meshConfig['specular']];
 
             modelTextures.add(meshTextures);
           }
