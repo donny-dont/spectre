@@ -1,3 +1,5 @@
+part of spectre;
+
 /*
 
   Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
@@ -21,5 +23,5 @@
 */
 
 abstract class CameraController {
-  abstract void UpdateCamera(num seconds, Camera cam);
+  void updateCamera(num seconds, Camera cam);
 }

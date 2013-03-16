@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,11 +16,12 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
+part of spectre;
+
 /// Spectre Logging interface
-interface Logger {
+abstract class Logger {
   // Report an error
   void Error(String e);
   // Report a warning
@@ -65,17 +65,23 @@ class HtmlLogger implements Logger {
     _line_num = 0;
   }
   void _Append(String a) {
-    _logElement.innerHTML = '$a ${_logElement.innerHTML}';
+    _logElement.innerHtml = '$a ${_logElement.innerHtml}';
     _line_num++;
   }
   void Error(String e) {
+    print('Error: $e');
     _Append('<p style=\"color:red\">${_line_num}: $e</p>');
   }
   void Warning(String w) {
+    print('Warning: $w');
     _Append('<p style=\"color:orange\">${_line_num}: $w</p>');
   }
   void Info(String i) {
+    print('Info: $i');
     _Append('<p style=\"color:black\">${_line_num}: $i</p>');
   }
   void Log(String i) => Info(i);
 }
+
+// We have a single logger
+Logger spectreLog = new PrintLogger();

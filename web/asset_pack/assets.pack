@@ -1,0 +1,321 @@
+{
+  "litdiffuseVertexShader":{
+    "loadArguments":{
+
+    },
+    "name":"litdiffuseVertexShader",
+    "url":"/shader/litdiffuseVertexShader.glsl",
+    "type":"vertexShader",
+    "importArguments":{
+
+    }
+  },
+  "skyBox":{
+    "loadArguments":{
+
+    },
+    "name":"skyBox",
+    "url":"/mesh/skyBox.mesh",
+    "type":"mesh",
+    "importArguments":{
+
+    }
+  },
+  "skyBoxShader":{
+    "loadArguments":{
+
+    },
+    "name":"skyBoxShader",
+    "url":"/shader/skyBoxShader.shader",
+    "type":"shaderProgram",
+    "importArguments":{
+
+    }
+  },
+  "guard1_face":{
+    "loadArguments":{
+
+    },
+    "name":"guard1_face",
+    "url":"/tex2d/guard1_face.png",
+    "type":"",
+    "importArguments":{
+
+    }
+  },
+  "positiveY":{
+    "loadArguments":{
+
+    },
+    "name":"positiveY",
+    "url":"/tex2d/positiveY.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "guard1_helmet":{
+    "loadArguments":{
+
+    },
+    "name":"guard1_helmet",
+    "url":"/tex2d/guard1_helmet.png",
+    "type":"",
+    "importArguments":{
+
+    }
+  },
+  "skyBoxVertexShader":{
+    "loadArguments":{
+
+    },
+    "name":"skyBoxVertexShader",
+    "url":"/shader/skyBoxVertexShader.glsl",
+    "type":"vertexShader",
+    "importArguments":{
+
+    }
+  },
+  "litdiffuse":{
+    "loadArguments":{
+
+    },
+    "name":"litdiffuse",
+    "url":"/shader/litdiffuse.shader",
+    "type":"shaderProgram",
+    "importArguments":{
+
+    }
+  },
+  "skyBoxFragmentShader":{
+    "loadArguments":{
+
+    },
+    "name":"skyBoxFragmentShader",
+    "url":"/shader/skyBoxFragmentShader.glsl",
+    "type":"fragmentShader",
+    "importArguments":{
+
+    }
+  },
+  "guard_face":{
+    "loadArguments":{
+
+    },
+    "name":"guard_face",
+    "url":"/tex2d/guard1_face.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "unitCube":{
+    "loadArguments":{
+
+    },
+    "name":"unitCube",
+    "url":"/mesh/unitCube.mesh",
+    "type":"mesh",
+    "importArguments":{
+
+    }
+  },
+  "guard_helmet":{
+    "loadArguments":{
+
+    },
+    "name":"guard_helmet",
+    "url":"/tex2d/guard1_helmet.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "negativeZ":{
+    "loadArguments":{
+
+    },
+    "name":"negativeZ",
+    "url":"/tex2d/negativeZ.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "positiveZ":{
+    "loadArguments":{
+
+    },
+    "name":"positiveZ",
+    "url":"/tex2d/positiveZ.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "box":{
+    "loadArguments":{
+
+    },
+    "name":"box",
+    "url":"/json/box.json",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+  "wood":{
+    "loadArguments":{
+
+    },
+    "name":"wood",
+    "url":"/tex2d/wood.jpg",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "cylinder":{
+    "loadArguments":{
+
+    },
+    "name":"cylinder",
+    "url":"/json/cylinder.json",
+    "type":"",
+    "importArguments":{
+
+    }
+  },
+  "positiveX":{
+    "loadArguments":{
+
+    },
+    "name":"positiveX",
+    "url":"/tex2d/positiveX.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "round_grill":{
+    "loadArguments":{
+
+    },
+    "name":"round_grill",
+    "url":"/tex2d/round_grill.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "negativeY":{
+    "loadArguments":{
+
+    },
+    "name":"negativeY",
+    "url":"/tex2d/negativeY.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "guard_body":{
+    "loadArguments":{
+
+    },
+    "name":"guard_body",
+    "url":"/tex2d/guard1_body.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "space":{
+    "loadArguments":{
+
+    },
+    "name":"space",
+    "url":"/texCube/space.texCube",
+    "type":"texCube",
+    "importArguments":{
+
+    }
+  },
+  "litdiffuseFragmentShader":{
+    "loadArguments":{
+
+    },
+    "name":"litdiffuseFragmentShader",
+    "url":"/shader/litdiffuseFragmentShader.glsl",
+    "type":"fragmentShader",
+    "importArguments":{
+
+    }
+  },
+  "negativeX":{
+    "loadArguments":{
+
+    },
+    "name":"negativeX",
+    "url":"/tex2d/negativeX.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "bob":{
+    "loadArguments":{
+
+    },
+    "name":"bob",
+    "url":"/json/bob.json",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+  "hellknight":{
+    "loadArguments":{
+
+    },
+    "name":"hellknight",
+    "url":"/json/hellknight.json",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+  "hellknight_body":{
+    "loadArguments":{
+
+    },
+    "name":"hellknight_body",
+    "url":"/tex2d/hellknight_body.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "iron_grill":{
+    "loadArguments":{
+
+    },
+    "name":"iron_grill",
+    "url":"/tex2d/iron_grill.png",
+    "type":"tex2d",
+    "importArguments":{
+
+    }
+  },
+  "guard1_body":{
+    "loadArguments":{
+
+    },
+    "name":"guard1_body",
+    "url":"/tex2d/guard1_body.png",
+    "type":"",
+    "importArguments":{
+
+    }
+  }
+}

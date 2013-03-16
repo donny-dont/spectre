@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,33 +24,52 @@
 library spectre;
 
 import 'dart:html';
-import 'dart:json';
-import 'package:vector_math/vector_math_browser.dart';
-import 'package:handle_system/handle_system.dart';
+import 'dart:json' as JSON;
+import 'dart:async';
+import 'dart:math' as Math;
+import 'dart:scalarlist';
+import 'package:vector_math/vector_math.dart';
 import 'package:marker_prof/profiler.dart';
+import 'package:property_map/property_map.dart';
+import 'package:spectre/disposable.dart';
 
-part 'src/spectre/logger.dart';
-part 'src/spectre/device_children.dart';
-part 'src/spectre/graphics_device.dart';
-part 'src/spectre/graphics_context.dart';
-part 'src/spectre/resource_loader.dart';
-part 'src/spectre/resource.dart';
-part 'src/spectre/resource_manager.dart';
-part 'src/spectre/command_list_operations.dart';
-part 'src/spectre/command_list_builder.dart';
-part 'src/spectre/interpreter.dart';
-part 'src/spectre/input_layout_helper.dart';
-part 'src/spectre/debug_draw_manager.dart';
+part 'src/spectre/device_child.dart';
+part 'src/spectre/blend.dart';
+part 'src/spectre/blend_operation.dart';
+part 'src/spectre/blend_state.dart';
+part 'src/spectre/buffer.dart';
 part 'src/spectre/camera.dart';
 part 'src/spectre/camera_controller.dart';
-part 'src/spectre/mouse_keyboard_camera_controller.dart';
-
-// We have a single logger
-Logger spectreLog;
-
-Future<bool> initSpectre() {
-  if (spectreLog == null) {
-    spectreLog = new PrintLogger();
-  }
-  return new Future.immediate(true);
-}
+part 'src/spectre/compare_function.dart';
+part 'src/spectre/cull_mode.dart';
+part 'src/spectre/debug_draw_manager.dart';
+part 'src/spectre/depth_state.dart';
+part 'src/spectre/shader.dart';
+part 'src/spectre/fragment_shader.dart';
+part 'src/spectre/front_face.dart';
+part 'src/spectre/graphics_context.dart';
+part 'src/spectre/graphics_device.dart';
+part 'src/spectre/graphics_device_capabilities.dart';
+part 'src/spectre/graphics_device_config.dart';
+part 'src/spectre/index_buffer.dart';
+part 'src/spectre/input_layout.dart';
+part 'src/spectre/logger.dart';
+part 'src/spectre/fps_fly_camera_controller.dart';
+part 'src/spectre/rasterizer_state.dart';
+part 'src/spectre/render_buffer.dart';
+part 'src/spectre/render_target.dart';
+part 'src/spectre/sampler_state.dart';
+part 'src/spectre/shader_program.dart';
+part 'src/spectre/stencil_state.dart';
+part 'src/spectre/surface_format.dart';
+part 'src/spectre/texture.dart';
+part 'src/spectre/texture_address_mode.dart';
+part 'src/spectre/texture_cube.dart';
+part 'src/spectre/texture_mag_filter.dart';
+part 'src/spectre/texture_min_filter.dart';
+part 'src/spectre/texture_2d.dart';
+part 'src/spectre/vertex_buffer.dart';
+part 'src/spectre/vertex_shader.dart';
+part 'src/spectre/viewport.dart';
+part 'src/spectre/mesh.dart';
+part 'src/spectre/skinned_mesh.dart';

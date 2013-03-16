@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,8 +16,9 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre;
 
 class Camera {
   vec3 position;
@@ -44,7 +44,7 @@ class Camera {
     aspectRatio = 1.7777778;
   }
 
-  num get yaw() {
+  num get yaw {
     vec3 z = new vec3(0.0, 0.0, 1.0);
     vec3 forward = frontDirection;
     forward.normalize();
@@ -52,7 +52,7 @@ class Camera {
     return d;
   }
 
-  num get pitch() {
+  num get pitch {
     vec3 y = new vec3(0.0, 1.0, 0.0);
     vec3 forward = frontDirection;
     forward.normalize();
@@ -60,41 +60,41 @@ class Camera {
     return d;
   }
 
-  mat4 get projectionMatrix() {
-    return makePerspective(FOV, aspectRatio, zNear, zFar);
+  mat4 get projectionMatrix {
+    return makePerspectiveMatrix(FOV, aspectRatio, zNear, zFar);
   }
 
-  mat4 get lookAtMatrix() {
-    return makeLookAt(position, focusPosition, upDirection);
+  mat4 get viewMatrix {
+    return makeViewMatrix(position, focusPosition, upDirection);
   }
 
   void copyProjectionMatrixIntoArray(Float32Array pm) {
-    mat4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
+    mat4 m = makePerspectiveMatrix(FOV, aspectRatio, zNear, zFar);
     m.copyIntoArray(pm);
   }
 
   void copyViewMatrixIntoArray(Float32Array vm) {
-    mat4 m = makeLookAt(position, focusPosition, upDirection);
+    mat4 m = makeViewMatrix(position, focusPosition, upDirection);
     m.copyIntoArray(vm);
   }
 
   void copyNormalMatrixIntoArray(Float32Array nm) {
-    mat4 m = makeLookAt(position, focusPosition, upDirection);
+    mat4 m = makeViewMatrix(position, focusPosition, upDirection);
     m.copyIntoArray(nm);
   }
 
   void copyProjectionMatrix(mat4 pm) {
-    mat4 m = makePerspective(FOV, aspectRatio, zNear, zFar);
+    mat4 m = makePerspectiveMatrix(FOV, aspectRatio, zNear, zFar);
     m.copyInto(pm);
   }
 
   void copyViewMatrix(mat4 vm) {
-    mat4 m = makeLookAt(position, focusPosition, upDirection);
+    mat4 m = makeViewMatrix(position, focusPosition, upDirection);
     m.copyInto(vm);
   }
 
   void copyNormalMatrix(mat4 nm) {
-    mat4 m = makeLookAt(position, focusPosition, upDirection);
+    mat4 m = makeViewMatrix(position, focusPosition, upDirection);
     m.copyInto(nm);
   }
 
@@ -106,5 +106,5 @@ class Camera {
     focusPosition.copyInto(lap);
   }
 
-  vec3 get frontDirection() =>  (focusPosition-position).normalize();
+  vec3 get frontDirection =>  (focusPosition-position).normalize();
 }
