@@ -42,7 +42,6 @@ class Texture2D extends SpectreTexture {
   void _uploadPixelArray(int width, int height, dynamic array,
                          int pixelFormat, int pixelType) {
     if (pixelFormat == 0x83F0) {
-      print('Uploading compressed image ${width}x${height}');
       device.gl.compressedTexImage2D(_textureTarget, 0, 0x83F0, width, height, 0, array);
     } else {
       device.gl.texImage2D(_textureTarget, 0, _textureFormat, width, height,
