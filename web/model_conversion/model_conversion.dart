@@ -52,7 +52,7 @@ void _convertModel(_) {
 
       // Write out the file
       _writeText('model.mesh', request.responseText).then((modelUrl) {
-        _modelViewerComponent.loadModelFromUrl(modelUrl);
+        _modelViewerComponent.loadModelFromUrl(modelUrl, true);
       });
     }
   });
@@ -81,7 +81,7 @@ void _onUpdate(double time) {
 void _startup() {
   // Load the model viewer
   _modelViewerComponent = query('#model_viewer').xtag;
-  _modelViewerComponent.loadModelFromUrl('../meshes/cube.mesh');
+  _modelViewerComponent.loadModelFromUrl('../meshes/cube.mesh', false);
 
   // Hook into the submit button
   InputElement submitButton = query('#convertModel');

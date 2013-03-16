@@ -367,6 +367,12 @@ void main() {
     double dt = (time - _lastFrameTime) * 0.001;
     _lastFrameTime = time;
 
+    if (_isSkinnedMesh) {
+      SkinnedMesh model = _model as SkinnedMesh;
+
+      model.update(dt);
+    }
+
     // Update the camera
     _cameraController.updateCamera(dt, _camera);
 
@@ -424,7 +430,20 @@ void main() {
 
     // Draw the mesh
     if (_isSkinnedMesh) {
+      SkinnedMesh model = _model as SkinnedMesh;
 
+      _graphicsContext.setVertexBuffers(0, [model.vertexArray]);
+      _graphicsContext.setIndexBuffer(model.indexArray);
+      _graphicsContext.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+
+      // Draw each part of the mesh
+      int meshCount = model.meshes.length;
+
+      for (int i = 0; i < meshCount; ++i) {
+        Map meshData = model.meshes[i];
+
+        _graphicsContext.drawIndexed(meshData['count'], meshData['offset']);
+      }
     } else {
       SingleArrayIndexedMesh model = _model as SingleArrayIndexedMesh;
 
@@ -434,12 +453,13 @@ void main() {
   }
 
   /// Loads the model at the specified [url].
-  void loadModelFromUrl(String url) {
+  void loadModelFromUrl(String url, bool skinned) {
     if (_assetManager.root[_modelAssetName] != null) {
       _assetManager.root.deregisterAsset(_modelAssetName);
     }
 
-    Future<Asset> assetRequest = _assetManager.loadAndRegisterAsset(_modelAssetName, url, 'mesh', {}, {});
+    String type = skinned ? 'json' : 'mesh';
+    Future<Asset> assetRequest = _assetManager.loadAndRegisterAsset(_modelAssetName, url, type, {}, {});
 
     assetRequest.then((asset) {
       if (asset == null) {
@@ -447,11 +467,14 @@ void main() {
         return;
       }
 
-      // Update the model
-      _model = asset.imported;
-
-      // Get whether this is skinned or indexed
-      _isSkinnedMesh = _model is SkinnedMesh;
+      if (skinned) {
+        // Import the model
+        _model = importSkinnedMesh('SkinnedMesh', _graphicsDevice, asset.imported);
+      } else {
+        // Update the model
+        _model = asset.imported;
+     }
+      _isSkinnedMesh = skinned;
 
       // Reset the layout
       _inputLayout.mesh = _model;
