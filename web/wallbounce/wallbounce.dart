@@ -177,7 +177,7 @@ main() {
   _makeNormals();
 
   // Create the viewport
-  _viewport = _graphicsDevice.createViewport('view');
+  _viewport = new Viewport('view', _graphicsDevice);
   _viewport.x = 0;
   _viewport.y = 0;
   _viewport.width = canvas.width;

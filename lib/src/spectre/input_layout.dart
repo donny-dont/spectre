@@ -98,8 +98,4 @@ class InputLayout extends DeviceChild {
   InputLayout(String name, GraphicsDevice device)
       : super._internal(name, device) {
   }
-
-  void finalize() {
-    // Nothing to do.
-  }
 }

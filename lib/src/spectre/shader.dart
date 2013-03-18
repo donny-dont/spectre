@@ -31,6 +31,7 @@ class SpectreShader extends DeviceChild {
   }
 
   void finalize() {
+    super.finalize();
     device.gl.deleteShader(_shader);
     _shader = null;
   }

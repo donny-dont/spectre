@@ -4,3 +4,6 @@
 packages
 pubspec.lock
 out
+
+# Ignore Windows Thumbs.db
+Thumbs.db

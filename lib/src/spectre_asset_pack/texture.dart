@@ -23,54 +23,45 @@ part of spectre_asset_pack;
 
 class Tex2DImporter extends AssetImporter {
   final GraphicsDevice device;
-  dynamic get fallback => null;
-
   Tex2DImporter(this.device);
 
-  Texture2D _processImageElement(AssetRequest request, ImageElement pixels) {
-    Texture2D tex2d = device.createTexture2D(request.name);
+  void initialize(Asset asset) {
+    asset.imported = new Texture2D(asset.name, device);
+  }
+  Texture2D _processImageElement(Asset request, ImageElement pixels) {
+    var tex2d = new Texture2D(request.name, device);
     tex2d.uploadElement(pixels);
-    // TODO (johnmccutchan): Support an import argument specifying mipmap logic.
-    // For now, always generate them.
-    tex2d.generateMipmap();
     return tex2d;
   }
 
-  Future<dynamic> import(dynamic payload, AssetRequest request) {
+  Future<dynamic> import(dynamic payload, Asset asset) {
     if (payload is ImageElement) {
-      return new Future.immediate(_processImageElement(request, payload));
+      asset.imported.uploadElement(payload);
+      // TODO (johnmccutchan): Support an import argument specifying mipmap
+      // logic. For now, always generate them.
+      asset.imported.generateMipmap();
     }
-    return new Future.immediate(fallback);
+    return new Future.immediate(asset);
   }
 
   void delete(dynamic imported) {
     assert(imported is Texture2D);
-    print('Deleting ${imported.name}');
-    device.deleteDeviceChild(imported);
+    if (imported != null) {
+      print('Deleting ${imported.name}');
+      imported.dispose();
+    }
   }
 }
 
 class TexCubeImporter extends AssetImporter {
   final GraphicsDevice device;
-  dynamic get fallback => null;
-
   TexCubeImporter(this.device);
 
-  TextureCube _processImageElements(String name, List<ImageElement> sides) {
-    TextureCube texCube = device.createTextureCube(name);
-    texCube.positiveX.uploadElement(sides[0]);
-    texCube.negativeX.uploadElement(sides[1]);
-    texCube.positiveY.uploadElement(sides[2]);
-    texCube.negativeY.uploadElement(sides[3]);
-    texCube.positiveZ.uploadElement(sides[4]);
-    texCube.negativeZ.uploadElement(sides[5]);
-    // TODO (johnmccutchan): Support an import argument specifying mipmap logic.
-    // For now, always generate them.
-    texCube.generateMipmap();
-    return texCube;
+  void initialize(Asset asset) {
+    asset.imported = new TextureCube(asset.name, device);
   }
 
-  Future<dynamic> import(dynamic payload, AssetRequest request) {
+  Future<dynamic> import(dynamic payload, Asset asset) {
     if (payload is List<ImageElement>) {
       assert(payload.length == 6);  //  6 sides.
       if (payload[0] != null &&
@@ -79,46 +70,50 @@ class TexCubeImporter extends AssetImporter {
           payload[3] != null &&
           payload[4] != null &&
           payload[5] != null) {
-        return new Future.immediate(_processImageElements(request.name,
-                                                          payload));
+        TextureCube texCube = asset.imported;
+        texCube.positiveX.uploadElement(payload[0]);
+        texCube.negativeX.uploadElement(payload[1]);
+        texCube.positiveY.uploadElement(payload[2]);
+        texCube.negativeY.uploadElement(payload[3]);
+        texCube.positiveZ.uploadElement(payload[4]);
+        texCube.negativeZ.uploadElement(payload[5]);
+        // TODO (johnmccutchan): Support an import argument specifying mipmap
+        // logic. For now, always generate them.
+        texCube.generateMipmap();
       }
     }
-    return new Future.immediate(fallback);
+    return new Future.immediate(asset);
   }
 
   void delete(dynamic imported) {
     assert(imported is TextureCube);
     print('Deleting ${imported.name}');
-    device.deleteDeviceChild(imported);
+    imported.dispose();
   }
 }
 
 class _ImagePackLoader extends AssetLoader {
-  Future<dynamic> load(AssetRequest request) {
+  Future<dynamic> load(Asset asset) {
     TextLoader loader = new TextLoader();
     ImageLoader imgLoader = new ImageLoader();
-    Future<String> futureText = loader.load(request);
-    Completer completer = new Completer();
-    futureText.then((text) {
+    Future<String> futureText = loader.load(asset);
+    return futureText.then((text) {
+      List parsed;
       try {
-        List parsed = JSON.parse(text);
-        List<Future<ImageElement>> futureImages = new List();
-        parsed.forEach((String imgSrc) {
-          AssetRequest imgRequest = new AssetRequest(imgSrc, request.baseURL,
-                                                     imgSrc, request.type,
-                                                     request.loadArguments,
-                                                     request.importArguments);
-          Future futureImg = imgLoader.load(imgRequest);
-          futureImages.add(futureImg);
-        });
-        Future.wait(futureImages).then((images) {
-          completer.complete(images);
-        });
+        parsed = JSON.parse(text);
       } catch (e) {
-        completer.complete(null);
+        return new Future.immediate(null);
       }
+      var futureImages = new List<Future<ImageElement>>();
+      parsed.forEach((String imgSrc) {
+        Asset imgRequest = new Asset(null, imgSrc, asset.baseUrl, imgSrc,
+                                     asset.type, null, asset.loaderArguments,
+                                     null, asset.importerArguments);
+        Future futureImg = imgLoader.load(imgRequest);
+        futureImages.add(futureImg);
+      });
+      return Future.wait(futureImages);
     });
-    return completer.future;
   }
 
   void delete(dynamic arg) {

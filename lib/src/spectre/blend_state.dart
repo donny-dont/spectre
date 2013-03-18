@@ -370,8 +370,4 @@ class BlendState extends DeviceChild {
     value = values[_writeRenderTargetAlphaName];
     _writeRenderTargetAlpha = (value != null) ? value : _writeRenderTargetAlpha;
   }
-
-  void finalize() {
-    // Nothing to do.
-  }
 }
