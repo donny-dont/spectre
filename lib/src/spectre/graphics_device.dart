@@ -108,9 +108,18 @@ class GraphicsDevice {
     if (config == null) {
       config = new GraphicsDeviceConfig();
     }
+
     _gl = surface.getContext3d(stencil: config.stencilBuffer);
+
+    if (_gl == null) {
+      throw new UnsupportedError('WebGL not available');
+    }
+
+    // Query the device capabilities
     _capabilities = new GraphicsDeviceCapabilities._fromContext(gl);
+    // \todo REMOVE This should go away once extensions are fully supported
     print(_capabilities);
+
     // Create the associated GraphicsContext
     _context = new GraphicsContext(this);
     RenderTarget._systemRenderTarget = new RenderTarget.systemTarget(

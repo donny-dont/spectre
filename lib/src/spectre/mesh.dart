@@ -20,6 +20,50 @@
 
 part of spectre;
 
+/// A container for mesh data.
+///
+/// Made up of a [VertexBuffer], [InputLayout], [PrimitiveType], and optionally
+/// an [IndexBuffer]. Whenever possible prefer creating a [Mesh] and setting this
+/// to the [GraphicsContext] rather than setting each of the components individually.
+class Mesh extends DeviceChild {
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+
+  /// The vertices of the mesh.
+  VertexBuffer _vertexBuffer;
+  /// The layout of the vertices within the mesh.
+  InputLayout _inputLayout;
+  /// The indices of the mesh.
+  IndexBuffer _indexBuffer;
+  /// The primitive type
+  int _primitiveType;
+
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  Mesh(String name, GraphicsDevice graphicsDevice, VertexBuffer vertexBuffer, InputLayout inputLayout, [IndexBuffer indexBuffer = null, int primitiveType = PrimitiveType.TriangleList])
+    : super._internal(name, graphicsDevice)
+    , _vertexBuffer = vertexBuffer
+    , _inputLayout = inputLayout
+    , _indexBuffer = indexBuffer
+    , _primitiveType = primitiveType;
+
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// The vertices of the mesh.
+  VertexBuffer get vertexBuffer => _vertexBuffer;
+  /// The layout of the vertices within the mesh.
+  InputLayout get inputLayout => _inputLayout;
+  /// The indices of the mesh.
+  IndexBuffer get indexBuffer => _indexBuffer;
+  /// The primitive type
+  int get primitiveType => _primitiveType;
+}
+
 class SpectreMeshAttribute {
   final String name;
   final String componentType;

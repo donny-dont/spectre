@@ -25,15 +25,18 @@ class VertexData {
   Map<String, VertexArray> _elements;
   int _vertexCount;
 
-  VertexData(Float32Array array, List<InputElementDescription> elements) {
+  VertexData(Float32Array array, List<InputLayoutElement> elements) {
     _elements = new Map<String, VertexArray>();
 
-    for (InputElementDescription element in elements) {
-      int count  = element.format.count;
-      int offset = element.vertexBufferOffset;
-      int stride = element.elementStride;
+    // \TODO remove! This is just a test
+    bool position = true;
 
-      _vertexCount = array.length ~/ (element.elementStride >> 2);
+    for (InputLayoutElement element in elements) {
+      int count  = element.attributeFormat.count;
+      int offset = element.attributeOffset;
+      int stride = element.attributeStride;
+
+      _vertexCount = array.length ~/ (stride >> 2);
 
       VertexArray vertexArray;
 
@@ -44,8 +47,9 @@ class VertexData {
         default: vertexArray = new Vector4Array.fromArray(array, offset, stride); break;
       }
 
-      String elementName = element.name;
-      _elements[element.name] = vertexArray;
+      String elementName = (position) ? 'vPosition' : 'vNormal';
+      position = false;
+      _elements[elementName] = vertexArray;
     }
   }
 

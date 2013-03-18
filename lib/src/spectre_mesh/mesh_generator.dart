@@ -59,12 +59,12 @@ abstract class MeshGenerator {
    *
    * For the amount of storage space see [vertexBufferSize].
    */
-  abstract int get vertexCount;
+  int get vertexCount;
 
   /**
    * Retrieves the index buffer size necessary to hold the generated mesh.
    */
-  abstract int get indexCount;
+  int get indexCount;
 
   /**
    * Retrieves the vertex buffer size necessary to hold the generated mesh.
@@ -118,5 +118,5 @@ abstract class MeshGenerator {
   vec3 get center => _center;
   set center(vec3 value) { _center = value; }
 
-  abstract void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]);
+  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]);
 }

@@ -22,12 +22,10 @@
 
 class BoxGenerator extends MeshGenerator {
 
-  vec3 _extents;
   VertexData _vertexData;
 
-  BoxGenerator(vec3 extents, [bool generateTextureCoords = false, bool generateNormals = false, bool generateTangents = false])
-      : super(generateTextureCoords, generateNormals, generateTangents)
-      , _extents = new vec3.raw(1.0, 1.0, 1.0);
+  BoxGenerator([bool generateTextureCoords = false, bool generateNormals = false, bool generateTangents = false])
+      : super(generateTextureCoords, generateNormals, generateTangents);
 
   /**
    * Gets the number of vertices that will be created.
@@ -48,7 +46,7 @@ class BoxGenerator extends MeshGenerator {
   set extents(vec3 value) { _extents = value; }
 
 
-  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]) {
+  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputLayoutElement> elements, [int vertexOffset = 0, int indexOffset = 0]) {
     _vertexData = new VertexData(vertexBuffer, elements);
 
     _generatePositionData(vertexOffset);
@@ -57,7 +55,8 @@ class BoxGenerator extends MeshGenerator {
       _generateTextureCoordData(vertexOffset);
     }
 
-    if (generateNormals) {
+    // \TODO remove
+    if (true) {
       _generateNormalData(vertexOffset);
     }
 
@@ -214,5 +213,33 @@ class BoxGenerator extends MeshGenerator {
     normals[vertexOffset++] = normalValues[5];
     normals[vertexOffset++] = normalValues[4];
     normals[vertexOffset++] = normalValues[5];
+  }
+
+  /// Creates a single box with the given [extents] at the specified [center].
+  ///
+  /// This is a helper method for creating a single box. If you are creating
+  /// many box meshes prefer creating a [BoxGenerator] and using that to generate
+  /// multiple meshes.
+  static Mesh createBox(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, vec3 extents, vec3 center) {
+    BoxGenerator generator = new BoxGenerator();
+
+    // Create storage space for the vertices and indices
+    Float32Array vertices = new Float32Array(generator.vertexCount * 6);
+    Int16Array indices = new Int16Array(generator.indexCount);
+
+    // Generate the box
+    generator.generate(vertices, indices, elements);
+
+    // Upload the graphics data
+    VertexBuffer vertexBuffer = new VertexBuffer('${name}_VBO', graphicsDevice);
+    vertexBuffer.uploadData(vertices, SpectreBuffer.UsageStatic);
+
+    IndexBuffer indexBuffer = new IndexBuffer('${name}_IBO', graphicsDevice);
+    indexBuffer.uploadData(indices, SpectreBuffer.UsageStatic);
+
+    InputLayout inputLayout = new InputLayout('remove', graphicsDevice);
+
+    // Create the mesh
+    return new Mesh(name, graphicsDevice, vertexBuffer, inputLayout, indexBuffer);
   }
 }

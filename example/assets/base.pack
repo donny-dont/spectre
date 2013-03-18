@@ -1,0 +1,9 @@
+{
+  "solidLightingShader":{
+    "loadArguments":{},
+    "name":"solidLightingShader",
+    "url":"/solid_lighting.shader",
+    "type":"shaderProgram",
+    "importArguments":{}
+  }
+}
