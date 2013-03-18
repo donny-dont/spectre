@@ -107,6 +107,8 @@ abstract class DemoScreen {
 
   void onRender();
 
+  void onResize(int width, int height);
+
   Future<bool> _onLoad();
   void _onUnload();
 }

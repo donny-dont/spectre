@@ -94,13 +94,13 @@ class SimpleGeometryScreen extends DemoScreen {
   void _createCamera() {
     // Create the Camera
     _camera = new Camera();
-    _camera.position = new vec3.raw(150.0, 60.0, 0.0);
-    _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
+    _camera.position = new vec3.raw(0.0, 0.0, 5.0);
+    _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
 
     // Create the CameraController and set the velocity of the movement
     _cameraController = new FpsFlyCameraController();
-    _cameraController.forwardVelocity = 250.0;
-    _cameraController.strafeVelocity = 250.0;
+    _cameraController.forwardVelocity = 5.0;
+    _cameraController.strafeVelocity = 5.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4();
@@ -136,7 +136,7 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 0,  0, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 12, GraphicsDevice.DeviceFormatFloat3);
     InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
 
     List<InputLayoutElement> elements = [positionElement, normalElement];
@@ -273,5 +273,14 @@ class SimpleGeometryScreen extends DemoScreen {
     // Set and draw the mesh
     _graphicsContext.setMeshNew(_mesh);
     _graphicsContext.drawMeshNew(_mesh);
+  }
+
+  void onResize(int width, int height) {
+    // Resize the viewport
+    _viewport.width = width;
+    _viewport.height = height;
+
+    // Change the aspect ratio of the camera
+    _camera.aspectRatio = _viewport.aspectRatio;
   }
 }

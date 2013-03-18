@@ -1,4 +1,11 @@
 {
+  "solidColorShader":{
+    "loadArguments":{},
+    "name":"solidColorShader",
+    "url":"/solid_color.shader",
+    "type":"shaderProgram",
+    "importArguments":{}
+  },
   "solidLightingShader":{
     "loadArguments":{},
     "name":"solidLightingShader",

@@ -73,6 +73,9 @@ class Application {
 
   DemoScreen _currentScreen;
 
+  int _width;
+  int _height;
+
   //---------------------------------------------------------------------
   // Construction
   //---------------------------------------------------------------------
@@ -138,6 +141,7 @@ class Application {
       _currentScreen = new SimpleGeometryScreen(_graphicsDevice, _assetManager);
 
       _currentScreen.onLoad().then((value) {
+        _currentScreen.onResize(_width, _height);
         _gameLoop.start();
       });
     });
@@ -168,6 +172,8 @@ class Application {
   /// otherwise the rendered scene will be incorrect.
   void onResize(int width, int height) {
     // Resize the viewport
+    _width = width;
+    _height = height;
     //_viewport.width = width;
     //_viewport.height = height;
   }

@@ -56,7 +56,7 @@ class BoxGenerator extends MeshGenerator {
     }
 
     // \TODO remove
-    if (true) {
+    if (generateNormals) {
       _generateNormalData(vertexOffset);
     }
 
@@ -238,6 +238,7 @@ class BoxGenerator extends MeshGenerator {
     indexBuffer.uploadData(indices, SpectreBuffer.UsageStatic);
 
     InputLayout inputLayout = new InputLayout('remove', graphicsDevice);
+    inputLayout.elements.addAll(elements);
 
     // Create the mesh
     return new Mesh(name, graphicsDevice, vertexBuffer, inputLayout, indexBuffer);
