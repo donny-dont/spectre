@@ -55,12 +55,13 @@ class TextureImporter extends AssetImporter {
 
     } else {
       Texture2D texture = new Texture2D(assetRequest.name, device);
+      int surfaceFormat = DdsResourceFormat.toSurfaceFormat(resourceFormat);
 
       // Need a way to translate to SurfaceFormat
       if (DdsResourceFormat.isBlockCompressed(resourceFormat)) {
         Uint8Array array = new Uint8Array.fromBuffer(dds.getPixelData(0, 0));
 
-        texture.uploadPixelArray(width, height, array, pixelFormat: 0x83F0);
+        texture.uploadPixelArray(width, height, array, pixelFormat: surfaceFormat);
       } else {
 
       }

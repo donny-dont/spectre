@@ -262,4 +262,15 @@ class DdsResourceFormat {
 
     return false;
   }
+
+  /// Converts from [DdsResourceFormat] to [SurfaceFormat].
+  static int toSurfaceFormat(int value) {
+    switch (value) {
+      case UnormBc1: return SurfaceFormat.Dxt1;
+      case UnormBc3: return SurfaceFormat.Dxt3;
+      case UnormBc5: return SurfaceFormat.Dxt5;
+    }
+
+    throw new ArgumentError('The DDS resource does not correspond to a SurfaceFormat');
+  }
 }

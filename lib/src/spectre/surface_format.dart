@@ -53,15 +53,15 @@ class SurfaceFormat {
   ///
   /// Only available if the compressed texture s3tc extension is supported. Assumes
   /// the texture has no alpha component. DXT1 can support alpha but only 1-bit.
-  static const int Dxt1 = 0x83F0; // Value is not in WebGLRenderingContext. Using value from spec.
+  static const int Dxt1 = WebGLCompressedTextureS3TC.COMPRESSED_RGB_S3TC_DXT1_EXT;
   /// DXT3 compression format.
   ///
   /// Only available if the compressed texture s3tc extension is supported.
-  static const int Dxt3 = 0x83F2; // Value is not in WebGLRenderingContext. Using value from spec.
+  static const int Dxt3 = WebGLCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT3_EXT;
   /// DXT5 compression format.
   ///
   /// Only available if the compressed texture s3tc extension is supported.
-  static const int Dxt5 = 0x83F3; // Value is not in WebGLRenderingContext. Using value from spec.
+  static const int Dxt5 = WebGLCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
   //---------------------------------------------------------------------
   // Class methods
