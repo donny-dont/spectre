@@ -222,7 +222,7 @@ class DebugDrawManager {
     _depthDisabled = new DepthState(_depthStateDisabledName, device);
     _depthDisabled.depthBufferEnabled = false;
     _depthDisabled.depthBufferWriteEnabled = false;
-    _blend = new BlendState.additive(_blendStateName, device);
+    _blend = new BlendState.alphaBlend(_blendStateName, device);
     _rasterizer = new RasterizerState(_rasterizerStateName, device);
     _rasterizer.cullMode = CullMode.None;
     _lineVertexShader = new VertexShader(_lineVertexShaderName, device);
