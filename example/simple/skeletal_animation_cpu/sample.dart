@@ -434,10 +434,10 @@ class Application {
     // Copy the Normal matrix from the camera into the Float32Array.
     _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
 
-    _debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+    _debugDrawManager.addCircle(new vec3(0.0, 4.0, 0.0),
                                 new vec3(0.0, 1.0, 0.0),
-                                8.0, new vec4(1.0, 0.0, 0.0, 1.0),
-                                0.0, true);
+                                8.0, new vec4(1.0, 0.0, 0.0, 1.0));
+    _debugDrawManager.addAxes(new mat4.identity(), 3.0);
   }
 
   /// Renders the scene.
