@@ -12,14 +12,5 @@ dependencies:
     git: https://github.com/johnmccutchan/game_loop.git
   asset_pack:
     git: https://github.com/johnmccutchan/asset_pack.git
-  property_map:
-    git: git://github.com/financeCoding/property_map.git
-  unittest: '>=0.4.1 <0.4.2'
-  browser: '>=0.4.1 <0.4.2'
-  bot: '>=0.15.0 <0.16.0'
-  meta: '>=0.4.1 <0.4.2'
-  html5lib: '>=0.4.0 <0.4.1'
-  args: '>=0.4.1 <0.4.2'
-  logging: '>=0.4.1 <0.4.2'
-  pathos: '>=0.4.1 <0.4.2'
-  source_maps: '>=0.4.0 <0.4.1'
+  unittest: any
+  browser: any
