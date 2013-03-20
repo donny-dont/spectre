@@ -27,7 +27,6 @@ library skeletal_animation_cpu;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
-import 'package:property_map/property_map.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop.dart';
 import 'package:asset_pack/asset_pack.dart';
@@ -93,7 +92,7 @@ class Application {
   ///
   /// If the debugging information is turned on in this sample the
   /// mesh's skeleton will be displayed.
-  bool _drawDebugInformation = false;
+  bool _drawDebugInformation = true;
 
   //---------------------------------------------------------------------
   // Rendering state member variables
@@ -172,8 +171,8 @@ class Application {
     // but the canvas needs to take up the entire contents of the window. The
     // stylesheet accomplishes this but the underlying canvas will default to
     // 300x150 which will produce a really low resolution image.
-    int width = canvas.offsetWidth;
-    int height = canvas.offsetHeight;
+    int width = canvas.offset.width;
+    int height = canvas.offset.height;
 
     canvas.width = width;
     canvas.height = height;
@@ -186,6 +185,8 @@ class Application {
 
     // Create the Camera and the CameraController
     _createCamera();
+
+    _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
     // Call the onResize method which will update the viewport and camera
     onResize(width, height);
@@ -387,6 +388,11 @@ class Application {
     // Update the state of the CameraController
     Keyboard keyboard = _gameLoop.keyboard;
 
+    _debugDrawManager.update(dt);
+
+    // Update the mesh
+    _meshes[_meshIndex].update(dt);
+
     _cameraController.forward     = keyboard.buttons[Keyboard.W].down;
     _cameraController.backward    = keyboard.buttons[Keyboard.S].down;
     _cameraController.strafeLeft  = keyboard.buttons[Keyboard.A].down;
@@ -428,8 +434,10 @@ class Application {
     // Copy the Normal matrix from the camera into the Float32Array.
     _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
 
-    // Update the mesh
-    _meshes[_meshIndex].update(dt);
+    _debugDrawManager.addCircle(new vec3(0.0, 4.0, 0.0),
+                                new vec3(0.0, 1.0, 0.0),
+                                8.0, new vec4(1.0, 0.0, 0.0, 1.0));
+    _debugDrawManager.addAxes(new mat4.identity(), 3.0);
   }
 
   /// Renders the scene.
@@ -483,7 +491,8 @@ class Application {
 
     // Render debugging information if requested
     if (_drawDebugInformation) {
-
+      _debugDrawManager.prepareForRender();
+      _debugDrawManager.render(_camera);
     }
   }
 

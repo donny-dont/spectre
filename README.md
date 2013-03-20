@@ -1,6 +1,6 @@
 # Spectre
 
-[![Build Status](https://drone.io/github.com/johnmccutchan/spectre/status.png)](https://drone.io/github.com/johnmccutchan/spectre)
+[![Build Status](https://drone.io/github.com/johnmccutchan/spectre/status.png)](https://drone.io/github.com/johnmccutchan/spectre/latest)
 
 ## A modern graphics API for WebGL development with Dart
 
