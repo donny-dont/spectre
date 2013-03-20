@@ -68,7 +68,7 @@ void renderFrame(GameLoop gameLoop) {
                                 new vec3.raw(0.0, 1.0, 0.0),
                                 2.0,
                                 new vec4.raw(1.0, 1.0, 1.0, 1.0),
-                                5.0);
+                                duration:5.0);
   }
 
   _drawSkybox();
