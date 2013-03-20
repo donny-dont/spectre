@@ -27,7 +27,7 @@ import 'dart:html';
 import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:math' as Math;
-import 'dart:scalarlist';
+//import 'dart:scalarlist';
 import 'package:vector_math/vector_math.dart';
 import 'package:marker_prof/profiler.dart';
 import 'package:property_map/property_map.dart';

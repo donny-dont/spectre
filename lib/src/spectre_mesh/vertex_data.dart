@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 The Spectre Project authors.
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,9 +16,9 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
+part of spectre_mesh;
 
 class VertexData {
   Map<String, VertexArray> _elements;

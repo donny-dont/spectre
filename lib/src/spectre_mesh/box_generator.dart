@@ -1,6 +1,5 @@
 /*
-
-  Copyright (C) 2012 The Spectre Project authors.
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -17,15 +16,16 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
+
+part of spectre_mesh;
 
 class BoxGenerator extends MeshGenerator {
 
   VertexData _vertexData;
+  vec3 _extents = new vec3.raw(0.5, 0.5, 0.5);
 
-  BoxGenerator([bool generateTextureCoords = false, bool generateNormals = false, bool generateTangents = false])
-      : super(generateTextureCoords, generateNormals, generateTangents);
+  BoxGenerator();
 
   /**
    * Gets the number of vertices that will be created.
@@ -51,16 +51,17 @@ class BoxGenerator extends MeshGenerator {
 
     _generatePositionData(vertexOffset);
 
-    if (generateTextureCoords) {
+
+    if (false) {
       _generateTextureCoordData(vertexOffset);
     }
 
     // \TODO remove
-    if (generateNormals) {
+    if (true) {
       _generateNormalData(vertexOffset);
     }
 
-    if (generateTangents) {
+    if (true) {
 
     }
 
