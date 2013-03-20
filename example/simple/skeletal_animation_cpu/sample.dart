@@ -125,7 +125,7 @@ class Application {
   ///
   /// A [FpsFlyCameraController] provides a way to move the camera in the
   /// same way that a free-look FPS operates.
-  FpsFlyCameraController _cameraController;
+  OrbitCameraController _cameraController;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
   /// [Float32Array] storage for the Model-View matrix.
@@ -257,9 +257,9 @@ class Application {
     _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
 
     // Create the CameraController and set the velocity of the movement
-    _cameraController = new FpsFlyCameraController();
-    _cameraController.forwardVelocity = 250.0;
-    _cameraController.strafeVelocity = 250.0;
+    _cameraController = new OrbitCameraController();
+    //_cameraController.forwardVelocity = 250.0;
+    //_cameraController.strafeVelocity = 250.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4();
@@ -393,10 +393,10 @@ class Application {
     // Update the mesh
     _meshes[_meshIndex].update(dt);
 
-    _cameraController.forward     = keyboard.buttons[Keyboard.W].down;
+    /*_cameraController.forward     = keyboard.buttons[Keyboard.W].down;
     _cameraController.backward    = keyboard.buttons[Keyboard.S].down;
     _cameraController.strafeLeft  = keyboard.buttons[Keyboard.A].down;
-    _cameraController.strafeRight = keyboard.buttons[Keyboard.D].down;
+    _cameraController.strafeRight = keyboard.buttons[Keyboard.D].down;*/
 
     if (_gameLoop.pointerLock.locked) {
       Mouse mouse = _gameLoop.mouse;
@@ -433,7 +433,7 @@ class Application {
 
     // Copy the Normal matrix from the camera into the Float32Array.
     _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
-
+    
     _debugDrawManager.addCircle(new vec3(0.0, 4.0, 0.0),
                                 new vec3(0.0, 1.0, 0.0),
                                 8.0, new vec4(1.0, 0.0, 0.0, 1.0));
