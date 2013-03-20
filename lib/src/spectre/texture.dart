@@ -138,30 +138,30 @@ class SpectreTexture extends DeviceChild {
 
   /// Sets the initial state for the [Texture].
   void _initializeState() {
-    WebGLTexture oldBind =_pushBind();
+    WebGLTexture oldBind = _pushBind();
+
+    WebGLRenderingContext gl = device.gl;
 
     // Set the parameters otherwise the texture object cannot be rendered
-    device.gl.texParameteri(
+    gl.texParameteri(
         _textureTarget,
         WebGLRenderingContext.TEXTURE_WRAP_S,
-        _samplerState.addressU
-      );
-    device.gl.texParameteri(
-      _textureTarget,
-      WebGLRenderingContext.TEXTURE_WRAP_T,
-      _samplerState.addressV
-    );
-    device.gl.texParameteri(
-      _textureTarget,
-      WebGLRenderingContext.TEXTURE_MIN_FILTER,
-      _samplerState.minFilter
-    );
+        _samplerState.addressU);
 
-    device.gl.texParameteri(
-      _textureTarget,
-      WebGLRenderingContext.TEXTURE_MAG_FILTER,
-      _samplerState.magFilter
-    );
+    gl.texParameteri(
+        _textureTarget,
+        WebGLRenderingContext.TEXTURE_WRAP_T,
+        _samplerState.address);
+
+    gl.texParameteri(
+        _textureTarget,
+        WebGLRenderingContext.TEXTURE_MIN_FILTER,
+        _samplerState.minFilter);
+
+    gl.texParameteri(
+        _textureTarget,
+        WebGLRenderingContext.TEXTURE_MAG_FILTER,
+        _samplerState.magFilter);
 
     _popBind(oldBind);
   }
@@ -173,23 +173,23 @@ class SpectreTexture extends DeviceChild {
   /// So to get ensure redudant state changes are not occurring checks are made within
   /// [Texture] rather than [GraphicsContext].
   void _applySampler(SamplerState samplerState) {
+    WebGLRenderingContext gl = device.gl;
+
     // Modify the texture wrapping if necessary
     if (_samplerState.addressU != samplerState.addressU) {
-      device.gl.texParameteri(
-        _textureTarget,
-        WebGLRenderingContext.TEXTURE_WRAP_S,
-        samplerState.addressU
-      );
+      gl.texParameteri(
+          _textureTarget,
+          WebGLRenderingContext.TEXTURE_WRAP_S,
+          samplerState.addressU);
 
       _samplerState.addressU = samplerState.addressU;
     }
 
     if (_samplerState.addressV != samplerState.addressV) {
-      device.gl.texParameteri(
-        _textureTarget,
-        WebGLRenderingContext.TEXTURE_WRAP_T,
-        samplerState.addressV
-      );
+      gl.texParameteri(
+          _textureTarget,
+          WebGLRenderingContext.TEXTURE_WRAP_T,
+          samplerState.addressV);
 
       _samplerState.addressV = samplerState.addressV;
     }
@@ -197,31 +197,28 @@ class SpectreTexture extends DeviceChild {
     // See if aniostropy is requested as this overrides the other filters
     if (_samplerState.maxAnisotropy > 1.0) {
       if (_samplerState.maxAnisotropy != samplerState.maxAnisotropy) {
-        device.gl.texParameterf(
-          _textureTarget,
-          ExtTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT,
-          samplerState.maxAnisotropy
-        );
+        gl.texParameterf(
+            _textureTarget,
+            ExtTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT,
+            samplerState.maxAnisotropy);
 
         _samplerState.maxAnisotropy = samplerState.maxAnisotropy;
       }
     } else {
       if (_samplerState.minFilter != samplerState.minFilter) {
-        device.gl.texParameteri(
-          _textureTarget,
-          WebGLRenderingContext.TEXTURE_MIN_FILTER,
-          samplerState.minFilter
-        );
+        gl.texParameteri(
+            _textureTarget,
+            WebGLRenderingContext.TEXTURE_MIN_FILTER,
+            samplerState.minFilter);
 
         _samplerState.minFilter = samplerState.minFilter;
       }
 
       if (_samplerState.magFilter != samplerState.magFilter) {
-        device.gl.texParameteri(
-          _textureTarget,
-          WebGLRenderingContext.TEXTURE_MAG_FILTER,
-          samplerState.magFilter
-        );
+        gl.texParameteri(
+            _textureTarget,
+            WebGLRenderingContext.TEXTURE_MAG_FILTER,
+            samplerState.magFilter);
 
         _samplerState.magFilter = samplerState.magFilter;
       }

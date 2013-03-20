@@ -45,7 +45,7 @@ class Texture2D extends SpectreTexture {
       device.gl.compressedTexImage2D(_textureTarget, 0, pixelFormat, width, height, 0, array);
     } else {
       device.gl.texImage2D(_textureTarget, 0, _textureFormat, width, height,
-                         0, pixelFormat, pixelType, array);
+                           0, pixelFormat, pixelType, array);
     }
   }
 
