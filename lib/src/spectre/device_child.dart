@@ -22,7 +22,7 @@ part of spectre;
 
 /// A resource created by a device
 /// All resources have a [name]
-abstract class DeviceChild extends Disposable implements Serializable {
+abstract class DeviceChild extends Disposable {
   final GraphicsDevice device;
   final String name;
   String toString() => name;
