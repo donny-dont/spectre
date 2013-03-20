@@ -61,8 +61,8 @@ void renderFrame(GameLoop gameLoop) {
 void resizeFrame(GameLoop gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
   // Adjust the viewport dimensions
   _viewport.width = canvas.width;
   _viewport.height = canvas.height;
@@ -85,8 +85,8 @@ main() {
   _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
 
   // Create the viewport
   _viewport = new Viewport('view', _graphicsDevice);

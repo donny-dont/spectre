@@ -172,8 +172,8 @@ class Application {
     // but the canvas needs to take up the entire contents of the window. The
     // stylesheet accomplishes this but the underlying canvas will default to
     // 300x150 which will produce a really low resolution image.
-    int width = canvas.offsetWidth;
-    int height = canvas.offsetHeight;
+    int width = canvas.offset.width;
+    int height = canvas.offset.height;
 
     canvas.width = width;
     canvas.height = height;

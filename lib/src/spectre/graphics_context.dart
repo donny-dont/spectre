@@ -75,9 +75,9 @@ class GraphicsContext {
   //---------------------------------------------------------------------
 
   GraphicsContext(this.device) {
-    _vertexBufferHandles = new List<VertexBuffer>.fixedLength(numVertexBuffers);
-    _samplerStateHandles = new List<SamplerState>.fixedLength(numTextures);
-    _textureHandles = new List<SpectreTexture>.fixedLength(numTextures);
+    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
+    _samplerStateHandles = new List<SamplerState>(numTextures);
+    _textureHandles = new List<SpectreTexture>(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
 
     _initializeState();
