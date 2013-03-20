@@ -314,12 +314,44 @@ class DebugDrawManager {
       _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
                                                 color.a, duration);
     }
-    _circle_u.x = 1.0;
-    _circle_u.y = 0.0;
-    _circle_u.z = 0.0;
-    _circle_v.x = 0.0;
-    _circle_v.y = 1.0;
-    _circle_v.z = 0.0;
+    
+    int latSegments = 6;
+    int lonSegments = 8;
+    num twoPi = (2.0 * Math.PI);
+
+    vec3 lastVertex, vertex, upperVertex;
+
+    for (int y = 0; y < latSegments; ++y) {
+      lastVertex = null;
+      for (int x = 0; x <= lonSegments; ++x) {
+        num u = x / lonSegments;
+        num v = y / latSegments;
+        num v2 = (y+1) / latSegments;
+
+        vertex = new vec3.raw(
+            radius * cos(u * twoPi) * sin(v * Math.PI),
+            radius * cos(v * Math.PI),
+            radius * sin(u * twoPi) * sin(v * Math.PI)
+        ) + center;
+        
+        upperVertex = new vec3.raw(
+            radius * cos(u * twoPi) * sin(v2 * Math.PI),
+            radius * cos(v2 * Math.PI),
+            radius * sin(u * twoPi) * sin(v2 * Math.PI)
+        ) + center;
+  
+        if(lastVertex != null) {
+          _addLineRaw(
+              lastVertex.x, lastVertex.y, lastVertex.z, 
+              vertex.x, vertex.y, vertex.z, depthEnabled);
+          _addLineRaw(
+              upperVertex.x, upperVertex.y, upperVertex.z, 
+              vertex.x, vertex.y, vertex.z, depthEnabled);
+        }
+        
+        lastVertex = vertex;
+      }
+    }
   }
 
   final vec3 _circle_u = new vec3.zero();
