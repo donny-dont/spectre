@@ -151,7 +151,7 @@ class SpectreTexture extends DeviceChild {
     gl.texParameteri(
         _textureTarget,
         WebGLRenderingContext.TEXTURE_WRAP_T,
-        _samplerState.address);
+        _samplerState.addressV);
 
     gl.texParameteri(
         _textureTarget,
