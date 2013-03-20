@@ -5,7 +5,6 @@ description: Graphics Library
 homepage: https://github.com/johnmccutchan/spectre
 documentation: http://johnmccutchan.github.com/spectre/
 dependencies:
-  unittest: any
   marker_prof:
     git: https://github.com/johnmccutchan/markerprof.git
   vector_math:
@@ -14,6 +13,5 @@ dependencies:
     git: https://github.com/johnmccutchan/game_loop.git
   asset_pack:
     git: https://github.com/johnmccutchan/asset_pack.git
-  property_map:
-    git: https://github.com/sethillgard/property_map.git
-  bot: ">=0.15.0"
+  unittest: any
+  browser: any

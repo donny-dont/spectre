@@ -334,7 +334,7 @@ class Animation {
   final String name;
   final List<_AnimationBoneData> _boneData;
   Animation(this.name, final int length) :
-      _boneData = new List<_AnimationBoneData>.fixedLength(length) {
+      _boneData = new List<_AnimationBoneData>(length) {
   }
   double _runTime = 0.0;
   double get runTime => _runTime;

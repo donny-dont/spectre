@@ -23,12 +23,15 @@ part of spectre_asset_pack;
 
 class MeshImporter extends AssetImporter {
   final GraphicsDevice device;
-  dynamic get fallback => null;
-
   MeshImporter(this.device);
 
-  SpectreMesh _processMeshes(AssetRequest request, List meshes) {
-    final String name = request.name;
+
+
+  void initialize(Asset asset) {
+  }
+
+  SpectreMesh _processMeshes(Asset asset, List meshes) {
+    final String name = asset.name;
     SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
     var vertexArray = new Float32Array.fromList(meshes[0]['vertices']);
     var indexArray = new Uint16Array.fromList(meshes[0]['indices']);
@@ -47,43 +50,39 @@ class MeshImporter extends AssetImporter {
     return mesh;
   }
 
-  SpectreMesh _processIndexedMesh(AssetRequest request, Map indexedMesh) {
+  SpectreMesh _processIndexedMesh(Asset asset, Map indexedMesh) {
     // TODO(johnmccutchan): Implement support for new mesh format.
     assert(false);
   }
-  SpectreMesh _processArrayMesh(AssetRequest request, Map arrayMesh) {
+  SpectreMesh _processArrayMesh(Asset asset, Map arrayMesh) {
     // TODO(johnmccutchan): Implement support for new mesh format.
     assert(false);
   }
-  Future<dynamic> import(dynamic payload, AssetRequest request) {
+
+  Future<Asset> import(dynamic payload, Asset asset) {
     if (payload is String) {
       try {
         Map parsed = JSON.parse(payload);
         SpectreMesh mesh;
         if (parsed.containsKey('meshes')) {
-          mesh = _processMeshes(request, parsed['meshes']);
+          mesh = _processMeshes(asset, parsed['meshes']);
         } else if (parsed.containsKey('indexedMesh')) {
-          mesh = _processIndexedMesh(request, parsed['indexedMesh']);
+          mesh = _processIndexedMesh(asset, parsed['indexedMesh']);
         } else if (parsed.containsKey('arrayMesh')) {
-          mesh =  _processArrayMesh(request, parsed['arrayMesh']);
-        } else {
-          return new Future.immediate(fallback);
+          mesh =  _processArrayMesh(asset, parsed['arrayMesh']);
         }
         if (mesh != null) {
-          return new Future.immediate(mesh);
-        } else {
-          return new Future.immediate(fallback);
+          asset.imported = mesh;
         }
-      } catch (_) {
-        return new Future.immediate(fallback);
-      }
-    } else {
-      assert(!(payload is String));
-      return new Future.immediate(fallback);
+      } catch (_) {}
     }
+    return new Future.immediate(asset);
   }
+
   void delete(SpectreMesh imported) {
-    print('Deleting ${imported.name}');
-    imported.dispose();
+    if (imported != null) {
+      print('Deleting ${imported.name}');
+      imported.dispose();
+    }
   }
 }

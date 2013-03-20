@@ -79,8 +79,8 @@ void testFromJson() {
   expect(_renderer.depthBuffers.length, 2);
   expect(_renderer.renderTargets.length, 2);
   // Test update of front buffer dimensions.
-  expect(_frontBuffer.clientWidth, 123);
-  expect(_frontBuffer.clientHeight, 456);
+  expect(_frontBuffer.client.width, 123);
+  expect(_frontBuffer.client.height, 456);
   // Render target is _NOT_ renderable.
   // This is because the attachments are not of the same dimensions.
   expect(_renderer.renderTargets['backBuffer'].isRenderable, false);
