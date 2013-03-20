@@ -20,31 +20,80 @@
 
 part of spectre_asset_pack;
 
+/// Importer for [Texture]s.
+///
+/// The [TextureImporter] takes the following arguments.
+/// * surfaceFormat - Specifies the [SurfaceFormat] to use. This is only
+///   applicable when [ImageElement]s are loaded. By default this value
+///   is [SurfaceFormat.Rgba].
+/// * generateMipmaps - Whether mip maps should be generated. This value is
+///   only applicable when [ImageElement]s are loaded. By default this value
+///   is true. If the [ImageElement] is a non-power of two mipmap generation
+///   will be ignored.
 class TextureImporter extends AssetImporter {
-  final GraphicsDevice device;
-  dynamic get fallback => null;
+  //---------------------------------------------------------------------
+  // Class variables
+  //---------------------------------------------------------------------
 
-  TextureImporter(this.device);
+  /// The argument name for specifying the surface format.
+  static const String _surfaceFormatArgument = 'surfaceFormat';
+  /// The argument name for specifying whether mipmaps should be generated.
+  static const String _generateMipmapsArgument = 'generateMipmaps';
 
-  Future<dynamic> import(dynamic payload, AssetRequest assetRequest) {
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+
+  /// The [GraphicsDevice] to create the [Texture] with.
+  GraphicsDevice _graphicsDevice;
+
+  /// Creates an instance of the [TextureImporter] class.
+  TextureImporter(GraphicsDevice graphicsDevice)
+      : _graphicsDevice = graphicsDevice;
+
+  void initialize(Asset asset) {
+    // Set the default values for the importer
+    Map importArguments = asset.importArguments;
+
+    importArguments.putIfAbsent(_surfaceFormatArgument, 'SurfaceFormat.Rgba');
+    importArguments.putIfAbsent(_generateMipmapsArgument, true);
+
+    // Can't initialize the actual asset yet
+  }
+
+  Future<dynamic> import(dynamic payload, Asset asset) {
     // Check the payload type to determine what to load
     if (payload is ImageElement) {
-
+      return _importImageElement(payload, asset);
     } else if (payload is ArrayBuffer) {
       // Currently there's only DDS support
       // If more compressed formats are added change accordingly
-      return _importDdsTexture(payload, assetRequest);
+      return _importDdsTexture(payload, asset);
     } else {
 
     }
   }
 
-  Future<dynamic> _importDdsTexture(ArrayBuffer payload, AssetRequest assetRequest) {
+  Future<dynamic> _importImageElement(ImageElement payload, Asset asset) {
+    asset.imported = new Texture2D(asset.name, _graphicsDevice);
+
+    Map importerArguments = asset.importerArguments;
+
+    // Upload the asset
+    asset.imported.uploadElement(payload, surfaceType);
+
+    // Generate mipmaps
+    if (importerArguments[_generateMipmapsArgument]) {
+      asset.imported.generateMipmaps();
+    }
+  }
+
+  Future<dynamic> _importDdsTexture(ArrayBuffer payload, Asset asset) {
     DdsFile dds = new DdsFile(payload);
 
     // Not supported currently in WebGL
     if (dds.isVolumeTexture) {
-      return new Future.immediate(fallback);
+      return new Future.immediate(asset);
     }
 
     int width = dds.width;
@@ -54,7 +103,7 @@ class TextureImporter extends AssetImporter {
     if (dds.isCubeMap) {
 
     } else {
-      Texture2D texture = new Texture2D(assetRequest.name, device);
+      Texture2D texture = new Texture2D(asset.name, _graphicsDevice);
       int surfaceFormat = DdsResourceFormat.toSurfaceFormat(resourceFormat);
 
       // Need a way to translate to SurfaceFormat
@@ -65,12 +114,15 @@ class TextureImporter extends AssetImporter {
       } else {
 
       }
-
-      return new Future.immediate(texture);
     }
+
+    return new Future.immediate(asset);
   }
 
   void delete(dynamic imported) {
-    imported.dispose();
+    assert(imported is SpectreTexture);
+    if (imported != null) {
+      imported.dispose();
+    }
   }
 }
