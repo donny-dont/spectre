@@ -61,6 +61,8 @@ void renderFrame(GameLoop gameLoop) {
   _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
                             new vec3.raw(0.0, 0.0, 10.0),
                             new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  _debugDrawManager.addSphere(new vec3(20.0, 20.0, 20.0), 20.0,
+                              new vec4(0.0, 1.0, 0.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
