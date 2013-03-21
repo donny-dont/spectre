@@ -30,6 +30,41 @@ class MeshImporter extends AssetImporter {
   void initialize(Asset asset) {
   }
 
+  SpectreMesh _processMesh(Asset asset, Map json) {
+    final String name = asset.name;
+    SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
+    var vertexArray = new Float32Array.fromList(json['vertices']);
+    var indexArray = new Uint16Array.fromList(json['indices']);
+    mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
+    mesh.indexArray.uploadData(indexArray, SpectreBuffer.UsageStatic);
+    mesh.count = indexArray.length;
+    List attributes = json['attributes'];
+
+    attributes.forEach((v) {
+      String name = v['name'];
+      int offset = v['offset'];
+      int stride = v['stride'];
+      int count = 1;
+
+      switch (v['format']) {
+        case 'float2': count = 2; break;
+        case 'float3': count = 3; break;
+        case 'float4': count = 4; break;
+      }
+
+      SpectreMeshAttribute attribute = new SpectreMeshAttribute(
+          name,
+          'float',
+          count,
+          offset,
+          stride,
+          false);
+
+      mesh.attributes[name] = attribute;
+    });
+    return mesh;
+  }
+
   SpectreMesh _processMeshes(Asset asset, List meshes) {
     final String name = asset.name;
     SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
@@ -64,6 +99,10 @@ class MeshImporter extends AssetImporter {
       try {
         Map parsed = JSON.parse(payload);
         SpectreMesh mesh;
+
+        mesh = _processMesh(asset, parsed);
+
+        /*
         if (parsed.containsKey('meshes')) {
           mesh = _processMeshes(asset, parsed['meshes']);
         } else if (parsed.containsKey('indexedMesh')) {
@@ -71,6 +110,7 @@ class MeshImporter extends AssetImporter {
         } else if (parsed.containsKey('arrayMesh')) {
           mesh =  _processArrayMesh(asset, parsed['arrayMesh']);
         }
+        */
         if (mesh != null) {
           asset.imported = mesh;
         }
