@@ -1,3 +1,4 @@
+library asset_pack_example;
 import 'dart:html';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart';
