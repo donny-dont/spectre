@@ -258,8 +258,7 @@ class Application {
 
     // Create the CameraController and set the velocity of the movement
     _cameraController = new OrbitCameraController();
-    //_cameraController.forwardVelocity = 250.0;
-    //_cameraController.strafeVelocity = 250.0;
+    _cameraController.radius = 150.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4();
@@ -397,10 +396,9 @@ class Application {
     _cameraController.backward    = keyboard.buttons[Keyboard.S].down;
     _cameraController.strafeLeft  = keyboard.buttons[Keyboard.A].down;
     _cameraController.strafeRight = keyboard.buttons[Keyboard.D].down;*/
-
-    if (_gameLoop.pointerLock.locked) {
-      Mouse mouse = _gameLoop.mouse;
-
+  
+    Mouse mouse = _gameLoop.mouse;
+    if (mouse.isDown(Mouse.LEFT)) {
       _cameraController.accumDX = mouse.dx;
       _cameraController.accumDY = mouse.dy;
     }
@@ -571,10 +569,12 @@ void main() {
   // Hook up the game loop
   // The loop isn't started until the start method is called.
   _gameLoop = new GameLoop(canvas);
+  _gameLoop.pointerLock.lockOnClick = false;
+  
   _gameLoop.onResize = onResize;
   _gameLoop.onUpdate = onFrame;
   _gameLoop.onRender = onRender;
-  _gameLoop.onPointerLockChange = onPointerLockChange;
+  //_gameLoop.onPointerLockChange = onPointerLockChange;
 
   //_gameLoop.start();
 }
