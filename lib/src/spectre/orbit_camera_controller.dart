@@ -21,66 +21,59 @@
 part of spectre;
 
 class OrbitCameraController extends CameraController {
-  num mouseSensitivity;
+  num mouseSensitivity = 360.0;
+  num zoomSpeed = 10.0;
 
-  int accumDX;
-  int accumDY;
-  int accumDZ;
+  num accumDX = 0.0;
+  num accumDY = 0.0;
+  num accumDZ = 0.0;
   
-  num yaw;
-  num pitch;
-  num radius;
+  num yaw = 0.0;
+  num pitch = 0.0;
+  num radius = 100.0;
   
-  num minYaw;
-  num maxYaw;
-  num minRadius;
-  num maxRadius;
+  num minYaw = -Math.PI * 0.25;
+  num maxYaw = Math.PI * 0.33;
+  num minRadius = 50.0;
+  num maxRadius = 250.0;
   
-  vec2 momentum;
+  num momentumDuration = 0.650;
   
-  num friction;
+  bool hasMomentum = true;
+  bool hasFriction = true;
+  
+  vec2 _momentum = new vec2();
+  num _momentumTime = 0;
 
   OrbitCameraController() {
-    accumDX = 0;
-    accumDY = 0;
-    accumDZ = 0;
-    mouseSensitivity = 360.0;
     
-    pitch = 0;
-    yaw = 0;
-    radius = 100;
-    
-    minYaw = -Math.PI * 0.25;
-    maxYaw = Math.PI * 0.33;
-    
-    minRadius = 50.0;
-    maxRadius = 200.0;
-    
-    friction = 1.0;
-    momentum = new vec2();
   }
 
-  void updateCamera(num seconds, Camera cam) {
+  void updateCamera(num dt, Camera cam) {
     if(accumDX != 0 || accumDY != 0) {
-      momentum.x = accumDX/mouseSensitivity;
-      momentum.y = accumDY/mouseSensitivity;
+      _momentum.x = accumDX/mouseSensitivity;
+      _momentum.y = accumDY/mouseSensitivity;
 
       accumDX = 0;
       accumDY = 0;
+      
+      _momentumTime = 0;
     }
     
-    num momentumLen = momentum.length;
-    
-    if(momentumLen == 0.0) {
-      return;
+    if(accumDZ !=0) {
+      _ZoomView(dt, accumDZ);
+      accumDZ = 0;
     }
     
-    _RotateView(seconds, cam, momentum.x, momentum.y);
+    _RotateView(dt, cam, _momentum.x, _momentum.y);
     
-    momentumLen = max(0.0, momentumLen - (friction * seconds));
-    
-    momentum.normalize();
-    momentum.scale(momentumLen);
+    _ApplyFriction(dt);
+  }
+  
+  void _ZoomView(num dt, num zoomDelta) {
+    radius = (radius + zoomDelta).clamp(minRadius, maxRadius);
+    // TODO: Exponential zoom?
+    // TODO: Incorporate dt
   }
 
   void _RotateView(num dt, Camera cam, num yawDelta, num pitchDelta) {
@@ -96,17 +89,33 @@ class OrbitCameraController extends CameraController {
     cam.position = cam.focusPosition + offset;
   }
   
-  void _ZoomView(num dt, Camera cam, num zoomDelta) {
-    yaw += yawDelta;
-    pitch = (pitch + pitchDelta).clamp(minYaw, maxYaw);
+  void _ApplyFriction(num dt) {
+    if(!hasMomentum) {
+      _momentum.x = 0.0;
+      _momentum.y = 0.0;
+      return;
+    }
     
-    vec3 offset = new vec3.raw(
-      radius * cos(yaw) * cos(pitch),
-      radius * sin(pitch),
-      radius * sin(yaw) * cos(pitch)
-    );
-
-    cam.position = cam.focusPosition + offset;
+    if(!hasFriction) {
+      return;
+    }
+    
+    num momentumLen = _momentum.length;
+    if(momentumLen == 0.0) {
+      return;
+    }
+    
+    _momentumTime += dt;
+    
+    if(_momentumTime >= momentumDuration) {
+      _momentum.x = 0.0;
+      _momentum.y = 0.0;
+      return;
+    }
+    
+    momentumLen -= momentumLen * (_momentumTime / momentumDuration);
+    _momentum.normalize();
+    _momentum.scale(momentumLen);
   }
 }
 

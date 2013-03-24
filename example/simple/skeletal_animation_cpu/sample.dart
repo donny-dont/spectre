@@ -45,6 +45,8 @@ part 'ui.dart';
 
 /// The sample application.
 class Application {
+  num wheelDelta = 0.0;
+  
   //---------------------------------------------------------------------
   // Class variables
   //---------------------------------------------------------------------
@@ -398,10 +400,14 @@ class Application {
     _cameraController.strafeRight = keyboard.buttons[Keyboard.D].down;*/
   
     Mouse mouse = _gameLoop.mouse;
+    
     if (mouse.isDown(Mouse.LEFT)) {
       _cameraController.accumDX = mouse.dx;
       _cameraController.accumDY = mouse.dy;
     }
+
+    _cameraController.accumDZ = wheelDelta;
+    wheelDelta = 0.0;
 
     _cameraController.updateCamera(dt, _camera);
 
@@ -575,6 +581,11 @@ void main() {
   _gameLoop.onUpdate = onFrame;
   _gameLoop.onRender = onRender;
   //_gameLoop.onPointerLockChange = onPointerLockChange;
+  
+  canvas.onMouseWheel.listen((ev) {
+    _application.wheelDelta = ev.deltaY;
+    ev.preventDefault();
+  });
 
   //_gameLoop.start();
 }
