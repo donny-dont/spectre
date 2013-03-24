@@ -45,7 +45,6 @@ part 'ui.dart';
 
 /// The sample application.
 class Application {
-  num wheelDelta = 0.0;
   
   //---------------------------------------------------------------------
   // Class variables
@@ -393,21 +392,15 @@ class Application {
 
     // Update the mesh
     _meshes[_meshIndex].update(dt);
-
-    /*_cameraController.forward     = keyboard.buttons[Keyboard.W].down;
-    _cameraController.backward    = keyboard.buttons[Keyboard.S].down;
-    _cameraController.strafeLeft  = keyboard.buttons[Keyboard.A].down;
-    _cameraController.strafeRight = keyboard.buttons[Keyboard.D].down;*/
   
     Mouse mouse = _gameLoop.mouse;
     
-    if (mouse.isDown(Mouse.LEFT)) {
+    if (mouse.isDown(Mouse.LEFT) || _gameLoop.pointerLock.locked) {
       _cameraController.accumDX = mouse.dx;
       _cameraController.accumDY = mouse.dy;
     }
 
-    _cameraController.accumDZ = wheelDelta;
-    wheelDelta = 0.0;
+    _cameraController.accumDZ = mouse.wheelDy;
 
     _cameraController.updateCamera(dt, _camera);
 
@@ -575,17 +568,15 @@ void main() {
   // Hook up the game loop
   // The loop isn't started until the start method is called.
   _gameLoop = new GameLoop(canvas);
-  _gameLoop.pointerLock.lockOnClick = false;
   
   _gameLoop.onResize = onResize;
   _gameLoop.onUpdate = onFrame;
   _gameLoop.onRender = onRender;
-  //_gameLoop.onPointerLockChange = onPointerLockChange;
+  _gameLoop.onPointerLockChange = onPointerLockChange;
   
-  canvas.onMouseWheel.listen((ev) {
-    _application.wheelDelta = ev.deltaY;
-    ev.preventDefault();
-  });
-
+  // This application doesn't need pointer lock, so disable it.
+  // If you want to use pointer lock, however, comment this line
+  _gameLoop.pointerLock.lockOnClick = false;
+  
   //_gameLoop.start();
 }
