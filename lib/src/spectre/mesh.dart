@@ -31,7 +31,7 @@ class Mesh extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// The vertices of the mesh.
-  VertexBuffer _vertexBuffers;
+  List<VertexBuffer> _vertexBuffers;
   /// The layout of the vertices within the mesh.
   InputLayout _inputLayout;
   /// The indices of the mesh.
