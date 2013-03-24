@@ -35,6 +35,7 @@ part 'src/spectre_mesh/plane_generator.dart';
 part 'src/spectre_mesh/tangent_space_builder.dart';
 part 'src/spectre_mesh/vertex_data.dart';
 part 'src/spectre_mesh/scalar_list.dart';
+part 'src/spectre_mesh/sphere_generator.dart';
 part 'src/spectre_mesh/strided_list.dart';
 part 'src/spectre_mesh/vector2_list.dart';
 part 'src/spectre_mesh/vector3_list.dart';
