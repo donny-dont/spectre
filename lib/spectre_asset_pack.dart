@@ -30,6 +30,7 @@ import 'dart:async';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 
+part 'src/spectre_asset_pack/importers/mesh_importer.dart';
 part 'src/spectre_asset_pack/dds_file.dart';
 part 'src/spectre_asset_pack/dds_resource_format.dart';
 part 'src/spectre_asset_pack/mesh.dart';

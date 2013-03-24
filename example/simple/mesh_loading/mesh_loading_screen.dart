@@ -20,11 +20,10 @@
 
 part of spectre_example;
 
-/// Displays a simple geometry using the mesh library.
+/// Displays a mesh file loaded into Spectre.
 ///
-/// Shows how standard mesh types can be created and displayed within
-/// an application.
-class SimpleGeometryScreen extends DemoScreen {
+/// Shows how a mesh can be loaded and displayed within an application.
+class MeshLoadingScreen extends DemoScreen {
   //---------------------------------------------------------------------
   // Rendering state member variables
   //---------------------------------------------------------------------
@@ -69,8 +68,8 @@ class SimpleGeometryScreen extends DemoScreen {
   // Construction
   //---------------------------------------------------------------------
 
-  /// Creates an instance of the [SimpleGeometryScreen] class.
-  SimpleGeometryScreen(GraphicsDevice graphicsDevice, AssetManager assetManager)
+  /// Creates an instance of the [MeshLoadingScreen] class.
+  MeshLoadingScreen(GraphicsDevice graphicsDevice, AssetManager assetManager)
     : super(graphicsDevice, assetManager);
 
   //---------------------------------------------------------------------
@@ -78,17 +77,17 @@ class SimpleGeometryScreen extends DemoScreen {
   //---------------------------------------------------------------------
 
   Future<bool> _onLoad() {
-    // Create the rendering state
-    _createRendererState();
+    // Load the pack file with the mesh
+    return _assetManager.loadPack('meshLoading', 'assets/simple/mesh_loading.pack').then((assetPack) {
+       // Create the rendering state
+      _createRendererState();
 
-    // Create the Camera and the CameraController
-    _createCamera();
+      // Create the Camera and the CameraController
+      _createCamera();
 
-    // Create the Mesh and retrieve the ShaderProgram
-    _createMesh();
-
-    // Ready to display
-    return new Future.immediate(true);
+      // Create the Mesh and retrieve the ShaderProgram
+      _createMesh();
+    });
   }
 
   /// Creates the rendering state.
@@ -132,8 +131,8 @@ class SimpleGeometryScreen extends DemoScreen {
 
   /// Create the mesh to display.
   void _createMesh() {
-    // Create a box mesh
-    _mesh = _createBoxMesh();
+    // Get the example mesh to render with.
+    _mesh = _assetManager.root['meshLoading.exampleMesh'];
 
     // Get the ShaderProgram to render with.
     //
@@ -141,26 +140,6 @@ class SimpleGeometryScreen extends DemoScreen {
     // the Application at startup into the 'base' pack. The shader can be accessed
     // through the [] operator using the format 'packName.resourceName'.
     _shaderProgram = _assetManager.root['base.solidLightingShader'];
-  }
-
-  /// Creates a box mesh for display.
-  Mesh _createBoxMesh() {
-    // A box mesh can be created through a BoxGenerator.
-    //
-    // There are helper methods that can be used when creating a single mesh.
-    // When creating a large number of boxes a BoxGenerator should be created and
-    // used to create all the boxes.
-    //
-    // Create a unit cube centered at the origin.
-    vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
-    vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
-
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 12, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
-
-    List<InputLayoutElement> elements = [positionElement, normalElement];
-
-    return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
   }
 
   //---------------------------------------------------------------------

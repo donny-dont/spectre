@@ -31,7 +31,7 @@ class Mesh extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// The vertices of the mesh.
-  VertexBuffer _vertexBuffer;
+  VertexBuffer _vertexBuffers;
   /// The layout of the vertices within the mesh.
   InputLayout _inputLayout;
   /// The indices of the mesh.
@@ -43,9 +43,9 @@ class Mesh extends DeviceChild {
   // Construction
   //---------------------------------------------------------------------
 
-  Mesh(String name, GraphicsDevice graphicsDevice, VertexBuffer vertexBuffer, InputLayout inputLayout, [IndexBuffer indexBuffer = null, int primitiveType = PrimitiveType.TriangleList])
+  Mesh(String name, GraphicsDevice graphicsDevice, List<VertexBuffer> vertexBuffers, InputLayout inputLayout, [IndexBuffer indexBuffer = null, int primitiveType = PrimitiveType.TriangleList])
     : super._internal(name, graphicsDevice)
-    , _vertexBuffer = vertexBuffer
+    , _vertexBuffers = vertexBuffers
     , _inputLayout = inputLayout
     , _indexBuffer = indexBuffer
     , _primitiveType = primitiveType;
@@ -55,7 +55,7 @@ class Mesh extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// The vertices of the mesh.
-  VertexBuffer get vertexBuffer => _vertexBuffer;
+  List<VertexBuffer> get vertexBuffers => _vertexBuffers;
   /// The layout of the vertices within the mesh.
   InputLayout get inputLayout => _inputLayout;
   /// The indices of the mesh.

@@ -48,6 +48,12 @@ part 'shared/demo_screen.dart';
 
 part 'simple/simple_geometry/simple_geometry_screen.dart';
 
+//---------------------------------------------------------------------
+// MeshLoading sources
+//---------------------------------------------------------------------
+
+part 'simple/mesh_loading/mesh_loading_screen.dart';
+
 /// The sample application.
 class Application {
   //---------------------------------------------------------------------
@@ -138,7 +144,8 @@ class Application {
   void _onLoad() {
     // Load the base pack
     _assetManager.loadPack('base', 'assets/base.pack').then((assetPack) {
-      _currentScreen = new SimpleGeometryScreen(_graphicsDevice, _assetManager);
+      _currentScreen = new MeshLoadingScreen(_graphicsDevice, _assetManager);
+      //_currentScreen = new SimpleGeometryScreen(_graphicsDevice, _assetManager);
 
       _currentScreen.onLoad().then((value) {
         _currentScreen.onResize(_width, _height);

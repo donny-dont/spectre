@@ -1,0 +1,9 @@
+{
+  "exampleMesh":{
+    "loadArguments":{},
+    "name":"exampleMesh",
+    "url":"/example.mesh",
+    "type":"mesh",
+    "importArguments":{}
+  }
+}

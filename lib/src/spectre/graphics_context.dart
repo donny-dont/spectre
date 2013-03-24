@@ -610,7 +610,7 @@ class GraphicsContext {
     setPrimitiveTopology(mesh.primitiveType);
     setInputLayout(mesh.inputLayout);
     setIndexBuffer(mesh.indexBuffer);
-    setVertexBuffers(0, [mesh.vertexBuffer]);
+    setVertexBuffers(0, mesh.vertexBuffers);
   }
 
   void drawMeshNew(Mesh mesh) {
