@@ -47,24 +47,17 @@ class MeshImporterRedux extends AssetImporter {
 
   /// Processes the mesh.
   void _importMesh(Map meshValues, Asset asset) {
-    print('Hey im importing stuff!');
-
     // Load the individual vertex buffers
     int vertexBufferSlot = 0;
     List vertexBuffersData = meshValues['vertexBuffers'];
     List<VertexBuffer> vertexBuffers = new List<VertexBuffer>();
     InputLayout layout = new InputLayout('${asset.name}_layout', _graphicsDevice);
 
-    print('Time to iterate over stuff');
-
     vertexBuffersData.forEach((value) {
       // Load the vertex attributes
       int stride = value['stride'];
-      print('stride $stride');
 
       value['layout'].forEach((layoutValue) {
-        print('creating a value');
-        print(layoutValue);
         layout.elements.add(_createVertexElement(layoutValue, vertexBufferSlot, stride));
       });
 
@@ -74,14 +67,11 @@ class MeshImporterRedux extends AssetImporter {
       vertexBufferSlot++;
     });
 
-    print('Time to create indices!');
     // Load the index buffer
     IndexBuffer indexBuffer = _createIndexBuffer(meshValues['indices'], 16, '${asset.name}_ibo');
-    print('indices created!');
+
     // Create the mesh
     asset.imported = new Mesh(asset.name, _graphicsDevice, vertexBuffers, layout, indexBuffer);
-
-    print('Mesh created!');
   }
 
   /// Creates a [VertexBuffer] from the given [values].
@@ -90,15 +80,11 @@ class MeshImporterRedux extends AssetImporter {
 
     // Get the vertices
     if (values is String) {
-      print('decoding');
-      print(values.length);
       ArrayBuffer buffer = _decoder.decode(values);
-      print('decoded');
+
       vertices = new Float32Array.fromBuffer(buffer);
-      print('buffered');
     } else {
       vertices = new Float32Array.fromList(values);
-      print('loaded list');
     }
 
     // Create the vertex buffer
@@ -124,6 +110,7 @@ class MeshImporterRedux extends AssetImporter {
     // \TODO Support for UINT?
     if (values is String) {
       ArrayBuffer buffer = _decoder.decode(values);
+
       indices = new Uint16Array.fromBuffer(buffer);
     } else {
       indices = new Uint16Array.fromList(values);
@@ -138,13 +125,10 @@ class MeshImporterRedux extends AssetImporter {
 
   /// Creates a [SpectreMeshAttribute] from the given [values].
   InputLayoutElement _createVertexElement(Map values, int slot, int stride) {
-    print(values);
     String name = values['name'];
     int index = _getAttributeIndex(name);
     DeviceFormat format = _getAttributeFormat(name);
     int offset = values['offset'];
-
-    print('Element: $name $index $format $offset');
 
     return new InputLayoutElement(slot, index, offset, stride, format);
   }
