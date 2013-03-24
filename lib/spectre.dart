@@ -29,8 +29,6 @@ import 'dart:async';
 import 'dart:math' as Math;
 //import 'dart:scalarlist';
 import 'package:vector_math/vector_math.dart';
-import 'package:marker_prof/profiler.dart';
-import 'package:property_map/property_map.dart';
 import 'package:spectre/disposable.dart';
 
 part 'src/spectre/device_child.dart';

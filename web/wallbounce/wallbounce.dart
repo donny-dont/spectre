@@ -40,7 +40,7 @@ List<vec2> lineNormals;
 
 void _makeNormals() {
   assert(lineStart.length == lineEnd.length);
-  lineNormals = new List<vec2>.fixedLength(lineStart.length);
+  lineNormals = new List<vec2>(lineStart.length);
   for (int i = 0; i < lineStart.length; i++) {
     vec2 n = lineEnd[i]-lineStart[i];
     n.normalize();
@@ -148,8 +148,8 @@ void renderFrame(GameLoop gameLoop) {
 void resizeFrame(GameLoop gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
   // Adjust the viewport dimensions
   Viewport vp = _viewport;
   vp.width = canvas.width;
@@ -171,8 +171,8 @@ main() {
   _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
 
   _makeNormals();
 

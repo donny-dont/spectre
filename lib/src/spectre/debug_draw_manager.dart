@@ -65,6 +65,10 @@ class _DebugLineCollection {
     _lineObject.duration = duration;
   }
 
+  void finishLineObject() {
+    // TODO: Verify that there are is a multiple of two vertices.
+  }
+
   _DebugLineVertex getVertex() {
     if (_freeLineVertices.length > 0) {
       return _freeLineVertices.removeLast();
@@ -92,6 +96,10 @@ class _DebugLineCollection {
   }
 
   void update(num dt) {
+    if (_lineObject != null) {
+      //_lineObjects.add(_lineObject);
+      //_lineObject = null;
+    }
     for (int i = _lineObjects.length-1; i >= 0; i--) {
       _DebugLineObject lineObject = _lineObjects[i];
       lineObject.duration -= dt;
@@ -104,6 +112,17 @@ class _DebugLineCollection {
       }
     }
   }
+
+  void _addLine(vec3 start, vec3 finish) {
+    addVertex(finish.x, finish.y, finish.z);
+    addVertex(start.x, start.y, start.z);
+  }
+
+  void _addLineRaw(double sx, double sy, double sz,
+                   double fx, double fy, double fz) {
+    addVertex(fx, fy, fz);
+    addVertex(sx, sy, sz);
+  }
 }
 
 class _DebugDrawLineManager {
@@ -113,18 +132,18 @@ class _DebugDrawLineManager {
   SingleArrayMesh _lineMesh;
   InputLayout _lineMeshInputLayout;
 
-  int _maxVertices;
   Float32Array _vboStorage;
-  int _vboUsed;
 
-  _DebugDrawLineManager(this.device, String name, int vboSize,
-                        ShaderProgram lineShaderHandle) {
-    _maxVertices = vboSize;
-    _vboUsed = 0;
-    _vboStorage = new Float32Array(vboSize*DebugDrawVertexSize);
-    _lineMesh = new SingleArrayMesh(name, device);
+  _DebugDrawLineManager(this.device, int maxVertices,
+                        ShaderProgram shaderProgram) {
+    if ((maxVertices & 0x1) != 0) {
+      // Keep an even number of vertices.
+      maxVertices += 1;
+    }
+    _vboStorage = new Float32Array(maxVertices*DebugDrawVertexSize);
+    _lineMesh = new SingleArrayMesh('_DebugDrawLineManager', device);
     _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
-    _lineMesh.vertexArray.allocate(vboSize*DebugDrawVertexSize*4,
+    _lineMesh.vertexArray.allocate(_vboStorage.length*4,
                                    SpectreBuffer.UsageDynamic);
     _lineMesh.attributes['vPosition'] = new SpectreMeshAttribute('vPosition',
                                                                  'float', 3,
@@ -132,35 +151,42 @@ class _DebugDrawLineManager {
     _lineMesh.attributes['vColor'] = new SpectreMeshAttribute('vColor',
                                                               'float', 4,
                                                               12, 28, false);
-    _lineMeshInputLayout = new InputLayout('$name Layout', device);
-    _lineMeshInputLayout.shaderProgram = lineShaderHandle;
+    _lineMeshInputLayout = new InputLayout('_DebugDrawLineManager', device);
+    _lineMeshInputLayout.shaderProgram = shaderProgram;
     _lineMeshInputLayout.mesh = _lineMesh;
   }
 
   void _prepareForRender(GraphicsContext context) {
-    _vboUsed = 0;
+    final int vertexBufferLength = _vboStorage.length;
+    int vertexBufferCursor = 0;
     for (_DebugLineObject line in lines._lineObjects) {
       _DebugLineVertex v = line.vertexStream;
       while (v != null) {
-        _vboStorage[_vboUsed++] = v.x;
-        _vboStorage[_vboUsed++] = v.y;
-        _vboStorage[_vboUsed++] = v.z;
-        _vboStorage[_vboUsed++] = line.r;
-        _vboStorage[_vboUsed++] = line.g;
-        _vboStorage[_vboUsed++] = line.b;
-        _vboStorage[_vboUsed++] = line.a;
+        _vboStorage[vertexBufferCursor++] = v.x;
+        _vboStorage[vertexBufferCursor++] = v.y;
+        _vboStorage[vertexBufferCursor++] = v.z;
+        _vboStorage[vertexBufferCursor++] = line.r;
+        _vboStorage[vertexBufferCursor++] = line.g;
+        _vboStorage[vertexBufferCursor++] = line.b;
+        _vboStorage[vertexBufferCursor++] = line.a;
         v = v.next;
+        if (vertexBufferCursor == vertexBufferLength) {
+          break;
+        }
+      }
+      if (vertexBufferCursor == vertexBufferLength) {
+        break;
       }
     }
     _lineMesh.vertexArray.uploadSubData(0, _vboStorage);
-    _lineMesh.count = vertexCount;
+    _lineMesh.count = vertexBufferCursor ~/ DebugDrawVertexSize;
   }
-
-  int get vertexCount => _vboUsed ~/ DebugDrawVertexSize;
 
   void update(num dt) {
     lines.update(dt);
   }
+
+
 }
 
 /** The debug draw manager manages a collection of debug primitives that are
@@ -179,7 +205,7 @@ class _DebugDrawLineManager {
  * - AABB (Axis Aligned Bounding Boxes)
  *
  *
- * The following controls are supported for each primitive:
+ * The following properties can be controlled for each primitive:
  *
  * - Depth testing on or off.
  * - Size.
@@ -188,21 +214,9 @@ class _DebugDrawLineManager {
  *
  */
 class DebugDrawManager {
-  static final _depthStateEnabledName = 'Debug Depth Enabled State';
-  static final _depthStateDisabledName = 'Debug Depth Disabled State';
-  static final _blendStateName = 'Debug Blend State';
-  static final _rasterizerStateName = 'Debug Rasterizer State';
-  static final _lineVertexShaderName = 'Debug Line Vertex Shader';
-  static final _lineFragmentShaderName = 'Debug Line Fragment Shader';
-  static final _lineShaderProgramName = 'Debug Line Program';
-  static final _depthEnabledLineVBOName = 'Debug Draw Depth Enabled VBO';
-  static final _depthDisabledLineVBOName = 'Debug Draw Depth Disabled VBO';
-  static final _cameraTransformUniformName = 'cameraTransform';
-
-  DepthState _depthEnabled;
-  DepthState _depthDisabled;
-  BlendState _blend;
-  RasterizerState _rasterizer;
+  DepthState _depthState;
+  BlendState _blendState;
+  RasterizerState _rasterizerState;
   VertexShader _lineVertexShader;
   FragmentShader _lineFragmentShader;
   ShaderProgram _lineShaderProgram;
@@ -213,125 +227,130 @@ class DebugDrawManager {
 
   final GraphicsDevice device;
 
-  /** Construct and initialize a DebugDrawManager. */
-  DebugDrawManager(this.device, {int vboSize: 16384}) {
-    _depthEnabled = new DepthState(_depthStateEnabledName, device);
-    _depthEnabled.depthBufferEnabled = true;
-    _depthEnabled.depthBufferWriteEnabled = true;
-    _depthEnabled.depthBufferFunction = CompareFunction.LessEqual;
-    _depthDisabled = new DepthState(_depthStateDisabledName, device);
-    _depthDisabled.depthBufferEnabled = false;
-    _depthDisabled.depthBufferWriteEnabled = false;
-    _blend = new BlendState(_blendStateName, device);
-    _rasterizer = new RasterizerState(_rasterizerStateName, device);
-    _rasterizer.cullMode = CullMode.Back;
-    _lineVertexShader = new VertexShader(_lineVertexShaderName, device);
-    _lineFragmentShader = new FragmentShader(_lineFragmentShaderName, device);
-    _lineShaderProgram = new ShaderProgram(_lineShaderProgramName, device);
+  /** Construct and initialize a DebugDrawManager. Can specify maximum
+   * number of vertices with [maxVertices]. */
+  DebugDrawManager(this.device, {int maxVertices: 16384}) {
+    _depthState = new DepthState('DebugDrawManager', device);
+    _blendState = new BlendState.alphaBlend('DebugDrawManager', device);
+    _rasterizerState = new RasterizerState('DebugDrawManager', device);
+    _rasterizerState.cullMode = CullMode.None;
+    _lineVertexShader = new VertexShader('DebugDrawManager', device);
+    _lineFragmentShader = new FragmentShader('DebugDrawManager', device);
+    _lineShaderProgram = new ShaderProgram('DebugDrawManager', device);
     _lineVertexShader.source = _debugLineVertexShader;
     _lineFragmentShader.source = _debugLineFragmentShader;
     _lineShaderProgram.vertexShader = _lineVertexShader;
     _lineShaderProgram.fragmentShader = _lineFragmentShader;
     _lineShaderProgram.link();
     _depthEnabledLines = new _DebugDrawLineManager(device,
-                                                   _depthEnabledLineVBOName,
-                                                   vboSize,
+                                                   maxVertices,
                                                    _lineShaderProgram);
     _depthDisabledLines = new _DebugDrawLineManager(device,
-                                                    _depthDisabledLineVBOName,
-                                                    vboSize,
+                                                    maxVertices,
                                                     _lineShaderProgram);
   }
 
-  void _addLine(vec3 start, vec3 finish, bool depthEnabled) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.addVertex(finish.x, finish.y, finish.z);
-      _depthEnabledLines.lines.addVertex(start.x, start.y, start.z);
-    } else {
-      _depthDisabledLines.lines.addVertex(finish.x, finish.y, finish.z);
-      _depthDisabledLines.lines.addVertex(start.x, start.y, start.z);
-    }
-  }
 
-  void _addLineRaw(double sx, double sy, double sz,
-                   double fx, double fy, double fz, bool depthEnabled) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.addVertex(fx, fy, fz);
-      _depthEnabledLines.lines.addVertex(sx, sy, sz);
-    } else {
-      _depthDisabledLines.lines.addVertex(fx, fy, fz);
-      _depthDisabledLines.lines.addVertex(sx, sy, sz);
-    }
-  }
 
-  /** Add a line primitive. The line extends from [start] to [finish].
-   * The line is drawn in [color] for [duration] seconds.
+  /** Add a line primitive extending from [start] to [finish].
+   * Filled with [color].
+   *
+   * Optional parameters: [duration] and [depthEnabled].
    */
   void addLine(vec3 start, vec3 finish, vec4 color,
                {num duration: 0.0, bool depthEnabled: true}) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                               color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    }
-    _addLine(start, finish, depthEnabled);
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
+    lineManager.lines._addLine(start, finish);
+    lineManager.lines.finishLineObject();
   }
 
-  /** Add a cross primitive. The cross primitive is drawn at [point].
-   * The cross is drawn in [color] for [duration] seconds.
-   * The cross is drawn [size] units wide.
+  /** Add a cross primitive at [point]. Filled with [color].
+   *
+   * Optional paremeters: [size], [duration], and [depthEnabled].
    */
   void addCross(vec3 point, vec4 color,
-                [num size = 1.0, num duration = 0.0, bool depthEnabled=true]) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                               color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    }
+                {num size: 1.0, num duration: 0.0, bool depthEnabled:true}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
     num half_size = size * 0.5;
-    _addLine(point, point + new vec3(half_size, 0.0, 0.0), depthEnabled);
-    _addLine(point, point + new vec3(-half_size, 0.0, 0.0), depthEnabled);
-    _addLine(point, point + new vec3(0.0, half_size, 0.0), depthEnabled);
-    _addLine(point, point + new vec3(0.0, -half_size, 0.0), depthEnabled);
-    _addLine(point, point + new vec3(0.0, 0.0, half_size), depthEnabled);
-    _addLine(point, point + new vec3(0.0, 0.0, -half_size), depthEnabled);
+    lineManager.lines._addLine(point, point + new vec3(half_size, 0.0, 0.0));
+    lineManager.lines._addLine(point, point + new vec3(-half_size, 0.0, 0.0));
+    lineManager.lines._addLine(point, point + new vec3(0.0, half_size, 0.0));
+    lineManager.lines._addLine(point, point + new vec3(0.0, -half_size, 0.0));
+    lineManager.lines._addLine(point, point + new vec3(0.0, 0.0, half_size));
+    lineManager.lines._addLine(point, point + new vec3(0.0, 0.0, -half_size));
+    lineManager.lines.finishLineObject();
   }
 
-  /** Add a sphere primitive. The sphere primitive is drawn at [center]
-   * with [radius].
-   * The sphere is drawn in [color] for [duration] seconds.
+  /** Add a sphere primitive at [center] with [radius]. Filled with [color].
+   *
+   * Optional paremeters: [duration] and [depthEnabled].
    */
   void addSphere(vec3 center, num radius, vec4 color,
-                 [num duration = 0.0, bool depthEnabled = true]) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                               color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
+                 {num duration: 0.0, bool depthEnabled: true}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
+
+    int latSegments = 6;
+    int lonSegments = 8;
+    num twoPi = (2.0 * Math.PI);
+
+    vec3 lastVertex, vertex, upperVertex;
+
+    for (int y = 0; y < latSegments; ++y) {
+      lastVertex = null;
+      for (int x = 0; x <= lonSegments; ++x) {
+        num u = x / lonSegments;
+        num v = y / latSegments;
+        num v2 = (y+1) / latSegments;
+
+        vertex = new vec3.raw(
+            radius * cos(u * twoPi) * sin(v * Math.PI),
+            radius * cos(v * Math.PI),
+            radius * sin(u * twoPi) * sin(v * Math.PI)
+        ) + center;
+
+        upperVertex = new vec3.raw(
+            radius * cos(u * twoPi) * sin(v2 * Math.PI),
+            radius * cos(v2 * Math.PI),
+            radius * sin(u * twoPi) * sin(v2 * Math.PI)
+        ) + center;
+
+        if(lastVertex != null) {
+          lineManager.lines._addLineRaw(
+              lastVertex.x, lastVertex.y, lastVertex.z,
+              vertex.x, vertex.y, vertex.z);
+          lineManager.lines._addLineRaw(
+              upperVertex.x, upperVertex.y, upperVertex.z,
+              vertex.x, vertex.y, vertex.z);
+        }
+
+        lastVertex = vertex;
+      }
     }
-    _circle_u.x = 1.0;
-    _circle_u.y = 0.0;
-    _circle_u.z = 0.0;
-    _circle_v.x = 0.0;
-    _circle_v.y = 1.0;
-    _circle_v.z = 0.0;
+    lineManager.lines.finishLineObject();
   }
 
   final vec3 _circle_u = new vec3.zero();
   final vec3 _circle_v = new vec3.zero();
 
-  /** Add an arc primitive. The arc is drawn at [center] with [radius].
-   * The arc is drawn from [startAngle] to [stopAngle].
-   * The arc is drawn in [color] for [duration] seconds.
+  /** Add an arc primitive at [center] in the plane whose normal is
+   * [planeNormal] with a [radius]. The arc begins at [startAngle] and extends
+   * to [stopAngle]. Filled with [color].
+   *
+   * Optional parameters: [duration], [depthEnabled], and [numSegments].
    */
   void addArc(vec3 center, vec3 planeNormal, num radius, num startAngle,
-              num stopAngle, vec4 color, [num duration = 0.0,
-              bool depthEnabled = true, int numSegments = 16]) {
+              num stopAngle, vec4 color, {num duration: 0.0,
+              bool depthEnabled: true, int numSegments: 16}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
+
     buildPlaneVectors(planeNormal, _circle_u, _circle_v);
     num alpha = 0.0;
     num twoPi = (2.0 * 3.141592653589793238462643);
@@ -344,35 +363,32 @@ class DebugDrawManager {
     double lastY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
     double lastZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
 
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-
-
     for (alpha = startAngle; alpha <= stopAngle+_step; alpha += _step) {
       cosScale = cos(alpha) * radius;
       sinScale = sin(alpha) * radius;
       double pX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
       double pY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
       double pZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
-      _addLineRaw(lastX, lastY, lastZ, pX, pY, pZ, depthEnabled);
+      lineManager.lines._addLineRaw(lastX, lastY, lastZ, pX, pY, pZ);
       lastX = pX;
       lastY = pY;
       lastZ = pZ;
     }
+    lineManager.lines.finishLineObject();
   }
 
-  /** Add a circle primitive. The circle is located at [center] and
-   * is drawn in the plane defined by [planeNormal].
-   * The circle has [radius] and [color] and is drawn for [duration] seconds.
+  /** Add an circle primitive at [center] in the plane whose normal is
+   * [planeNormal] with a [radius]. Filled with [color].
+   *
+   * Optional parameters: [duration], [depthEnabled], and [numSegments].
    */
   void addCircle(vec3 center, vec3 planeNormal, num radius, vec4 color,
-                 [num duration = 0.0, bool depthEnabled = true,
-                 int numSegments = 16]) {
+                 {num duration: 0.0, bool depthEnabled: true,
+                 int numSegments: 16}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
+
     buildPlaneVectors(planeNormal, _circle_u, _circle_v);
     num alpha = 0.0;
     num twoPi = (2.0 * 3.141592653589793238462643);
@@ -382,39 +398,33 @@ class DebugDrawManager {
     double lastY = center.y + _circle_u.y * radius;
     double lastZ = center.z + _circle_u.z * radius;
 
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-
     for (alpha = 0.0; alpha <= twoPi; alpha += _step) {
       double cosScale = cos(alpha) * radius;
       double sinScale = sin(alpha) * radius;
       double pX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
       double pY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
       double pZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
-      _addLineRaw(lastX, lastY, lastZ, pX, pY, pZ, depthEnabled);
+      lineManager.lines._addLineRaw(lastX, lastY, lastZ, pX, pY, pZ);
       lastX = pX;
       lastY = pY;
       lastZ = pZ;
     }
-    _addLineRaw(lastX, lastY, lastZ,
-                center.x + _circle_u.x * radius,
-                center.y + _circle_u.y * radius,
-                center.z + _circle_u.z * radius, depthEnabled);
+    lineManager.lines._addLineRaw(lastX, lastY, lastZ,
+                                  center.x + _circle_u.x * radius,
+                                  center.y + _circle_u.y * radius,
+                                  center.z + _circle_u.z * radius);
+    lineManager.lines.finishLineObject();
   }
 
-  /// Add a transformation (rotation & translation) from [xform].
-  /// Size is controlled with [size]
+  /// Add a coordinate system primitive. Derived from [xform]. Scaled by [size].
   ///
   /// X,Y, and Z axes are colored Red,Green, and Blue
   ///
-  /// Options: [duration] and [depthEnabled]
+  /// Optional paremeters: [duration], and [depthEnabled]
   void addAxes(mat4 xform, num size,
-               [num duration = 0.0, bool depthEnabled = true]) {
+               {num duration: 0.0, bool depthEnabled: true}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+
     vec4 origin = new vec4.raw(0.0, 0.0, 0.0, 1.0);
     num size_90p = 0.9 * size;
     num size_10p = 0.1 * size;
@@ -449,18 +459,14 @@ class DebugDrawManager {
     X_head_3 = xform * X_head_3;
 
     color = new vec4.raw(1.0, 0.0, 0.0, 1.0);
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-    _addLine(origin.xyz, X.xyz, depthEnabled);
-    _addLine(X.xyz, X_head_0.xyz, depthEnabled);
-    _addLine(X.xyz, X_head_1.xyz, depthEnabled);
-    _addLine(X.xyz, X_head_2.xyz, depthEnabled);
-    _addLine(X.xyz, X_head_3.xyz, depthEnabled);
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+        duration);
+    lineManager.lines._addLine(origin.xyz, X.xyz);
+    lineManager.lines._addLine(X.xyz, X_head_0.xyz);
+    lineManager.lines._addLine(X.xyz, X_head_1.xyz);
+    lineManager.lines._addLine(X.xyz, X_head_2.xyz);
+    lineManager.lines._addLine(X.xyz, X_head_3.xyz);
+    lineManager.lines.finishLineObject();
 
     Y = xform * Y;
     Y_head_0 = xform * Y_head_0;
@@ -469,18 +475,14 @@ class DebugDrawManager {
     Y_head_3 = xform * Y_head_3;
 
     color = new vec4.raw(0.0, 1.0, 0.0, 1.0);
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-    _addLine(origin.xyz, Y.xyz, depthEnabled);
-    _addLine(Y.xyz, Y_head_0.xyz, depthEnabled);
-    _addLine(Y.xyz, Y_head_1.xyz, depthEnabled);
-    _addLine(Y.xyz, Y_head_2.xyz, depthEnabled);
-    _addLine(Y.xyz, Y_head_3.xyz, depthEnabled);
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+        duration);
+    lineManager.lines._addLine(origin.xyz, Y.xyz);
+    lineManager.lines._addLine(Y.xyz, Y_head_0.xyz);
+    lineManager.lines._addLine(Y.xyz, Y_head_1.xyz);
+    lineManager.lines._addLine(Y.xyz, Y_head_2.xyz);
+    lineManager.lines._addLine(Y.xyz, Y_head_3.xyz);
+    lineManager.lines.finishLineObject();
 
     Z = xform * Z;
     Z_head_0 = xform * Z_head_0;
@@ -489,97 +491,89 @@ class DebugDrawManager {
     Z_head_3 = xform * Z_head_3;
 
     color = new vec4.raw(0.0, 0.0, 1.0, 1.0);
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-    _addLine(origin.xyz, Z.xyz, depthEnabled);
-    _addLine(Z.xyz, Z_head_0.xyz, depthEnabled);
-    _addLine(Z.xyz, Z_head_1.xyz, depthEnabled);
-    _addLine(Z.xyz, Z_head_2.xyz, depthEnabled);
-    _addLine(Z.xyz, Z_head_3.xyz, depthEnabled);
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+        duration);
+    lineManager.lines._addLine(origin.xyz, Z.xyz);
+    lineManager.lines._addLine(Z.xyz, Z_head_0.xyz);
+    lineManager.lines._addLine(Z.xyz, Z_head_1.xyz);
+    lineManager.lines._addLine(Z.xyz, Z_head_2.xyz);
+    lineManager.lines._addLine(Z.xyz, Z_head_3.xyz);
+    lineManager.lines.finishLineObject();
   }
 
-  /// Add a triangle with vertices [vertex0], [vertex1], and [vertex2].
-  /// Color [color]
+  /// Add a triangle primitives from vertices [vertex0], [vertex1],
+  /// and [vertex2]. Filled with [color].
   ///
-  /// Options: [duration] and [depthEnabled]
+  /// Optional parameters: [duration] and [depthEnabled]
   void addTriangle(vec3 vertex0, vec3 vertex1, vec3 vertex2, vec4 color,
-                   [num duration = 0.0, bool depthEnabled = true]) {
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
-    _addLine(vertex0, vertex1, depthEnabled);
-    _addLine(vertex1, vertex2, depthEnabled);
-    _addLine(vertex2, vertex0, depthEnabled);
+                   {num duration: 0.0, bool depthEnabled: true}) {
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+                                      duration);
+    lineManager.lines._addLine(vertex0, vertex1);
+    lineManager.lines._addLine(vertex1, vertex2);
+    lineManager.lines._addLine(vertex2, vertex0);
+    lineManager.lines.finishLineObject();
   }
 
-  /// Add an AABB from [boxMin] to [boxMax] with [color].
+  /// Add an Axis Aligned Bounding Box with corners at [boxMin] and [boxMax].
+  /// Filled with [color].
   ///
-  /// Options: [duration] and [depthEnabled]
+  /// Option parameters: [duration] and [depthEnabled]
   void addAABB(vec3 boxMin, vec3 boxMax, vec4 color,
-               [num duration = 0.0, bool depthEnabled = true]) {
+               {num duration: 0.0, bool depthEnabled: true}) {
     vec3 vertex_a;
     vec3 vertex_b;
 
-    if (depthEnabled) {
-      _depthEnabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                color.a, duration);
-    } else {
-      _depthDisabledLines.lines.startLineObject(color.r, color.g, color.b,
-                                                 color.a, duration);
-    }
+    var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
+    lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
+        duration);
+
     vertex_a = new vec3.copy(boxMin);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[0] = boxMax[0];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[1] = boxMax[1];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[2] = boxMax[2];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_a[1] = boxMax[1];
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[0] = boxMax[0];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[2] = boxMax[2];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_a = new vec3.copy(boxMin);
     vertex_a[0] = boxMax[0];
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[1] = boxMax[1];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_a = new vec3.copy(boxMax);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[0] = boxMin[0];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[1] = boxMin[1];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[2] = boxMin[2];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_a[1] = boxMin[1];
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[0] = boxMin[0];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[2] = boxMin[2];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
     vertex_a = new vec3.copy(boxMin);
     vertex_a[2] = boxMax[2];
     vertex_b = new vec3.copy(vertex_a);
     vertex_b[1] = boxMax[1];
-    _addLine(vertex_a, vertex_b, depthEnabled);
+    lineManager.lines._addLine(vertex_a, vertex_b);
+    lineManager.lines.finishLineObject();
   }
 
   /// Prepare to render debug primitives
@@ -596,13 +590,18 @@ class DebugDrawManager {
     pm.copyIntoArray(_cameraMatrix);
     device.context.setShaderProgram(_lineShaderProgram);
     device.context.setConstant('cameraTransform', _cameraMatrix);
-    device.context.setDepthState(_depthEnabled);
-    device.context.setBlendState(_blend);
-    device.context.setRasterizerState(_rasterizer);
+    _depthState.depthBufferEnabled = true;
+    _depthState.depthBufferWriteEnabled = true;
+    _depthState.depthBufferFunction = CompareFunction.LessEqual;
+    device.context.setDepthState(_depthState);
+    device.context.setBlendState(_blendState);
+    device.context.setRasterizerState(_rasterizerState);
     device.context.setInputLayout(_depthEnabledLines._lineMeshInputLayout);
     device.context.setMesh(_depthEnabledLines._lineMesh);
     device.context.drawMesh(_depthEnabledLines._lineMesh);
-    device.context.setDepthState(_depthDisabled);
+    _depthState.depthBufferEnabled = false;
+    _depthState.depthBufferWriteEnabled = false;
+    device.context.setDepthState(_depthState);
     device.context.setMesh(_depthDisabledLines._lineMesh);
     device.context.drawMesh(_depthDisabledLines._lineMesh);
   }
