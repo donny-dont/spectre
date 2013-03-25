@@ -180,9 +180,7 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
 
     InputLayoutElement positionElement = new InputLayoutElement(0, 0,  0, 12, GraphicsDevice.DeviceFormatFloat3);
-    //InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
-
-    List<InputLayoutElement> elements = [positionElement]; //, normalElement];
+    List<InputLayoutElement> elements = [positionElement];
 
     return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
   }
