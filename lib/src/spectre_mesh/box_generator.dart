@@ -21,10 +21,18 @@
 part of spectre_mesh;
 
 class BoxGenerator extends MeshGenerator {
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
 
-  VertexData _vertexData;
+  /// The extents of the [Mesh] to generate.
   vec3 _extents = new vec3.raw(0.5, 0.5, 0.5);
 
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  /// Creates an instance of the [BoxGenerator] class.
   BoxGenerator();
 
   /**
@@ -46,60 +54,53 @@ class BoxGenerator extends MeshGenerator {
   set extents(vec3 value) { _extents = value; }
 
 
-  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputLayoutElement> elements, [int vertexOffset = 0, int indexOffset = 0]) {
-    _vertexData = new VertexData(vertexBuffer, elements);
-
-    _generatePositionData(vertexOffset);
-
-
-    if (false) {
-      _generateTextureCoordData(vertexOffset);
-    }
-
-    // \TODO remove
-    if (true) {
-      _generateNormalData(vertexOffset);
-    }
-
-    if (true) {
-
-    }
-
-    // Generate index data
-    indexBuffer[indexOffset++] =  0;  indexBuffer[indexOffset++] =  1;  indexBuffer[indexOffset++] =  2;
-    indexBuffer[indexOffset++] =  1;  indexBuffer[indexOffset++] =  3;  indexBuffer[indexOffset++] =  2;
-    indexBuffer[indexOffset++] = 10;  indexBuffer[indexOffset++] = 11;  indexBuffer[indexOffset++] =  4;
-    indexBuffer[indexOffset++] = 11;  indexBuffer[indexOffset++] =  5;  indexBuffer[indexOffset++] =  4;
-    indexBuffer[indexOffset++] = 12;  indexBuffer[indexOffset++] = 13;  indexBuffer[indexOffset++] =  6;
-    indexBuffer[indexOffset++] = 13;  indexBuffer[indexOffset++] =  7;  indexBuffer[indexOffset++] =  6;
-    indexBuffer[indexOffset++] = 14;  indexBuffer[indexOffset++] = 15;  indexBuffer[indexOffset++] =  8;
-    indexBuffer[indexOffset++] = 15;  indexBuffer[indexOffset++] =  9;  indexBuffer[indexOffset++] =  8;
-    indexBuffer[indexOffset++] = 22;  indexBuffer[indexOffset++] = 16;  indexBuffer[indexOffset++] = 20;
-    indexBuffer[indexOffset++] = 16;  indexBuffer[indexOffset++] = 18;  indexBuffer[indexOffset++] = 20;
-    indexBuffer[indexOffset++] = 17;  indexBuffer[indexOffset++] = 23;  indexBuffer[indexOffset++] = 19;
-    indexBuffer[indexOffset++] = 23;  indexBuffer[indexOffset++] = 21;  indexBuffer[indexOffset++] = 19;
+  /// Populates the indices for the mesh.
+  ///
+  /// Index data will be placed within the [indices] array starting at the specified
+  /// [indexOffset].
+  void _generateIndices(Int16Array indices, int vertexOffset, int indexOffset) {
+    indices[indexOffset++] =  0;  indices[indexOffset++] =  1;  indices[indexOffset++] =  2;
+    indices[indexOffset++] =  1;  indices[indexOffset++] =  3;  indices[indexOffset++] =  2;
+    indices[indexOffset++] = 10;  indices[indexOffset++] = 11;  indices[indexOffset++] =  4;
+    indices[indexOffset++] = 11;  indices[indexOffset++] =  5;  indices[indexOffset++] =  4;
+    indices[indexOffset++] = 12;  indices[indexOffset++] = 13;  indices[indexOffset++] =  6;
+    indices[indexOffset++] = 13;  indices[indexOffset++] =  7;  indices[indexOffset++] =  6;
+    indices[indexOffset++] = 14;  indices[indexOffset++] = 15;  indices[indexOffset++] =  8;
+    indices[indexOffset++] = 15;  indices[indexOffset++] =  9;  indices[indexOffset++] =  8;
+    indices[indexOffset++] = 22;  indices[indexOffset++] = 16;  indices[indexOffset++] = 20;
+    indices[indexOffset++] = 16;  indices[indexOffset++] = 18;  indices[indexOffset++] = 20;
+    indices[indexOffset++] = 17;  indices[indexOffset++] = 23;  indices[indexOffset++] = 19;
+    indices[indexOffset++] = 23;  indices[indexOffset++] = 21;  indices[indexOffset++] = 19;
   }
 
-  /**
-   * Generates positional data.
-   */
-  void _generatePositionData(int vertexOffset) {
+  /// Generates the positions for the mesh.
+  ///
+  /// Positions will be placed within the [positions] array starting at the specified
+  /// [vertexOffset]. When complete \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [array] will contain position data.
+  ///
+  /// The mesh will be centered at the given [center] position.
+  void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
     double xExtent = 0.5;
     double yExtent = 0.5;
     double zExtent = 0.5;
 
-    List<vec3> positionValues = [
-      new vec3(-xExtent,  yExtent,  zExtent),
-      new vec3(-xExtent, -yExtent,  zExtent),
-      new vec3( xExtent,  yExtent,  zExtent),
-      new vec3( xExtent, -yExtent,  zExtent),
-      new vec3( xExtent,  yExtent, -zExtent),
-      new vec3( xExtent, -yExtent, -zExtent),
-      new vec3(-xExtent,  yExtent, -zExtent),
-      new vec3(-xExtent, -yExtent, -zExtent)
-    ];
+    print('Center');
+    double xCenter = center.x;
+    double yCenter = center.y;
+    double zCenter = center.z;
+    print('Done');
 
-    Vector3Array positions = _vertexData.elements['vPosition'];
+    List<vec3> positionValues = [
+      new vec3(-xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter),
+      new vec3(-xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
+      new vec3( xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter),
+      new vec3( xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
+      new vec3( xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
+      new vec3( xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter),
+      new vec3(-xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
+      new vec3(-xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter)
+    ];
 
     positions[vertexOffset++] = positionValues[0];
     positions[vertexOffset++] = positionValues[1];
@@ -129,10 +130,12 @@ class BoxGenerator extends MeshGenerator {
     positions[vertexOffset++] = positionValues[7];
   }
 
-  /**
-   * Generates texture coordinate data.
-   */
-  void _generateTextureCoordData(int vertexOffset) {
+  /// Generates the texture coordinates for the mesh.
+  ///
+  /// Texture coordinates will be placed within the [array] starting at the
+  /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [array] will contain texture coordinate data.
+  void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
     List<vec2> textureCoordValues = [
       new vec2(0.0, 1.0),
       new vec2(0.0, 0.0),
@@ -140,8 +143,6 @@ class BoxGenerator extends MeshGenerator {
       new vec2(1.0, 0.0)
     ];
 
-    Vector2Array textureCoords = _vertexData.elements['vTexCoord'];
-
     textureCoords[vertexOffset++] = textureCoordValues[0];
     textureCoords[vertexOffset++] = textureCoordValues[1];
     textureCoords[vertexOffset++] = textureCoordValues[2];
@@ -170,13 +171,12 @@ class BoxGenerator extends MeshGenerator {
     textureCoords[vertexOffset++] = textureCoordValues[1];
   }
 
-  /**
-   * Generates normal data.
-   *
-   * With a box the normal data is well known,
-   * so rather than computing it just assign it over.
-   */
-  void _generateNormalData(int vertexOffset) {
+  /// Generates the normals for the mesh.
+  ///
+  /// Normals will be placed within the [vertexArray] starting at the specified
+  /// [vertexOffset]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [vertexArray] will contain normal data.
+  void _generateNormals(Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
     List<vec3> normalValues = [
       new vec3( 0.0,  0.0,  1.0),
       new vec3( 1.0,  0.0,  0.0),
@@ -185,8 +185,6 @@ class BoxGenerator extends MeshGenerator {
       new vec3( 0.0,  1.0,  0.0),
       new vec3( 0.0, -1.0,  0.0)
     ];
-
-    Vector3Array normals = _vertexData.elements['vNormal'];
 
     normals[vertexOffset++] = normalValues[0];
     normals[vertexOffset++] = normalValues[0];
@@ -222,26 +220,10 @@ class BoxGenerator extends MeshGenerator {
   /// many box meshes prefer creating a [BoxGenerator] and using that to generate
   /// multiple meshes.
   static Mesh createBox(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, vec3 extents, vec3 center) {
+    // Setup the generator
     BoxGenerator generator = new BoxGenerator();
 
-    // Create storage space for the vertices and indices
-    Float32Array vertices = new Float32Array(generator.vertexCount * 6);
-    Int16Array indices = new Int16Array(generator.indexCount);
-
-    // Generate the box
-    generator.generate(vertices, indices, elements);
-
-    // Upload the graphics data
-    VertexBuffer vertexBuffer = new VertexBuffer('${name}_VBO', graphicsDevice);
-    vertexBuffer.uploadData(vertices, SpectreBuffer.UsageStatic);
-
-    IndexBuffer indexBuffer = new IndexBuffer('${name}_IBO', graphicsDevice);
-    indexBuffer.uploadData(indices, SpectreBuffer.UsageStatic);
-
-    InputLayout inputLayout = new InputLayout('remove', graphicsDevice);
-    inputLayout.elements.addAll(elements);
-
     // Create the mesh
-    return new Mesh(name, graphicsDevice, vertexBuffer, inputLayout, indexBuffer);
+    return MeshGenerator._createMesh(name, graphicsDevice, elements, generator, center);
   }
 }

@@ -144,8 +144,8 @@ class Application {
   void _onLoad() {
     // Load the base pack
     _assetManager.loadPack('base', 'assets/base.pack').then((assetPack) {
-      _currentScreen = new MeshLoadingScreen(_graphicsDevice, _assetManager);
-      //_currentScreen = new SimpleGeometryScreen(_graphicsDevice, _assetManager);
+      //_currentScreen = new MeshLoadingScreen(_graphicsDevice, _assetManager);
+      _currentScreen = new SimpleGeometryScreen(_graphicsDevice, _assetManager);
 
       _currentScreen.onLoad().then((value) {
         _currentScreen.onResize(_width, _height);

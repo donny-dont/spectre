@@ -20,18 +20,17 @@
 
 part of spectre_mesh;
 
-/**
- * Base class for mesh generation.
- *
- * Contains the base information for what vertex attributes should be
- * generated. This includes texture coordinates, normal data, and
- * tangent data. Additionally the generator provides methods to
- * calculate the normal, and tangent data.
- *
- * Mesh generators do not allocate any memory, instead the client is
- * expected to query the number of vertices and indices required and
- * pass in an array with enough space to hold the mesh data.
- */
+
+/// Base class for mesh generation.
+///
+/// Contains the base information for what vertex attributes should be
+/// generated. This includes texture coordinates, normal data, and
+/// tangent data. Additionally the generator provides methods to
+/// calculate the normal, and tangent data.
+///
+/// Mesh generators do not allocate any memory, instead the client is
+/// expected to query the number of vertices and indices required and
+/// pass in an array with enough space to hold the mesh data.
 abstract class MeshGenerator {
   //---------------------------------------------------------------------
   // Class variables
@@ -89,37 +88,37 @@ abstract class MeshGenerator {
   // Properties
   //---------------------------------------------------------------------
 
-  /**
-   * Gets the number of vertices that will be created.
-   *
-   * For the amount of storage space see [vertexBufferSize].
-   */
+  /// Gets the number of vertices that will be generated.
+  ///
+  /// For the amount of storage space required see [vertexBufferSize].
   int get vertexCount;
 
-  /**
-   * Retrieves the index buffer size necessary to hold the generated mesh.
-   */
+  /// Retrieves the size of the index buffer necessary to hold the generated [Mesh].
   int get indexCount;
 
   //---------------------------------------------------------------------
   // Public methods
   //---------------------------------------------------------------------
 
-
-  /// Generates the mesh.
+  /// Adds the generated mesh's data to the [vertexData] and [indices].
   ///
-  ///
-
-  void generate(Float32Array vertexBuffer, Int16Array indexBuffer, List<InputElementDescription> elements, [int vertexOffset = 0, int indexOffset = 0]);
-
-  void generateMesh(VertexData vertexData, Int16Array indices, [vec3 center = new vec3.zero(), int vertexOffset = 0, int indexOffset = 0]) {
+  /// Specifying the [center] point changes the location the position data is generated at. By default
+  /// the mesh will be centered at \[0.0, 0.0, 0.0\]. Additionally an offset into the vertex and index
+  /// data can be specified by [vertexOffset] and [indexOffset]. If unspecified the mesh will be generated
+  /// at the start of the arrays.
+  void generateMesh(VertexData vertexData, Int16Array indices, [vec3 center, int vertexOffset = 0, int indexOffset = 0]) {
     // Ensure that there is enough room in the vertex and index data to hold the mesh
-    if (vertexData.count < vertexOffset + vertexCount) {
+    if (vertexData.vertexCount < vertexOffset + vertexCount) {
       throw new ArgumentError('The vertex data does not have enough space to hold the mesh');
     }
 
     if (indices.length < indexOffset + indexCount) {
       throw new ArgumentError('The index data does not have enough space to hold the mesh');
+    }
+
+    // Default to a center at (0, 0, 0)
+    if (center == null) {
+      center = new vec3.zero();
     }
 
     // Generate position data
@@ -163,13 +162,13 @@ abstract class MeshGenerator {
 
   /// Populates the indices for the mesh.
   ///
-  /// Index data will be placed within the [array] starting at the specified
+  /// Index data will be placed within the [indices] array starting at the specified
   /// [indexOffset].
   void _generateIndices(Int16Array indexBuffer, int vertexOffset, int indexOffset);
 
   /// Generates the positions for the mesh.
   ///
-  /// Positions will be placed within the [array] starting at the specified
+  /// Positions will be placed within the [positions] array starting at the specified
   /// [vertexOffset]. When complete \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain position data.
   ///
@@ -201,5 +200,35 @@ abstract class MeshGenerator {
   /// Generates the tangent data for the mesh.
   void _generateTangentData() {
 
+  }
+
+  /// Creates a single [Mesh] using the supplied [MeshGenerator].
+  ///
+  /// Provides a shorthand way for [MeshGenerators] to create a single mesh.
+  /// The [MeshGenerator] should be supplied with any options regarding its creation
+  /// before calling this.
+  static Mesh _createMesh(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, MeshGenerator generator, vec3 center) {
+    // Create storage space for the vertices and indices
+    Float32Array vertices = new Float32Array(generator.vertexCount * 6);
+    Int16Array indices = new Int16Array(generator.indexCount);
+
+    // Create the vertex data view
+    VertexData vertexData = new VertexData(vertices, elements);
+
+    // Generate the box
+    generator.generateMesh(vertexData, indices, center);
+
+    // Upload the graphics data
+    VertexBuffer vertexBuffer = new VertexBuffer('${name}_VBO', graphicsDevice);
+    vertexBuffer.uploadData(vertices, SpectreBuffer.UsageStatic);
+
+    IndexBuffer indexBuffer = new IndexBuffer('${name}_IBO', graphicsDevice);
+    indexBuffer.uploadData(indices, SpectreBuffer.UsageStatic);
+
+    InputLayout inputLayout = new InputLayout('remove', graphicsDevice);
+    inputLayout.elements.addAll(elements);
+
+    // Create the mesh
+    return new Mesh(name, graphicsDevice, [ vertexBuffer ], inputLayout, indexBuffer);
   }
 }
