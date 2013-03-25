@@ -25,6 +25,7 @@ library spectre_mesh;
 import 'dart:html';
 import 'dart:scalarlist';
 import 'spectre.dart';
+import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
 
 part 'src/spectre_mesh/arrays.dart';

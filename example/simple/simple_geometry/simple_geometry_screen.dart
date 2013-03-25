@@ -140,7 +140,7 @@ class SimpleGeometryScreen extends DemoScreen {
     // The shader to use is shared between multiple examples, and is loaded by
     // the Application at startup into the 'base' pack. The shader can be accessed
     // through the [] operator using the format 'packName.resourceName'.
-    _shaderProgram = _assetManager.root['base.solidColorShader'];
+    _shaderProgram = _assetManager.root['base.solidLightingShader'];
   }
 
   /// Creates a box mesh for display.
@@ -155,10 +155,10 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 0,  0, 12, GraphicsDevice.DeviceFormatFloat3);
-    //InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
 
-    List<InputLayoutElement> elements = [positionElement];//, normalElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement];
 
     return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
   }

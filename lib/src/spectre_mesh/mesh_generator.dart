@@ -144,7 +144,7 @@ abstract class MeshGenerator {
     Vector3Array normals = vertexData.elements[_normalAttributeName];
 
     if (normals != null) {
-      _generateNormals(normals, indices, vertexOffset, indexOffset);
+      _generateNormals(positions, normals, indices, vertexOffset, indexOffset);
     }
 
     // Generate texture data if requested
@@ -193,8 +193,8 @@ abstract class MeshGenerator {
   ///
   /// A subclass should override this if the normals can easily be determined. This
   /// is the case for something like a box or plane.
-  void _generateNormals(Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
-
+  void _generateNormals(Vector3Array positions, Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
+    NormalDataBuilder.build(positions, normals, indices, indexOffset);
   }
 
   /// Generates the tangent data for the mesh.
@@ -217,6 +217,10 @@ abstract class MeshGenerator {
 
     // Generate the box
     generator.generateMesh(vertexData, indices, center);
+
+    for (int i = 0; i < vertices.length; ++i) {
+      print(vertices[i]);
+    }
 
     // Upload the graphics data
     VertexBuffer vertexBuffer = new VertexBuffer('${name}_VBO', graphicsDevice);

@@ -20,65 +20,74 @@
 
 part of spectre_mesh;
 
+/// Contains functions for generating normals for arbitrary mesh data.
 class NormalDataBuilder {
+  /// Uses the index data and positions to compute the vertex [normals].
+  ///
+  /// To compute the normal for a vertex the [indices] are used to access the [positions]
+  /// that make up a triangle face. The face normal is then computed and added to the value
+  /// contained in [normals]. As a final step the values within [normals] are themselves
+  /// normalized.
+  ///
+  /// It is assumed that the indices in the range \[indexOffset .. indexOffset + indexLength] refer
+  /// only to vertices within the range \[[vertexOffset], .. [vertexOffset] + [vertexLength]\].
+  /// No checks are done to ensure this. This is to remove the cost of determining the vertex
+  /// range.
+  ///
+  /// It is also assumed that the values within [normals] are all set to (0, 0, 0). If this
+  /// is not the case the values within [normals] will be incorrect.
+  static void build(Vector3Array positions, Vector3Array normals, Uint16Array indices, [int vertexOffset = 0, int vertexLength, int indexOffset = 0, int indexLength]) {
+    // Temporary variables
+    vec3 v0 = new vec3();
+    vec3 v1 = new vec3();
+    vec3 v2 = new vec3();
 
-  /**
-   * Calculates the normal data based on the triangle data.
-   *
-   *
-   */
-  static void build(Float32Array vertexBuffer,
-                    Uint16Array indexBuffer,
-                    List<InputElementDescription> bufferLayout)
-  {
-    VertexData vertexData = new VertexData(vertexBuffer, bufferLayout);
-    Vector3Array normals = vertexData.elements['vNormal'];
-    assert(normals != null);
+    // Get the maximum index within indices to use
+    int maxIndex = _getMaxIndex(indexOffset, indexLength, indices.length);
 
-    // Compute normals for each triangle
-    {
-      Vector3Array positions = vertexData.elements['vPosition'];
+    // Run through the indices computing the normals for each triangle
+    // and adding them to the normal data
+    for (int i = indexOffset; i < maxIndex; i += 3) {
+      int i0 = indices[i];
+      int i1 = indices[i + 1];
+      int i2 = indices[i + 2];
 
-      // Temporary variables
-      vec3 v0;
-      vec3 v1;
-      vec3 v2;
+      positions.getAt(i0, v0);
+      positions.getAt(i1, v1);
+      positions.getAt(i2, v2);
 
-      int indexCount = indexBuffer.length;
+      // Compute the normal
+      v1.sub(v0); // p0 = v1 - v0
+      v2.sub(v0); // p0 = v2 - v0
 
-      for (int i = 0; i < indexCount; i += 3) {
-        int i0 = indexBuffer[i];
-        int i1 = indexBuffer[i + 1];
-        int i2 = indexBuffer[i + 2];
+      v1.cross(v2, v0); // cross(v1, v2)
+      v0.normalize();
 
-        positions.getAt(i0, v0);
-        positions.getAt(i1, v1);
-        positions.getAt(i2, v2);
-
-        // Compute the normal
-        v1.sub(v0); // p0 = v1 - v0
-        v2.sub(v0); // p0 = v2 - v0
-
-        v1.cross(v2, v0); // cross(v1, v2)
-        v0.normalize();
-
-        // Add the normal to the vertices
-        _addToVec3(i0, normals, v0, v1);
-        _addToVec3(i1, normals, v0, v1);
-        _addToVec3(i2, normals, v0, v1);
-      }
+      // Add the normal to the vertices
+      _addToVec3(i0, normals, v0, v1);
+      _addToVec3(i1, normals, v0, v1);
+      _addToVec3(i2, normals, v0, v1);
     }
 
-    // Normalize the values
-    {
-      int vertexCount = normals.length;
-      vec3 normal;
+    // Get the maximum vertex index
+    int maxVertex = _getMaxIndex(vertexOffset, vertexLength, normals.length);
 
-      for (int i = 0; i < vertexCount; ++i) {
-        normals.getAt(i, normal);
-        normal.normalize();
-        normals.setAt(i, normal);
-      }
+    // Normalize the values
+    vec3 normal = new vec3();
+
+    for (int i = vertexOffset; i < maxVertex; ++i) {
+      normals.getAt(i, normal);
+      normal.normalize();
+      normals.setAt(i, normal);
+    }
+  }
+
+  static int _getMaxIndex(int offset, int length, int lastIndex) {
+    if (length == null) {
+      return lastIndex;
+    } else {
+      int maxIndex = offset + length;
+      return Math.min(maxIndex, lastIndex);
     }
   }
 

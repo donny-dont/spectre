@@ -35,42 +35,54 @@ class BoxGenerator extends MeshGenerator {
   /// Creates an instance of the [BoxGenerator] class.
   BoxGenerator();
 
-  /**
-   * Gets the number of vertices that will be created.
-   *
-   * For the amount of storage space see [vertexBufferSize].
-   */
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// Gets the number of vertices that will be generated.
+  ///
+  /// For the amount of storage space required see [vertexBufferSize].
   int get vertexCount => 24;
 
-  /**
-   * Retrieves the index buffer size necessary to hold the generated mesh.
-   */
+  /// Retrieves the size of the index buffer necessary to hold the generated [Mesh].
   int get indexCount => 36;
 
-  /**
-   * The extents of the box.
-   */
+  /// The extents of the box.
   vec3 get extents => _extents;
   set extents(vec3 value) { _extents = value; }
 
+  //---------------------------------------------------------------------
+  // Private mesh generation methods
+  //---------------------------------------------------------------------
 
   /// Populates the indices for the mesh.
   ///
   /// Index data will be placed within the [indices] array starting at the specified
   /// [indexOffset].
   void _generateIndices(Int16Array indices, int vertexOffset, int indexOffset) {
+    // Negative X
     indices[indexOffset++] =  0;  indices[indexOffset++] =  1;  indices[indexOffset++] =  2;
-    indices[indexOffset++] =  1;  indices[indexOffset++] =  3;  indices[indexOffset++] =  2;
-    indices[indexOffset++] = 10;  indices[indexOffset++] = 11;  indices[indexOffset++] =  4;
-    indices[indexOffset++] = 11;  indices[indexOffset++] =  5;  indices[indexOffset++] =  4;
-    indices[indexOffset++] = 12;  indices[indexOffset++] = 13;  indices[indexOffset++] =  6;
-    indices[indexOffset++] = 13;  indices[indexOffset++] =  7;  indices[indexOffset++] =  6;
-    indices[indexOffset++] = 14;  indices[indexOffset++] = 15;  indices[indexOffset++] =  8;
-    indices[indexOffset++] = 15;  indices[indexOffset++] =  9;  indices[indexOffset++] =  8;
-    indices[indexOffset++] = 22;  indices[indexOffset++] = 16;  indices[indexOffset++] = 20;
-    indices[indexOffset++] = 16;  indices[indexOffset++] = 18;  indices[indexOffset++] = 20;
-    indices[indexOffset++] = 17;  indices[indexOffset++] = 23;  indices[indexOffset++] = 19;
-    indices[indexOffset++] = 23;  indices[indexOffset++] = 21;  indices[indexOffset++] = 19;
+    indices[indexOffset++] =  0;  indices[indexOffset++] =  2;  indices[indexOffset++] =  3;
+
+    // Negative Y
+    indices[indexOffset++] =  4;  indices[indexOffset++] =  6;  indices[indexOffset++] =  7;
+    indices[indexOffset++] =  4;  indices[indexOffset++] =  7;  indices[indexOffset++] =  5;
+
+    // Negative Z
+    indices[indexOffset++] =  8;  indices[indexOffset++] = 11;  indices[indexOffset++] = 10;
+    indices[indexOffset++] =  8;  indices[indexOffset++] = 10;  indices[indexOffset++] =  9;
+
+    // Positive Y
+    indices[indexOffset++] = 15;  indices[indexOffset++] = 14;  indices[indexOffset++] = 13;
+    indices[indexOffset++] = 15;  indices[indexOffset++] = 13;  indices[indexOffset++] = 12;
+
+    // Positive Z
+    indices[indexOffset++] = 18;  indices[indexOffset++] = 19;  indices[indexOffset++] = 16;
+    indices[indexOffset++] = 18;  indices[indexOffset++] = 16;  indices[indexOffset++] = 17;
+
+    // Positive X
+    indices[indexOffset++] = 20;  indices[indexOffset++] = 22;  indices[indexOffset++] = 23;
+    indices[indexOffset++] = 20;  indices[indexOffset++] = 23;  indices[indexOffset++] = 21;
   }
 
   /// Generates the positions for the mesh.
@@ -81,49 +93,57 @@ class BoxGenerator extends MeshGenerator {
   ///
   /// The mesh will be centered at the given [center] position.
   void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
-    double xExtent = 0.5;
-    double yExtent = 0.5;
-    double zExtent = 0.5;
+    // Create the position values
+    double xExtent = _extents.x;
+    double yExtent = _extents.y;
+    double zExtent = _extents.z;
 
-    print('Center');
     double xCenter = center.x;
     double yCenter = center.y;
     double zCenter = center.z;
-    print('Done');
 
     List<vec3> positionValues = [
-      new vec3(-xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter),
-      new vec3(-xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
-      new vec3( xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter),
-      new vec3( xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
-      new vec3( xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
-      new vec3( xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter),
-      new vec3(-xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
-      new vec3(-xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter)
+      new vec3.raw(-xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter),
+      new vec3.raw(-xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
+      new vec3.raw(-xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter),
+      new vec3.raw(-xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
+      new vec3.raw( xExtent + xCenter, -yExtent + yCenter, -zExtent + zCenter),
+      new vec3.raw( xExtent + xCenter, -yExtent + yCenter,  zExtent + zCenter),
+      new vec3.raw( xExtent + xCenter,  yExtent + yCenter, -zExtent + zCenter),
+      new vec3.raw( xExtent + xCenter,  yExtent + yCenter,  zExtent + zCenter)
     ];
 
+    // Negative X
     positions[vertexOffset++] = positionValues[0];
     positions[vertexOffset++] = positionValues[1];
+    positions[vertexOffset++] = positionValues[2];
+    positions[vertexOffset++] = positionValues[3];
+
+    // Negative Y
     positions[vertexOffset++] = positionValues[2];
     positions[vertexOffset++] = positionValues[3];
     positions[vertexOffset++] = positionValues[4];
     positions[vertexOffset++] = positionValues[5];
-    positions[vertexOffset++] = positionValues[6];
-    positions[vertexOffset++] = positionValues[7];
 
-    positions[vertexOffset++] = positionValues[0];
+    // Negative Z
     positions[vertexOffset++] = positionValues[1];
     positions[vertexOffset++] = positionValues[2];
-    positions[vertexOffset++] = positionValues[3];
     positions[vertexOffset++] = positionValues[4];
-    positions[vertexOffset++] = positionValues[5];
+    positions[vertexOffset++] = positionValues[6];
+
+    // Positive Y
+    positions[vertexOffset++] = positionValues[0];
+    positions[vertexOffset++] = positionValues[1];
     positions[vertexOffset++] = positionValues[6];
     positions[vertexOffset++] = positionValues[7];
 
+    // Positive Z
     positions[vertexOffset++] = positionValues[0];
-    positions[vertexOffset++] = positionValues[1];
-    positions[vertexOffset++] = positionValues[2];
     positions[vertexOffset++] = positionValues[3];
+    positions[vertexOffset++] = positionValues[5];
+    positions[vertexOffset++] = positionValues[7];
+
+    // Positive X
     positions[vertexOffset++] = positionValues[4];
     positions[vertexOffset++] = positionValues[5];
     positions[vertexOffset++] = positionValues[6];
@@ -176,43 +196,56 @@ class BoxGenerator extends MeshGenerator {
   /// Normals will be placed within the [vertexArray] starting at the specified
   /// [vertexOffset]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [vertexArray] will contain normal data.
-  void _generateNormals(Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
+  void _generateNormals(Vector3Array positions, Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
     List<vec3> normalValues = [
-      new vec3( 0.0,  0.0,  1.0),
-      new vec3( 1.0,  0.0,  0.0),
-      new vec3( 0.0,  0.0, -1.0),
-      new vec3(-1.0,  0.0,  0.0),
-      new vec3( 0.0,  1.0,  0.0),
-      new vec3( 0.0, -1.0,  0.0)
+        new vec3(-1.0,  0.0,  0.0),
+        new vec3( 0.0, -1.0,  0.0),
+        new vec3( 0.0,  0.0, -1.0),
+        new vec3( 0.0,  1.0,  0.0),
+        new vec3( 0.0,  0.0,  1.0),
+        new vec3( 1.0,  0.0,  0.0)
     ];
 
+    // Negative X
     normals[vertexOffset++] = normalValues[0];
     normals[vertexOffset++] = normalValues[0];
     normals[vertexOffset++] = normalValues[0];
     normals[vertexOffset++] = normalValues[0];
+
+    // Negative Y
     normals[vertexOffset++] = normalValues[1];
     normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[1];
+    normals[vertexOffset++] = normalValues[1];
+
+    // Negative Z
+    normals[vertexOffset++] = normalValues[2];
+    normals[vertexOffset++] = normalValues[2];
     normals[vertexOffset++] = normalValues[2];
     normals[vertexOffset++] = normalValues[2];
 
+    // Positive Y
     normals[vertexOffset++] = normalValues[3];
     normals[vertexOffset++] = normalValues[3];
-    normals[vertexOffset++] = normalValues[1];
-    normals[vertexOffset++] = normalValues[1];
-    normals[vertexOffset++] = normalValues[2];
-    normals[vertexOffset++] = normalValues[2];
     normals[vertexOffset++] = normalValues[3];
     normals[vertexOffset++] = normalValues[3];
 
+    // Positive Z
     normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[4];
+    normals[vertexOffset++] = normalValues[4];
+
+    // Positive X
     normals[vertexOffset++] = normalValues[5];
-    normals[vertexOffset++] = normalValues[4];
     normals[vertexOffset++] = normalValues[5];
-    normals[vertexOffset++] = normalValues[4];
     normals[vertexOffset++] = normalValues[5];
-    normals[vertexOffset++] = normalValues[4];
     normals[vertexOffset++] = normalValues[5];
   }
+
+  //---------------------------------------------------------------------
+  // Single mesh generation
+  //---------------------------------------------------------------------
 
   /// Creates a single box with the given [extents] at the specified [center].
   ///
