@@ -1,18 +1,14 @@
 name: spectre
-description: Graphics Library
 version: 0.5.0
 author: John McCutchan <john@johnmccutchan.com>
+description: Graphics Library
 homepage: https://github.com/johnmccutchan/spectre
 dependencies:
   unittest: any
-  marker_prof:
-    git: https://github.com/johnmccutchan/markerprof.git
+  asset_pack:
+    git: https://github.com/johnmccutchan/asset_pack.git
+  browser: any
   vector_math:
     git: https://github.com/johnmccutchan/DartVectorMath.git
   game_loop:
     git: https://github.com/johnmccutchan/game_loop.git
-  asset_pack:
-    git: https://github.com/johnmccutchan/asset_pack.git
-  property_map:
-    git: https://github.com/sethillgard/property_map.git
-  bot: ">=0.15.0"

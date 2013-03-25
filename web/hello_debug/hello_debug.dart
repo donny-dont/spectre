@@ -49,7 +49,7 @@ void renderFrame(GameLoop gameLoop) {
                                 new vec3.raw(0.0, 1.0, 0.0),
                                 2.0,
                                 new vec4.raw(1.0, 1.0, 1.0, 1.0),
-                                5.0);
+                                duration:5.0);
   }
   // Prepare the debug draw manager for rendering
   _debugDrawManager.prepareForRender();
@@ -61,8 +61,8 @@ void renderFrame(GameLoop gameLoop) {
 void resizeFrame(GameLoop gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
   // Adjust the viewport dimensions
   _viewport.width = canvas.width;
   _viewport.height = canvas.height;
@@ -85,8 +85,8 @@ main() {
   _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
   // Set the canvas width and height to match the dom elements
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
+  canvas.width = canvas.client.width;
+  canvas.height = canvas.client.height;
 
   // Create the viewport
   _viewport = new Viewport('view', _graphicsDevice);
