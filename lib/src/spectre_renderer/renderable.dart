@@ -34,7 +34,7 @@ class Renderable {
   String get meshPath => _meshPath;
   void set meshPath(String o) {
     _meshPath = o;
-    mesh = renderer.assetManager.getAssetAtPath(_meshPath);
+    mesh = renderer.assetManager[_meshPath];
   }
   String _meshPath;
 
@@ -42,21 +42,23 @@ class Renderable {
   String get materialPath => _materialPath;
   set materialPath(String o) {
     _materialPath = o;
-    material = renderer.assetManager.getAssetAtPath(_materialPath);
+    material = renderer.assetManager[_materialPath];
   }
   String _materialPath;
 
+  InputLayout get inputLayout => _inputLayout;
   InputLayout _inputLayout;
   // Bounding Box.
 
-  Renderable(this.renderer, this.name, this.meshPath, this._materialPaths) {
+  Renderable(this.name, this.renderer, this._meshPath, this._materialPaths) {
     _inputLayout = new InputLayout(name, renderer.device);
+    mesh = renderer.assetManager[_meshPath];
     _link();
   }
 
-  Renderable.json(this.renderer, Map json) : name = json['name'] {
-    fromJson(json);
+  Renderable.json(Map json, this.renderer) : name = json['name'] {
     _inputLayout = new InputLayout(name, renderer.device);
+    fromJson(json);
     _link();
   }
 

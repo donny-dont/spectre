@@ -216,6 +216,15 @@ class Renderer {
 
   void _renderSceneLayer(Layer layer, List<Renderable> renderables,
                          Camera camera) {
+    for (int i = 0; i < renderables.length; i++) {
+      Renderable renderable = renderables[i];
+      renderable.material.updateCameraConstants(camera);
+      renderable.material.updateObjectTransformConstant(renderable.T);
+      _applyMaterial(renderable.material);
+      device.context.setInputLayout(renderable.inputLayout);
+      device.context.setIndexedMesh(renderable.mesh);
+      device.context.drawIndexedMesh(renderable.mesh);
+    }
   }
 
   void _renderLayer(Layer layer, List<Renderable> renderables, Camera camera) {

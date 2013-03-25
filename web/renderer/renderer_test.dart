@@ -16,6 +16,7 @@ GameLoop gameLoop;
 AssetManager assetManager;
 Renderer renderer;
 final List<Layer> layers = new List<Layer>();
+final List<Renderable> renderables = new List<Renderable>();
 
 final Camera camera = new Camera();
 final cameraController = new FpsFlyCameraController();
@@ -74,7 +75,7 @@ void gameFrame(GameLoop gameLoop) {
 
 void renderFrame(GameLoop gameLoop) {
   renderer.time = gameLoop.gameTime;
-  renderer.render(layers, null, camera);
+  renderer.render(layers, renderables, camera);
 
   // Add three lines, one for each axis.
   debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
@@ -137,6 +138,89 @@ void _setupSkybox() {
   _skyboxRasterizerState.cullMode = CullMode.None;
 }
 
+void _buildCubes() {
+  renderables.length = 100;
+  for (int i = 0; i < 100; i++) {
+    Renderable renderable = new Renderable('box $i', renderer,
+                                           'demoAssets.unitCube', {});
+    renderable.T.setIdentity();
+    renderable.T.translate(i.toDouble() * 2.0, 0.0, 0.0);
+    renderable.materialPath = 'demoAssets.simpleTexture';
+    renderables[i] = renderable;
+  }
+}
+
+void _makeMaterial() {
+  var shaderProgram = new ShaderProgram('simpleTexture', graphicsDevice);
+  var vertexShader = new VertexShader('simpleTexture', graphicsDevice);
+  var fragmentShader = new FragmentShader('simpleTexture', graphicsDevice);
+  Material material = new Material('simpleTexture', shaderProgram, renderer);
+  shaderProgram.vertexShader = vertexShader;
+  shaderProgram.fragmentShader = fragmentShader;
+  vertexShader.source = '''
+precision highp float;
+
+attribute vec3 POSITION;
+attribute vec3 NORMAL;
+attribute vec2 TEXCOORD0;
+
+uniform mat4 cameraProjectionView;
+uniform mat4 normalTransform;
+uniform mat4 objectTransform;
+
+uniform vec3 lightDirection;
+
+varying vec3 surfaceNormal;
+varying vec2 samplePoint;
+varying vec3 lightDir;
+
+void main() {
+    // TexCoord
+    samplePoint = TEXCOORD0;
+    // Normal
+    //mat4 LM = normalTransform*objectTransform;
+    vec3 N = (objectTransform*vec4(NORMAL, 0.0)).xyz;
+    N = normalize(N);
+    N = (normalTransform*vec4(N, 0.0)).xyz;
+    surfaceNormal = normalize(N);
+    lightDir = (normalTransform*vec4(lightDirection, 0.0)).xyz;
+    mat4 M = cameraProjectionView*objectTransform;
+    vec4 vPosition4 = vec4(POSITION.x, POSITION.y, POSITION.z, 1.0);
+    gl_Position = M*vPosition4;
+}
+''';
+  fragmentShader.source = '''
+precision mediump float;
+
+varying vec3 surfaceNormal;
+varying vec2 samplePoint;
+
+varying vec3 lightDir;
+
+uniform sampler2D diffuse;
+
+void main() {
+  vec3 normal = normalize(surfaceNormal);
+  vec3 light = normalize(lightDir);
+  float NdotL = max(dot(normal, -light), 0.3);
+  vec3 ambientColor = vec3(0.1, 0.1, 0.1);
+  //vec3 diffuseColor = vec3(1.0, 0.0, 0.0) * NdotL;
+  vec3 diffuseColor = vec3(texture2D(diffuse, samplePoint)) * NdotL;
+  vec3 finalColor = diffuseColor + ambientColor;
+    //gl_FragColor = vec4(NdotL, NdotL, 1.0, 1.0);
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+''';
+  print(fragmentShader.compileLog);
+  shaderProgram.link();
+  assert(shaderProgram.linked);
+  material.link();
+  var asset = assetManager['demoAssets'].registerAsset('simpleTexture',
+                                                       'shader', '', '', {},
+                                                       {});
+  asset.imported = material;
+}
+
 Float32Array _cameraTransform = new Float32Array(16);
 
 void _drawSkybox() {
@@ -193,16 +277,16 @@ main() {
     camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
     camera.position = new vec3.raw(2.0, 2.0, 2.0);
     camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
-
+    _makeMaterial();
+    _buildCubes();
     // Setup layers.
     var clearBackBuffer = new Layer('clear', 'fullscreen');
     clearBackBuffer.clearColorTarget = true;
     clearBackBuffer.clearDepthTarget = true;
     clearBackBuffer.renderTarget = 'backBuffer';
     layers.add(clearBackBuffer);
-    var colorBackBuffer = new Layer('color', 'fullscreen');
+    var colorBackBuffer = new Layer('color', 'scene');
     colorBackBuffer.clearColorTarget = true;
-    colorBackBuffer.clearColorG = 1.0;
     colorBackBuffer.clearDepthTarget = true;
     colorBackBuffer.renderTarget = 'backBuffer';
     layers.add(colorBackBuffer);
