@@ -100,6 +100,47 @@ bool materialEquals(Material a, Material b) {
 }
 
 void testMaterialConstruct() {
+  expect(() {
+    Material mateiral = new Material(_renderer, 'null shader', null);
+  }, throws);
+  ShaderProgram sp = new ShaderProgram('unlinked program', _graphicsDevice);
+  Material material = new Material(_renderer, 'unlinked shader', sp);
+  expect(0, material.constants.length);
+  expect(0, material.textures.length);
+  sp.vertexShader = new VertexShader('vs', _graphicsDevice);
+  sp.fragmentShader = new FragmentShader('fs', _graphicsDevice);
+  sp.link();
+  expect(false, sp.linked);
+  sp.vertexShader.source = '''
+precision highp float;
+
+// Input attributes
+attribute vec3 vPosition;
+attribute vec4 vColor;
+// Input uniforms
+uniform mat4 cameraTransform;
+// Varying outputs
+varying vec4 fColor;
+
+void main() {
+    fColor = vColor;
+    vec4 vPosition4 = vec4(vPosition.x, vPosition.y, vPosition.z, 1.0);
+    gl_Position = cameraTransform*vPosition4;
+}
+''';
+  sp.fragmentShader.source = '''
+precision mediump float;
+uniform sampler2D texture;
+varying vec4 fColor;
+
+void main() {
+    gl_FragColor = fColor + texture2D(texture, fColor.xy);
+}''';
+  sp.link();
+  expect(true, sp.linked);
+  material.link();
+  expect(material.constants.length, 1);
+  expect(material.textures.length, 1);
 }
 
 void testMaterialClone() {

@@ -31,6 +31,10 @@ class MaterialConstant {
 
   dynamic _constructValue(String type) {
     switch (type) {
+      case 'float':
+        return new Float32Array(1);
+      case 'vec2':
+        return new Float32Array(2);
       case 'vec3':
         return new Float32Array(3);
       case 'vec4':

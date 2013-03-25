@@ -41,14 +41,19 @@ class Material {
     BlendState _blendState;
     BlendState get blendState => _blendState;
 
-    Material(this.renderer, this.name, this.shader) {
+    Material(this.name, this.shader, this.renderer) {
+      if (this.name == null) {
+        throw new ArgumentError('name cannot be null.');
+      }
+      if (this.shader == null) {
+        throw new ArgumentError('shader cannot be null.');
+      }
+      if (this.renderer == null) {
+        throw new ArgumentError('renderer cannot be null.');
+      }
       _depthState = new DepthState(name, renderer.device);
       _blendState = new BlendState(name, renderer.device);
       _rasterizerState = new RasterizerState(name, renderer.device);
-      while (_textures.length < shader.samplers.length) {
-        _textures.add(null);
-        _samplers.add(null);
-      }
       _link();
     }
 
@@ -57,10 +62,6 @@ class Material {
       _depthState = new DepthState(name, renderer.device);
       _blendState = new BlendState(name, renderer.device);
       _rasterizerState = new RasterizerState(name, renderer.device);
-      while (_textures.length < shader.samplers.length) {
-        _textures.add(null);
-        _samplers.add(null);
-      }
       _depthState.fromJson(other._depthState.toJson());
       _blendState.fromJson(other._blendState.toJson());
       _rasterizerState.fromJson(other._rasterizerState.toJson());
@@ -85,7 +86,17 @@ class Material {
       device.context.setTextures(0, _textures);
     }
 
+    void _setupTextureSamplerTable() {
+      _textures.length = shader.samplers.length;
+      _samplers.length = shader.samplers.length;
+      for (int i = 0; i < shader.samplers.length; i++) {
+        _textures[i] = null;
+        _samplers[i] = null;
+      }
+    }
+
     void _cloneLink(Material other) {
+      _setupTextureSamplerTable();
       constants.clear();
       other.constants.forEach((k, v) {
         constants[k] = new MaterialConstant.clone(v);
@@ -95,7 +106,9 @@ class Material {
         textures[k] = new MaterialTexture.clone(v);
       });
     }
+
     void _link() {
+      _setupTextureSamplerTable();
       constants.clear();
       shader.uniforms.forEach((k, v) {
         constants[k] = new MaterialConstant(k, v.type);
@@ -104,6 +117,10 @@ class Material {
       shader.samplers.forEach((k, v) {
         textures[k] = new MaterialTexture(renderer, k, '', v.textureUnit);
       });
+    }
+
+    void link() {
+      _link();
     }
 
     void updateCameraConstants(Camera camera) {
