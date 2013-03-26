@@ -27,7 +27,6 @@ import 'dart:scalarlist';
 import 'spectre.dart';
 import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
-import 'dart:math' as Math;
 
 part 'src/spectre_mesh/arrays.dart';
 part 'src/spectre_mesh/box_generator.dart';

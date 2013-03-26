@@ -21,30 +21,103 @@
 part of spectre_mesh;
 
 class SphereGenerator extends MeshGenerator {
-
-  VertexData _vertexData;
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+  
+  /// The radius of the [Mesh] to create
   num radius = 0.5;
-  vec3 center = new vec3.zero();
-  int latSegments = 6;
-  int lonSegments = 8;
+  
+  /// The number of segments the [Mesh] will be divided into vertically
+  int latSegments = 12;
+  
+  /// The number of segments the [Mesh] will be divided into horizontally
+  int lonSegments = 16;
 
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  /// Creates an instance of the [SphereGenerator] class.
   SphereGenerator();
 
-  /**
-   * Gets the number of vertices that will be created.
-   *
-   * For the amount of storage space see [vertexBufferSize].
-   */
+  //---------------------------------------------------------------------
+  // Properties
+  //---------------------------------------------------------------------
+
+  /// Gets the number of vertices that will be generated.
+  ///
+  /// For the amount of storage space required see [vertexBufferSize].
   int get vertexCount => ((lonSegments * (latSegments - 1)) + 2);
 
-  /**
-   * Retrieves the index buffer size necessary to hold the generated mesh.
-   */
+  /// Retrieves the size of the index buffer necessary to hold the generated [Mesh].
   int get indexCount => 6 * lonSegments * latSegments;
   
-  /**
-   * Generates positional data.
-   */
+  //---------------------------------------------------------------------
+  // Private mesh generation methods
+  //---------------------------------------------------------------------
+
+  /// Populates the indices for the mesh.
+  ///
+  /// Index data will be placed within the [indices] array starting at the specified
+  /// [indexOffset].
+  void _generateIndices(Uint16Array indices, int vertexOffset, int indexOffset) {
+    int x;
+    
+    // First ring
+    for(x = 0; x < lonSegments-1; ++x) {
+      indices[indexOffset++] = 0;
+      indices[indexOffset++] = x + 2;
+      indices[indexOffset++] = x + 1;
+    }
+    indices[indexOffset++] = 0;
+    indices[indexOffset++] = 1;
+    indices[indexOffset++] = x + 1;
+    
+    // Center rings
+    int ring1Base, ring2Base;
+    for (int y = 0; y < latSegments-2; ++y) {
+      ring1Base = (lonSegments * y) + 1;
+      ring2Base = (lonSegments * (y + 1)) + 1;
+      for (x = 0; x < lonSegments-1; ++x) {
+        indices[indexOffset++] = ring1Base + x;
+        indices[indexOffset++] = ring1Base + x + 1;
+        indices[indexOffset++] = ring2Base + x;
+        
+        indices[indexOffset++] = ring1Base + x + 1;
+        indices[indexOffset++] = ring2Base + x + 1;
+        indices[indexOffset++] = ring2Base + x;
+      }
+      
+      indices[indexOffset++] = ring1Base + x;
+      indices[indexOffset++] = ring1Base;
+      indices[indexOffset++] = ring2Base + x;
+      
+      indices[indexOffset++] = ring1Base;
+      indices[indexOffset++] = ring2Base;
+      indices[indexOffset++] = ring2Base + x;
+    }
+    
+    // Last ring
+    ring1Base = (lonSegments * (latSegments-2)) + 1;
+    ring2Base = (lonSegments * (latSegments-1)) + 1;
+    for(x = 0; x < lonSegments-1; ++x) {
+      indices[indexOffset++] = ring2Base;
+      indices[indexOffset++] = ring1Base + x;
+      indices[indexOffset++] = ring1Base + x + 1;
+    }
+    indices[indexOffset++] = ring2Base;
+    indices[indexOffset++] = ring1Base + x;
+    indices[indexOffset++] = ring1Base;
+  }
+  
+  /// Generates the positions for the mesh.
+  ///
+  /// Positions will be placed within the [positions] array starting at the specified
+  /// [vertexOffset]. When complete \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [array] will contain position data.
+  ///
+  /// The mesh will be centered at the given [center] position.
   void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
     positions[vertexOffset++] = new vec3.raw(center.x, center.y + radius, center.z);
 
@@ -64,10 +137,12 @@ class SphereGenerator extends MeshGenerator {
     positions[vertexOffset++] = new vec3.raw(center.x, center.y - radius, center.z);
   }
   
-  /**
-   * Generates texture coordinate data.
-   */
-  void _generateTextureCoordData(Vector2Array texCoords, int vertexOffset) {
+  /// Generates the texture coordinates for the mesh.
+  ///
+  /// Texture coordinates will be placed within the [array] starting at the
+  /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [array] will contain texture coordinate data.
+  void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
     int offset = vertexOffset++;
     
     texCoords[vertexOffset++] = new vec2.raw(0.5, 0);
@@ -83,60 +158,11 @@ class SphereGenerator extends MeshGenerator {
     texCoords[vertexOffset++] = new vec2.raw(0.5, 1.0);
   }
   
-  /**
-   * Populates the indices for the mesh.
-   */
-  void _generateIndices(Int16Array indexBuffer, int vertexOffset, int indexOffset) {
-    int x;
-    
-    // First ring
-    for(x = 0; x < lonSegments-1; ++x) {
-      indexBuffer[indexOffset++] = 0;
-      indexBuffer[indexOffset++] = x + 2;
-      indexBuffer[indexOffset++] = x + 1;
-    }
-    indexBuffer[indexOffset++] = 0;
-    indexBuffer[indexOffset++] = 1;
-    indexBuffer[indexOffset++] = x + 1;
-    
-    // Center rings
-    int ring1Base, ring2Base;
-    for (int y = 0; y < latSegments-2; ++y) {
-      ring1Base = (lonSegments * y) + 1;
-      ring2Base = (lonSegments * (y + 1)) + 1;
-      for (x = 0; x < lonSegments-1; ++x) {
-        indexBuffer[indexOffset++] = ring1Base + x;
-        indexBuffer[indexOffset++] = ring1Base + x + 1;
-        indexBuffer[indexOffset++] = ring2Base + x;
-        
-        indexBuffer[indexOffset++] = ring1Base + x + 1;
-        indexBuffer[indexOffset++] = ring2Base + x + 1;
-        indexBuffer[indexOffset++] = ring2Base + x;
-      }
-      
-      indexBuffer[indexOffset++] = ring1Base + x;
-      indexBuffer[indexOffset++] = ring1Base;
-      indexBuffer[indexOffset++] = ring2Base + x;
-      
-      indexBuffer[indexOffset++] = ring1Base;
-      indexBuffer[indexOffset++] = ring2Base;
-      indexBuffer[indexOffset++] = ring2Base + x;
-    }
-    
-    // Last ring
-    ring1Base = (lonSegments * (latSegments-2)) + 1;
-    ring2Base = (lonSegments * (latSegments-1)) + 1;
-    for(x = 0; x < lonSegments-1; ++x) {
-      indexBuffer[indexOffset++] = ring2Base;
-      indexBuffer[indexOffset++] = ring1Base + x;
-      indexBuffer[indexOffset++] = ring1Base + x + 1;
-    }
-    indexBuffer[indexOffset++] = ring2Base;
-    indexBuffer[indexOffset++] = ring1Base + x;
-    indexBuffer[indexOffset++] = ring1Base;
-  }
+  //---------------------------------------------------------------------
+  // Single mesh generation
+  //---------------------------------------------------------------------
 
-  /// Creates a single sphere with the given [extents] at the specified [center].
+  /// Creates a single sphere with the given [radius] at the specified [center].
   ///
   /// This is a helper method for creating a single sphere. If you are creating
   /// many sphere meshes prefer creating a [SphereGenerator] and using that to generate
@@ -147,7 +173,6 @@ class SphereGenerator extends MeshGenerator {
     generator.radius = radius;
 
     // Create the mesh
-    Mesh mesh = MeshGenerator._createMesh(name, graphicsDevice, elements, generator, center);
-    return mesh;
+    return MeshGenerator._createMesh(name, graphicsDevice, elements, generator, center);
   }
 }

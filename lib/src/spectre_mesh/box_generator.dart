@@ -59,7 +59,7 @@ class BoxGenerator extends MeshGenerator {
   ///
   /// Index data will be placed within the [indices] array starting at the specified
   /// [indexOffset].
-  void _generateIndices(Int16Array indices, int vertexOffset, int indexOffset) {
+  void _generateIndices(Uint16Array indices, int vertexOffset, int indexOffset) {
     // Negative X
     indices[indexOffset++] =  0;  indices[indexOffset++] =  1;  indices[indexOffset++] =  2;
     indices[indexOffset++] =  0;  indices[indexOffset++] =  2;  indices[indexOffset++] =  3;
@@ -196,7 +196,7 @@ class BoxGenerator extends MeshGenerator {
   /// Normals will be placed within the [vertexArray] starting at the specified
   /// [vertexOffset]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [vertexArray] will contain normal data.
-  void _generateNormals(Vector3Array positions, Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
+  void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
     List<vec3> normalValues = [
         new vec3(-1.0,  0.0,  0.0),
         new vec3( 0.0, -1.0,  0.0),
