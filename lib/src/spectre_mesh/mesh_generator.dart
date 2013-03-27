@@ -106,7 +106,7 @@ abstract class MeshGenerator {
   /// the mesh will be centered at \[0.0, 0.0, 0.0\]. Additionally an offset into the vertex and index
   /// data can be specified by [vertexOffset] and [indexOffset]. If unspecified the mesh will be generated
   /// at the start of the arrays.
-  void generateMesh(VertexData vertexData, Int16Array indices, [vec3 center, int vertexOffset = 0, int indexOffset = 0]) {
+  void generateMesh(VertexData vertexData, Uint16Array indices, [vec3 center, int vertexOffset = 0, int indexOffset = 0]) {
     // Ensure that there is enough room in the vertex and index data to hold the mesh
     if (vertexData.vertexCount < vertexOffset + vertexCount) {
       throw new ArgumentError('The vertex data does not have enough space to hold the mesh');
@@ -164,7 +164,7 @@ abstract class MeshGenerator {
   ///
   /// Index data will be placed within the [indices] array starting at the specified
   /// [indexOffset].
-  void _generateIndices(Int16Array indexBuffer, int vertexOffset, int indexOffset);
+  void _generateIndices(Uint16Array indexBuffer, int vertexOffset, int indexOffset);
 
   /// Generates the positions for the mesh.
   ///
@@ -193,7 +193,7 @@ abstract class MeshGenerator {
   ///
   /// A subclass should override this if the normals can easily be determined. This
   /// is the case for something like a box or plane.
-  void _generateNormals(Vector3Array positions, Vector3Array normals, Int16Array indices, int vertexOffset, int indexOffset) {
+  void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
     NormalDataBuilder.build(positions, normals, indices, indexOffset);
   }
 
@@ -210,7 +210,7 @@ abstract class MeshGenerator {
   static Mesh _createMesh(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, MeshGenerator generator, vec3 center) {
     // Create storage space for the vertices and indices
     Float32Array vertices = new Float32Array(generator.vertexCount * 6);
-    Int16Array indices = new Int16Array(generator.indexCount);
+    Uint16Array indices = new Uint16Array(generator.indexCount);
 
     // Create the vertex data view
     VertexData vertexData = new VertexData(vertices, elements);
