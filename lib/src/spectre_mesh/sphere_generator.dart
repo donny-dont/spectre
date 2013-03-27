@@ -122,14 +122,17 @@ class SphereGenerator extends MeshGenerator {
     positions[vertexOffset++] = new vec3.raw(center.x, center.y + radius, center.z);
 
     for (int y = 1; y < latSegments; ++y) {
+      double v = y / latSegments;
+      double sv = sin(v * Math.PI);
+      double cv = cos(v * Math.PI);
+      
       for (int x = 0; x < lonSegments; ++x) {
-        num u = x / lonSegments;
-        num v = y / latSegments;
-
+        double u = x / lonSegments;
+        
         positions[vertexOffset++] = new vec3.raw(
-            radius * cos(u * Math.PI * 2.0) * sin(v * Math.PI) + center.x,
-            radius * cos(v * Math.PI) + center.y,
-            radius * sin(u * Math.PI * 2.0) * sin(v * Math.PI) + center.z
+            radius * cos(u * Math.PI * 2.0) * sv + center.x,
+            radius * cv + center.y,
+            radius * sin(u * Math.PI * 2.0) * sv + center.z
         );
       }
     }
@@ -148,9 +151,10 @@ class SphereGenerator extends MeshGenerator {
     texCoords[vertexOffset++] = new vec2.raw(0.5, 0);
     
     for (int y = 1; y < latSegments; ++y) {
+      double v = y / latSegments;
+      
       for (int x = 0; x < lonSegments; ++x) {
-        num u = x / lonSegments;
-        num v = y / latSegments;
+        double u = x / lonSegments;
         texCoords[vertexOffset++] = new vec2.raw(u, v);
       }
     }
