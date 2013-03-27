@@ -63,7 +63,8 @@ class SimpleGeometryScreen extends DemoScreen {
   /// provide a variable shininess, which is used in Phong lighting, across the mesh.
   ShaderProgram _shaderProgram;
   /// The [Mesh] to draw to the screen.
-  Mesh _mesh;
+  Mesh _boxMesh;
+  Mesh _sphereMesh;
 
   //---------------------------------------------------------------------
   // Construction
@@ -133,7 +134,10 @@ class SimpleGeometryScreen extends DemoScreen {
   /// Create the mesh to display.
   void _createMesh() {
     // Create a box mesh
-    _mesh = _createBoxMesh();
+    _boxMesh = _createBoxMesh();
+    
+    // Create a sphere mesh
+    _sphereMesh = _createSphereMesh();
 
     // Get the ShaderProgram to render with.
     //
@@ -161,6 +165,26 @@ class SimpleGeometryScreen extends DemoScreen {
     List<InputLayoutElement> elements = [positionElement, normalElement];
 
     return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
+  }
+  
+  /// Creates a box mesh for display.
+  Mesh _createSphereMesh() {
+    // A sphere mesh can be created through a SphereGenerator.
+    //
+    // There are helper methods that can be used when creating a single mesh.
+    // When creating a large number of spheres a SphereGenerator should be created and
+    // used to create all the spheres.
+    //
+    // Create a unit sphere
+    num radius = 0.5;
+    vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
+
+    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
+
+    List<InputLayoutElement> elements = [positionElement, normalElement];
+
+    return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
   }
 
   //---------------------------------------------------------------------
@@ -201,9 +225,13 @@ class SimpleGeometryScreen extends DemoScreen {
   }
 
   void _destroyMesh() {
-    // Dispose of the Mesh
-    _mesh.dispose();
-    _mesh = null;
+    // Dispose of the Box Mesh
+    _boxMesh.dispose();
+    _boxMesh = null;
+    
+    // Dispose of the Sphere Mesh
+    _sphereMesh.dispose();
+    _sphereMesh = null;
 
     // The ShaderProgram is contained within the base AssetPack which is
     // potentially shared. Just set this to null to remove the reference.
@@ -289,9 +317,13 @@ class SimpleGeometryScreen extends DemoScreen {
     _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
     _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
 
-    // Set and draw the mesh
-    _graphicsContext.setMeshNew(_mesh);
-    _graphicsContext.drawMeshNew(_mesh);
+    // Set and draw the box mesh
+    _graphicsContext.setMeshNew(_boxMesh);
+    _graphicsContext.drawMeshNew(_boxMesh);
+    
+    // Set and draw the sphere mesh
+    _graphicsContext.setMeshNew(_sphereMesh);
+    _graphicsContext.drawMeshNew(_sphereMesh);
   }
 
   void onResize(int width, int height) {
