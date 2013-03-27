@@ -9,6 +9,7 @@ import 'package:spectre/spectre_renderer.dart';
 
 final String _canvasId = '#frontBuffer';
 
+
 GraphicsDevice graphicsDevice;
 GraphicsContext graphicsContext;
 DebugDrawManager debugDrawManager;
@@ -100,8 +101,6 @@ void renderFrame(GameLoop gameLoop) {
   }
   // Prepare the debug draw manager for rendering
   debugDrawManager.prepareForRender();
-  // Render it
-  debugDrawManager.render(camera);
 }
 
 // Handle resizes
@@ -280,17 +279,20 @@ main() {
     _makeMaterial();
     _buildCubes();
     // Setup layers.
-    var clearBackBuffer = new Layer('clear', 'fullscreen');
+    var clearBackBuffer = new FullscreenLayer('clear');
     clearBackBuffer.clearColorTarget = true;
     clearBackBuffer.clearDepthTarget = true;
     clearBackBuffer.renderTarget = 'backBuffer';
     layers.add(clearBackBuffer);
-    var colorBackBuffer = new Layer('color', 'scene');
+    var colorBackBuffer = new SceneLayer('color');
     colorBackBuffer.clearColorTarget = true;
     colorBackBuffer.clearDepthTarget = true;
     colorBackBuffer.renderTarget = 'backBuffer';
     layers.add(colorBackBuffer);
-    var blitBackBuffer = new Layer('blit', 'fullscreen');
+    var debugLayer = new DebugDrawLayer('debug', debugDrawManager);
+    debugLayer.renderTarget = 'backBuffer';
+    layers.add(debugLayer);
+    var blitBackBuffer = new FullscreenLayer('blit');
     blitBackBuffer.renderTarget = 'frontBuffer';
     blitBackBuffer.clearColorTarget = true;
     blitBackBuffer.material = assetManager['fullscreenEffects.blit'];

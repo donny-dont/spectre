@@ -35,7 +35,7 @@ part of spectre_renderer;
  * is the effect. In the case of a scene layer, the material is used as a
  * fallback material for renderables that do not have a material.
  */
-class Layer {
+abstract class Layer {
   static const int SortModeNone = 0;
   static const int SortModeBackToFront = 1;
   static const int SortModeFrontToBack = 2;
@@ -54,8 +54,7 @@ class Layer {
 
   /// Name of layer.
   final String name;
-  /// Type of layer. Either 'fullscreen' or 'scene'.
-  final String type;
+  String get type;
 
   /// Material.
   Material material;
@@ -82,18 +81,14 @@ class Layer {
   num clearDepthValue = 1.0;
 
   /// Construct a new layer, specifying [name] and [type].
-  Layer(this.name, this.type) {
-    if (type != 'fullscreen' && type != 'scene') {
-      throw new ArgumentError('invalid type.');
-    }
+  Layer(this.name) {
   }
 
-  Layer.json(Map json) : name = json['name'], type = json['type'] {
-    if (type != 'fullscreen' && type != 'scene') {
-      throw new ArgumentError('invalid type.');
-    }
+  Layer.json(Map json) : name = json['name'] {
     fromJson(json);
   }
+
+  void render(Renderer renderer, List<Renderable> renderables, Camera camera);
 
   void fromJson(Map json) {
     renderTarget = json['rendertarget'];

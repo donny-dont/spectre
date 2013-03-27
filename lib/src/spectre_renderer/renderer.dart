@@ -242,13 +242,7 @@ class Renderer {
     if (layer.clearDepthTarget) {
       device.context.clearDepthBuffer(layer.clearDepthValue);
     }
-    if (layer.type == 'scene') {
-      _renderSceneLayer(layer, renderables, camera);
-    } else if (layer.type == 'fullscreen') {
-      _renderFullscreenLayer(layer);
-    } else {
-      throw new StateError('unknown layer type.');
-    }
+    layer.render(this, renderables, camera);
   }
 
   void render(List<Layer> layers, List<Renderable> renderables, Camera camera) {
@@ -267,19 +261,19 @@ class Renderer {
     Float32Array fullscreenVertexArray = new Float32Array(12);
     // Vertex 0
     fullscreenVertexArray[0] = -1.0;
-    fullscreenVertexArray[1] = 1.0;
+    fullscreenVertexArray[1] = -1.0;
     fullscreenVertexArray[2] = 0.0;
     fullscreenVertexArray[3] = 0.0;
     // Vertex 1
-    fullscreenVertexArray[4] = -1.0;
-    fullscreenVertexArray[5] = -3.0;
-    fullscreenVertexArray[6] = 0.0;
-    fullscreenVertexArray[7] = 2.0;
+    fullscreenVertexArray[4] = 3.0;
+    fullscreenVertexArray[5] = -1.0;
+    fullscreenVertexArray[6] = 2.0;
+    fullscreenVertexArray[7] = 0.0;
     // Vertex 2
-    fullscreenVertexArray[8] = 3.0;
-    fullscreenVertexArray[9] = 1.0;
-    fullscreenVertexArray[10] = 2.0;
-    fullscreenVertexArray[11] = 0.0;
+    fullscreenVertexArray[8] = -1.0;
+    fullscreenVertexArray[9] = 3.0;
+    fullscreenVertexArray[10] = 0.0;
+    fullscreenVertexArray[11] = 2.0;
     _fullscreenMesh.vertexArray.uploadData(fullscreenVertexArray,
                                            SpectreBuffer.UsageStatic);
     _fullscreenMesh.attributes['vPosition'] = new SpectreMeshAttribute(

@@ -18,22 +18,13 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-library spectre_renderer;
+part of spectre_renderer;
 
-import 'dart:html';
-import 'dart:async';
-import 'package:vector_math/vector_math.dart';
-import 'package:asset_pack/asset_pack.dart';
-import 'package:spectre/spectre.dart';
-import 'package:spectre/spectre_post.dart';
-
-part 'src/spectre_renderer/asset_pack.dart';
-part 'src/spectre_renderer/debugdraw_layer.dart';
-part 'src/spectre_renderer/fullscreen_layer.dart';
-part 'src/spectre_renderer/layer.dart';
-part 'src/spectre_renderer/material.dart';
-part 'src/spectre_renderer/material_constant.dart';
-part 'src/spectre_renderer/material_texture.dart';
-part 'src/spectre_renderer/renderable.dart';
-part 'src/spectre_renderer/renderer.dart';
-part 'src/spectre_renderer/scene_layer.dart';
+class SceneLayer extends Layer {
+  void render(Renderer renderer, List<Renderable> renderables, Camera camera) {
+    renderer._renderSceneLayer(this, renderables, camera);
+  }
+  String get type => 'Scene';
+  SceneLayer(String name) : super(name) {
+  }
+}
