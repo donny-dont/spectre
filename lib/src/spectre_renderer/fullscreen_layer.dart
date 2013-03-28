@@ -22,7 +22,11 @@ part of spectre_renderer;
 
 class FullscreenLayer extends Layer {
   void render(Renderer renderer, List<Renderable> renderables, Camera camera) {
-    renderer._renderFullscreenLayer(this);
+    if (material == null) {
+      return;
+    }
+    renderer.applyMaterial(material, null);
+    renderer.renderFullscreenMesh(material);
   }
   String get type => 'Fullscreen';
   FullscreenLayer(String name) : super(name) {

@@ -203,12 +203,22 @@ class Renderer {
     material.apply(device);
   }
 
-  void _renderFullscreenLayer(Layer layer) {
-    if (layer == null || layer.material == null) {
-      return;
+  /// Takes two materials [primary] and [fallback] and configures the GPU
+  /// to draw using the material. Any material properties not defined in
+  /// [primary] will be looked in [fallback] before falling back to the
+  /// defaults specified by the shader.
+  /// NOTE: [primary] and [fallback] must have the same shader.
+  void applyMaterial(Material primary, Material fallback) {
+    if (fallback != null) {
+      assert(primary.shader == fallback.shader);
     }
-    _fullscreenMeshInputLayout.shaderProgram = layer.material.shader;
-    _applyMaterial(layer.material);
+    _applyMaterial(primary);
+  }
+
+  /// Draws a single triangle covering the entire viewport. Useful for
+  /// doing full screen passes.
+  void renderFullscreenMesh(Material material) {
+    _fullscreenMeshInputLayout.shaderProgram = material.shader;
     device.context.setInputLayout(_fullscreenMeshInputLayout);
     device.context.setMesh(_fullscreenMesh);
     device.context.drawMesh(_fullscreenMesh);
@@ -217,13 +227,7 @@ class Renderer {
   void _renderSceneLayer(Layer layer, List<Renderable> renderables,
                          Camera camera) {
     for (int i = 0; i < renderables.length; i++) {
-      Renderable renderable = renderables[i];
-      renderable.material.updateCameraConstants(camera);
-      renderable.material.updateObjectTransformConstant(renderable.T);
-      _applyMaterial(renderable.material);
-      device.context.setInputLayout(renderable.inputLayout);
-      device.context.setIndexedMesh(renderable.mesh);
-      device.context.drawIndexedMesh(renderable.mesh);
+
     }
   }
 

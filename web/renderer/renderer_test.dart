@@ -9,6 +9,16 @@ import 'package:spectre/spectre_renderer.dart';
 
 final String _canvasId = '#frontBuffer';
 
+// TODO:
+// Material constants are decoupled from shader constants.
+// Material is a property sheet.
+// Shader looks up current value in material.
+// Look up material settings first in renderable then layer.
+// A shader has a default material property sheet.
+// Add Material->apply(). Possible for a material to override it.
+// Fix renderable interface.
+// Add layer list importer and material importer.
+// Only update material camera transform, time uniforms once.
 
 GraphicsDevice graphicsDevice;
 GraphicsContext graphicsContext;

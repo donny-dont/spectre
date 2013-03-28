@@ -22,7 +22,9 @@ part of spectre_renderer;
 
 class SceneLayer extends Layer {
   void render(Renderer renderer, List<Renderable> renderables, Camera camera) {
-    renderer._renderSceneLayer(this, renderables, camera);
+    renderables.forEach((r) {
+      r.render(this, camera);
+    });
   }
   String get type => 'Scene';
   SceneLayer(String name) : super(name) {

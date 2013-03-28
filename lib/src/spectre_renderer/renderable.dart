@@ -22,6 +22,8 @@ part of spectre_renderer;
 
 /**
  * The renderable class contains everything needed to render a mesh instance.
+ * TODO(johnmccutchan): Factor this into a base interface and implement
+ * MeshRenderable.
  */
 class Renderable {
   final Renderer renderer;
@@ -87,7 +89,7 @@ class Renderable {
     }
   }
 
-  void _render() {
+  void render(Layer layer, Camera camera) {
     if (_material == null) {
       spectreLog.Error('Cannot render $name it has no material.');
       return;
@@ -100,10 +102,11 @@ class Renderable {
       spectreLog.Error('Cannot render $name inputs are invalid.');
       return;
     }
-
-    renderer.device.context.setIndexedMesh(_mesh);
-    _material.apply(renderer.device);
+    _material.updateCameraConstants(camera);
+    _material.updateObjectTransformConstant(T);
+    renderer._applyMaterial(_material);
     renderer.device.context.setInputLayout(_inputLayout);
+    renderer.device.context.setIndexedMesh(_mesh);
     renderer.device.context.drawIndexedMesh(_mesh);
   }
 
