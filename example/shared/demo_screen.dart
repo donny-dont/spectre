@@ -73,7 +73,7 @@ abstract class DemoScreen {
   bool _isLoaded = false;
 
   /// Creates an instance of the [Screen] class.
-  Screen();
+  Screen(){}
 
   /// Sets up the [Screen] for the display.
   Future<bool> onLoad() {

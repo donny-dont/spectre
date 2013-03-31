@@ -20,8 +20,10 @@
 
 part of spectre_mesh;
 
+/// Contains functions for generating tangents for arbitrary mesh data.
 class TangentSpaceBuilder {
 
+  //static void build(Vector3Array positions, Vector2Array texCoords, Vector3Array normals, Vector3Array values)
   static void build(Float32Array vertexBuffer,
                     Uint16Array indexBuffer,
                     List<InputElementDescription> bufferLayout)

@@ -1,4 +1,11 @@
 {
+  "mosaicDiffuse":{
+    "loadArguments":{},
+    "name":"mosaicDiffuse",
+    "url":"/mosaic_diffuse.png",
+    "type":"tex2d",
+    "importArguments":{}
+  },
   "solidColorShader":{
     "loadArguments":{},
     "name":"solidColorShader",
@@ -10,6 +17,27 @@
     "loadArguments":{},
     "name":"solidLightingShader",
     "url":"/solid_lighting.shader",
+    "type":"shaderProgram",
+    "importArguments":{}
+  },
+  "singleTextureShader":{
+    "loadArguments":{},
+    "name":"singleTextureShader",
+    "url":"/single_texture.shader",
+    "type":"shaderProgram",
+    "importArguments":{}
+  },
+  "texturedLightingShader":{
+    "loadArguments":{},
+    "name":"texturedLightingShader",
+    "url":"/textured_lighting.shader",
+    "type":"shaderProgram",
+    "importArguments":{}
+  },
+  "bumpMappingShader":{
+    "loadArguments":{},
+    "name":"bumpMappingShader",
+    "url":"/bump_mapping.shader",
     "type":"shaderProgram",
     "importArguments":{}
   }

@@ -272,8 +272,7 @@ WEBGL_lose_context: $_loseContext
     _debugShaders = _hasExtension(gl, 'WEBGL_debug_shaders');
     _compressedTextureS3TC = _hasExtension(gl, 'WEBGL_compressed_texture_s3tc');
     _depthTextures = _hasExtension(gl, 'WEBGL_depth_texture');
-    // \todo This call is crashing on me. See if its just my machine.
-    _unsignedIntIndices = false; //_hasExtension(gl, 'OES_element_index_uint');
+    _unsignedIntIndices = _hasExtension(gl, 'OES_element_index_uint');
 
     // Query the anisotropic extension and get the maximum anisotropy level
     if (_hasExtension(gl, 'EXT_texture_filter_anisotropic') != null) {

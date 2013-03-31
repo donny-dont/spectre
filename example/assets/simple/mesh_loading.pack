@@ -1,4 +1,18 @@
 {
+  "hellknightDiffuse":{
+    "loadArguments":{},
+    "name":"hellknightDiffuse",
+    "url":"/hellknight_diffuse.png",
+    "type":"tex2d",
+    "importArguments":{}
+  },
+  "hellknightNormal":{
+    "loadArguments":{},
+    "name":"hellknightNormal",
+    "url":"/hellknight_normal.png",
+    "type":"tex2d",
+    "importArguments":{}
+  },
   "exampleMesh":{
     "loadArguments":{},
     "name":"exampleMesh",

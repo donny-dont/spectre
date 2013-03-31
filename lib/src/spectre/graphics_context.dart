@@ -618,7 +618,7 @@ class GraphicsContext {
     if (mesh.indexBuffer != null) {
       drawIndexed(mesh.indexBuffer.size ~/ 2, 0);
     } else {
-      draw(mesh.vertexBuffer.size ~/ 4, 0);
+      draw(mesh.vertexBuffers[0].size ~/ 4, 0);
     }
   }
 

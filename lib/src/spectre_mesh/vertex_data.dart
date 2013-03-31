@@ -27,9 +27,6 @@ class VertexData {
   VertexData(Float32Array array, List<InputLayoutElement> elements) {
     _elements = new Map<String, VertexArray>();
 
-    // \TODO remove! This is just a test
-    bool position = true;
-
     for (InputLayoutElement element in elements) {
       int count  = element.attributeFormat.count;
       int offset = element.attributeOffset;
@@ -46,8 +43,15 @@ class VertexData {
         default: vertexArray = new Vector4Array.fromArray(array, offset, stride); break;
       }
 
-      String elementName = (position) ? 'vPosition' : 'vNormal';
-      position = false;
+      String elementName;
+
+      // \TODO remove!
+      switch (element.attributeIndex) {
+        case 1: elementName = 'vPosition'; break;
+        case 2: elementName = 'vTexCoord0'; break;
+        case 0: elementName = 'vNormal'; break;
+      }
+
       _elements[elementName] = vertexArray;
     }
   }

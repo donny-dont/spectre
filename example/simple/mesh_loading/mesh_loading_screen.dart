@@ -64,6 +64,10 @@ class MeshLoadingScreen extends DemoScreen {
   /// The [Mesh] to draw to the screen.
   Mesh _mesh;
 
+  SamplerState _samplerState;
+  Texture2D _diffuseTexture;
+  Texture2D _normalTexture;
+
   //---------------------------------------------------------------------
   // Construction
   //---------------------------------------------------------------------
@@ -112,13 +116,13 @@ class MeshLoadingScreen extends DemoScreen {
   void _createCamera() {
     // Create the Camera
     _camera = new Camera();
-    _camera.position = new vec3.raw(0.0, 0.0, 5.0);
+    _camera.position = new vec3.raw(150.0, 0.0, 150.0);
     _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
 
     // Create the CameraController and set the velocity of the movement
     _cameraController = new FpsFlyCameraController();
-    _cameraController.forwardVelocity = 5.0;
-    _cameraController.strafeVelocity = 5.0;
+    _cameraController.forwardVelocity = 250.0;
+    _cameraController.strafeVelocity = 250.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4();
@@ -134,12 +138,23 @@ class MeshLoadingScreen extends DemoScreen {
     // Get the example mesh to render with.
     _mesh = _assetManager.root['meshLoading.exampleMesh'];
 
+    InputLayout layout = _mesh.inputLayout;
+    layout.elements[0].attributeIndex = 2;
+    layout.elements[1].attributeIndex = 1;
+    layout.elements[2].attributeIndex = 3;
+    layout.elements[3].attributeIndex = 0;
+    layout.elements[4].attributeIndex = 4;
+
     // Get the ShaderProgram to render with.
     //
     // The shader to use is shared between multiple examples, and is loaded by
     // the Application at startup into the 'base' pack. The shader can be accessed
     // through the [] operator using the format 'packName.resourceName'.
-    _shaderProgram = _assetManager.root['base.solidLightingShader'];
+    _shaderProgram = _assetManager.root['base.bumpMappingShader'];
+
+    _diffuseTexture = _assetManager.root['meshLoading.hellknightDiffuse'];
+    _normalTexture = _assetManager.root['meshLoading.hellknightNormal'];
+    _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
   }
 
   //---------------------------------------------------------------------
@@ -267,6 +282,9 @@ class MeshLoadingScreen extends DemoScreen {
     _graphicsContext.setConstant('uModelViewMatrix', _modelViewMatrixArray);
     _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
     _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
+
+    _graphicsContext.setSamplers(0, [ _samplerState, _samplerState ]);
+    _graphicsContext.setTextures(0, [ _diffuseTexture, _normalTexture ]);
 
     // Set and draw the mesh
     _graphicsContext.setMeshNew(_mesh);

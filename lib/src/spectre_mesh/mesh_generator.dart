@@ -198,7 +198,7 @@ abstract class MeshGenerator {
   }
 
   /// Generates the tangent data for the mesh.
-  void _generateTangentData() {
+  void _generateTangents() {
 
   }
 
@@ -208,8 +208,10 @@ abstract class MeshGenerator {
   /// The [MeshGenerator] should be supplied with any options regarding its creation
   /// before calling this.
   static Mesh _createMesh(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, MeshGenerator generator, vec3 center) {
+    int elementCount = elements[0].attributeStride ~/ 4;
+
     // Create storage space for the vertices and indices
-    Float32Array vertices = new Float32Array(generator.vertexCount * 6);
+    Float32Array vertices = new Float32Array(generator.vertexCount * elementCount);
     Uint16Array indices = new Uint16Array(generator.indexCount);
 
     // Create the vertex data view
@@ -217,10 +219,6 @@ abstract class MeshGenerator {
 
     // Generate the box
     generator.generateMesh(vertexData, indices, center);
-
-    for (int i = 0; i < vertices.length; ++i) {
-      print(vertices[i]);
-    }
 
     // Upload the graphics data
     VertexBuffer vertexBuffer = new VertexBuffer('${name}_VBO', graphicsDevice);

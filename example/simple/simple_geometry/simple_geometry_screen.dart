@@ -66,6 +66,9 @@ class SimpleGeometryScreen extends DemoScreen {
   Mesh _boxMesh;
   Mesh _sphereMesh;
 
+  SamplerState _samplerState;
+  Texture2D _diffuseTexture;
+
   //---------------------------------------------------------------------
   // Construction
   //---------------------------------------------------------------------
@@ -135,7 +138,7 @@ class SimpleGeometryScreen extends DemoScreen {
   void _createMesh() {
     // Create a box mesh
     _boxMesh = _createBoxMesh();
-    
+
     // Create a sphere mesh
     _sphereMesh = _createSphereMesh();
 
@@ -144,7 +147,10 @@ class SimpleGeometryScreen extends DemoScreen {
     // The shader to use is shared between multiple examples, and is loaded by
     // the Application at startup into the 'base' pack. The shader can be accessed
     // through the [] operator using the format 'packName.resourceName'.
-    _shaderProgram = _assetManager.root['base.solidLightingShader'];
+    _shaderProgram = _assetManager.root['base.texturedLightingShader'];
+
+    _diffuseTexture = _assetManager.root['base.mosaicDiffuse'];
+    _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
   }
 
   /// Creates a box mesh for display.
@@ -159,14 +165,15 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 24, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 32, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 32, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 2, 24, 32, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement, texCoordElement];
 
     return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
   }
-  
+
   /// Creates a box mesh for display.
   Mesh _createSphereMesh() {
     // A sphere mesh can be created through a SphereGenerator.
@@ -179,10 +186,11 @@ class SimpleGeometryScreen extends DemoScreen {
     num radius = 0.5;
     vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 24, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 24, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 32, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 32, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 2, 24, 32, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement, texCoordElement];
 
     return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
   }
@@ -228,7 +236,7 @@ class SimpleGeometryScreen extends DemoScreen {
     // Dispose of the Box Mesh
     _boxMesh.dispose();
     _boxMesh = null;
-    
+
     // Dispose of the Sphere Mesh
     _sphereMesh.dispose();
     _sphereMesh = null;
@@ -317,10 +325,13 @@ class SimpleGeometryScreen extends DemoScreen {
     _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
     _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
 
+    _graphicsContext.setSamplers(0, [ _samplerState]);
+    _graphicsContext.setTextures(0, [ _diffuseTexture ]);
+
     // Set and draw the box mesh
     _graphicsContext.setMeshNew(_boxMesh);
     _graphicsContext.drawMeshNew(_boxMesh);
-    
+
     // Set and draw the sphere mesh
     _graphicsContext.setMeshNew(_sphereMesh);
     _graphicsContext.drawMeshNew(_sphereMesh);

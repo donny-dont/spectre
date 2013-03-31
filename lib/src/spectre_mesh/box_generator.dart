@@ -49,7 +49,12 @@ class BoxGenerator extends MeshGenerator {
 
   /// The extents of the box.
   vec3 get extents => _extents;
-  set extents(vec3 value) { _extents = value; }
+  set extents(vec3 value) {
+    _extents.copyInto(value);
+
+    // Get absolute value
+    _extents.absolute();
+  }
 
   //---------------------------------------------------------------------
   // Private mesh generation methods
@@ -156,39 +161,48 @@ class BoxGenerator extends MeshGenerator {
   /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain texture coordinate data.
   void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
-    List<vec2> textureCoordValues = [
+    List<vec2> texCoordValues = [
       new vec2(0.0, 1.0),
       new vec2(0.0, 0.0),
       new vec2(1.0, 1.0),
       new vec2(1.0, 0.0)
     ];
 
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[1];
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
+    // Negative X
+    texCoords[vertexOffset++] = texCoordValues[3];
+    texCoords[vertexOffset++] = texCoordValues[1];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[2];
 
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[1];
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[1];
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[1];
+    // Negative Y
+    texCoords[vertexOffset++] = texCoordValues[1];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[3];
+    texCoords[vertexOffset++] = texCoordValues[2];
 
-    textureCoords[vertexOffset++] = textureCoordValues[1];
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[2];
-    textureCoords[vertexOffset++] = textureCoordValues[3];
-    textureCoords[vertexOffset++] = textureCoordValues[0];
-    textureCoords[vertexOffset++] = textureCoordValues[1];
+    // Negative Z
+    texCoords[vertexOffset++] = texCoordValues[1];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[2];
+    texCoords[vertexOffset++] = texCoordValues[3];
+
+    // Positive Y
+    texCoords[vertexOffset++] = texCoordValues[1];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[2];
+    texCoords[vertexOffset++] = texCoordValues[3];
+
+    // Positive Z
+    texCoords[vertexOffset++] = texCoordValues[1];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[2];
+    texCoords[vertexOffset++] = texCoordValues[3];
+
+    // Positive X
+    texCoords[vertexOffset++] = texCoordValues[2];
+    texCoords[vertexOffset++] = texCoordValues[0];
+    texCoords[vertexOffset++] = texCoordValues[3];
+    texCoords[vertexOffset++] = texCoordValues[1];
   }
 
   /// Generates the normals for the mesh.
@@ -255,6 +269,7 @@ class BoxGenerator extends MeshGenerator {
   static Mesh createBox(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, vec3 extents, vec3 center) {
     // Setup the generator
     BoxGenerator generator = new BoxGenerator();
+    generator.extents = extents;
 
     // Create the mesh
     return MeshGenerator._createMesh(name, graphicsDevice, elements, generator, center);
