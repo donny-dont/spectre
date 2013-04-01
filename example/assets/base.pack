@@ -40,5 +40,12 @@
     "url":"/bump_mapping.shader",
     "type":"shaderProgram",
     "importArguments":{}
+  },
+  "uvgridDiffuse":{
+    "loadArguments":{},
+    "name":"uvgridDiffuse",
+    "url":"/ash_uvgrid01.jpg",
+    "type":"tex2d",
+    "importArguments":{}
   }
 }

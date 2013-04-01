@@ -25,8 +25,11 @@ class CylinderGenerator extends MeshGenerator {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// The radius of the cylinder base
-  num radius = 0.5;
+  /// The radius of the cylinder top
+  num topRadius = 0.5;
+  
+  /// The radius of the cylinder bottom
+  num bottomRadius = 0.5;
   
   /// The height of the cylinder
   num height = 1.0;
@@ -48,10 +51,10 @@ class CylinderGenerator extends MeshGenerator {
   /// Gets the number of vertices that will be generated.
   ///
   /// For the amount of storage space required see [vertexBufferSize].
-  int get vertexCount => (segments * 4);
+  int get vertexCount => ((segments + 1) * 2) + (segments * 2);
 
   /// Retrieves the size of the index buffer necessary to hold the generated [Mesh].
-  int get indexCount => (segments * 6) + (segments - 2) * 6;
+  int get indexCount => (segments * 6) + ((segments - 2) * 6);
 
   //---------------------------------------------------------------------
   // Private mesh generation methods
@@ -63,42 +66,34 @@ class CylinderGenerator extends MeshGenerator {
   /// [indexOffset].
   void _generateIndices(Uint16Array indices, int vertexOffset, int indexOffset) {
     int x;
-    int ring1Base, ring2Base;
-    
-    // Top cap
-    for(x = 1; x < segments-1; ++x) {
-      indices[indexOffset++] = 0;
-      indices[indexOffset++] = x + 1;
-      indices[indexOffset++] = x;
-    }
     
     // Sides
-    ring1Base = segments;
-    ring2Base = segments * 2;
-    for(x = 0; x < segments-1; ++x) {
-      indices[indexOffset++] = ring1Base + x;
-      indices[indexOffset++] = ring1Base + x + 1;
-      indices[indexOffset++] = ring2Base + x;
+    int base1 = 0;
+    int base2 = segments + 1;
+    for(x = 0; x < segments; ++x) {
+      indices[indexOffset++] = base1 + x;
+      indices[indexOffset++] = base1 + x + 1;
+      indices[indexOffset++] = base2 + x;
       
-      indices[indexOffset++] = ring1Base + x + 1;
-      indices[indexOffset++] = ring2Base + x + 1;
-      indices[indexOffset++] = ring2Base + x;
+      indices[indexOffset++] = base1 + x + 1;
+      indices[indexOffset++] = base2 + x + 1;
+      indices[indexOffset++] = base2 + x;
     }
     
-    indices[indexOffset++] = ring1Base + x;
-    indices[indexOffset++] = ring1Base;
-    indices[indexOffset++] = ring2Base + x;
-    
-    indices[indexOffset++] = ring1Base;
-    indices[indexOffset++] = ring2Base;
-    indices[indexOffset++] = ring2Base + x;
+    // Top cap
+    base1 = (segments + 1) * 2;
+    for(x = 1; x < segments-1; ++x) {
+      indices[indexOffset++] = base1;
+      indices[indexOffset++] = base1 + x + 1;
+      indices[indexOffset++] = base1 + x;
+    }
     
     // Bottom cap
-    ring1Base = segments * 3;
+    base1 = (segments + 1) * 2 + segments;
     for(x = 1; x < segments-1; ++x) {
-      indices[indexOffset++] = ring1Base;
-      indices[indexOffset++] = ring1Base + x;
-      indices[indexOffset++] = ring1Base + x + 1;
+      indices[indexOffset++] = base1;
+      indices[indexOffset++] = base1 + x;
+      indices[indexOffset++] = base1 + x + 1;
     }
   }
 
@@ -113,24 +108,46 @@ class CylinderGenerator extends MeshGenerator {
     // Vertices are doubled up so that normals will be sharp
     
     // Top
-    for (int x = 0; x < segments * 2; ++x) {
-      double u = (x % segments) / segments;
+    for (int x = 0; x <= segments; ++x) {
+      double u = x / segments;
       
       positions[vertexOffset++] = new vec3.raw(
-          radius * cos(u * Math.PI * 2.0) + center.x,
+          topRadius * cos(u * Math.PI * 2.0) + center.x,
           height * 0.5 + center.y,
-          radius * sin(u * Math.PI * 2.0) + center.z
+          topRadius * sin(u * Math.PI * 2.0) + center.z
       );
     }
     
     // Bottom
-    for (int x = 0; x < segments * 2; ++x) {
-      double u = (x % segments) / segments;
+    for (int x = 0; x <= segments; ++x) {
+      double u = x / segments;
       
       positions[vertexOffset++] = new vec3.raw(
-          radius * cos(u * Math.PI * 2.0) + center.x,
+          bottomRadius * cos(u * Math.PI * 2.0) + center.x,
           height * -0.5 + center.y,
-          radius * sin(u * Math.PI * 2.0) + center.z
+          bottomRadius * sin(u * Math.PI * 2.0) + center.z
+      );
+    }
+    
+    // Top cap
+    for (int x = 0; x < segments; ++x) {
+      double u = x / segments;
+      
+      positions[vertexOffset++] = new vec3.raw(
+          topRadius * cos(u * Math.PI * 2.0) + center.x,
+          height * 0.5 + center.y,
+          topRadius * sin(u * Math.PI * 2.0) + center.z
+      );
+    }
+    
+    // Bottom cap
+    for (int x = 0; x < segments; ++x) {
+      double u = x / segments;
+      
+      positions[vertexOffset++] = new vec3.raw(
+          bottomRadius * cos(u * Math.PI * 2.0) + center.x,
+          height * -0.5 + center.y,
+          bottomRadius * sin(u * Math.PI * 2.0) + center.z
       );
     }
   }
@@ -143,17 +160,34 @@ class CylinderGenerator extends MeshGenerator {
   void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
     // Vertices are doubled up so that normals will be sharp
     
-    // Cone top
-    for (int x = 0; x < segments * 2; ++x) {
-      double u = (x % segments) / segments;
+    // Cylinder top
+    for (int x = 0; x <= segments; ++x) {
+      double u = 1.0 - (x / segments);
       texCoords[vertexOffset++] = new vec2.raw(u, 0.0);
     }
     
-    // Cone base
-    // We create two sets of these points so the normals will be sharp
-    for (int x = 0; x < segments * 2; ++x) {
-      double u = (x % segments) / segments;
+    // Cylinder bottom
+    for (int x = 0; x <= segments; ++x) {
+      double u = 1.0 - (x / segments);
       texCoords[vertexOffset++] = new vec2.raw(u, 1.0);
+    }
+    
+    // Top cap
+    for (int x = 0; x < segments; ++x) {
+      double r = (x / segments) * Math.PI * 2.0;
+      texCoords[vertexOffset++] = new vec2.raw(
+          (cos(r) * 0.5 + 0.5),
+          (sin(r) * 0.5 + 0.5)
+      );
+    }
+    
+    // Bottom cap
+    for (int x = 0; x < segments; ++x) {
+      double r = (x / segments) * Math.PI * 2.0;
+      texCoords[vertexOffset++] = new vec2.raw(
+          (cos(r) * 0.5 + 0.5),
+          (sin(r) * 0.5 + 0.5)
+      );
     }
   }
 
@@ -166,10 +200,11 @@ class CylinderGenerator extends MeshGenerator {
   /// This is a helper method for creating a single cylinder. If you are creating
   /// many cylinder meshes prefer creating a [CylinderGenerator] and using that to generate
   /// multiple meshes.
-  static Mesh createCylinder(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, num radius, num height, vec3 center) {
+  static Mesh createCylinder(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, num topRadius, num bottomRadius, num height, vec3 center) {
     // Setup the generator
     CylinderGenerator generator = new CylinderGenerator();
-    generator.radius = radius;
+    generator.topRadius = topRadius;
+    generator.bottomRadius = bottomRadius;
     generator.height = height;
 
     // Create the mesh
