@@ -45,6 +45,8 @@ class SimpleGeometryScreen extends DemoScreen {
   FpsFlyCameraController _cameraController;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
+  /// [Float32Array] storage for the View matrix.
+  Float32Array _viewMatrixArray;
   /// [Float32Array] storage for the Model-View matrix.
   Float32Array _modelViewMatrixArray;
   /// [Float32Array] storage for the Model-View-Projection matrix.
@@ -68,6 +70,7 @@ class SimpleGeometryScreen extends DemoScreen {
 
   SamplerState _samplerState;
   Texture2D _diffuseTexture;
+  Texture2D _normalTexture;
 
   //---------------------------------------------------------------------
   // Construction
@@ -129,6 +132,7 @@ class SimpleGeometryScreen extends DemoScreen {
     _modelViewProjectionMatrix = new mat4();
 
     // Create the Float32Arrays that store the constant values for the matrices
+    _viewMatrixArray = new Float32Array(16);
     _modelViewMatrixArray = new Float32Array(16);
     _modelViewProjectionMatrixArray = new Float32Array(16);
     _normalMatrixArray = new Float32Array(16);
@@ -147,9 +151,10 @@ class SimpleGeometryScreen extends DemoScreen {
     // The shader to use is shared between multiple examples, and is loaded by
     // the Application at startup into the 'base' pack. The shader can be accessed
     // through the [] operator using the format 'packName.resourceName'.
-    _shaderProgram = _assetManager.root['base.texturedLightingShader'];
+    _shaderProgram = _assetManager.root['base.bumpMappingShader'];
 
     _diffuseTexture = _assetManager.root['base.mosaicDiffuse'];
+    _normalTexture = _assetManager.root['base.mosaicNormal'];
     _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
   }
 
@@ -165,11 +170,13 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement texCoordElement = new InputLayoutElement(0, 2, 24, 32, GraphicsDevice.DeviceFormatFloat2);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, texCoordElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
     return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
   }
@@ -186,11 +193,13 @@ class SimpleGeometryScreen extends DemoScreen {
     num radius = 0.5;
     vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement texCoordElement = new InputLayoutElement(0, 2, 24, 32, GraphicsDevice.DeviceFormatFloat2);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, texCoordElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
     return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
   }
@@ -284,6 +293,8 @@ class SimpleGeometryScreen extends DemoScreen {
     // collected language objects should be reused whenever possible.
     _modelViewProjectionMatrix.multiply(_camera.viewMatrix);
 
+    _camera.viewMatrix.copyIntoArray(_viewMatrixArray);
+
     // At this point we actually have the Model-View-Projection matrix. This
     // is because the model matrix is currently the identity matrix. The model
     // has no rotation, no scaling, and is sitting at (0, 0, 0).
@@ -321,12 +332,13 @@ class SimpleGeometryScreen extends DemoScreen {
 
     // The matrices are the same for the drawing of each part of the mesh so
     // they only need to be set once.
+    _graphicsContext.setConstant('uViewMatrix', _viewMatrixArray);
     _graphicsContext.setConstant('uModelViewMatrix', _modelViewMatrixArray);
     _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
     _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);
 
-    _graphicsContext.setSamplers(0, [ _samplerState]);
-    _graphicsContext.setTextures(0, [ _diffuseTexture ]);
+    _graphicsContext.setSamplers(0, [ _samplerState, _samplerState ]);
+    _graphicsContext.setTextures(0, [ _diffuseTexture, _normalTexture ]);
 
     // Set and draw the box mesh
     _graphicsContext.setMeshNew(_boxMesh);

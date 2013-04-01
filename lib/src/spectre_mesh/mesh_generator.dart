@@ -152,7 +152,7 @@ abstract class MeshGenerator {
     Vector3Array bitangents = vertexData.elements[_bitangentAttributeName];
 
     if ((tangents != null) && (bitangents != null)) {
-      _generateTangents();
+      _generateTangents(positions, texCoords, normals, tangents, bitangents, indices, vertexOffset, indexOffset);
     }
   }
 
@@ -194,12 +194,31 @@ abstract class MeshGenerator {
   /// A subclass should override this if the normals can easily be determined. This
   /// is the case for something like a box or plane.
   void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
-    NormalDataBuilder.build(positions, normals, indices, indexOffset);
+    NormalDataBuilder.build(
+        positions,
+        normals,
+        indices,
+        vertexOffset,
+        vertexCount,
+        indexOffset,
+        indexCount
+    );
   }
 
   /// Generates the tangent data for the mesh.
-  void _generateTangents() {
-
+  void _generateTangents(Vector3Array positions, Vector2Array texCoords, Vector3Array normals, Vector3Array tangents, Vector3Array bitangents, Uint16Array indices, int vertexOffset, int indexOffset) {
+    TangentSpaceBuilder.build(
+        positions,
+        texCoords,
+        normals,
+        tangents,
+        bitangents,
+        indices,
+        vertexOffset,
+        vertexCount,
+        indexOffset,
+        indexCount
+    );
   }
 
   /// Creates a single [Mesh] using the supplied [MeshGenerator].

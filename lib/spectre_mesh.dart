@@ -23,7 +23,7 @@
 library spectre_mesh;
 
 import 'dart:html';
-import 'dart:scalarlist';
+import 'dart:typeddata';
 import 'spectre.dart';
 import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
@@ -35,6 +35,7 @@ part 'src/spectre_mesh/normal_data_builder.dart';
 part 'src/spectre_mesh/plane_generator.dart';
 part 'src/spectre_mesh/tangent_space_builder.dart';
 part 'src/spectre_mesh/vertex_data.dart';
+part 'src/spectre_mesh/vertex_data_builder.dart';
 part 'src/spectre_mesh/scalar_list.dart';
 part 'src/spectre_mesh/sphere_generator.dart';
 part 'src/spectre_mesh/strided_list.dart';

@@ -47,11 +47,14 @@ class VertexData {
 
       // \TODO remove!
       switch (element.attributeIndex) {
-        case 1: elementName = 'vPosition'; break;
-        case 2: elementName = 'vTexCoord0'; break;
-        case 0: elementName = 'vNormal'; break;
+        case 2: elementName = 'vPosition'; break;
+        case 1: elementName = 'vNormal'; break;
+        case 3: elementName = 'vTangent'; break;
+        case 0: elementName = 'vBitangent'; break;
+        case 4: elementName = 'vTexCoord0'; break;
       }
 
+      //print('$elementName $count');
       _elements[elementName] = vertexArray;
     }
   }

@@ -44,6 +44,8 @@ class MeshLoadingScreen extends DemoScreen {
   FpsFlyCameraController _cameraController;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
+  /// [Float32Array] storage for the View matrix.
+  Float32Array _viewMatrixArray;
   /// [Float32Array] storage for the Model-View matrix.
   Float32Array _modelViewMatrixArray;
   /// [Float32Array] storage for the Model-View-Projection matrix.
@@ -128,6 +130,7 @@ class MeshLoadingScreen extends DemoScreen {
     _modelViewProjectionMatrix = new mat4();
 
     // Create the Float32Arrays that store the constant values for the matrices
+    _viewMatrixArray = new Float32Array(16);
     _modelViewMatrixArray = new Float32Array(16);
     _modelViewProjectionMatrixArray = new Float32Array(16);
     _normalMatrixArray = new Float32Array(16);
@@ -234,6 +237,8 @@ class MeshLoadingScreen extends DemoScreen {
     // Start off by copying the projection matrix into the matrix.
     _camera.copyProjectionMatrix(_modelViewProjectionMatrix);
 
+    _camera.viewMatrix.copyIntoArray(_viewMatrixArray);
+
     // Multiply the projection matrix by the view matrix to combine them.
     //
     // The mathematical operators in Dart Vector Math will end up creating
@@ -279,6 +284,7 @@ class MeshLoadingScreen extends DemoScreen {
 
     // The matrices are the same for the drawing of each part of the mesh so
     // they only need to be set once.
+    _graphicsContext.setConstant('uViewMatrix', _viewMatrixArray);
     _graphicsContext.setConstant('uModelViewMatrix', _modelViewMatrixArray);
     _graphicsContext.setConstant('uModelViewProjectionMatrix', _modelViewProjectionMatrixArray);
     _graphicsContext.setConstant('uNormalMatrix', _normalMatrixArray);

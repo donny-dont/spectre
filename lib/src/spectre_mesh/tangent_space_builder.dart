@@ -23,44 +23,45 @@ part of spectre_mesh;
 /// Contains functions for generating tangents for arbitrary mesh data.
 class TangentSpaceBuilder {
 
-  //static void build(Vector3Array positions, Vector2Array texCoords, Vector3Array normals, Vector3Array values)
-  static void build(Float32Array vertexBuffer,
-                    Uint16Array indexBuffer,
-                    List<InputElementDescription> bufferLayout)
+  static void build(Vector3Array positions,
+                    Vector2Array texCoords,
+                    Vector3Array normals,
+                    Vector3Array tangents,
+                    Vector3Array bitangents,
+                    Uint16Array indices,
+                   [int vertexOffset = 0,
+                    int vertexCount,
+                    int indexOffset = 0,
+                    int indexCount])
   {
-    VertexData vertexData = new VertexData(vertexBuffer, bufferLayout);
-    assert(vertexData.elements['vPosition']  != null);
-    assert(vertexData.elements['vTexCoord']  != null);
-    assert(vertexData.elements['vNormal']    != null);
-    assert(vertexData.elements['vTangent']   != null);
-    assert(vertexData.elements['vBitangent'] != null);
+    // Get the maximum vertex index
+    int maxVertex = _VertexDataBuilder._getMaxIndex(vertexOffset, vertexCount, tangents.length);
 
-    int vertexCount = vertexData.vertexCount;
+    // Create temporary arrays to hold the tangent data
+    vertexCount = maxVertex - vertexOffset;
 
     Vector3Array tan1 = new Vector3Array(vertexCount);
     Vector3Array tan2 = new Vector3Array(vertexCount);
 
     {
-      Vector3Array positions = vertexData.elements['vPosition'];
-      Vector2Array texCoords = vertexData.elements['vTexCoords'];
+      vec3 v0 = new vec3();
+      vec3 v1 = new vec3();
+      vec3 v2 = new vec3();
 
-      vec3 v0;
-      vec3 v1;
-      vec3 v2;
+      vec2 w0 = new vec2();
+      vec2 w1 = new vec2();
+      vec2 w2 = new vec2();
 
-      vec2 w0;
-      vec2 w1;
-      vec2 w2;
+      vec3 tdir = new vec3();
+      vec3 sdir = new vec3();
 
-      vec3 tdir;
-      vec3 sdir;
+      // Get the maximum index within indices to use
+      int maxIndex = _VertexDataBuilder._getMaxIndex(indexOffset, indexCount, indices.length);
 
-      int indexCount = indexBuffer.length;
-
-      for (int i = 0; i < indexCount; i += 3) {
-        int i0 = indexBuffer[i];
-        int i1 = indexBuffer[i + 1];
-        int i2 = indexBuffer[i + 2];
+      for (int i = indexOffset; i < maxIndex; i += 3) {
+        int i0 = indices[i];
+        int i1 = indices[i + 1];
+        int i2 = indices[i + 2];
 
         positions.getAt(i0, v0);
         positions.getAt(i1, v1);
@@ -96,54 +97,49 @@ class TangentSpaceBuilder {
           ((s0 * z1) - (s1 * z0)) * r
         );
 
-        _addToVec3(i0, tan1, sdir, v0);
-        _addToVec3(i1, tan1, sdir, v0);
-        _addToVec3(i2, tan1, sdir, v0);
+        // Take into account the offset
+        i0 -= vertexOffset;
+        i1 -= vertexOffset;
+        i2 -= vertexOffset;
 
-        _addToVec3(i0, tan2, tdir, v0);
-        _addToVec3(i1, tan2, tdir, v0);
-        _addToVec3(i2, tan2, tdir, v0);
+        _VertexDataBuilder._addToVec3(i0, tan1, sdir, v0);
+        _VertexDataBuilder._addToVec3(i1, tan1, sdir, v0);
+        _VertexDataBuilder._addToVec3(i2, tan1, sdir, v0);
+
+        _VertexDataBuilder._addToVec3(i0, tan2, tdir, v0);
+        _VertexDataBuilder._addToVec3(i1, tan2, tdir, v0);
+        _VertexDataBuilder._addToVec3(i2, tan2, tdir, v0);
       }
     }
 
     {
-      Vector3Array normals = vertexData.elements['vNormal'];
-      Vector3Array tangents = vertexData.elements['vTangent'];
-      Vector3Array bitangents = vertexData.elements['vBitangent'];
+      vec3 n = new vec3();
+      vec3 t = new vec3();
+      vec3 nCrossT = new vec3();
 
-      vec3 n;
-      vec3 t;
-      vec3 temp;
-      vec3 nCrossT;
-
-      for (int i = 0; i < vertexCount; ++i) {
+      for (int i = vertexOffset, j = 0; i < maxVertex; ++i, ++j) {
         normals.getAt(i, n);
-        tan1.getAt(i, t);
+        tan1.getAt(j, t);
 
         double nDotT = n.dot(t);
         n.cross(t, nCrossT);
 
+        n.x *= nDotT;
+        n.y *= nDotT;
+        n.z *= nDotT;
         t.sub(n);
-        t.x *= nDotT;
-        t.y *= nDotT;
-        t.z *= nDotT;
         t.normalize();
 
         tangents.setAt(i, t);
 
-        tan2.getAt(i, t);
-        double h = nCrossT.dot(t) < 0.0 ? -1.0 : 0.0;
+        tan2.getAt(j, t);
+        double h = nCrossT.dot(t) < 0.0 ? -1.0 : 1.0;
         nCrossT.x *= h;
         nCrossT.y *= h;
         nCrossT.z *= h;
+        nCrossT.normalize();
         bitangents.setAt(i, nCrossT);
       }
     }
-  }
-
-  static void _addToVec3(int index, Vector3Array array, vec3 value, vec3 temp) {
-    array.getAt(index, temp);
-    temp.add(value);
-    array.setAt(index, temp);
   }
 }
