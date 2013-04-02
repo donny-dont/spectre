@@ -67,6 +67,7 @@ class SimpleGeometryScreen extends DemoScreen {
   /// The [Mesh] to draw to the screen.
   Mesh _boxMesh;
   Mesh _sphereMesh;
+  Mesh _cylinderMesh;
 
   SamplerState _samplerState;
   Texture2D _diffuseTexture;
@@ -145,6 +146,9 @@ class SimpleGeometryScreen extends DemoScreen {
 
     // Create a sphere mesh
     _sphereMesh = _createSphereMesh();
+    
+    // Create a cylinder mesh
+    _cylinderMesh = _createCylinderMesh();
 
     // Get the ShaderProgram to render with.
     //
@@ -203,6 +207,31 @@ class SimpleGeometryScreen extends DemoScreen {
 
     return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
   }
+  
+  /// Creates a cylinder mesh for display.
+  Mesh _createCylinderMesh() {
+    // A cylinder mesh can be created through a CylinderGenerator.
+    //
+    // There are helper methods that can be used when creating a single mesh.
+    // When creating a large number of spheres a CylinderGenerator should be created and
+    // used to create all the cylinders.
+    //
+    // Create a unit cylinder
+    num topRadius = 0.5;
+    num bottomRadius = 0.75;
+    num height = 1.0;
+    vec3 center  = new vec3.raw(-2.0, 0.0, 0.0);
+
+    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
+
+    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
+
+    return CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, elements, topRadius, bottomRadius, height, center);
+  }
 
   //---------------------------------------------------------------------
   // Unloading methods
@@ -249,6 +278,10 @@ class SimpleGeometryScreen extends DemoScreen {
     // Dispose of the Sphere Mesh
     _sphereMesh.dispose();
     _sphereMesh = null;
+    
+    // Dispose of the Cylinder Mesh
+    _cylinderMesh.dispose();
+    _cylinderMesh = null;
 
     // The ShaderProgram is contained within the base AssetPack which is
     // potentially shared. Just set this to null to remove the reference.
@@ -347,6 +380,10 @@ class SimpleGeometryScreen extends DemoScreen {
     // Set and draw the sphere mesh
     _graphicsContext.setMeshNew(_sphereMesh);
     _graphicsContext.drawMeshNew(_sphereMesh);
+    
+    // Set and draw the cylinder mesh
+    _graphicsContext.setMeshNew(_cylinderMesh);
+    _graphicsContext.drawMeshNew(_cylinderMesh);
   }
 
   void onResize(int width, int height) {
