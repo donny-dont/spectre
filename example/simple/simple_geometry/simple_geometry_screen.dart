@@ -157,7 +157,6 @@ class SimpleGeometryScreen extends DemoScreen {
     // through the [] operator using the format 'packName.resourceName'.
     _shaderProgram = _assetManager.root['base.bumpMappingShader'];
 
-    //_diffuseTexture = _assetManager.root['base.uvgridDiffuse'];
     _diffuseTexture = _assetManager.root['base.mosaicDiffuse'];
     _normalTexture = _assetManager.root['base.mosaicNormal'];
     _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
@@ -223,11 +222,13 @@ class SimpleGeometryScreen extends DemoScreen {
     num height = 1.0;
     vec3 center  = new vec3.raw(-2.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 1,  0, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 0, 12, 32, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement texCoordElement = new InputLayoutElement(0, 2, 24, 32, GraphicsDevice.DeviceFormatFloat2);
+    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
+    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, texCoordElement];
+    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
     return CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, elements, topRadius, bottomRadius, height, center);
   }
