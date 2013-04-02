@@ -250,6 +250,10 @@ abstract class MeshGenerator {
     inputLayout.elements.addAll(elements);
 
     // Create the mesh
-    return new Mesh(name, graphicsDevice, [ vertexBuffer ], inputLayout, indexBuffer);
+    // \TODO Remove vertexData???
+    Mesh mesh = new Mesh(name, graphicsDevice, [ vertexBuffer ], inputLayout, indexBuffer);
+    mesh.vertexData = vertexData;
+
+    return mesh;
   }
 }

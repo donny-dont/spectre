@@ -31,6 +31,7 @@ import 'package:vector_math/vector_math.dart';
 part 'src/spectre_mesh/arrays.dart';
 part 'src/spectre_mesh/box_generator.dart';
 part 'src/spectre_mesh/cylinder_generator.dart';
+part 'src/spectre_mesh/debug_draw_mesh.dart';
 part 'src/spectre_mesh/mesh_generator.dart';
 part 'src/spectre_mesh/normal_data_builder.dart';
 part 'src/spectre_mesh/plane_generator.dart';

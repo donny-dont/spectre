@@ -62,6 +62,9 @@ class Mesh extends DeviceChild {
   IndexBuffer get indexBuffer => _indexBuffer;
   /// The primitive type
   int get primitiveType => _primitiveType;
+
+  // \TODO REMOVE or make better!
+  dynamic vertexData;
 }
 
 class SpectreMeshAttribute {

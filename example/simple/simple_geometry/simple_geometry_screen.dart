@@ -73,6 +73,8 @@ class SimpleGeometryScreen extends DemoScreen {
   Texture2D _diffuseTexture;
   Texture2D _normalTexture;
 
+  DebugDrawManager _debugDrawManager;
+
   //---------------------------------------------------------------------
   // Construction
   //---------------------------------------------------------------------
@@ -141,12 +143,14 @@ class SimpleGeometryScreen extends DemoScreen {
 
   /// Create the mesh to display.
   void _createMesh() {
+    _debugDrawManager = new DebugDrawManager(_graphicsDevice);
+
     // Create a box mesh
     _boxMesh = _createBoxMesh();
 
     // Create a sphere mesh
     _sphereMesh = _createSphereMesh();
-    
+
     // Create a cylinder mesh
     _cylinderMesh = _createCylinderMesh();
 
@@ -182,7 +186,17 @@ class SimpleGeometryScreen extends DemoScreen {
 
     List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
-    return BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
+    Mesh mesh = BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
+
+    Vector3Array positions = mesh.vertexData.elements['vPosition'];
+    Vector3Array normals = mesh.vertexData.elements['vNormal'];
+    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
+    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
+
+    debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
+    debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
+
+    return mesh;
   }
 
   /// Creates a box mesh for display.
@@ -205,9 +219,19 @@ class SimpleGeometryScreen extends DemoScreen {
 
     List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
-    return SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
+    Mesh mesh = SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
+
+    Vector3Array positions = mesh.vertexData.elements['vPosition'];
+    Vector3Array normals = mesh.vertexData.elements['vNormal'];
+    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
+    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
+
+    debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
+    debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
+
+    return mesh;
   }
-  
+
   /// Creates a cylinder mesh for display.
   Mesh _createCylinderMesh() {
     // A cylinder mesh can be created through a CylinderGenerator.
@@ -230,7 +254,17 @@ class SimpleGeometryScreen extends DemoScreen {
 
     List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
 
-    return CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, elements, topRadius, bottomRadius, height, center);
+    Mesh mesh = CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, elements, topRadius, bottomRadius, height, center);
+
+    Vector3Array positions = mesh.vertexData.elements['vPosition'];
+    Vector3Array normals = mesh.vertexData.elements['vNormal'];
+    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
+    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
+
+    debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
+    debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
+
+    return mesh;
   }
 
   //---------------------------------------------------------------------
@@ -278,7 +312,7 @@ class SimpleGeometryScreen extends DemoScreen {
     // Dispose of the Sphere Mesh
     _sphereMesh.dispose();
     _sphereMesh = null;
-    
+
     // Dispose of the Cylinder Mesh
     _cylinderMesh.dispose();
     _cylinderMesh = null;
@@ -296,6 +330,8 @@ class SimpleGeometryScreen extends DemoScreen {
   ///
   /// Uses the current change in time, [dt].
   void onUpdate(double dt) {
+    _debugDrawManager.update(dt);
+
     // Update the state of the CameraController
     Keyboard keyboard = _gameLoop.keyboard;
 
@@ -380,10 +416,15 @@ class SimpleGeometryScreen extends DemoScreen {
     // Set and draw the sphere mesh
     _graphicsContext.setMeshNew(_sphereMesh);
     _graphicsContext.drawMeshNew(_sphereMesh);
-    
+
     // Set and draw the cylinder mesh
     _graphicsContext.setMeshNew(_cylinderMesh);
     _graphicsContext.drawMeshNew(_cylinderMesh);
+
+    // Prepare the debug draw manager for rendering
+    _debugDrawManager.prepareForRender();
+    // Render it
+    _debugDrawManager.render(_camera);
   }
 
   void onResize(int width, int height) {
