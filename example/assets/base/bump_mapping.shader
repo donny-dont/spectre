@@ -1,4 +1,4 @@
 [
-  "/bump_mapping.vert",
-  "/bump_mapping.frag"
+  "/normal_mapping.vert",
+  "/normal_mapping.frag"
 ]

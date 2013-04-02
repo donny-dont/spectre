@@ -72,8 +72,6 @@ void _debugDrawVertexVectorData(DebugDrawManager debugDrawManager,
     endPoint.copyFrom(position3);
     endPoint.add(vector);
 
-    print('Position: $position3 EndPoint: $endPoint');
-
     // Add the line
     debugDrawManager.addLine(
         position3,
