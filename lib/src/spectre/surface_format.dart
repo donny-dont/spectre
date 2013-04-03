@@ -44,11 +44,11 @@ class SurfaceFormat {
   /// 32-bit RGBA pixel format with alpha, using 8 bits per channel.
   ///
   /// Underlying format is an unsigned byte.
-  static const int Rgba = WebGLRenderingContext.RGBA;
+  static const int Rgba = WebGL.RGBA;
   /// 24-bit RGB pixel format, using 8 bits per channel.
   ///
   /// Underlying format is an unsigned byte.
-  static const int Rgb = WebGLRenderingContext.RGB;
+  static const int Rgb = WebGL.RGB;
   /// DXT1 compression format.
   ///
   /// Only available if the compressed texture s3tc extension is supported. Assumes
@@ -122,6 +122,6 @@ class SurfaceFormat {
   static int _getInternalFormat(int value) {
     // This method will not be called for compressed textures as there's no internal format parameter
     // within compressedTexImage) so just return unsigned byte as the other formats are all unsigned byte
-    return WebGLRenderingContext.UNSIGNED_BYTE;
+    return WebGL.UNSIGNED_BYTE;
   }
 }

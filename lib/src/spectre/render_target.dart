@@ -27,10 +27,10 @@ part of spectre;
  * [RenderTarget.systemRenderTarget]
  */
 class RenderTarget extends DeviceChild {
-  final int _bindTarget = WebGLRenderingContext.FRAMEBUFFER;
-  final int _bindingParam = WebGLRenderingContext.FRAMEBUFFER_BINDING;
+  final int _bindTarget = WebGL.FRAMEBUFFER;
+  final int _bindingParam = WebGL.FRAMEBUFFER_BINDING;
 
-  WebGLFramebuffer _deviceFramebuffer;
+  WebGL.Framebuffer _deviceFramebuffer;
   DeviceChild _colorTarget;
   DeviceChild _depthTarget;
   DeviceChild get colorTarget => _colorTarget;
@@ -64,15 +64,15 @@ class RenderTarget extends DeviceChild {
 
 
   /** Bind this texture and return the previously bound framebuffer. */
-  WebGLFramebuffer _pushBind() {
-    WebGLFramebuffer oldBind = device.gl.getParameter(_bindingParam);
+  WebGL.Framebuffer _pushBind() {
+    WebGL.Framebuffer oldBind = device.gl.getParameter(_bindingParam);
     device.gl.bindFramebuffer(_bindTarget, _deviceFramebuffer);
     return oldBind;
   }
 
 
   /** Rebind [oldBind] */
-  void _popBind(WebGLFramebuffer oldBind) {
+  void _popBind(WebGL.Framebuffer oldBind) {
     device.gl.bindFramebuffer(_bindTarget, oldBind);
   }
 
@@ -85,7 +85,7 @@ class RenderTarget extends DeviceChild {
   void _updateStatus() {
     var oldBind = _pushBind();
     int fbStatus = device.gl.checkFramebufferStatus(_bindTarget);
-    _renderable = fbStatus == WebGLRenderingContext.FRAMEBUFFER_COMPLETE;
+    _renderable = fbStatus == WebGL.FRAMEBUFFER_COMPLETE;
     _popBind(oldBind);
   }
 
@@ -101,10 +101,10 @@ class RenderTarget extends DeviceChild {
     if (colorBuffer == null) {
       _colorTarget = null;
       device.gl.framebufferRenderbuffer(_bindTarget,
-                                        WebGLRenderingContext.COLOR_ATTACHMENT0,
-                                        WebGLRenderingContext.RENDERBUFFER,
+                                        WebGL.COLOR_ATTACHMENT0,
+                                        WebGL.RENDERBUFFER,
                                         null);
-      device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+      device.gl.bindFramebuffer(WebGL.FRAMEBUFFER, oldBind);
       _updateStatus();
       return;
     }
@@ -112,14 +112,14 @@ class RenderTarget extends DeviceChild {
       RenderBuffer rb = colorBuffer as RenderBuffer;
       _colorTarget = rb;
       device.gl.framebufferRenderbuffer(_bindTarget,
-                                        WebGLRenderingContext.COLOR_ATTACHMENT0,
-                                        WebGLRenderingContext.RENDERBUFFER,
+                                        WebGL.COLOR_ATTACHMENT0,
+                                        WebGL.RENDERBUFFER,
                                         rb._buffer);
     } else if (colorBuffer is Texture2D) {
       Texture2D t2d = colorBuffer as Texture2D;
       _colorTarget = t2d;
       device.gl.framebufferTexture2D(_bindTarget,
-                                     WebGLRenderingContext.COLOR_ATTACHMENT0,
+                                     WebGL.COLOR_ATTACHMENT0,
                                      t2d._textureTarget,
                                      t2d._deviceTexture, 0);
     } else {
@@ -146,10 +146,10 @@ class RenderTarget extends DeviceChild {
     if (depthBuffer == null) {
       _depthTarget = null;
       device.gl.framebufferRenderbuffer(_bindTarget,
-                                        WebGLRenderingContext.DEPTH_ATTACHMENT,
-                                        WebGLRenderingContext.RENDERBUFFER,
+                                        WebGL.DEPTH_ATTACHMENT,
+                                        WebGL.RENDERBUFFER,
                                         null);
-      device.gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, oldBind);
+      device.gl.bindFramebuffer(WebGL.FRAMEBUFFER, oldBind);
       _updateStatus();
       return;
     }
@@ -157,14 +157,14 @@ class RenderTarget extends DeviceChild {
       RenderBuffer rb = depthBuffer as RenderBuffer;
       _depthTarget = rb;
       device.gl.framebufferRenderbuffer(_bindTarget,
-                                        WebGLRenderingContext.DEPTH_ATTACHMENT,
-                                        WebGLRenderingContext.RENDERBUFFER,
+                                        WebGL.DEPTH_ATTACHMENT,
+                                        WebGL.RENDERBUFFER,
                                         rb._buffer);
     } else if (depthBuffer is Texture2D) {
       Texture2D t2d = depthBuffer as Texture2D;
       _depthTarget = t2d;
       device.gl.framebufferTexture2D(_bindTarget,
-                                     WebGLRenderingContext.DEPTH_ATTACHMENT,
+                                     WebGL.DEPTH_ATTACHMENT,
                                      t2d._textureTarget,
                                      t2d._deviceTexture, 0);
     } else {

@@ -26,12 +26,12 @@ part of spectre;
  */
 class SpectreBuffer extends DeviceChild {
   /** Hint that buffer data is used once and then discarded. */
-  static const UsageStream = WebGLRenderingContext.STREAM_DRAW;
+  static const UsageStream = WebGL.STREAM_DRAW;
   /** Hint that buffer data is used few times and then discarded. */
-  static const UsageDynamic = WebGLRenderingContext.DYNAMIC_DRAW;
+  static const UsageDynamic = WebGL.DYNAMIC_DRAW;
   /** Hint that buffer data is used many times and never discarded. */
-  static const UsageStatic = WebGLRenderingContext.STATIC_DRAW;
-  WebGLBuffer _deviceBuffer;
+  static const UsageStatic = WebGL.STATIC_DRAW;
+  WebGL.Buffer _deviceBuffer;
   final int _bindTarget;
   final int _bindingParam;
   int _usage = UsageDynamic;
@@ -49,7 +49,7 @@ class SpectreBuffer extends DeviceChild {
     _deviceBuffer = null;
   }
 
-  WebGLBuffer _pushBind() {
+  WebGL.Buffer _pushBind() {
     var oldBind = device.gl.getParameter(_bindingParam);
     device.gl.bindBuffer(_bindTarget, _deviceBuffer);
     return oldBind;
@@ -59,7 +59,7 @@ class SpectreBuffer extends DeviceChild {
     device.gl.bindBuffer(_bindTarget, _deviceBuffer);
   }
 
-  void _popBind(WebGLBuffer oldBind) {
+  void _popBind(WebGL.Buffer oldBind) {
     device.gl.bindBuffer(_bindTarget, oldBind);
   }
 

@@ -26,7 +26,7 @@ import 'package:spectre/spectre.dart';
 import 'mock_graphics_device.dart';
 import 'mock_webgl_rendering_context.dart';
 import 'dart:html';
-
+import 'dart:web_gl' as WebGL;
 //---------------------------------------------------------------------
 // GraphicsContext testing utility functions
 //---------------------------------------------------------------------
@@ -86,7 +86,7 @@ int verifyInitialBlendState(GraphicsDevice graphicsDevice, MockWebGLRenderingCon
   BlendState blendState = new BlendState.opaque('InitialBlendState', graphicsDevice);
 
   // Make sure BlendState.opaque was used
-  gl.getLogs(callsTo('disable', WebGLRenderingContext.BLEND)).verify(happenedOnce);
+  gl.getLogs(callsTo('disable', WebGL.BLEND)).verify(happenedOnce);
 
   gl.getLogs(
     callsTo(
@@ -145,7 +145,7 @@ int verifyBlendState(MockWebGLRenderingContext gl, BlendState blendState, BlendS
     }
 
     logEntries.verify(happenedOnce);
-    expect(logEntries.first.args[0], WebGLRenderingContext.BLEND);
+    expect(logEntries.first.args[0], WebGL.BLEND);
   }
 
   // Check to see if colorMask was called
@@ -413,7 +413,7 @@ int verifyInitialDepthState(GraphicsDevice graphicsDevice, MockWebGLRenderingCon
   DepthState depthState = new DepthState.depthWrite('InitialDepthState', graphicsDevice);
 
   // Make sure DepthState.cullClockwise was used
-  gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+  gl.getLogs(callsTo('enable', WebGL.DEPTH_TEST)).verify(happenedOnce);
 
   gl.getLogs(callsTo('depthFunc', depthState.depthBufferFunction)).verify(happenedOnce);
   gl.getLogs(callsTo('depthMask', depthState.depthBufferWriteEnabled)).verify(happenedOnce);
@@ -425,11 +425,11 @@ int verifyDepthState(MockWebGLRenderingContext gl, DepthState depthState, DepthS
   // Check to see if the depth buffer was enabled/disabled
   if (depthState.depthBufferEnabled != depthStateLast.depthBufferEnabled) {
     if (depthState.depthBufferEnabled) {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(neverHappened);
+      gl.getLogs(callsTo('enable', WebGL.DEPTH_TEST)).verify(happenedOnce);
+      gl.getLogs(callsTo('disable', WebGL.DEPTH_TEST)).verify(neverHappened);
     } else {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.DEPTH_TEST)).verify(neverHappened);
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+      gl.getLogs(callsTo('enable', WebGL.DEPTH_TEST)).verify(neverHappened);
+      gl.getLogs(callsTo('disable', WebGL.DEPTH_TEST)).verify(happenedOnce);
     }
   }
 
@@ -489,7 +489,7 @@ void testDepthStateTransitions(bool depthBufferEnabled) {
     // Shouldn't call enable
     numEntries = 2;
   } else {
-    gl.getLogs(callsTo('disable', WebGLRenderingContext.DEPTH_TEST)).verify(happenedOnce);
+    gl.getLogs(callsTo('disable', WebGL.DEPTH_TEST)).verify(happenedOnce);
     gl.getLogs(callsTo('depthMask')).verify(happenedOnce);
 
     // Shouldn't call depthFunc
@@ -550,15 +550,15 @@ int verifyInitialRasterizerState(GraphicsDevice graphicsDevice, MockWebGLRenderi
   RasterizerState rasterizerState = new RasterizerState.cullClockwise('InitialRasterizerState', graphicsDevice);
 
   // Make sure RasterizerState.cullClockwise was used
-  gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
+  gl.getLogs(callsTo('enable', WebGL.CULL_FACE)).verify(happenedOnce);
 
   gl.getLogs(callsTo('cullFace', rasterizerState.cullMode)).verify(happenedOnce);
   gl.getLogs(callsTo('frontFace', rasterizerState.frontFace)).verify(happenedOnce);
 
-  gl.getLogs(callsTo('disable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+  gl.getLogs(callsTo('disable', WebGL.POLYGON_OFFSET_FILL)).verify(happenedOnce);
   gl.getLogs(callsTo('polygonOffset', rasterizerState.depthBias, rasterizerState.slopeScaleDepthBias)).verify(happenedOnce);
 
-  gl.getLogs(callsTo('disable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+  gl.getLogs(callsTo('disable', WebGL.SCISSOR_TEST)).verify(happenedOnce);
 
   return 6;
 }
@@ -567,11 +567,11 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
   // Check to see if culling was enabled/disabled
   if (rasterizerState.cullMode != rasterizerStateLast.cullMode) {
     if (rasterizerState.cullMode != CullMode.None) {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(neverHappened);
+      gl.getLogs(callsTo('enable', WebGL.CULL_FACE)).verify(happenedOnce);
+      gl.getLogs(callsTo('disable', WebGL.CULL_FACE)).verify(neverHappened);
     } else {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.CULL_FACE)).verify(neverHappened);
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
+      gl.getLogs(callsTo('enable', WebGL.CULL_FACE)).verify(neverHappened);
+      gl.getLogs(callsTo('disable', WebGL.CULL_FACE)).verify(happenedOnce);
     }
   }
 
@@ -598,7 +598,7 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
   if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0.0)) {
     // Check to see if polygon offset is enabled
     if (!offsetEnabled) {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+      gl.getLogs(callsTo('enable', WebGL.POLYGON_OFFSET_FILL)).verify(happenedOnce);
     }
 
     // Check to see if polygonOffset was called
@@ -612,16 +612,16 @@ int verifyRasterizerState(MockWebGLRenderingContext gl, RasterizerState rasteriz
   } else {
     // Check to see if polygon offset is disabled
     if (offsetEnabled) {
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+      gl.getLogs(callsTo('disable', WebGL.POLYGON_OFFSET_FILL)).verify(happenedOnce);
     }
   }
 
   // Check to see if the scissor test was enabled/disabled
   if (rasterizerState.scissorTestEnabled != rasterizerStateLast.scissorTestEnabled) {
     if (rasterizerState.scissorTestEnabled) {
-      gl.getLogs(callsTo('enable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+      gl.getLogs(callsTo('enable', WebGL.SCISSOR_TEST)).verify(happenedOnce);
     } else {
-      gl.getLogs(callsTo('disable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+      gl.getLogs(callsTo('disable', WebGL.SCISSOR_TEST)).verify(happenedOnce);
     }
   }
 
@@ -664,17 +664,17 @@ void testRasterizerStateTransitions(bool cullEnabled) {
   if (rasterizerState.cullMode != CullMode.None) {
     gl.getLogs(callsTo('cullFace')).verify(happenedOnce);
     gl.getLogs(callsTo('frontFace')).verify(happenedOnce);
-    gl.getLogs(callsTo('enable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+    gl.getLogs(callsTo('enable', WebGL.POLYGON_OFFSET_FILL)).verify(happenedOnce);
     gl.getLogs(callsTo('polygonOffset')).verify(happenedOnce);
-    gl.getLogs(callsTo('enable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+    gl.getLogs(callsTo('enable', WebGL.SCISSOR_TEST)).verify(happenedOnce);
 
     // All methods should be called
     numEntries = 5;
   } else {
-    gl.getLogs(callsTo('disable', WebGLRenderingContext.CULL_FACE)).verify(happenedOnce);
-    gl.getLogs(callsTo('enable', WebGLRenderingContext.POLYGON_OFFSET_FILL)).verify(happenedOnce);
+    gl.getLogs(callsTo('disable', WebGL.CULL_FACE)).verify(happenedOnce);
+    gl.getLogs(callsTo('enable', WebGL.POLYGON_OFFSET_FILL)).verify(happenedOnce);
     gl.getLogs(callsTo('polygonOffset')).verify(happenedOnce);
-    gl.getLogs(callsTo('enable', WebGLRenderingContext.SCISSOR_TEST)).verify(happenedOnce);
+    gl.getLogs(callsTo('enable', WebGL.SCISSOR_TEST)).verify(happenedOnce);
 
     // Just colorMask should be called
     numEntries = 4;

@@ -45,7 +45,7 @@ part 'ui.dart';
 
 /// The sample application.
 class Application {
-  
+
   //---------------------------------------------------------------------
   // Class variables
   //---------------------------------------------------------------------
@@ -392,9 +392,9 @@ class Application {
 
     // Update the mesh
     _meshes[_meshIndex].update(dt);
-  
+
     Mouse mouse = _gameLoop.mouse;
-    
+
     if (mouse.isDown(Mouse.LEFT) || _gameLoop.pointerLock.locked) {
       _cameraController.accumDX = mouse.dx;
       _cameraController.accumDY = mouse.dy;
@@ -430,7 +430,7 @@ class Application {
 
     // Copy the Normal matrix from the camera into the Float32Array.
     _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
-    
+
     _debugDrawManager.addCircle(new vec3(0.0, 4.0, 0.0),
                                 new vec3(0.0, 1.0, 0.0),
                                 8.0, new vec4(1.0, 0.0, 0.0, 1.0));
@@ -568,15 +568,15 @@ void main() {
   // Hook up the game loop
   // The loop isn't started until the start method is called.
   _gameLoop = new GameLoop(canvas);
-  
+
   _gameLoop.onResize = onResize;
   _gameLoop.onUpdate = onFrame;
   _gameLoop.onRender = onRender;
   _gameLoop.onPointerLockChange = onPointerLockChange;
-  
+
   // This application doesn't need pointer lock, so disable it.
   // If you want to use pointer lock, however, comment this line
   _gameLoop.pointerLock.lockOnClick = false;
-  
+
   //_gameLoop.start();
 }

@@ -24,9 +24,9 @@ part of spectre;
  * or stencil buffer render target attachment.
  */
 class RenderBuffer extends DeviceChild {
-  static const int FormatRGB = WebGLRenderingContext.RGB565;
-  static const int FormatRGBA = WebGLRenderingContext.RGBA4;
-  static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT16;
+  static const int FormatRGB = WebGL.RGB565;
+  static const int FormatRGBA = WebGL.RGBA4;
+  static const int FormatDepth = WebGL.DEPTH_COMPONENT16;
 
   static String formatToString(int format) {
     if (format == FormatRGB) {
@@ -54,15 +54,15 @@ class RenderBuffer extends DeviceChild {
     assert(false);
   }
 
-  final int _target = WebGLRenderingContext.RENDERBUFFER;
-  final int _target_param = WebGLRenderingContext.RENDERBUFFER_BINDING;
+  final int _target = WebGL.RENDERBUFFER;
+  final int _target_param = WebGL.RENDERBUFFER_BINDING;
 
   int _width = 0;
   int get width => _width;
   int _height = 0;
   int get height => _height;
   int _format = FormatRGB;
-  WebGLRenderbuffer _buffer;
+  WebGL.Renderbuffer _buffer;
 
   RenderBuffer(String name, GraphicsDevice device) :
       super._internal(name, device) {
@@ -86,7 +86,7 @@ class RenderBuffer extends DeviceChild {
     _width = width;
     _height = height;
     _format = format;
-    WebGLRenderbuffer oldBind = device.gl.getParameter(_target_param);
+    WebGL.Renderbuffer oldBind = device.gl.getParameter(_target_param);
     device.gl.bindRenderbuffer(_target, _buffer);
     _allocateStorage(width, height, format);
     device.gl.bindRenderbuffer(_target, oldBind);

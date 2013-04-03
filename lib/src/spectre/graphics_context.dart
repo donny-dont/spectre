@@ -22,9 +22,9 @@ part of spectre;
 
 /// The [GraphicsContext] configures the GPU pipeline and executes draw commands.
 class GraphicsContext {
-  static final int PrimitiveTopologyTriangles = WebGLRenderingContext.TRIANGLES;
-  static final int PrimitiveTopologyLines = WebGLRenderingContext.LINES;
-  static final int PrimitiveTopologyPoints = WebGLRenderingContext.POINTS;
+  static final int PrimitiveTopologyTriangles = WebGL.TRIANGLES;
+  static final int PrimitiveTopologyLines = WebGL.LINES;
+  static final int PrimitiveTopologyPoints = WebGL.POINTS;
   static final int numVertexBuffers = 2;
   static final int numTextures = 3;
   final GraphicsDevice device;
@@ -97,7 +97,7 @@ class GraphicsContext {
     _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
     _blendState = new BlendState.opaque('CurrentBlendState', device);
 
-    device.gl.disable(WebGLRenderingContext.BLEND);
+    device.gl.disable(WebGL.BLEND);
     device.gl.blendFuncSeparate(
       _blendState.colorSourceBlend,
       _blendState.colorDestinationBlend,
@@ -122,7 +122,7 @@ class GraphicsContext {
     _depthStateDefault = new DepthState.depthWrite('DepthStateDefault', device);
     _depthState = new DepthState.depthWrite('CurrentDepthState', device);
 
-    device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+    device.gl.enable(WebGL.DEPTH_TEST);
     device.gl.depthMask(_depthState.depthBufferWriteEnabled);
     device.gl.depthFunc(_depthState.depthBufferFunction);
 
@@ -130,14 +130,14 @@ class GraphicsContext {
     _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
     _rasterizerState = new RasterizerState.cullClockwise('CurrentRasterizerState', device);
 
-    device.gl.enable(WebGLRenderingContext.CULL_FACE);
+    device.gl.enable(WebGL.CULL_FACE);
     device.gl.cullFace(_rasterizerState.cullMode);
     device.gl.frontFace(_rasterizerState.frontFace);
 
-    device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+    device.gl.disable(WebGL.POLYGON_OFFSET_FILL);
     device.gl.polygonOffset(_rasterizerState.depthBias, _rasterizerState.slopeScaleDepthBias);
 
-    device.gl.disable(WebGLRenderingContext.SCISSOR_TEST);
+    device.gl.disable(WebGL.SCISSOR_TEST);
   }
 
   void _PrepareTextures() {
@@ -191,7 +191,7 @@ class GraphicsContext {
       IndexBuffer indexBuffer = _indexBufferHandle;
       indexBuffer._bind();
     } else {
-      device.gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
+      device.gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, null);
     }
   }
 
@@ -203,7 +203,7 @@ class GraphicsContext {
       if (sampler == null || texture == null) {
         continue;
       }
-      texture._bind(WebGLRenderingContext.TEXTURE0 + i);
+      texture._bind(WebGL.TEXTURE0 + i);
       texture._applySampler(sampler);
     }
   }
@@ -330,9 +330,9 @@ class GraphicsContext {
     // Disable/Enable blending if necessary
     if (_blendState.enabled != blendState.enabled) {
       if (blendState.enabled) {
-        device.gl.enable(WebGLRenderingContext.BLEND);
+        device.gl.enable(WebGL.BLEND);
       } else {
-        device.gl.disable(WebGLRenderingContext.BLEND);
+        device.gl.disable(WebGL.BLEND);
       }
 
       _blendState.enabled = blendState.enabled;
@@ -420,9 +420,9 @@ class GraphicsContext {
 
     if (_depthState.depthBufferEnabled != depthState.depthBufferEnabled) {
       if (depthState.depthBufferEnabled) {
-        device.gl.enable(WebGLRenderingContext.DEPTH_TEST);
+        device.gl.enable(WebGL.DEPTH_TEST);
       } else {
-        device.gl.disable(WebGLRenderingContext.DEPTH_TEST);
+        device.gl.disable(WebGL.DEPTH_TEST);
       }
 
       _depthState.depthBufferEnabled = depthState.depthBufferEnabled;
@@ -454,11 +454,11 @@ class GraphicsContext {
     // Disable/Enable culling if necessary
     if (_rasterizerState.cullMode != rasterizerState.cullMode) {
       if (rasterizerState.cullMode == CullMode.None) {
-        device.gl.disable(WebGLRenderingContext.CULL_FACE);
+        device.gl.disable(WebGL.CULL_FACE);
 
         _rasterizerState.cullMode = rasterizerState.cullMode;
       } else if (_rasterizerState.cullMode == CullMode.None) {
-        device.gl.enable(WebGLRenderingContext.CULL_FACE);
+        device.gl.enable(WebGL.CULL_FACE);
       }
     }
 
@@ -484,7 +484,7 @@ class GraphicsContext {
     if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0)) {
       // Enable polygon offset
       if (!offsetEnabled) {
-        device.gl.enable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+        device.gl.enable(WebGL.POLYGON_OFFSET_FILL);
       }
 
       // Modify the polygon offset if necessary
@@ -499,7 +499,7 @@ class GraphicsContext {
     } else {
       // Disable polygon offset
       if (offsetEnabled) {
-        device.gl.disable(WebGLRenderingContext.POLYGON_OFFSET_FILL);
+        device.gl.disable(WebGL.POLYGON_OFFSET_FILL);
 
         _rasterizerState.depthBias           = rasterizerState.depthBias;
         _rasterizerState.slopeScaleDepthBias = rasterizerState.slopeScaleDepthBias;
@@ -509,9 +509,9 @@ class GraphicsContext {
     // Disable/Enable scissor test if necessary
     if (_rasterizerState.scissorTestEnabled != rasterizerState.scissorTestEnabled) {
       if (rasterizerState.scissorTestEnabled) {
-        device.gl.enable(WebGLRenderingContext.SCISSOR_TEST);
+        device.gl.enable(WebGL.SCISSOR_TEST);
       } else {
-        device.gl.disable(WebGLRenderingContext.SCISSOR_TEST);
+        device.gl.disable(WebGL.SCISSOR_TEST);
       }
 
       _rasterizerState.scissorTestEnabled = rasterizerState.scissorTestEnabled;
@@ -553,17 +553,17 @@ class GraphicsContext {
 
   void clearColorBuffer(num r, num g, num b, num a) {
     device.gl.clearColor(r, g, b, a);
-    device.gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+    device.gl.clear(WebGL.COLOR_BUFFER_BIT);
   }
 
   void clearDepthBuffer(num depth) {
     device.gl.clearDepth(depth);
-    device.gl.clear(WebGLRenderingContext.DEPTH_BUFFER_BIT);
+    device.gl.clear(WebGL.DEPTH_BUFFER_BIT);
   }
 
   void clearStencilBuffer(int stencil) {
     device.gl.clearStencil(stencil);
-    device.gl.clear(WebGLRenderingContext.STENCIL_BUFFER_BIT);
+    device.gl.clear(WebGL.STENCIL_BUFFER_BIT);
   }
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
@@ -588,7 +588,7 @@ class GraphicsContext {
     _prepareInputs();
     _prepareTextures();
     device.gl.drawElements(_primitiveTopology, numIndices,
-                           WebGLRenderingContext.UNSIGNED_SHORT, indexOffset);
+                           WebGL.UNSIGNED_SHORT, indexOffset);
   }
 
   void drawIndexedMesh(SingleArrayIndexedMesh indexedMesh) {

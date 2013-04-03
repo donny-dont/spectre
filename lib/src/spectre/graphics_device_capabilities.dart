@@ -112,7 +112,7 @@ class GraphicsDeviceCapabilities {
   //---------------------------------------------------------------------
 
   /// Queries the device capabilities in the [WebGLRenderingContext].
-  GraphicsDeviceCapabilities._fromContext(WebGLRenderingContext gl) {
+  GraphicsDeviceCapabilities._fromContext(WebGL.RenderingContext gl) {
     _queryDeviceContext(gl);
     _queryDeviceInfo(gl);
     _queryExtensionInfo(gl);
@@ -238,30 +238,30 @@ WEBGL_lose_context: $_loseContext
   }
 
   /// Queries context info using the [WebGLRenderingContext].
-  void _queryDeviceContext(WebGLRenderingContext gl) {
-    WebGLContextAttributes attributes = gl.getContextAttributes();
+  void _queryDeviceContext(WebGL.RenderingContext gl) {
+    WebGL.ContextAttributes attributes = gl.getContextAttributes();
 
     _depthBuffer = attributes.depth;
     _stencilBuffer = attributes.stencil;
   }
 
   /// Queries device info using the [WebGLRenderingContext].
-  void _queryDeviceInfo(WebGLRenderingContext gl) {
-    _textureUnits = gl.getParameter(WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS);
-    _vertexShaderTextureUnits = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-    _maxTextureSize = gl.getParameter(WebGLRenderingContext.MAX_TEXTURE_SIZE);
-    _maxCubeMapTextureSize = gl.getParameter(WebGLRenderingContext.MAX_CUBE_MAP_TEXTURE_SIZE);
-    _maxVertexAttribs = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_ATTRIBS);
-    _maxVaryingVectors = gl.getParameter(WebGLRenderingContext.MAX_VARYING_VECTORS);
-    _maxVertexShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS);
-    _maxFragmentShaderUniforms = gl.getParameter(WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS);
+  void _queryDeviceInfo(WebGL.RenderingContext gl) {
+    _textureUnits = gl.getParameter(WebGL.MAX_TEXTURE_IMAGE_UNITS);
+    _vertexShaderTextureUnits = gl.getParameter(WebGL.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+    _maxTextureSize = gl.getParameter(WebGL.MAX_TEXTURE_SIZE);
+    _maxCubeMapTextureSize = gl.getParameter(WebGL.MAX_CUBE_MAP_TEXTURE_SIZE);
+    _maxVertexAttribs = gl.getParameter(WebGL.MAX_VERTEX_ATTRIBS);
+    _maxVaryingVectors = gl.getParameter(WebGL.MAX_VARYING_VECTORS);
+    _maxVertexShaderUniforms = gl.getParameter(WebGL.MAX_VERTEX_UNIFORM_VECTORS);
+    _maxFragmentShaderUniforms = gl.getParameter(WebGL.MAX_FRAGMENT_UNIFORM_VECTORS);
 
-    _depthBufferSize = gl.getParameter(WebGLRenderingContext.DEPTH_BITS);
-    _stencilBufferSize = gl.getParameter(WebGLRenderingContext.STENCIL_BITS);
+    _depthBufferSize = gl.getParameter(WebGL.DEPTH_BITS);
+    _stencilBufferSize = gl.getParameter(WebGL.STENCIL_BITS);
   }
 
   /// Queries extensions using the [WebGLRenderingContext].
-  void _queryExtensionInfo(WebGLRenderingContext gl) {
+  void _queryExtensionInfo(WebGL.RenderingContext gl) {
     // Approved
     _floatTextures = _hasExtension(gl, 'OES_texture_float');
     _halfFloatTextures = _hasExtension(gl, 'OES_texture_half_float');
@@ -278,7 +278,8 @@ WEBGL_lose_context: $_loseContext
     // Query the anisotropic extension and get the maximum anisotropy level
     if (_hasExtension(gl, 'EXT_texture_filter_anisotropic') != null) {
       _anisotropicFiltering = true;
-      _maxAnisotropyLevel = gl.getParameter(ExtTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+      _maxAnisotropyLevel = gl.getParameter(
+          WebGL.ExtTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
     } else {
       _anisotropicFiltering = false;
       _maxAnisotropyLevel = 1;
@@ -296,14 +297,14 @@ WEBGL_lose_context: $_loseContext
   //---------------------------------------------------------------------
 
   /// Queries the [WebGLRenderingContext] to see if the given extension is available.
-  static bool _hasExtension(WebGLRenderingContext gl, String name) {
+  static bool _hasExtension(WebGL.RenderingContext gl, String name) {
     return _getExtension(gl, name) != null;
   }
 
   /// Queries the [WebGLRenderingContext] to retrieve the given extension.
   ///
   /// Returns [null] if the extension is not supported.
-  static Object _getExtension(WebGLRenderingContext gl, String name) {
+  static Object _getExtension(WebGL.RenderingContext gl, String name) {
     Object extension;
     int numVendorExtensions = _vendorExtensions.length;
 

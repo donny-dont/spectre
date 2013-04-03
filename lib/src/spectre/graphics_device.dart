@@ -40,13 +40,13 @@ class DeviceFormat {
 /// An existing resource can be looked up using its name.
 class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat1 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
+                    const DeviceFormat(WebGL.FLOAT, 1, false);
   static const DeviceFormat DeviceFormatFloat2 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
+                    const DeviceFormat(WebGL.FLOAT, 2, false);
   static const DeviceFormat DeviceFormatFloat3 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
+                    const DeviceFormat(WebGL.FLOAT, 3, false);
   static const DeviceFormat DeviceFormatFloat4 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
+                    const DeviceFormat(WebGL.FLOAT, 4, false);
 
 
   CanvasElement _surface;
@@ -56,8 +56,8 @@ class GraphicsDevice {
   GraphicsDeviceCapabilities _capabilities;
   GraphicsDeviceCapabilities get capabilities => _capabilities;
 
-  WebGLRenderingContext _gl;
-  WebGLRenderingContext get gl => _gl;
+  WebGL.RenderingContext _gl;
+  WebGL.RenderingContext get gl => _gl;
 
   int get canvasWidth => _surface.width;
   int get canvasHeight => _surface.height;
