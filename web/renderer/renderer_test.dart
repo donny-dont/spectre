@@ -164,6 +164,7 @@ void _makeMaterial() {
   var vertexShader = new VertexShader('simpleTexture', graphicsDevice);
   var fragmentShader = new FragmentShader('simpleTexture', graphicsDevice);
   Material material = new Material('simpleTexture', shaderProgram, renderer);
+  material.depthState.depthBufferWriteEnabled = true;
   shaderProgram.vertexShader = vertexShader;
   shaderProgram.fragmentShader = fragmentShader;
   vertexShader.source = '''
@@ -295,8 +296,6 @@ main() {
     clearBackBuffer.renderTarget = 'backBuffer';
     layers.add(clearBackBuffer);
     var colorBackBuffer = new SceneLayer('color');
-    colorBackBuffer.clearColorTarget = true;
-    colorBackBuffer.clearDepthTarget = true;
     colorBackBuffer.renderTarget = 'backBuffer';
     layers.add(colorBackBuffer);
     var debugLayer = new DebugDrawLayer('debug', debugDrawManager);
@@ -304,7 +303,6 @@ main() {
     layers.add(debugLayer);
     var blitBackBuffer = new FullscreenLayer('blit');
     blitBackBuffer.renderTarget = 'frontBuffer';
-    blitBackBuffer.clearColorTarget = true;
     blitBackBuffer.material = assetManager['fullscreenEffects.blit'];
     blitBackBuffer.material.textures['source'].texturePath =
         'renderer.colorBuffer';
