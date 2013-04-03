@@ -39,8 +39,12 @@ import 'texture_mag_filter_test.dart' as texture_mag_filter_test;
 import 'texture_min_filter_test.dart' as texture_min_filter_test;
 import 'viewport_test.dart' as viewport_test;
 
+import 'scalar_list_test.dart' as scalar_list_test;
+import 'vector2_list_test.dart' as vector2_list_test;
+import 'vector3_list_test.dart' as vector3_list_test;
+
 void main() {
-  //useHtmlEnhancedConfiguration();
+  useHtmlEnhancedConfiguration();
 
   group('Blend tests', blend_test.main);
   group('BlendOperation tests', blend_operation_test.main);
@@ -60,4 +64,10 @@ void main() {
   group('TextureMagFilter tests', texture_mag_filter_test.main);
   group('TextureMinFilter tests', texture_min_filter_test.main);
   group('Viewport tests', viewport_test.main);
+
+  group('Spectre Mesh Library:', () {
+    group('ScalarList tests', scalar_list_test.main);
+    group('Vector2List tests', vector2_list_test.main);
+    group('Vector3List tests', vector3_list_test.main);
+  });
 }

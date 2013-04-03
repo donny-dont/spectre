@@ -605,6 +605,23 @@ class GraphicsContext {
     draw(mesh.count, 0);
   }
 
+  void setMeshNew(Mesh mesh) {
+    // \TODO Cache this information, VAO?
+    setPrimitiveTopology(mesh.primitiveType);
+    setInputLayout(mesh.inputLayout);
+    setIndexBuffer(mesh.indexBuffer);
+    setVertexBuffers(0, mesh.vertexBuffers);
+  }
+
+  void drawMeshNew(Mesh mesh) {
+    // \TODO make sure this mesh is actually bound
+    if (mesh.indexBuffer != null) {
+      drawIndexed(mesh.indexBuffer.size ~/ 2, 0);
+    } else {
+      draw(mesh.vertexBuffers[0].size ~/ 4, 0);
+    }
+  }
+
   /// Draw a mesh with [numVertices] starting at [vertexOffset]
   void draw(int numVertices, int vertexOffset) {
     if (numVertices == 0) {

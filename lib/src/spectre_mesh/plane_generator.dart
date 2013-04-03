@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
+  Copyright (C) 2013 Spectre Authors
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -16,24 +16,11 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
-/** Spectre asset_pack companion library */
+part of spectre_mesh;
+/*
+class PlaneGenerator extends MeshGenerator {
 
-library spectre_asset_pack;
-
-import 'dart:html';
-import 'dart:json' as JSON;
-import 'dart:math' as Math;
-import 'dart:async';
-import 'package:asset_pack/asset_pack.dart';
-import 'package:spectre/spectre.dart';
-
-part 'src/spectre_asset_pack/importers/mesh_importer.dart';
-part 'src/spectre_asset_pack/dds_file.dart';
-part 'src/spectre_asset_pack/dds_resource_format.dart';
-part 'src/spectre_asset_pack/mesh.dart';
-part 'src/spectre_asset_pack/shader.dart';
-part 'src/spectre_asset_pack/spectre_asset_pack.dart';
-part 'src/spectre_asset_pack/texture.dart';
+}
+*/

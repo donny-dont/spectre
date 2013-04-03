@@ -22,7 +22,7 @@ part of spectre;
 
 class InputLayoutElement {
   final int vboSlot;
-  final int attributeIndex;
+   int attributeIndex;
   final int attributeOffset;
   final int attributeStride;
   final DeviceFormat attributeFormat;

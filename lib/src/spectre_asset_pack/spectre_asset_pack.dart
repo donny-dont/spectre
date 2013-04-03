@@ -34,7 +34,7 @@ void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
   assetManager.loaders['fragmentShader'] = new TextLoader();
   assetManager.loaders['shaderProgram'] = new _TextListLoader();
 
-  assetManager.importers['mesh'] = new MeshImporter(graphicsDevice);
+  assetManager.importers['mesh'] = new MeshImporterRedux(graphicsDevice);
   assetManager.importers['tex2d'] = new Tex2DImporter(graphicsDevice);
   assetManager.importers['texCube'] = new TexCubeImporter(graphicsDevice);
   assetManager.importers['vertexShader'] =

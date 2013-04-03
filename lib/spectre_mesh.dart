@@ -1,5 +1,6 @@
 /*
-  Copyright (C) 2013 John McCutchan <john@johnmccutchan.com>
+
+  Copyright (C) 2012 The Spectre Project authors.
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,21 +20,26 @@
 
 */
 
-/** Spectre asset_pack companion library */
-
-library spectre_asset_pack;
+library spectre_mesh;
 
 import 'dart:html';
-import 'dart:json' as JSON;
+import 'dart:typeddata';
+import 'spectre.dart';
 import 'dart:math' as Math;
-import 'dart:async';
-import 'package:asset_pack/asset_pack.dart';
-import 'package:spectre/spectre.dart';
+import 'package:vector_math/vector_math.dart';
 
-part 'src/spectre_asset_pack/importers/mesh_importer.dart';
-part 'src/spectre_asset_pack/dds_file.dart';
-part 'src/spectre_asset_pack/dds_resource_format.dart';
-part 'src/spectre_asset_pack/mesh.dart';
-part 'src/spectre_asset_pack/shader.dart';
-part 'src/spectre_asset_pack/spectre_asset_pack.dart';
-part 'src/spectre_asset_pack/texture.dart';
+part 'src/spectre_mesh/arrays.dart';
+part 'src/spectre_mesh/box_generator.dart';
+part 'src/spectre_mesh/cylinder_generator.dart';
+part 'src/spectre_mesh/debug_draw_mesh.dart';
+part 'src/spectre_mesh/mesh_generator.dart';
+part 'src/spectre_mesh/normal_data_builder.dart';
+part 'src/spectre_mesh/plane_generator.dart';
+part 'src/spectre_mesh/tangent_space_builder.dart';
+part 'src/spectre_mesh/vertex_data.dart';
+part 'src/spectre_mesh/vertex_data_builder.dart';
+part 'src/spectre_mesh/scalar_list.dart';
+part 'src/spectre_mesh/sphere_generator.dart';
+part 'src/spectre_mesh/strided_list.dart';
+part 'src/spectre_mesh/vector2_list.dart';
+part 'src/spectre_mesh/vector3_list.dart';
