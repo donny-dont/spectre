@@ -140,9 +140,6 @@ class GraphicsContext {
     device.gl.disable(WebGL.SCISSOR_TEST);
   }
 
-  void _PrepareTextures() {
-  }
-
   void _prepareInputs({bool debug: false}) {
     if (_inputLayoutHandle == 0) {
       spectreLog.Error('Prepare for draw no input layout');
@@ -200,6 +197,9 @@ class GraphicsContext {
     for (int i = 0; i < numTextures; i++) {
       SamplerState sampler = _samplerStateHandles[i];
       SpectreTexture texture = _textureHandles[i];
+      device.gl.activeTexture(WebGL.TEXTURE0 + i);
+      device.gl.bindTexture(WebGL.TEXTURE_2D, null);
+      device.gl.bindTexture(WebGL.TEXTURE_CUBE_MAP, null);
       if (sampler == null || texture == null) {
         continue;
       }
@@ -520,16 +520,8 @@ class GraphicsContext {
 
   /// Set RenderTarget to [renderTargetHandle]
   void setRenderTarget(RenderTarget renderTargetHandle) {
-    if (_renderTargetHandle == renderTargetHandle) {
-      return;
-    }
     _renderTargetHandle = renderTargetHandle;
-    if (_renderTargetHandle == null) {
-      RenderTarget.systemRenderTarget._bind();
-    } else {
-      RenderTarget rt = renderTargetHandle;
-      rt._bind();
-    }
+    _renderTargetHandle._bind();
   }
 
   ShaderProgramUniform _findUniform(String name) {
