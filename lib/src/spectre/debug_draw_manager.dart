@@ -592,7 +592,6 @@ class DebugDrawManager {
     device.context.setConstant('cameraTransform', _cameraMatrix);
     _depthState.depthBufferEnabled = true;
     _depthState.depthBufferWriteEnabled = true;
-    _depthState.depthBufferFunction = CompareFunction.LessEqual;
     device.context.setDepthState(_depthState);
     device.context.setBlendState(_blendState);
     device.context.setRasterizerState(_rasterizerState);
