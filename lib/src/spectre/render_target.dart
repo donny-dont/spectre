@@ -51,7 +51,7 @@ class RenderTarget extends DeviceChild {
   }
 
   RenderTarget.systemTarget(String name, GraphicsDevice device) :
-      super._internal(name, device) {
+    super._internal(name, device) {
     _renderable = true;
   }
 
@@ -106,6 +106,7 @@ class RenderTarget extends DeviceChild {
                                         null);
       device.gl.bindFramebuffer(WebGL.FRAMEBUFFER, oldBind);
       _updateStatus();
+      _popBind(oldBind);
       return;
     }
     if (colorBuffer is RenderBuffer) {
@@ -151,6 +152,7 @@ class RenderTarget extends DeviceChild {
                                         null);
       device.gl.bindFramebuffer(WebGL.FRAMEBUFFER, oldBind);
       _updateStatus();
+      _popBind(oldBind);
       return;
     }
     if (depthBuffer is RenderBuffer) {
