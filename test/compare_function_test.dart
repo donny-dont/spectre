@@ -23,17 +23,18 @@ library compare_function_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
+import 'dart:web_gl' as WebGL;
 
 void main() {
   test('values', () {
-    expect(CompareFunction.Always      , WebGLRenderingContext.ALWAYS);
-    expect(CompareFunction.Equal       , WebGLRenderingContext.EQUAL);
-    expect(CompareFunction.Greater     , WebGLRenderingContext.GREATER);
-    expect(CompareFunction.GreaterEqual, WebGLRenderingContext.GEQUAL);
-    expect(CompareFunction.Less        , WebGLRenderingContext.LESS);
-    expect(CompareFunction.LessEqual   , WebGLRenderingContext.LEQUAL);
-    expect(CompareFunction.Fail        , WebGLRenderingContext.NEVER);
-    expect(CompareFunction.NotEqual    , WebGLRenderingContext.NOTEQUAL);
+    expect(CompareFunction.Always      , WebGL.ALWAYS);
+    expect(CompareFunction.Equal       , WebGL.EQUAL);
+    expect(CompareFunction.Greater     , WebGL.GREATER);
+    expect(CompareFunction.GreaterEqual, WebGL.GEQUAL);
+    expect(CompareFunction.Less        , WebGL.LESS);
+    expect(CompareFunction.LessEqual   , WebGL.LEQUAL);
+    expect(CompareFunction.Fail        , WebGL.NEVER);
+    expect(CompareFunction.NotEqual    , WebGL.NOTEQUAL);
   });
 
   test('stringify', () {

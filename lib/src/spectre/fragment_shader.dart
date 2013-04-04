@@ -23,6 +23,6 @@ part of spectre;
 /// FragmentShader
 class FragmentShader extends SpectreShader {
   FragmentShader(String name, GraphicsDevice device)
-      : super(name, device, WebGLRenderingContext.FRAGMENT_SHADER) {
+      : super(name, device, WebGL.FRAGMENT_SHADER) {
   }
 }

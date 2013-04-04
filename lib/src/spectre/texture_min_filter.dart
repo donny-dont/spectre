@@ -36,9 +36,9 @@ class TextureMinFilter {
   //---------------------------------------------------------------------
 
   /// Use linear filtering for minification.
-  static const int Linear = WebGLRenderingContext.LINEAR;
+  static const int Linear = WebGL.LINEAR;
   /// Use point filtering for minification.
-  static const int Point = WebGLRenderingContext.NEAREST;
+  static const int Point = WebGL.NEAREST;
 
   //---------------------------------------------------------------------
   // Class methods

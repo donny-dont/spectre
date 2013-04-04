@@ -23,15 +23,16 @@ library texture_mag_filter_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
+import 'dart:web_gl' as WebGL;
 
 void main() {
   test('values', () {
-    expect(TextureMagFilter.Linear         , WebGLRenderingContext.LINEAR);
-    expect(TextureMagFilter.Point          , WebGLRenderingContext.NEAREST);
-    expect(TextureMagFilter.PointMipPoint  , WebGLRenderingContext.NEAREST_MIPMAP_NEAREST);
-    expect(TextureMagFilter.PointMipLinear , WebGLRenderingContext.NEAREST_MIPMAP_LINEAR);
-    expect(TextureMagFilter.LinearMipPoint , WebGLRenderingContext.LINEAR_MIPMAP_NEAREST);
-    expect(TextureMagFilter.LinearMipLinear, WebGLRenderingContext.LINEAR_MIPMAP_LINEAR);
+    expect(TextureMagFilter.Linear         , WebGL.LINEAR);
+    expect(TextureMagFilter.Point          , WebGL.NEAREST);
+    expect(TextureMagFilter.PointMipPoint  , WebGL.NEAREST_MIPMAP_NEAREST);
+    expect(TextureMagFilter.PointMipLinear , WebGL.NEAREST_MIPMAP_LINEAR);
+    expect(TextureMagFilter.LinearMipPoint , WebGL.LINEAR_MIPMAP_NEAREST);
+    expect(TextureMagFilter.LinearMipLinear, WebGL.LINEAR_MIPMAP_LINEAR);
   });
 
   test('stringify', () {

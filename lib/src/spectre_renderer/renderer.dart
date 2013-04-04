@@ -48,6 +48,8 @@ class Renderer {
   FragmentShader _blurFragmentShader;
   ShaderProgram _blurShaderProgram;
 
+  BlendState _clearBlendState;
+  DepthState _clearDepthState;
   SamplerState NPOTSampler;
   SingleArrayMesh _fullscreenMesh;
   InputLayout _fullscreenMeshInputLayout;
@@ -240,10 +242,12 @@ class Renderer {
     }
     device.context.setRenderTarget(renderTarget);
     if (layer.clearColorTarget) {
+      device.context.setBlendState(_clearBlendState);
       device.context.clearColorBuffer(layer.clearColorR, layer.clearColorG,
                                       layer.clearColorB, layer.clearColorA);
     }
     if (layer.clearDepthTarget) {
+      device.context.setDepthState(_clearDepthState);
       device.context.clearDepthBuffer(layer.clearDepthValue);
     }
     layer.render(this, renderables, camera);
@@ -369,9 +373,9 @@ uniform vec2 cursor;
 uniform vec2 renderTargetResolution;
 
 void main() {
-    vec4 vPosition4 = vec4(vPosition.x, vPosition.y, 1.0, 1.0);
-    gl_Position = vPosition4;
-    samplePoint = vTexCoord;
+  vec4 vPosition4 = vec4(vPosition.x, vPosition.y, 1.0, 1.0);
+  gl_Position = vPosition4;
+  samplePoint = vTexCoord;
 }
 ''';
     _blitFragmentShader.source = '''
@@ -385,8 +389,7 @@ varying vec2 samplePoint;
 uniform sampler2D source;
 
 void main() {
-    vec2 sample = gl_FragCoord.xy / renderTargetResolution;
-    gl_FragColor = texture2D(source, samplePoint);
+  gl_FragColor = texture2D(source, samplePoint);
 }
 ''';
     _blitShaderProgram.link();
@@ -398,13 +401,20 @@ void main() {
   }
 
   void _buildFullscreenPassData() {
-    NPOTSampler = new SamplerState.pointClamp('Renderer.NPOTSampler', device);
+    NPOTSampler = new SamplerState.linearClamp('Renderer.NPOTSampler', device);
     _buildFullscreenMesh();
     _buildFullscreenBlitMaterial();
     _buildFullscreenBlurMaterial();
   }
 
   Renderer(this.frontBuffer, this.device, this.assetManager) {
+    _clearDepthState = new DepthState('clear depth state', device);
+    _clearDepthState.depthBufferWriteEnabled = true;
+    _clearBlendState = new BlendState('clear blend state', device);
+    _clearBlendState.writeRenderTargetRed = true;
+    _clearBlendState.writeRenderTargetGreen = true;
+    _clearBlendState.writeRenderTargetBlue = true;
+    _clearBlendState.writeRenderTargetAlpha = true;
     _rendererPack = assetManager.registerPack('renderer', '');
     _fullscreenEffectsPack = assetManager.registerPack('fullscreenEffects','');
     _buildFullscreenPassData();
