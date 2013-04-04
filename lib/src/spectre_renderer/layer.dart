@@ -22,10 +22,6 @@ part of spectre_renderer;
 
 /** A layer describes one rendering pass.
  *
- * A layer has a type: 'fullscreen' or 'scene' . A fullscreen layer
- * is typically a post-processing effect such as blur or shadow map.
- * A scene layer sorts the renderables in the scene and then draws them.
- *
  * A layer controls which render target is writes to.
  *
  * A layer controls whether or not the depth and color buffers are cleared
