@@ -27,7 +27,7 @@ library spectre_example;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
-import 'dart:scalarlist';
+import 'dart:typeddata';
 
 import 'package:asset_pack/asset_pack.dart';
 import 'package:game_loop/game_loop.dart';

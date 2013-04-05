@@ -17,7 +17,7 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uNormalMatrix;
 
 // Constants
-vec4 lightDirection = vec4(0.0, 0.0, 1.0, 0.0);
+vec4 lightDirection = vec4(1.0, 0.0, 1.0, 0.0);
 
 // Varying variables
 // Allows communication between vertex and fragment stages

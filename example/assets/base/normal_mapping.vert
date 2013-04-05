@@ -32,7 +32,6 @@ void main(void) {
   vec3 n = normalize(vNormal * normalMatrix);
   vec3 t = normalize(vTangent * normalMatrix);
   vec3 b = normalize(vBitangent * normalMatrix);
-  //vec3 b = cross (n, t);
 
   mat3 tbnMat = mat3(t.x, b.x, n.x,
                      t.y, b.y, n.y,
