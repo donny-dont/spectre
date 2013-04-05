@@ -21,11 +21,11 @@
 part of spectre;
 
 class SpectreTexture extends DeviceChild {
-  //static const int FormatR = WebGLRenderingContext.RED;
-  //static const int FormatRG = WebGLRenderingContext.RG;
-  static const int FormatRGB = WebGLRenderingContext.RGB;
-  static const int FormatRGBA = WebGLRenderingContext.RGBA;
-  static const int FormatDepth = WebGLRenderingContext.DEPTH_COMPONENT;
+  //static const int FormatR = WebGL.RED;
+  //static const int FormatRG = WebGL.RG;
+  static const int FormatRGB = WebGL.RGB;
+  static const int FormatRGBA = WebGL.RGBA;
+  static const int FormatDepth = WebGL.DEPTH_COMPONENT;
 
   static String formatToString(int format) {
     /*
@@ -67,13 +67,13 @@ class SpectreTexture extends DeviceChild {
     assert(false);
   }
 
-  static const int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
-  static const int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
-  static const int PixelTypeU32 = WebGLRenderingContext.UNSIGNED_INT;
-  static const int PixelTypeS8 = WebGLRenderingContext.BYTE;
-  static const int PixelTypeS16 = WebGLRenderingContext.SHORT;
-  static const int PixelTypeS32 = WebGLRenderingContext.INT;
-  static const int PixelTypeFloat = WebGLRenderingContext.FLOAT;
+  static const int PixelTypeU8 = WebGL.UNSIGNED_BYTE;
+  static const int PixelTypeU16 = WebGL.UNSIGNED_SHORT;
+  static const int PixelTypeU32 = WebGL.UNSIGNED_INT;
+  static const int PixelTypeS8 = WebGL.BYTE;
+  static const int PixelTypeS16 = WebGL.SHORT;
+  static const int PixelTypeS32 = WebGL.INT;
+  static const int PixelTypeFloat = WebGL.FLOAT;
 
   int _width = 0;
   int get width => _width;
@@ -94,17 +94,17 @@ class SpectreTexture extends DeviceChild {
   final int _bindTarget;
   final int _bindingParam;
   final int _textureTarget;
-  WebGLTexture _deviceTexture;
+  WebGL.Texture _deviceTexture;
 
   /** Bind this texture and return the previously bound texture. */
-  WebGLTexture _pushBind() {
-    WebGLTexture oldBind = device.gl.getParameter(_bindingParam);
+  WebGL.Texture _pushBind() {
+    WebGL.Texture oldBind = device.gl.getParameter(_bindingParam);
     device.gl.bindTexture(_bindTarget, _deviceTexture);
     return oldBind;
   }
 
   /** Rebind [oldBind] */
-  void _popBind(WebGLTexture oldBind) {
+  void _popBind(WebGL.Texture oldBind) {
     device.gl.bindTexture(_bindTarget, oldBind);
   }
 
@@ -116,16 +116,16 @@ class SpectreTexture extends DeviceChild {
 
   void _applySampler(SamplerState sampler) {
     device.gl.texParameteri(_textureTarget,
-                            WebGLRenderingContext.TEXTURE_WRAP_S,
+                            WebGL.TEXTURE_WRAP_S,
                             sampler.addressU);
     device.gl.texParameteri(_textureTarget,
-                            WebGLRenderingContext.TEXTURE_WRAP_T,
+                            WebGL.TEXTURE_WRAP_T,
                             sampler.addressV);
     device.gl.texParameteri(_textureTarget,
-                            WebGLRenderingContext.TEXTURE_MIN_FILTER,
+                            WebGL.TEXTURE_MIN_FILTER,
                             sampler.minFilter);
     device.gl.texParameteri(_textureTarget,
-                            WebGLRenderingContext.TEXTURE_MAG_FILTER,
+                            WebGL.TEXTURE_MAG_FILTER,
                             sampler.magFilter);
   }
 

@@ -24,6 +24,7 @@
 library spectre;
 
 import 'dart:html';
+import 'dart:web_gl' as WebGL;
 import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:math' as Math;
@@ -55,6 +56,7 @@ part 'src/spectre/logger.dart';
 part 'src/spectre/mesh.dart';
 part 'src/spectre/primitive_type.dart';
 part 'src/spectre/fps_fly_camera_controller.dart';
+part 'src/spectre/orbit_camera_controller.dart';
 part 'src/spectre/rasterizer_state.dart';
 part 'src/spectre/render_buffer.dart';
 part 'src/spectre/render_target.dart';

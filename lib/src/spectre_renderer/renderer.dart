@@ -22,7 +22,7 @@ part of spectre_renderer;
 
 /** Spectre Renderer. The renderer holds global GPU resources such as
  * depth buffers, color buffers, and the canvas front buffer. A renderer
- * draws the world a layer at a time. A layer can render all renderables or
+ * draws the world a layer at a time. A [Layer] can render all renderables or
  * do a full screen scene pass.
  */
 class Renderer {
@@ -30,6 +30,7 @@ class Renderer {
   final CanvasElement frontBuffer;
   final AssetManager assetManager;
   AssetPack _rendererPack;
+  AssetPack _fullscreenEffectsPack;
   final Map<String, Texture2D> colorBuffers = new Map<String, Texture2D>();
   final Map<String, RenderBuffer> depthBuffers =
       new Map<String, RenderBuffer>();
@@ -38,10 +39,25 @@ class Renderer {
 
   Viewport _frontBufferViewport;
   Viewport get frontBufferViewport => _frontBufferViewport;
-  SamplerState _npotSampler;
+
+  VertexShader _blitVertexShader;
+  FragmentShader _blitFragmentShader;
+  ShaderProgram _blitShaderProgram;
+
+  VertexShader _blurVertexShader;
+  FragmentShader _blurFragmentShader;
+  ShaderProgram _blurShaderProgram;
+
+  BlendState _clearBlendState;
+  DepthState _clearDepthState;
+  SamplerState NPOTSampler;
+  SingleArrayMesh _fullscreenMesh;
+  InputLayout _fullscreenMeshInputLayout;
+
+  double time = 0.0;
 
   void _dispose() {
-    _rendererPack.unload();
+    _rendererPack.clear();
     colorBuffers.forEach((_, t) {
       t.dispose();
     });
@@ -66,7 +82,9 @@ class Renderer {
     Texture2D buffer = new Texture2D(name, device);
     buffer.uploadPixelArray(width, height, null);
     colorBuffers[name] = buffer;
-    _rendererPack.registerAsset(name, 'ColorBuffer', buffer);
+    var asset =
+        _rendererPack.registerAsset(name, 'ColorBuffer', '', '', {}, {});
+    asset.imported = buffer;
   }
 
   void _makeDepthBuffer(Map target) {
@@ -79,8 +97,9 @@ class Renderer {
     RenderBuffer buffer = new RenderBuffer(name, device);
     buffer.allocateStorage(width, height, RenderBuffer.FormatDepth);
     depthBuffers[name] = buffer;
-    _rendererPack.registerAsset(name, 'DepthBuffer', buffer);
-
+    var asset =
+        _rendererPack.registerAsset(name, 'DepthBuffer', '', '', {}, {});
+    asset.imported = buffer;
   }
 
   void _makeRenderTarget(Map target) {
@@ -102,7 +121,9 @@ class Renderer {
     renderTarget.colorTarget = colorBuffer;
     renderTarget.depthTarget = depthBuffer;
     renderTargets[name]= renderTarget;
-    _rendererPack.registerAsset(name, 'RenderTarget', renderTarget);
+    var asset = _rendererPack.registerAsset(name, 'RenderTarget', '', '', {},
+                                            {});
+    asset.imported = renderTarget;
   }
 
   void _configureFrontBuffer(Map target) {
@@ -113,6 +134,14 @@ class Renderer {
     }
     frontBuffer.width = width;
     frontBuffer.height = height;
+    _frontBufferViewport.width = frontBuffer.width;
+    _frontBufferViewport.height = frontBuffer.height;
+    renderTargets['frontBuffer'] = RenderTarget.systemRenderTarget;
+    if (_rendererPack['frontBuffer'] == null) {
+      var asset = _rendererPack.registerAsset('frontBuffer', 'RenderTarget', '',
+                                              '', {}, {});
+      asset.imported =  RenderTarget.systemRenderTarget;
+    }
   }
 
   /// Clear render targets.
@@ -148,12 +177,11 @@ class Renderer {
 
   }
 
-  void applyCameraUniforms() {
-    // Walk over shaders
-  }
-
   List<Renderable> _determineVisibleSet(List<Renderable> renderables,
                                         Camera camera) {
+    if (renderables == null) {
+      return null;
+    }
     List<Renderable> visibleSet = new List<Renderable>();
     int numRenderables = renderables.length;
     for (int i = 0; i < numRenderables; i++) {
@@ -169,71 +197,227 @@ class Renderer {
   void _sortDrawables(List<Renderable> visibleSet, int sortMode) {
   }
 
-  /*
-  void _renderPassLayer(Layer layer, List<Renderable> renderables,
-                        Camera camera, Viewport viewport) {
-    renderables.forEach((renderable) {
-      renderable.material.updateCameraConstants(camera);
-      renderable.material.updateObjectTransformConstant(renderable.T);
-      renderable.material.updateViewportConstants(viewport);
-      renderable._render();
-    });
+  void _applyMaterial(Material material) {
+    var constant = material.constants['time'];
+    if (constant != null) {
+      constant.value[0] = time / 1000.0;
+    }
+    material.apply(device);
   }
 
-  void _renderFullscreenLayer(Layer layer, List<Renderable> drawables,
-                              Camera camera, Viewport viewport) {
-    String process = layer.properties['process'];
-    String source = layer.properties['source'];
-    if (process != null && source != null) {
-      Texture2D colorTexture = _colorTargets[source];
-      Map arguments = {
-                       'textures': [colorTexture],
-                       'samplers': [_npotSampler],
-      };
-      SpectrePost.pass(process, layer.renderTarget, arguments);
+  /// Takes two materials [primary] and [fallback] and configures the GPU
+  /// to draw using the material. Any material properties not defined in
+  /// [primary] will be looked in [fallback] before falling back to the
+  /// defaults specified by the shader.
+  /// NOTE: [primary] and [fallback] must have the same shader.
+  void applyMaterial(Material primary, Material fallback) {
+    if (fallback != null) {
+      assert(primary.shader == fallback.shader);
+    }
+    _applyMaterial(primary);
+  }
+
+  /// Draws a single triangle covering the entire viewport. Useful for
+  /// doing full screen passes.
+  void renderFullscreenMesh(Material material) {
+    _fullscreenMeshInputLayout.shaderProgram = material.shader;
+    device.context.setInputLayout(_fullscreenMeshInputLayout);
+    device.context.setMesh(_fullscreenMesh);
+    device.context.drawMesh(_fullscreenMesh);
+  }
+
+  void _renderSceneLayer(Layer layer, List<Renderable> renderables,
+                         Camera camera) {
+    for (int i = 0; i < renderables.length; i++) {
+
     }
   }
 
-  void _setupLayer(Layer layer) {
-    device.context.setRenderTarget(layer.renderTarget);
-    if (layer.clearColorTarget == true) {
-      num r = layer.clearColorR;
-      num g = layer.clearColorG;
-      num b = layer.clearColorB;
-      num a = layer.clearColorA;
-      device.context.clearColorBuffer(r, g, b, a);
+  void _renderLayer(Layer layer, List<Renderable> renderables, Camera camera) {
+    RenderTarget renderTarget = _rendererPack[layer.renderTarget];
+    if (renderTarget == null) {
+      print('Render target ${layer.renderTarget} cannot be found...');
+      print('... skipping ${layer.name}');
+      return;
     }
-    if (layer.clearDepthTarget == true) {
-      num v = layer.clearDepthValue;
-      device.context.clearDepthBuffer(v);
+    device.context.setRenderTarget(renderTarget);
+    if (layer.clearColorTarget) {
+      device.context.setBlendState(_clearBlendState);
+      device.context.clearColorBuffer(layer.clearColorR, layer.clearColorG,
+                                      layer.clearColorB, layer.clearColorA);
     }
-  }*/
+    if (layer.clearDepthTarget) {
+      device.context.setDepthState(_clearDepthState);
+      device.context.clearDepthBuffer(layer.clearDepthValue);
+    }
+    layer.render(this, renderables, camera);
+  }
 
-  void render(List<Renderable> renderables, Camera camera, Viewport viewport) {
+  void render(List<Layer> layers, List<Renderable> renderables, Camera camera) {
     frontBufferViewport.width = frontBuffer.width;
     frontBufferViewport.height = frontBuffer.height;
-    device.context.setViewport(viewport);
     List<Renderable> visibleSet;
     visibleSet = _determineVisibleSet(renderables, camera);
-    return;
-    /*
-    int numLayers = layerConfig.layers.length;
+    final int numLayers = layers.length;
     for (int layerIndex = 0; layerIndex < numLayers; layerIndex++) {
-      Layer layer = layerConfig.layers[layerIndex];
-      _setupLayer(layer);
-      if (layer.type == 'pass') {
-        _renderPassLayer(layer, renderables, camera, viewport);
-      } else if (layer.type == 'fullscreen') {
-        _renderFullscreenLayer(layer, renderables, camera, viewport);
-      }
+      _renderLayer(layers[layerIndex], visibleSet, camera);
     }
-    */
+  }
+
+  void _buildFullscreenMesh() {
+    _fullscreenMesh = new SingleArrayMesh('Renderer.FullscreenMesh', device);
+    Float32Array fullscreenVertexArray = new Float32Array(12);
+    // Vertex 0
+    fullscreenVertexArray[0] = -1.0;
+    fullscreenVertexArray[1] = -1.0;
+    fullscreenVertexArray[2] = 0.0;
+    fullscreenVertexArray[3] = 0.0;
+    // Vertex 1
+    fullscreenVertexArray[4] = 3.0;
+    fullscreenVertexArray[5] = -1.0;
+    fullscreenVertexArray[6] = 2.0;
+    fullscreenVertexArray[7] = 0.0;
+    // Vertex 2
+    fullscreenVertexArray[8] = -1.0;
+    fullscreenVertexArray[9] = 3.0;
+    fullscreenVertexArray[10] = 0.0;
+    fullscreenVertexArray[11] = 2.0;
+    _fullscreenMesh.vertexArray.uploadData(fullscreenVertexArray,
+                                           SpectreBuffer.UsageStatic);
+    _fullscreenMesh.attributes['vPosition'] = new SpectreMeshAttribute(
+        'vPosition',
+        'float',
+        2,
+        0,
+        16,
+        false);
+    _fullscreenMesh.attributes['vTexCoord'] = new SpectreMeshAttribute(
+        'vTexCoord',
+        'float',
+        2,
+        8,
+        16,
+        false);
+    _fullscreenMesh.count = 3;
+    _fullscreenMeshInputLayout = new InputLayout('fullscreen', device);
+    _fullscreenMeshInputLayout.mesh = _fullscreenMesh;
+  }
+
+  void _buildFullscreenBlurMaterial() {
+    _blurVertexShader = new VertexShader('starfield', device);
+    _blurFragmentShader = new FragmentShader('starfield', device);
+    _blurShaderProgram = new ShaderProgram('starfield', device);
+    _blurShaderProgram.vertexShader = _blurVertexShader;
+    _blurShaderProgram.fragmentShader = _blurFragmentShader;
+    _blurVertexShader.source = '''
+precision highp float;
+attribute vec2 vPosition;
+attribute vec2 vTexCoord;
+varying vec2 samplePoint;
+
+uniform float time;
+uniform vec2 cursor;
+uniform vec2 renderTargetResolution;
+
+void main() {
+    vec4 vPosition4 = vec4(vPosition.x, vPosition.y, 1.0, 1.0);
+    gl_Position = vPosition4;
+    samplePoint = vTexCoord;
+}
+''';
+    _blurFragmentShader.source = '''
+    precision mediump float;
+
+          const float blurSize = 1.0/512.0;
+
+          varying vec2 samplePoint;
+          uniform sampler2D source;
+
+          void main() {
+   vec4 sum = texture2D(source, vec2(samplePoint.x - 4.0*blurSize, samplePoint.y)) * 0.05;
+   sum += texture2D(source, vec2(samplePoint.x - 3.0*blurSize, samplePoint.y)) * 0.09;
+   sum += texture2D(source, vec2(samplePoint.x - 2.0*blurSize, samplePoint.y)) * 0.12;
+   sum += texture2D(source, vec2(samplePoint.x - blurSize, samplePoint.y)) * 0.15;
+   sum += texture2D(source, vec2(samplePoint.x, samplePoint.y)) * 0.16;
+   sum += texture2D(source, vec2(samplePoint.x + blurSize, samplePoint.y)) * 0.15;
+   sum += texture2D(source, vec2(samplePoint.x + 2.0*blurSize, samplePoint.y)) * 0.12;
+   sum += texture2D(source, vec2(samplePoint.x + 3.0*blurSize, samplePoint.y)) * 0.09;
+   sum += texture2D(source, vec2(samplePoint.x + 4.0*blurSize, samplePoint.y)) * 0.05;
+
+   gl_FragColor = sum;
+    }''';
+    print(_blurFragmentShader.compileLog);
+    _blurShaderProgram.link();
+    Material starFieldMaterial = new Material('blur',
+                                              _blurShaderProgram,
+                                              this);
+    var asset = _fullscreenEffectsPack.registerAsset('blur', 'material',
+                                                     '', '', {}, {});
+    asset.imported = starFieldMaterial;
+  }
+
+  void _buildFullscreenBlitMaterial() {
+    _blitVertexShader = new VertexShader('blit', device);
+    _blitFragmentShader = new FragmentShader('blit', device);
+    _blitShaderProgram = new ShaderProgram('blit', device);
+    _blitShaderProgram.vertexShader = _blitVertexShader;
+    _blitShaderProgram.fragmentShader = _blitFragmentShader;
+    _blitVertexShader.source = '''
+precision highp float;
+attribute vec2 vPosition;
+attribute vec2 vTexCoord;
+varying vec2 samplePoint;
+
+uniform float time;
+uniform vec2 cursor;
+uniform vec2 renderTargetResolution;
+
+void main() {
+  vec4 vPosition4 = vec4(vPosition.x, vPosition.y, 1.0, 1.0);
+  gl_Position = vPosition4;
+  samplePoint = vTexCoord;
+}
+''';
+    _blitFragmentShader.source = '''
+precision mediump float;
+
+uniform float time;
+uniform vec2 cursor;
+uniform vec2 renderTargetResolution;
+
+varying vec2 samplePoint;
+uniform sampler2D source;
+
+void main() {
+  gl_FragColor = texture2D(source, samplePoint);
+}
+''';
+    _blitShaderProgram.link();
+    Material blitMaterial = new Material('blit fullscreen', _blitShaderProgram,
+                                         this);
+    var asset = _fullscreenEffectsPack.registerAsset('blit', 'material', '', '',
+                                                     {}, {});
+    asset.imported = blitMaterial;
+  }
+
+  void _buildFullscreenPassData() {
+    NPOTSampler = new SamplerState.linearClamp('Renderer.NPOTSampler', device);
+    _buildFullscreenMesh();
+    _buildFullscreenBlitMaterial();
+    _buildFullscreenBlurMaterial();
   }
 
   Renderer(this.frontBuffer, this.device, this.assetManager) {
-    _rendererPack = assetManager.registerPack('renderer');
-    SpectrePost.init(device);
-    _npotSampler = new SamplerState.pointClamp('Renderer.NPOTSampler', device);
+    _clearDepthState = new DepthState('clear depth state', device);
+    _clearDepthState.depthBufferWriteEnabled = true;
+    _clearBlendState = new BlendState('clear blend state', device);
+    _clearBlendState.writeRenderTargetRed = true;
+    _clearBlendState.writeRenderTargetGreen = true;
+    _clearBlendState.writeRenderTargetBlue = true;
+    _clearBlendState.writeRenderTargetAlpha = true;
+    _rendererPack = assetManager.registerPack('renderer', '');
+    _fullscreenEffectsPack = assetManager.registerPack('fullscreenEffects','');
+    _buildFullscreenPassData();
     _frontBufferViewport = new Viewport('Renderer.Viewport', device);
     _frontBufferViewport.width = frontBuffer.width;
     _frontBufferViewport.height = frontBuffer.height;

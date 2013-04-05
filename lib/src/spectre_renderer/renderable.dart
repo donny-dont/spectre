@@ -22,6 +22,8 @@ part of spectre_renderer;
 
 /**
  * The renderable class contains everything needed to render a mesh instance.
+ * TODO(johnmccutchan): Factor this into a base interface and implement
+ * MeshRenderable.
  */
 class Renderable {
   final Renderer renderer;
@@ -34,7 +36,7 @@ class Renderable {
   String get meshPath => _meshPath;
   void set meshPath(String o) {
     _meshPath = o;
-    mesh = renderer.assetManager.getAssetAtPath(_meshPath);
+    mesh = renderer.assetManager[_meshPath];
   }
   String _meshPath;
 
@@ -42,21 +44,23 @@ class Renderable {
   String get materialPath => _materialPath;
   set materialPath(String o) {
     _materialPath = o;
-    material = renderer.assetManager.getAssetAtPath(_materialPath);
+    material = renderer.assetManager[_materialPath];
   }
   String _materialPath;
 
+  InputLayout get inputLayout => _inputLayout;
   InputLayout _inputLayout;
   // Bounding Box.
 
-  Renderable(this.renderer, this.name, this.meshPath, this._materialPaths) {
+  Renderable(this.name, this.renderer, this._meshPath, this._materialPaths) {
     _inputLayout = new InputLayout(name, renderer.device);
+    mesh = renderer.assetManager[_meshPath];
     _link();
   }
 
-  Renderable.json(this.renderer, Map json) : name = json['name'] {
-    fromJson(json);
+  Renderable.json(Map json, this.renderer) : name = json['name'] {
     _inputLayout = new InputLayout(name, renderer.device);
+    fromJson(json);
     _link();
   }
 
@@ -85,7 +89,7 @@ class Renderable {
     }
   }
 
-  void _render() {
+  void render(Layer layer, Camera camera) {
     if (_material == null) {
       spectreLog.Error('Cannot render $name it has no material.');
       return;
@@ -98,10 +102,11 @@ class Renderable {
       spectreLog.Error('Cannot render $name inputs are invalid.');
       return;
     }
-
-    renderer.device.context.setIndexedMesh(_mesh);
-    _material.apply(renderer.device);
+    _material.updateCameraConstants(camera);
+    _material.updateObjectTransformConstant(T);
+    renderer._applyMaterial(_material);
     renderer.device.context.setInputLayout(_inputLayout);
+    renderer.device.context.setIndexedMesh(_mesh);
     renderer.device.context.drawIndexedMesh(_mesh);
   }
 

@@ -39,15 +39,15 @@ class BlendOperation {
   /// The result is the destination added to the source.
   ///
   ///     Result = (Source Color * Source Blend) + (Destination Color * Destination Blend)
-  static const int Add = WebGLRenderingContext.FUNC_ADD;
+  static const int Add = WebGL.FUNC_ADD;
   /// The result is the source subtracted from the destination.
   ///
   ///     Result = (Destination Color * Destination Blend) - (Source Color * Source Blend)
-  static const int ReverseSubtract = WebGLRenderingContext.FUNC_REVERSE_SUBTRACT;
+  static const int ReverseSubtract = WebGL.FUNC_REVERSE_SUBTRACT;
   /// The result is the destination subtracted from the source.
   ///
   ///     Result = (Source Color * Source Blend) - (Destination Color * Destination Blend)
-  static const int Subtract = WebGLRenderingContext.FUNC_SUBTRACT;
+  static const int Subtract = WebGL.FUNC_SUBTRACT;
 
   //---------------------------------------------------------------------
   // Class methods

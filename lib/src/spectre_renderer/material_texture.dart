@@ -62,8 +62,13 @@ class MaterialTexture {
 
   /** Link this texture. A texture must be linked before it can be used. */
   link() {
-    var texture = renderer.assetManager.root.getImportedAtPath(_texturePath);
-    // TODO(johnmccutchan): Use fallback texture if it can't be found.
+    var texture = renderer.assetManager[_texturePath];
+    if (texture == null) {
+      // TODO(johnmccutchan): Use fallback texture if it can't be found.
+      _texture = null;
+      return;
+    }
+    assert(texture != null);
     _texture = texture;
   }
 

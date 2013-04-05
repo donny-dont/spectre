@@ -23,11 +23,12 @@ library surface_format_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
+import 'dart:web_gl' as WebGL;
 
 void main() {
   test('values', () {
-    expect(SurfaceFormat.Rgba, WebGLRenderingContext.RGBA);
-    expect(SurfaceFormat.Rgb , WebGLRenderingContext.RGB);
+    expect(SurfaceFormat.Rgba, WebGL.RGBA);
+    expect(SurfaceFormat.Rgb , WebGL.RGB);
 
     // Values are taken directly from the extension specification
     expect(SurfaceFormat.Dxt1, 0x83F0);

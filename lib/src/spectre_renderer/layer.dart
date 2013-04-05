@@ -22,23 +22,28 @@ part of spectre_renderer;
 
 /** A layer describes one rendering pass.
  *
- * A layer has a type: full screen pass or a scene pass. A full screen pass
+ * A layer has a type: 'fullscreen' or 'scene' . A fullscreen layer
  * is typically a post-processing effect such as blur or shadow map.
- * A scene pass sorts the renderables in the scene and then draws them.
+ * A scene layer sorts the renderables in the scene and then draws them.
  *
- * A layer selects the color and depth buffers being written to.
+ * A layer controls which render target is writes to.
  *
  * A layer controls whether or not the depth and color buffers are cleared
  * before drawing and what value they should be cleared to.
  *
- * The material used to draw a renderable is controlled by the layer name.
+ * A layer has a material. In the case of a fullscreen layer, the material
+ * is the effect. In the case of a scene layer, the material is used as a
+ * fallback material for renderables that do not have a material.
  */
-class Layer {
+abstract class Layer {
   static const int SortModeNone = 0;
   static const int SortModeBackToFront = 1;
   static const int SortModeFrontToBack = 2;
+
   int _sortMode = SortModeNone;
+  /// Current sort mode.
   int get sortMode => _sortMode;
+  /// Set the sort mode to be None, BackToFront, or FrontToBack.
   set sortMode(int sm) {
     if (sm != SortModeNone && sm != SortModeBackToFront &&
         sm != SortModeFrontToBack) {
@@ -47,53 +52,46 @@ class Layer {
     _sortMode = sm;
   }
 
+  /// Name of layer.
   final String name;
-  final String type;
+  String get type;
 
-  String _depthTarget = 'system';
-  String get depthTarget => _depthTarget;
-  set depthTarget(String name) {
-    _depthTarget = name;
-    _link();
-  }
+  /// Material.
+  Material material;
 
-  String _colorTarget = 'system';
-  String get colorTarget => _colorTarget;
-  set colorTarget(String name) {
-    _colorTarget = name;
-    _link();
-  }
+  /// Force all renderables to rendered with the layer material?
+  bool forceLayerMaterial = false;
 
+  /// Render target.
+  String renderTarget;
+
+  /// Should the color target be cleared before rendering?
   bool clearColorTarget = false;
-  bool clearDepthTarget = false;
+  /// Red color target clear value.
   num clearColorR = 0.0;
+  /// Green color target clear value.
   num clearColorG = 0.0;
+  /// Blue color target clear value.
   num clearColorB = 0.0;
+  /// Alpha color target clear value.
   num clearColorA = 1.0;
+  /// Should the depth target be cleared before rendering?
+  bool clearDepthTarget = false;
+  /// Depth target clear value.
   num clearDepthValue = 1.0;
 
-  Layer(this.name, this.type) {
-    _link();
+  /// Construct a new layer, specifying [name] and [type].
+  Layer(this.name) {
   }
 
-  Layer.json(Map json) : name = json['name'], type = json['type'] {
+  Layer.json(Map json) : name = json['name'] {
     fromJson(json);
-    _link();
   }
 
-  void _link() {
-    _invalidate();
-  }
-
-  void _invalidate() {
-    _renderTarget = null;
-  }
-
-  RenderTarget _renderTarget;
+  void render(Renderer renderer, List<Renderable> renderables, Camera camera);
 
   void fromJson(Map json) {
-    colorTarget = json['colorTarget'];
-    depthTarget = json['depthTarget'];
+    renderTarget = json['rendertarget'];
     clearColorTarget = json['clearColorTarget'];
     clearColorR = json['clearColorR'];
     clearColorG = json['clearColorG'];
@@ -107,8 +105,7 @@ class Layer {
     Map json = new Map();
     json['name'] = name;
     json['type'] = type;
-    json['colorTarget'] = colorTarget;
-    json['depthTarget'] = depthTarget;
+    json['renderTarget'] = renderTarget;
     json['clearColorTarget'] = clearColorTarget;
     json['clearColorR'] = clearColorR;
     json['clearColorG'] = clearColorG;
@@ -116,5 +113,6 @@ class Layer {
     json['clearColorA'] = clearColorA;
     json['clearDepthTarget'] = clearDepthTarget;
     json['clearDepthValue'] = clearDepthValue;
+    return json;
   }
 }

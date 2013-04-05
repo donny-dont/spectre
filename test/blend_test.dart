@@ -23,22 +23,22 @@ library blend_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
-
+import 'dart:web_gl' as WebGL;
 void main() {
   test('values', () {
-    expect(Blend.Zero                   , WebGLRenderingContext.ZERO);
-    expect(Blend.One                    , WebGLRenderingContext.ONE);
-    expect(Blend.SourceColor            , WebGLRenderingContext.SRC_COLOR);
-    expect(Blend.InverseSourceColor     , WebGLRenderingContext.ONE_MINUS_SRC_COLOR);
-    expect(Blend.SourceAlpha            , WebGLRenderingContext.SRC_ALPHA);
-    expect(Blend.InverseSourceAlpha     , WebGLRenderingContext.ONE_MINUS_SRC_ALPHA);
-    expect(Blend.DestinationAlpha       , WebGLRenderingContext.DST_ALPHA);
-    expect(Blend.InverseDestinationAlpha, WebGLRenderingContext.ONE_MINUS_DST_ALPHA);
-    expect(Blend.DestinationColor       , WebGLRenderingContext.DST_COLOR);
-    expect(Blend.InverseDestinationColor, WebGLRenderingContext.ONE_MINUS_DST_COLOR);
-    expect(Blend.SourceAlphaSaturation  , WebGLRenderingContext.SRC_ALPHA_SATURATE);
-    expect(Blend.BlendFactor            , WebGLRenderingContext.CONSTANT_COLOR);
-    expect(Blend.InverseBlendFactor     , WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR);
+    expect(Blend.Zero                   , WebGL.ZERO);
+    expect(Blend.One                    , WebGL.ONE);
+    expect(Blend.SourceColor            , WebGL.SRC_COLOR);
+    expect(Blend.InverseSourceColor     , WebGL.ONE_MINUS_SRC_COLOR);
+    expect(Blend.SourceAlpha            , WebGL.SRC_ALPHA);
+    expect(Blend.InverseSourceAlpha     , WebGL.ONE_MINUS_SRC_ALPHA);
+    expect(Blend.DestinationAlpha       , WebGL.DST_ALPHA);
+    expect(Blend.InverseDestinationAlpha, WebGL.ONE_MINUS_DST_ALPHA);
+    expect(Blend.DestinationColor       , WebGL.DST_COLOR);
+    expect(Blend.InverseDestinationColor, WebGL.ONE_MINUS_DST_COLOR);
+    expect(Blend.SourceAlphaSaturation  , WebGL.SRC_ALPHA_SATURATE);
+    expect(Blend.BlendFactor            , WebGL.CONSTANT_COLOR);
+    expect(Blend.InverseBlendFactor     , WebGL.ONE_MINUS_CONSTANT_COLOR);
   });
 
   test('stringify', () {
