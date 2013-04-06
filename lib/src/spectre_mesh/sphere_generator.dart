@@ -29,10 +29,10 @@ class SphereGenerator extends MeshGenerator {
   num radius = 0.5;
 
   /// The number of segments the [Mesh] will be divided into vertically
-  int latSegments = 24;
+  int latSegments = 16;
 
   /// The number of segments the [Mesh] will be divided into horizontally
-  int lonSegments = 24;
+  int lonSegments = 16;
 
   //---------------------------------------------------------------------
   // Construction
@@ -48,7 +48,7 @@ class SphereGenerator extends MeshGenerator {
   /// Gets the number of vertices that will be generated.
   ///
   /// For the amount of storage space required see [vertexBufferSize].
-  int get vertexCount => ((lonSegments * (latSegments - 1)) + 2);
+  int get vertexCount => (lonSegments+1) * (latSegments+1);
 
   /// Retrieves the size of the index buffer necessary to hold the generated [Mesh].
   int get indexCount => 6 * lonSegments * latSegments;
@@ -63,52 +63,21 @@ class SphereGenerator extends MeshGenerator {
   /// [indexOffset].
   void _generateIndices(Uint16Array indices, int vertexOffset, int indexOffset) {
     int x;
-
-    // First ring
-    for(x = 0; x < lonSegments-1; ++x) {
-      indices[indexOffset++] = 0;
-      indices[indexOffset++] = x + 2;
-      indices[indexOffset++] = x + 1;
-    }
-    indices[indexOffset++] = 0;
-    indices[indexOffset++] = 1;
-    indices[indexOffset++] = x + 1;
-
-    // Center rings
-    int ring1Base, ring2Base;
-    for (int y = 0; y < latSegments-2; ++y) {
-      ring1Base = (lonSegments * y) + 1;
-      ring2Base = (lonSegments * (y + 1)) + 1;
-      for (x = 0; x < lonSegments-1; ++x) {
-        indices[indexOffset++] = ring1Base + x;
-        indices[indexOffset++] = ring1Base + x + 1;
-        indices[indexOffset++] = ring2Base + x;
-
-        indices[indexOffset++] = ring1Base + x + 1;
-        indices[indexOffset++] = ring2Base + x + 1;
-        indices[indexOffset++] = ring2Base + x;
+    
+    // Sides
+    for (int y = 0; y < latSegments; ++y) {
+      int base1 = (lonSegments+1) * y;
+      int base2 = (lonSegments+1) * (y+1);
+      for(x = 0; x < lonSegments; ++x) {
+        indices[indexOffset++] = base1 + x;
+        indices[indexOffset++] = base1 + x + 1;
+        indices[indexOffset++] = base2 + x;
+        
+        indices[indexOffset++] = base1 + x + 1;
+        indices[indexOffset++] = base2 + x + 1;
+        indices[indexOffset++] = base2 + x;
       }
-
-      indices[indexOffset++] = ring1Base + x;
-      indices[indexOffset++] = ring1Base;
-      indices[indexOffset++] = ring2Base + x;
-
-      indices[indexOffset++] = ring1Base;
-      indices[indexOffset++] = ring2Base;
-      indices[indexOffset++] = ring2Base + x;
     }
-
-    // Last ring
-    ring1Base = (lonSegments * (latSegments-2)) + 1;
-    ring2Base = (lonSegments * (latSegments-1)) + 1;
-    for(x = 0; x < lonSegments-1; ++x) {
-      indices[indexOffset++] = ring2Base;
-      indices[indexOffset++] = ring1Base + x;
-      indices[indexOffset++] = ring1Base + x + 1;
-    }
-    indices[indexOffset++] = ring2Base;
-    indices[indexOffset++] = ring1Base + x;
-    indices[indexOffset++] = ring1Base;
   }
 
   /// Generates the positions for the mesh.
@@ -119,14 +88,12 @@ class SphereGenerator extends MeshGenerator {
   ///
   /// The mesh will be centered at the given [center] position.
   void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
-    positions[vertexOffset++] = new vec3.raw(center.x, center.y + radius, center.z);
-
-    for (int y = 1; y < latSegments; ++y) {
+    for (int y = 0; y <= latSegments; ++y) {
       double v = y / latSegments;
       double sv = sin(v * Math.PI);
       double cv = cos(v * Math.PI);
 
-      for (int x = 0; x < lonSegments; ++x) {
+      for (int x = 0; x <= lonSegments; ++x) {
         double u = x / lonSegments;
 
         positions[vertexOffset++] = new vec3.raw(
@@ -136,8 +103,6 @@ class SphereGenerator extends MeshGenerator {
         );
       }
     }
-
-    positions[vertexOffset++] = new vec3.raw(center.x, center.y - radius, center.z);
   }
 
   /// Generates the texture coordinates for the mesh.
@@ -146,20 +111,37 @@ class SphereGenerator extends MeshGenerator {
   /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain texture coordinate data.
   void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
-    int offset = vertexOffset++;
-
-    texCoords[vertexOffset++] = new vec2.raw(0.5, 0);
-
-    for (int y = 1; y < latSegments; ++y) {
+    for (int y = 0; y <= latSegments; ++y) {
       double v = y / latSegments;
 
-      for (int x = 0; x < lonSegments; ++x) {
+      for (int x = 0; x <= lonSegments; ++x) {
         double u = x / lonSegments;
         texCoords[vertexOffset++] = new vec2.raw(u, v);
       }
     }
+  }
+  
+  /// Generates the normals for the mesh.
+  ///
+  /// Normals will be placed within the [vertexArray] starting at the specified
+  /// [vertexOffset]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
+  /// within the [vertexArray] will contain normal data.
+  void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
+    for (int y = 0; y <= latSegments; ++y) {
+      double v = y / latSegments;
+      double sv = sin(v * Math.PI);
+      double cv = cos(v * Math.PI);
 
-    texCoords[vertexOffset++] = new vec2.raw(0.5, 1.0);
+      for (int x = 0; x <= lonSegments; ++x) {
+        double u = x / lonSegments;
+
+        normals[vertexOffset++] = new vec3.raw(
+            cos(u * Math.PI * 2.0) * sv,
+            cv,
+            sin(u * Math.PI * 2.0) * sv
+        );
+      }
+    }
   }
 
   //---------------------------------------------------------------------
