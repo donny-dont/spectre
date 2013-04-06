@@ -60,7 +60,7 @@ class Vector2List implements StridedList<vec2> {
     , _length = length
     , _list = new Float32List(length);
 
-  Vector2List.view(ByteArray buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
+  Vector2List.view(ByteBuffer buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
     : _offset = offsetInBytes >> 2
     , _stride = strideInBytes >> 2
   {

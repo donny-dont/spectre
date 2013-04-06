@@ -60,7 +60,7 @@ class ScalarList implements StridedList<double> {
     , _length = length
     , _list = new Float32List(length);
 
-  ScalarList.view(ByteArray buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
+  ScalarList.view(ByteBuffer buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
     : _offset = offsetInBytes >> 2
     , _stride = strideInBytes >> 2
   {

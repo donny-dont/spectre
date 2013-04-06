@@ -23,7 +23,7 @@ library vector3_list_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_mesh.dart';
 import 'package:vector_math/vector_math.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';
 
 Float32List createSequentialList(int count) {
   Float32List list = new Float32List(count);
@@ -44,7 +44,7 @@ void main() {
     const int listSize = size ~/ elementCount;
 
     Float32List test = createSequentialList(size);
-    Vector3List list = new Vector3List.view(test.asByteArray());
+    Vector3List list = new Vector3List.view(test.buffer);
 
     expect(list.length, listSize);
 
@@ -63,7 +63,7 @@ void main() {
     const int listSize = size ~/ elementCount;
 
     Float32List test = createSequentialList(size);
-    ByteArray array = test.asByteArray();
+    ByteBuffer array = test.buffer;
 
     for (int k = 1; k < listSize; ++k) {
       int length = size ~/ (k * elementCount);
