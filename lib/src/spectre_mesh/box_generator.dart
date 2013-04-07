@@ -266,10 +266,18 @@ class BoxGenerator extends MeshGenerator {
   /// This is a helper method for creating a single box. If you are creating
   /// many box meshes prefer creating a [BoxGenerator] and using that to generate
   /// multiple meshes.
-  static Mesh createBox(String name, GraphicsDevice graphicsDevice, List<InputLayoutElement> elements, vec3 extents, vec3 center) {
+  static Mesh createBox(String name,
+                        GraphicsDevice graphicsDevice,
+                        List<InputLayoutElement> elements,
+                       {vec3 extents,
+                        vec3 center})
+  {
     // Setup the generator
     BoxGenerator generator = new BoxGenerator();
-    generator.extents = extents;
+
+    if (extents != null) {
+      generator.extents = extents;
+    }
 
     // Create the mesh
     return MeshGenerator._createMesh(name, graphicsDevice, elements, generator, center);

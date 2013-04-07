@@ -208,7 +208,13 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    Mesh mesh = BoxGenerator.createBox('BoxGeometry', _graphicsDevice, _createElements(), extents, center);
+    Mesh mesh = BoxGenerator.createBox(
+        'BoxGeometry',
+        _graphicsDevice,
+        _createElements(),
+        extents: extents,
+        center: center
+    );
 
     _debugMesh(mesh);
 
@@ -227,7 +233,14 @@ class SimpleGeometryScreen extends DemoScreen {
     num radius = 0.5;
     vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
 
-    Mesh mesh = SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, _createElements(), radius, center);
+    Mesh mesh = SphereGenerator.createSphere(
+        'SphereGeometry',
+        _graphicsDevice,
+        _createElements(),
+        radius: radius,
+        latSegments: 32,
+        lonSegments: 32,
+        center: center);
 
     _debugMesh(mesh);
 
@@ -248,7 +261,15 @@ class SimpleGeometryScreen extends DemoScreen {
     num height = 1.0;
     vec3 center  = new vec3.raw(-2.0, 0.0, 0.0);
 
-    Mesh mesh = CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, _createElements(), topRadius, bottomRadius, height, center);
+    Mesh mesh = CylinderGenerator.createCylinder(
+        'CylinderGeometry',
+        _graphicsDevice,
+        _createElements(),
+        topRadius: topRadius,
+        bottomRadius: bottomRadius,
+        height: height,
+        center: center
+    );
 
     _debugMesh(mesh);
 
