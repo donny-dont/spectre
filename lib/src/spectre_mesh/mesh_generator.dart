@@ -122,7 +122,7 @@ abstract class MeshGenerator {
     }
 
     // Generate position data
-    Vector3Array positions = vertexData.elements[_positionAttributeName];
+    Vector3List positions = vertexData.elements[_positionAttributeName];
 
     if (positions == null) {
       throw new ArgumentError('The vertex data does not contain a position attribute');
@@ -134,22 +134,22 @@ abstract class MeshGenerator {
     _generateIndices(indices, vertexOffset, indexOffset);
 
     // Generate texture coordinates if requested
-    Vector2Array texCoords = vertexData.elements[_textureCoordinateAttributeName];
+    Vector2List texCoords = vertexData.elements[_textureCoordinateAttributeName];
 
     if (texCoords != null) {
       _generateTextureCoordinates(texCoords, vertexOffset);
     }
 
     // Generate normals if requested
-    Vector3Array normals = vertexData.elements[_normalAttributeName];
+    Vector3List normals = vertexData.elements[_normalAttributeName];
 
     if (normals != null) {
       _generateNormals(positions, normals, indices, vertexOffset, indexOffset);
     }
 
     // Generate texture data if requested
-    Vector3Array tangents = vertexData.elements[_tangentAttributeName];
-    Vector3Array bitangents = vertexData.elements[_bitangentAttributeName];
+    Vector3List tangents = vertexData.elements[_tangentAttributeName];
+    Vector3List bitangents = vertexData.elements[_bitangentAttributeName];
 
     if ((tangents != null) && (bitangents != null)) {
       _generateTangents(positions, texCoords, normals, tangents, bitangents, indices, vertexOffset, indexOffset);
@@ -173,14 +173,14 @@ abstract class MeshGenerator {
   /// within the [array] will contain position data.
   ///
   /// The mesh will be centered at the given [center] position.
-  void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset);
+  void _generatePositions(Vector3List positions, vec3 center, int vertexOffset);
 
   /// Generates the texture coordinates for the mesh.
   ///
   /// Texture coordinates will be placed within the [array] starting at the
   /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain texture coordinate data.
-  void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset);
+  void _generateTextureCoordinates(Vector2List texCoords, int vertexOffset);
 
   /// Generates the normals for the mesh.
   ///
@@ -193,7 +193,7 @@ abstract class MeshGenerator {
   ///
   /// A subclass should override this if the normals can easily be determined. This
   /// is the case for something like a box or plane.
-  void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
+  void _generateNormals(Vector3List positions, Vector3List normals, Uint16Array indices, int vertexOffset, int indexOffset) {
     NormalDataBuilder.build(
         positions,
         normals,
@@ -206,7 +206,7 @@ abstract class MeshGenerator {
   }
 
   /// Generates the tangent data for the mesh.
-  void _generateTangents(Vector3Array positions, Vector2Array texCoords, Vector3Array normals, Vector3Array tangents, Vector3Array bitangents, Uint16Array indices, int vertexOffset, int indexOffset) {
+  void _generateTangents(Vector3List positions, Vector2List texCoords, Vector3List normals, Vector3List tangents, Vector3List bitangents, Uint16Array indices, int vertexOffset, int indexOffset) {
     TangentSpaceBuilder.build(
         positions,
         texCoords,

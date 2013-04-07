@@ -24,9 +24,10 @@ import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_mesh.dart';
 import 'package:vector_math/vector_math.dart';
 import 'dart:typeddata';
+import 'dart:html';
 
-Float32List createSequentialList(int count) {
-  Float32List list = new Float32List(count);
+Float32Array createSequentialList(int count) {
+  Float32Array list = new Float32Array(count);
 
   for (int i = 0; i < count; ++i) {
     list[i] = i.toDouble();
@@ -43,7 +44,7 @@ void main() {
     const int size = 2048;
     const int listSize = size ~/ elementCount;
 
-    Float32List test = createSequentialList(size);
+    Float32Array test = createSequentialList(size);
     Vector2List list = new Vector2List.view(test.buffer);
 
     expect(list.length, listSize);
@@ -61,8 +62,8 @@ void main() {
     const int size = 2048;
     const int listSize = size ~/ elementCount;
 
-    Float32List test = createSequentialList(size);
-    ByteBuffer array = test.buffer;
+    Float32Array test = createSequentialList(size);
+    ArrayBuffer array = test.buffer;
 
     for (int k = 1; k < listSize; ++k) {
       int length = size ~/ (k * elementCount);

@@ -23,11 +23,11 @@ part of spectre_mesh;
 /// Contains functions for generating tangents for arbitrary mesh data.
 class TangentSpaceBuilder {
 
-  static void build(Vector3Array positions,
-                    Vector2Array texCoords,
-                    Vector3Array normals,
-                    Vector3Array tangents,
-                    Vector3Array bitangents,
+  static void build(Vector3List positions,
+                    Vector2List texCoords,
+                    Vector3List normals,
+                    Vector3List tangents,
+                    Vector3List bitangents,
                     Uint16Array indices,
                    [int vertexOffset = 0,
                     int vertexCount,
@@ -40,8 +40,8 @@ class TangentSpaceBuilder {
     // Create temporary arrays to hold the tangent data
     vertexCount = maxVertex - vertexOffset;
 
-    Vector3Array tan1 = new Vector3Array(vertexCount);
-    Vector3Array tan2 = new Vector3Array(vertexCount);
+    Vector3List tan1 = new Vector3List(vertexCount);
+    Vector3List tan2 = new Vector3List(vertexCount);
 
     {
       vec3 v0 = new vec3();

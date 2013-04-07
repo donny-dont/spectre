@@ -22,30 +22,17 @@ part of spectre_mesh;
 
 /// Helper for accessing interleaved scalar elements.
 ///
-/// The [ScalarList] class provides easy random access to scalar values
-/// interleaved within vertex data. If the vertex data is not interleaved
-/// then a [ScalarList] should not be used as it has additional overhead,
-/// in comparison to [Float32List] and will perform worse.
-class Vector3List implements StridedList<vec3> {
+/// The [Vector3List] class provides easy random access to 3D vector values
+/// interleaved within vertex data.
+class Vector3List extends StridedList<vec3> {
   //---------------------------------------------------------------------
   // Class variables
   //---------------------------------------------------------------------
 
   /// The number of bytes per element in the [List]
   static const int BYTES_PER_ELEMENT = 12;
-
-  //---------------------------------------------------------------------
-  // Member variables
-  //---------------------------------------------------------------------
-
-  /// The offset to the element.
-  int _offset;
-  /// The length of the list.
-  int _length;
-  /// The stride between elements.
-  int _stride;
-  /// The [Float32List] used to access elements.
-  Float32List _list;
+  /// The number of items within the [Vector3List].
+  static const int _itemCount = 3;
 
   //---------------------------------------------------------------------
   // Construction
@@ -55,30 +42,11 @@ class Vector3List implements StridedList<vec3> {
   ///
   /// Initially all elements are set to zero.
   Vector3List(int length)
-    : _offset = 0
-    , _stride = 1
-    , _length = length
-    , _list = new Float32List(length);
+      : super._create(length, _itemCount);
 
-  Vector3List.view(ByteBuffer buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
-    : _offset = offsetInBytes >> 2
-    , _stride = strideInBytes >> 2
-  {
-    if (offsetInBytes % 4 != 0) {
-      throw new ArgumentError('The byte offset must be on a 4-byte boundary');
-    }
-
-    if (strideInBytes % 4 != 0) {
-      throw new ArgumentError('The stride offset must be on a 4-byte boundary');
-    }
-
-    if (strideInBytes < BYTES_PER_ELEMENT) {
-      throw new ArgumentError('The stride is less than the element size');
-    }
-
-    _list = new Float32List.view(buffer);
-    _length = _list.length ~/ _stride;
-  }
+  /// Creates a [Vector3List] view of the specified region in the specified byte buffer.
+  Vector3List.view(ArrayBuffer buffer, [int offsetInBytes = 0, int strideInBytes = BYTES_PER_ELEMENT])
+      : super._view(buffer, offsetInBytes, strideInBytes, BYTES_PER_ELEMENT);
 
   //---------------------------------------------------------------------
   // Operators
@@ -114,6 +82,32 @@ class Vector3List implements StridedList<vec3> {
 
   /// Returns the number of elements.
   int get length => _length;
+
+  //---------------------------------------------------------------------
+  // Public methods
+  //---------------------------------------------------------------------
+
+  /// Gets the [value] at the specified [index].
+  ///
+  /// Copies the value at [index] into [value]. This method will not create
+  /// a new object like the \[\] operator will. Prefer this method whenever
+  /// possible.
+  void getAt(int index, vec3 value) {
+    int actualIndex = _getActualIndex(index);
+
+    value.x = _list[actualIndex++];
+    value.y = _list[actualIndex++];
+    value.z = _list[actualIndex];
+  }
+
+  /// Sets the [value] at the specified [index].
+  void setAt(int index, vec3 value) {
+    int actualIndex = _getActualIndex(index);
+
+    _list[actualIndex++] = value.x;
+    _list[actualIndex++] = value.y;
+    _list[actualIndex]   = value.z;
+  }
 
   //---------------------------------------------------------------------
   // Private methods

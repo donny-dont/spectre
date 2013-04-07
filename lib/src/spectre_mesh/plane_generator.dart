@@ -164,7 +164,7 @@ class PlaneGenerator extends MeshGenerator {
   /// within the [array] will contain position data.
   ///
   /// The mesh will be centered at the given [center] position.
-  void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
+  void _generatePositions(Vector3List positions, vec3 center, int vertexOffset) {
     double xExtent = _extents.x;
     double yExtent = _extents.y;
 
@@ -186,7 +186,7 @@ class PlaneGenerator extends MeshGenerator {
   }
 
   /// Populates the positions for a single side of the plane.
-  void _generatePositionsSingleSide(Vector3Array positions, int vertexOffset, List<double> xSegmentList, List<double> ySegmentList) {
+  void _generatePositionsSingleSide(Vector3List positions, int vertexOffset, List<double> xSegmentList, List<double> ySegmentList) {
     vec3 position = new vec3.zero();
 
     for (int y = 0; y <= ySegments; ++y) {
@@ -207,7 +207,7 @@ class PlaneGenerator extends MeshGenerator {
   /// Texture coordinates will be placed within the [array] starting at the
   /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain texture coordinate data.
-  void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
+  void _generateTextureCoordinates(Vector2List texCoords, int vertexOffset) {
     List<double> uSegmentList = _createSegmentList(0.0, 1.0, xSegments);
     List<double> vSegmentList = _createSegmentList(1.0, 0.0, ySegments);
 
@@ -221,7 +221,7 @@ class PlaneGenerator extends MeshGenerator {
   }
 
   /// Populates the texture coordinates for a single side of the plane.
-  void _generateTextureCoordinatesSingleSide(Vector2Array texCoords, int vertexOffset, List<double> uSegmentList, List<double> vSegmentList) {
+  void _generateTextureCoordinatesSingleSide(Vector2List texCoords, int vertexOffset, List<double> uSegmentList, List<double> vSegmentList) {
     vec2 texCoord = new vec2();
 
     for (int y = 0; y <= ySegments; ++y) {
@@ -242,7 +242,7 @@ class PlaneGenerator extends MeshGenerator {
   /// Normals will be placed within the [vertexArray] starting at the specified
   /// [vertexOffset]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [vertexArray] will contain normal data.
-  void _generateNormals(Vector3Array positions, Vector3Array normals, Uint16Array indices, int vertexOffset, int indexOffset) {
+  void _generateNormals(Vector3List positions, Vector3List normals, Uint16Array indices, int vertexOffset, int indexOffset) {
     int singleSideVertexCount = _singleSideVertexCount;
     vec3 normal = new vec3.raw(0.0, 0.0, 1.0);
 

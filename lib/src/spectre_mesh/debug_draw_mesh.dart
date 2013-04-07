@@ -22,8 +22,8 @@ part of spectre_mesh;
 
 /// Draws vertex vector data.
 void _debugDrawVertexVectorData(DebugDrawManager debugDrawManager,
-                                Vector3Array positions,
-                                Vector3Array vectors,
+                                Vector3List positions,
+                                Vector3List vectors,
                                 mat4 modelMatrix,
                                 vec4 color,
                                 double duration,
@@ -83,8 +83,8 @@ void _debugDrawVertexVectorData(DebugDrawManager debugDrawManager,
 }
 
 void debugDrawMeshNormals(DebugDrawManager debugDrawManager,
-                          Vector3Array positions,
-                          Vector3Array normals,
+                          Vector3List positions,
+                          Vector3List normals,
                           mat4 modelMatrix,
                          [double duration = 120.0,
                           int vertexOffset = 0,
@@ -109,9 +109,9 @@ void debugDrawMeshNormals(DebugDrawManager debugDrawManager,
 }
 
 void debugDrawMeshTangents(DebugDrawManager debugDrawManager,
-                           Vector3Array positions,
-                           Vector3Array tangents,
-                           Vector3Array bitangents,
+                           Vector3List positions,
+                           Vector3List tangents,
+                           Vector3List bitangents,
                            mat4 modelMatrix,
                           [double duration = 120.0,
                            int vertexOffset = 0,

@@ -287,10 +287,10 @@ class SimpleGeometryScreen extends DemoScreen {
   }
 
   void _debugMesh(Mesh mesh) {
-    Vector3Array positions = mesh.vertexData.elements['vPosition'];
-    Vector3Array normals = mesh.vertexData.elements['vNormal'];
-    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
-    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
+    Vector3List positions = mesh.vertexData.elements['vPosition'];
+    Vector3List normals = mesh.vertexData.elements['vNormal'];
+    Vector3List tangents = mesh.vertexData.elements['vTangent'];
+    Vector3List bitangents = mesh.vertexData.elements['vBitangent'];
 
     debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
     debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());

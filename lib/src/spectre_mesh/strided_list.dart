@@ -20,7 +20,54 @@
 
 part of spectre_mesh;
 
-abstract class StridedList<E> {//implements List<T> {
+abstract class StridedList<E> {//implements List<E> {
+  //---------------------------------------------------------------------
+  // Member variables
+  //---------------------------------------------------------------------
+
+  /// The underlying [Float32List] containing the elements.
+  Float32Array _list;
+  /// The offset to the element.
+  int _offset;
+  /// The length of the list.
+  int _length;
+  /// The stride between elements.
+  int _stride;
+
+  //---------------------------------------------------------------------
+  // Construction
+  //---------------------------------------------------------------------
+
+  /// Creates an instance of the [StridedList] class with the given [length].
+  StridedList._create(int length, int itemCount)
+      : _offset = 0
+      , _stride = itemCount
+      , _length = length
+      , _list = new Float32Array(length * itemCount);
+
+  /// Creates a [StridedList] view of the specified region in the specified byte buffer.
+  StridedList._view(ArrayBuffer buffer, int offsetInBytes, int strideInBytes, int bytesPerElement)
+      : _offset = offsetInBytes >> 2
+      , _stride = strideInBytes >> 2
+  {
+    if (offsetInBytes % 4 != 0) {
+      throw new ArgumentError('The byte offset must be on a 4-byte boundary');
+    }
+
+    if (strideInBytes % 4 != 0) {
+      throw new ArgumentError('The stride offset must be on a 4-byte boundary');
+    }
+
+    if (strideInBytes < bytesPerElement) {
+      throw new ArgumentError('The stride is less than the element size');
+    }
+
+    // \TODO Change to Float32List when available
+    _list = new Float32Array.fromBuffer(buffer);
+    _length = _list.length ~/ _stride;
+  }
+
+
 
   //---------------------------------------------------------------------
   // Operators
@@ -36,6 +83,23 @@ abstract class StridedList<E> {//implements List<T> {
 
   /// Returns the number of elements.
   int get length;
+
+  /// Returns the underlying [Float32List].
+  Float32Array get list => _list;
+
+  //---------------------------------------------------------------------
+  // Methods
+  //---------------------------------------------------------------------
+
+  /// Gets the [value] at the specified [index].
+  ///
+  /// Copies the value at [index] into [value]. Dependent on the type of [E] the
+  /// \[\] operator can create a new object. Prefer this method when [E] is
+  /// an object.
+  void getAt(int index, E value);
+
+  /// Sets the [value] at the specified [index].
+  void setAt(int index, E value);
 
   //---------------------------------------------------------------------
   // Unsupported methods

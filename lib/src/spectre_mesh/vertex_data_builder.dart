@@ -45,7 +45,7 @@ class _VertexDataBuilder {
   /// Helper method to add a [value] to the [array] at the given [index].
   ///
   /// A [temp] value is passed in to the function to prevent additional allocations.
-  static void _addToVec3(int index, Vector3Array array, vec3 value, vec3 temp) {
+  static void _addToVec3(int index, Vector3List array, vec3 value, vec3 temp) {
     array.getAt(index, temp);
     temp.add(value);
     array.setAt(index, temp);

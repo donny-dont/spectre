@@ -152,7 +152,7 @@ class CylinderGenerator extends MeshGenerator {
   /// within the [array] will contain position data.
   ///
   /// The mesh will be centered at the given [center] position.
-  void _generatePositions(Vector3Array positions, vec3 center, int vertexOffset) {
+  void _generatePositions(Vector3List positions, vec3 center, int vertexOffset) {
     // Vertices are doubled up so that normals will be sharp
 
     // Top
@@ -205,7 +205,7 @@ class CylinderGenerator extends MeshGenerator {
   /// Texture coordinates will be placed within the [array] starting at the
   /// specified [vertexData]. When complete the \[[vertexOffset], [vertexOffset] + [vertexCount]\]
   /// within the [array] will contain texture coordinate data.
-  void _generateTextureCoordinates(Vector2Array texCoords, int vertexOffset) {
+  void _generateTextureCoordinates(Vector2List texCoords, int vertexOffset) {
     // Vertices are doubled up so that normals will be sharp
 
     // Cylinder top
