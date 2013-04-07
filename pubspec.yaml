@@ -3,12 +3,14 @@ version: 0.5.0
 author: John McCutchan <john@johnmccutchan.com>
 description: Graphics Library
 homepage: https://github.com/johnmccutchan/spectre
+documentation: http://johnmccutchan.github.io/spectre/
 dependencies:
-  unittest: any
   asset_pack:
     git: https://github.com/johnmccutchan/asset_pack.git
-  browser: any
   vector_math:
     git: https://github.com/johnmccutchan/DartVectorMath.git
+dev_dependencies:
+  unittest: any
+  browser: any
   game_loop:
     git: https://github.com/johnmccutchan/game_loop.git
