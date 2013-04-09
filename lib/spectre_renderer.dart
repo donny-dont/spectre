@@ -27,10 +27,13 @@ import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_post.dart';
 
+part 'src/spectre_renderer/asset_pack.dart';
+part 'src/spectre_renderer/debugdraw_layer.dart';
+part 'src/spectre_renderer/fullscreen_layer.dart';
+part 'src/spectre_renderer/layer.dart';
 part 'src/spectre_renderer/material.dart';
 part 'src/spectre_renderer/material_constant.dart';
 part 'src/spectre_renderer/material_texture.dart';
 part 'src/spectre_renderer/renderable.dart';
-part 'src/spectre_renderer/layer.dart';
 part 'src/spectre_renderer/renderer.dart';
-part 'src/spectre_renderer/asset_pack.dart';
+part 'src/spectre_renderer/scene_layer.dart';

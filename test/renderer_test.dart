@@ -99,8 +99,8 @@ void testFromJson() {
            (child.name == 'backBuffer' || child.name == 'backBufferRenderable');
   }).length, 2);
   // Test assetManager access
-  expect(_assetManager.root.renderer.depthBuffer.width, 512);
-  expect(_assetManager.root.renderer.depthBuffer.height, 512);
+  expect(_assetManager['renderer.depthBuffer'].width, 512);
+  expect(_assetManager['renderer.depthBuffer'].height, 512);
 }
 
 void testClear() {
@@ -122,7 +122,7 @@ void testClear() {
   }).length, 0);
   expect(() => _assetManager.root.getAssetAtPath('renderer.depthBuffer'),
          throws);
-  expect(() => _assetManager.root.testpack, throws);
+  expect(() => _assetManager.root.getAssetAtPath('testpack'), throws);
 }
 
 void main() {

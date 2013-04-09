@@ -23,6 +23,6 @@ part of spectre;
 /// VertexShader
 class VertexShader extends SpectreShader {
   VertexShader(String name, GraphicsDevice device)
-      : super(name, device, WebGLRenderingContext.VERTEX_SHADER) {
+      : super(name, device, WebGL.VERTEX_SHADER) {
   }
 }

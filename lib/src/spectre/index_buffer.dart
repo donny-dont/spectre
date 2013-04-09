@@ -23,7 +23,7 @@ part of spectre;
 /// IndexBuffer
 class IndexBuffer extends SpectreBuffer {
   IndexBuffer(String name, GraphicsDevice device)
-      : super(name, device, WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
-          WebGLRenderingContext.ELEMENT_ARRAY_BUFFER_BINDING) {
+      : super(name, device, WebGL.ELEMENT_ARRAY_BUFFER,
+          WebGL.ELEMENT_ARRAY_BUFFER_BINDING) {
   }
 }

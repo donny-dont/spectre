@@ -36,9 +36,9 @@ class FrontFace {
   //---------------------------------------------------------------------
 
   /// Triangles are considered front-facing if its vertices are clockwise.
-  static const int Clockwise = WebGLRenderingContext.CW;
+  static const int Clockwise = WebGL.CW;
   /// Triangles are considered front-facing if its vertices are counter-clockwise.
-  static const int CounterClockwise = WebGLRenderingContext.CCW;
+  static const int CounterClockwise = WebGL.CCW;
 
   //---------------------------------------------------------------------
   // Class methods

@@ -44,7 +44,7 @@ class DepthState extends DeviceChild {
   bool _depthBufferEnabled = true;
   /// Whether writing to the depth buffer is enabled or disabled.
   /// The default is true.
-  bool _depthBufferWriteEnabled = false;
+  bool _depthBufferWriteEnabled = true;
   /// The comparison function for the depth-buffer test.
   /// The default is CompareFunction.LessEqual
   int _depthBufferFunction = CompareFunction.LessEqual;

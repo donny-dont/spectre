@@ -40,23 +40,29 @@ class DeviceFormat {
 /// An existing resource can be looked up using its name.
 class GraphicsDevice {
   static const DeviceFormat DeviceFormatFloat1 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 1, false);
+                    const DeviceFormat(WebGL.FLOAT, 1, false);
   static const DeviceFormat DeviceFormatFloat2 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 2, false);
+                    const DeviceFormat(WebGL.FLOAT, 2, false);
   static const DeviceFormat DeviceFormatFloat3 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 3, false);
+                    const DeviceFormat(WebGL.FLOAT, 3, false);
   static const DeviceFormat DeviceFormatFloat4 =
-                    const DeviceFormat(WebGLRenderingContext.FLOAT, 4, false);
+                    const DeviceFormat(WebGL.FLOAT, 4, false);
 
 
+  CanvasElement _surface;
   GraphicsContext _context;
   GraphicsContext get context => _context;
 
   GraphicsDeviceCapabilities _capabilities;
   GraphicsDeviceCapabilities get capabilities => _capabilities;
 
-  WebGLRenderingContext _gl;
-  WebGLRenderingContext get gl => _gl;
+  WebGL.RenderingContext _gl;
+  WebGL.RenderingContext get gl => _gl;
+
+  int get canvasWidth => _surface.width;
+  int get canvasHeight => _surface.height;
+  int get frontBufferWidth => _gl.drawingBufferWidth;
+  int get frontBufferHeight => _gl.drawingBufferHeight;
 
   final Set<DeviceChild> children = new Set<DeviceChild>();
   void _addChild(DeviceChild child) {
@@ -104,6 +110,7 @@ class GraphicsDevice {
   /// of the underlying frame buffer.
   GraphicsDevice(CanvasElement surface, [GraphicsDeviceConfig config = null]) {
     assert(surface != null);
+    _surface = surface;
     // Get the WebGL context
     if (config == null) {
       config = new GraphicsDeviceConfig();
