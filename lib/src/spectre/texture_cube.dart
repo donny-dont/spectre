@@ -37,45 +37,45 @@ class TextureCube extends SpectreTexture {
   Texture2D get negativeZ => _negativeZ;
 
   TextureCube(String name, GraphicsDevice device)
-      : super(name, device, WebGLRenderingContext.TEXTURE_CUBE_MAP,
-          WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-          WebGLRenderingContext.TEXTURE_CUBE_MAP) {
+      : super(name, device, WebGL.TEXTURE_CUBE_MAP,
+          WebGL.TEXTURE_BINDING_CUBE_MAP,
+          WebGL.TEXTURE_CUBE_MAP) {
     _positiveX = new Texture2D._cube(
         '$name[+X]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_X);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_POSITIVE_X);
     _positiveY = new Texture2D._cube(
         '$name[+Y]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Y);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_POSITIVE_Y);
     _positiveZ = new Texture2D._cube(
         '$name[+Z]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_POSITIVE_Z);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_POSITIVE_Z);
     _negativeX = new Texture2D._cube(
         '$name[-X]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_X);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_NEGATIVE_X);
     _negativeY = new Texture2D._cube(
         '$name[-Y]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Y);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_NEGATIVE_Y);
     _negativeZ = new Texture2D._cube(
         '$name[-Z]',
         device,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_BINDING_CUBE_MAP,
-        WebGLRenderingContext.TEXTURE_CUBE_MAP_NEGATIVE_Z);
+        WebGL.TEXTURE_CUBE_MAP,
+        WebGL.TEXTURE_BINDING_CUBE_MAP,
+        WebGL.TEXTURE_CUBE_MAP_NEGATIVE_Z);
     _positiveX._deviceTexture = _deviceTexture;
     _positiveY._deviceTexture = _deviceTexture;
     _positiveZ._deviceTexture = _deviceTexture;

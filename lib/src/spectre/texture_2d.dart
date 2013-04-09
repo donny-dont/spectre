@@ -31,9 +31,8 @@ class Texture2D extends SpectreTexture {
   bool get loadError => _loadError;
 
   Texture2D(String name, GraphicsDevice device) :
-      super(name, device, WebGLRenderingContext.TEXTURE_2D,
-          WebGLRenderingContext.TEXTURE_BINDING_2D,
-          WebGLRenderingContext.TEXTURE_2D);
+      super(name, device, WebGL.TEXTURE_2D, WebGL.TEXTURE_BINDING_2D,
+            WebGL.TEXTURE_2D);
 
   Texture2D._cube(String name, GraphicsDevice device, int bindTarget,
                   int bindParam, int textureTarget) :

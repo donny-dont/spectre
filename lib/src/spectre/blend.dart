@@ -59,53 +59,53 @@ class Blend {
   //---------------------------------------------------------------------
 
   /// Each component of the color is multiplied by (0, 0, 0, 0).
-  static const int Zero = WebGLRenderingContext.ZERO;
+  static const int Zero = WebGL.ZERO;
   /// Each component of the color is multiplied by (1, 1, 1, 1).
-  static const int One = WebGLRenderingContext.ONE;
+  static const int One = WebGL.ONE;
   /// Each component of the color is multiplied by the source color.
   ///
   /// This can be represented as (Rs, Gs, Bs, As), where R, G, B, and A
   /// respectively stand for the red, green, blue, and alpha source values.
-  static const int SourceColor = WebGLRenderingContext.SRC_COLOR;
+  static const int SourceColor = WebGL.SRC_COLOR;
   /// Each component of the color is multiplied by the inverse of the source color.
   ///
   /// This can be represented as (1 − Rs, 1 − Gs, 1 − Bs, 1 − As) where R, G, B, and A
   /// respectively stand for the red, green, blue, and alpha destination values.
-  static const int InverseSourceColor = WebGLRenderingContext.ONE_MINUS_SRC_COLOR;
+  static const int InverseSourceColor = WebGL.ONE_MINUS_SRC_COLOR;
   /// Each component of the color is multiplied by the alpha value of the source.
   ///
   /// This can be represented as (As, As, As, As), where As is the alpha source value.
-  static const int SourceAlpha = WebGLRenderingContext.SRC_ALPHA;
+  static const int SourceAlpha = WebGL.SRC_ALPHA;
   /// Each component of the color is multiplied by the inverse of the alpha value of the source.
   ///
   /// This can be represented as (1 − As, 1 − As, 1 − As, 1 − As), where As is the alpha destination value.
-  static const int InverseSourceAlpha = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA;
+  static const int InverseSourceAlpha = WebGL.ONE_MINUS_SRC_ALPHA;
   /// Each component of the color is multiplied by the alpha value of the destination.
   ///
   /// This can be represented as (Ad, Ad, Ad, Ad), where Ad is the destination alpha value.
-  static const int DestinationAlpha = WebGLRenderingContext.DST_ALPHA;
+  static const int DestinationAlpha = WebGL.DST_ALPHA;
   /// Each component of the color is multiplied by the inverse of the alpha value of the destination.
   ///
   /// This can be represented as (1 − Ad, 1 − Ad, 1 − Ad, 1 − Ad), where Ad is the alpha destination value.
-  static const int InverseDestinationAlpha = WebGLRenderingContext.ONE_MINUS_DST_ALPHA;
+  static const int InverseDestinationAlpha = WebGL.ONE_MINUS_DST_ALPHA;
   /// Each component color is multiplied by the destination color.
   ///
   /// This can be represented as (Rd, Gd, Bd, Ad), where R, G, B, and A respectively stand for
   /// red, green, blue, and alpha destination values.
-  static const int DestinationColor = WebGLRenderingContext.DST_COLOR;
+  static const int DestinationColor = WebGL.DST_COLOR;
   /// Each component of the color is multiplied by the inverse of the destination color.
   ///
   /// This can be represented as (1 − Rd, 1 − Gd, 1 − Bd, 1 − Ad), where Rd, Gd, Bd, and Ad respectively
   /// stand for the red, green, blue, and alpha destination values.
-  static const int InverseDestinationColor = WebGLRenderingContext.ONE_MINUS_DST_COLOR;
+  static const int InverseDestinationColor = WebGL.ONE_MINUS_DST_COLOR;
   /// Each component of the color is multiplied by either the alpha of the source color, or the inverse of the alpha of the source color, whichever is greater.
   ///
   /// This can be represented as (f, f, f, 1), where f = min(A, 1 − Ad).
-  static const int SourceAlphaSaturation = WebGLRenderingContext.SRC_ALPHA_SATURATE;
+  static const int SourceAlphaSaturation = WebGL.SRC_ALPHA_SATURATE;
   /// Each component of the color is multiplied by a constant set in BlendFactor.
-  static const int BlendFactor = WebGLRenderingContext.CONSTANT_COLOR;
+  static const int BlendFactor = WebGL.CONSTANT_COLOR;
   /// Each component of the color is multiplied by the inverse of a constant set in BlendFactor.
-  static const int InverseBlendFactor = WebGLRenderingContext.ONE_MINUS_CONSTANT_COLOR;
+  static const int InverseBlendFactor = WebGL.ONE_MINUS_CONSTANT_COLOR;
 
   //---------------------------------------------------------------------
   // Class methods

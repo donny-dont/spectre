@@ -23,7 +23,6 @@ part of spectre;
 /// Defines storage for vertex data
 class VertexBuffer extends SpectreBuffer {
   VertexBuffer(String name, GraphicsDevice device)
-      : super(name, device, WebGLRenderingContext.ARRAY_BUFFER,
-              WebGLRenderingContext.ARRAY_BUFFER_BINDING) {
+      : super(name, device, WebGL.ARRAY_BUFFER, WebGL.ARRAY_BUFFER_BINDING) {
   }
 }

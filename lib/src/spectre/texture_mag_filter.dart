@@ -44,17 +44,17 @@ class TextureMagFilter {
   //---------------------------------------------------------------------
 
   /// Use linear filtering for magnification.
-  static const int Linear = WebGLRenderingContext.LINEAR;
+  static const int Linear = WebGL.LINEAR;
   /// Use point filtering for magnification.
-  static const int Point = WebGLRenderingContext.NEAREST;
+  static const int Point = WebGL.NEAREST;
   /// Use point filtering to expand, and point filtering between mipmap levels.
-  static const int PointMipPoint = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST;
+  static const int PointMipPoint = WebGL.NEAREST_MIPMAP_NEAREST;
   /// Use point filtering to expand, and linear filtering between mipmap levels.
-  static const int PointMipLinear = WebGLRenderingContext.NEAREST_MIPMAP_LINEAR;
+  static const int PointMipLinear = WebGL.NEAREST_MIPMAP_LINEAR;
   /// Use linear filtering to expand, and point filtering between mipmap levels.
-  static const int LinearMipPoint = WebGLRenderingContext.LINEAR_MIPMAP_NEAREST;
+  static const int LinearMipPoint = WebGL.LINEAR_MIPMAP_NEAREST;
   /// Use linear filtering to expand, and linear filtering between mipmap levels.
-  static const int LinearMipLinear = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR;
+  static const int LinearMipLinear = WebGL.LINEAR_MIPMAP_LINEAR;
 
   //---------------------------------------------------------------------
   // Class methods
@@ -63,6 +63,7 @@ class TextureMagFilter {
   /// Convert from a [String] name to the corresponding [TextureMinFilter] enumeration.
   static int parse(String name) {
     switch (name) {
+
       case _linearName         : return Linear;
       case _pointName          : return Point;
       case _pointMipPointName  : return PointMipPoint;

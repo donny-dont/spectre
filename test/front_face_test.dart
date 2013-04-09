@@ -23,11 +23,11 @@ library front_face_test;
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre.dart';
 import 'dart:html';
-
+import 'dart:web_gl' as WebGL;
 void main() {
   test('values', () {
-    expect(FrontFace.Clockwise       , WebGLRenderingContext.CW);
-    expect(FrontFace.CounterClockwise, WebGLRenderingContext.CCW);
+    expect(FrontFace.Clockwise       , WebGL.CW);
+    expect(FrontFace.CounterClockwise, WebGL.CCW);
   });
 
   test('stringify', () {

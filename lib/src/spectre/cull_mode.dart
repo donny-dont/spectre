@@ -40,9 +40,9 @@ class CullMode {
   /// Always draw all triangles.
   static const int None = 0;
   /// Do not draw triangles that are front-facing.
-  static const int Front = WebGLRenderingContext.FRONT;
+  static const int Front = WebGL.FRONT;
   /// Do not draw triangles that are back-facing.
-  static const int Back = WebGLRenderingContext.BACK;
+  static const int Back = WebGL.BACK;
 
   //---------------------------------------------------------------------
   // Class methods

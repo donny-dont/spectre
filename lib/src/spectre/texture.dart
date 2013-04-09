@@ -71,13 +71,13 @@ class SpectreTexture extends DeviceChild {
     assert(false);
   }
 
-  static const int PixelTypeU8 = WebGLRenderingContext.UNSIGNED_BYTE;
-  static const int PixelTypeU16 = WebGLRenderingContext.UNSIGNED_SHORT;
-  static const int PixelTypeU32 = WebGLRenderingContext.UNSIGNED_INT;
-  static const int PixelTypeS8 = WebGLRenderingContext.BYTE;
-  static const int PixelTypeS16 = WebGLRenderingContext.SHORT;
-  static const int PixelTypeS32 = WebGLRenderingContext.INT;
-  static const int PixelTypeFloat = WebGLRenderingContext.FLOAT;
+  static const int PixelTypeU8 = WebGL.UNSIGNED_BYTE;
+  static const int PixelTypeU16 = WebGL.UNSIGNED_SHORT;
+  static const int PixelTypeU32 = WebGL.UNSIGNED_INT;
+  static const int PixelTypeS8 = WebGL.BYTE;
+  static const int PixelTypeS16 = WebGL.SHORT;
+  static const int PixelTypeS32 = WebGL.INT;
+  static const int PixelTypeFloat = WebGL.FLOAT;
 
   int _width = 0;
   int _height = 0;
