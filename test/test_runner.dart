@@ -42,6 +42,7 @@ import 'viewport_test.dart' as viewport_test;
 import 'scalar_list_test.dart' as scalar_list_test;
 import 'vector2_list_test.dart' as vector2_list_test;
 import 'vector3_list_test.dart' as vector3_list_test;
+import 'vector4_list_test.dart' as vector4_list_test;
 
 void main() {
   useHtmlEnhancedConfiguration();
@@ -69,5 +70,6 @@ void main() {
     group('ScalarList tests', scalar_list_test.main);
     group('Vector2List tests', vector2_list_test.main);
     group('Vector3List tests', vector3_list_test.main);
+    group('Vector4List tests', vector4_list_test.main);
   });
 }
