@@ -112,23 +112,23 @@ void renderFrame(GameLoop gameLoop) {
   /* Draw playing area */
   // Top & Bottom
   for (int i = 0; i < 2; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(1.0, 0.0, 0.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(1.0, 0.0, 0.0, 1.0));
   }
 
   // Ends
   for (int i = 2; i < 4; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(1.0, 1.0, 1.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(1.0, 1.0, 1.0, 1.0));
   }
 
   // Other
   for (int i = 4; i < lineStart.length; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(0.0, 0.0, 1.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(0.0, 0.0, 1.0, 1.0));
   }
 
   // Draw ball
@@ -186,8 +186,8 @@ main() {
   // Create the camera
   _camera = new Camera();
   _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  _camera.position = new vec3.raw(0.0, 0.0, -2.5);
-  _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
+  _camera.position = new vec3(0.0, 0.0, -2.5);
+  _camera.focusPosition = new vec3(0.0, 0.0, 0.0);
 
   _gameLoop = new GameLoop(canvas);
   _gameLoop.onUpdate = gameFrame;

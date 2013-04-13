@@ -9,6 +9,6 @@ dependencies:
     git: https://github.com/johnmccutchan/asset_pack.git
   browser: any
   vector_math:
-    git: https://github.com/johnmccutchan/DartVectorMath.git
+    git: https://github.com/johnmccutchan/vector_math.git
   game_loop:
     git: https://github.com/johnmccutchan/game_loop.git

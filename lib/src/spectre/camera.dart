@@ -34,9 +34,9 @@ class Camera {
   }
 
   Camera() {
-    position = new vec3.raw(0.0, 0.0, 0.0);
-    focusPosition = new vec3.raw(0.0, 0.0, -1.0);
-    upDirection = new vec3.raw(0.0, 1.0, 0.0);
+    position = new vec3(0.0, 0.0, 0.0);
+    focusPosition = new vec3(0.0, 0.0, -1.0);
+    upDirection = new vec3(0.0, 1.0, 0.0);
 
     FOV = 0.785398163; // 2*45 degrees
     zNear = 1.0;

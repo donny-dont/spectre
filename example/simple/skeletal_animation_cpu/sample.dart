@@ -254,15 +254,15 @@ class Application {
   void _createCamera() {
     // Create the Camera
     _camera = new Camera();
-    _camera.position = new vec3.raw(150.0, 60.0, 0.0);
-    _camera.focusPosition = new vec3.raw(0.0, 60.0, 0.0);
+    _camera.position = new vec3(150.0, 60.0, 0.0);
+    _camera.focusPosition = new vec3(0.0, 60.0, 0.0);
 
     // Create the CameraController and set the velocity of the movement
     _cameraController = new OrbitCameraController();
     _cameraController.radius = 150.0;
 
     // Create the mat4 holding the Model-View-Projection matrix
-    _modelViewProjectionMatrix = new mat4();
+    _modelViewProjectionMatrix = new mat4.zero();
 
     // Create the Float32Arrays that store the constant values for the matrices
     _modelViewMatrixArray = new Float32Array(16);
