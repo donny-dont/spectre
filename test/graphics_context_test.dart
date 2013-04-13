@@ -28,6 +28,7 @@ import 'mock_webgl_rendering_context.dart';
 import 'dart:html';
 import 'dart:web_gl' as WebGL;
 
+part 'graphics_context_buffer_test.dart';
 part 'graphics_context_state_test.dart';
 
 //---------------------------------------------------------------------
@@ -44,6 +45,10 @@ void main() {
     verifyInitialPipelineState(graphicsDevice, gl);
   });
 
+  // Buffer tests
+  testIndexBuffer();
+
+  // State tests
   testViewport();
   testBlendState();
   testDepthState();

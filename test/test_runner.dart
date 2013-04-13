@@ -20,6 +20,7 @@
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';
+
 import 'blend_test.dart' as blend_test;
 import 'blend_operation_test.dart' as blend_operation_test;
 import 'blend_state_test.dart' as blend_state_test;
@@ -30,6 +31,7 @@ import 'depth_state_test.dart' as depth_state_test;
 import 'front_face_test.dart' as front_face_test;
 import 'graphics_context_test.dart' as graphics_context_test;
 import 'material_test.dart' as material_test;
+import 'primitive_type_test.dart' as primitive_type_test;
 import 'rasterizer_state_test.dart' as rasterizer_state_test;
 import 'renderer_test.dart' as renderer_test;
 import 'sampler_state_test.dart' as sampler_state_test;
@@ -56,6 +58,7 @@ void main() {
     group('DepthState tests', depth_state_test.main);
     group('FrontFace tests', front_face_test.main);
     group('GraphicsContext tests', graphics_context_test.main);
+    group('PrimitiveType tests', primitive_type_test.main);
     group('RasterizerState tests', rasterizer_state_test.main);
     group('SamplerState tests', sampler_state_test.main);
     group('SurfaceFormat tests', surface_format_test.main);

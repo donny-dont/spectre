@@ -133,4 +133,12 @@ class GraphicsDevice {
         'WebGLFrontBuffer',
         this);
   }
+
+  void _createMesh(Mesh mesh) {
+
+  }
+
+  void _deleteMesh(Mesh mesh) {
+
+  }
 }

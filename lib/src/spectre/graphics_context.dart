@@ -31,7 +31,6 @@ class GraphicsContext {
 
   // Input Assembler
   int _primitiveTopology;
-  IndexBuffer _indexBufferHandle;
   List<VertexBuffer> _vertexBufferHandles;
   List<int> _enabledVertexAttributeArrays;
   InputLayout _inputLayoutHandle;
@@ -69,6 +68,15 @@ class GraphicsContext {
   DepthState _depthState;
   /// The current [RasterizerState] of the pipeline.
   RasterizerState _rasterizerState;
+
+  //---------------------------------------------------------------------
+  // Buffers
+  //---------------------------------------------------------------------
+
+  /// The index buffer to bind to the pipeline.
+  IndexBuffer _indexBuffer;
+  /// The currently bound index buffer.
+  IndexBuffer _boundIndexBuffer;
 
   //---------------------------------------------------------------------
   // Construction
@@ -184,11 +192,15 @@ class GraphicsContext {
       // Remember that this was enabled.
       _enabledVertexAttributeArrays.add(element.attributeIndex);
     });
-    if (_indexBufferHandle != null) {
-      IndexBuffer indexBuffer = _indexBufferHandle;
-      indexBuffer._bind();
-    } else {
-      device.gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, null);
+  }
+
+  /// Prepares the [IndexBuffer] for binding to the pipeline.
+  void _prepareIndexBuffer() {
+    if (_indexBuffer != _boundIndexBuffer) {
+      WebGL.Buffer buffer = (_indexBuffer != null) ? _indexBuffer._deviceBuffer : null;
+      device.gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, buffer);
+
+      _boundIndexBuffer = _indexBuffer;
     }
   }
 
@@ -221,7 +233,7 @@ class GraphicsContext {
     }
     _preparedInputLayoutHandle = null;
     _enabledVertexAttributeArrays.clear();
-    _indexBufferHandle = null;
+    //_indexBufferHandle = null;
     for (int i = 0; i < numVertexBuffers; i++) {
       _vertexBufferHandles[i] = null;
     }
@@ -244,9 +256,9 @@ class GraphicsContext {
     _primitiveTopology = topology;
   }
 
-  /// Set the IndexBuffer to [indexBufferHandle]
-  void setIndexBuffer(IndexBuffer indexBufferHandle) {
-    _indexBufferHandle = indexBufferHandle;
+  /// Sets the [IndexBuffer] to bind to the pipeline.
+  void setIndexBuffer(IndexBuffer indexBuffer) {
+    _indexBuffer = indexBuffer;
   }
 
   /// Set multiple VertexBuffers in [vertexBufferHandles] starting at [startSlot]
@@ -579,6 +591,7 @@ class GraphicsContext {
     }
     _prepareInputs();
     _prepareTextures();
+    _prepareIndexBuffer();
     device.gl.drawElements(_primitiveTopology, numIndices,
                            WebGL.UNSIGNED_SHORT, indexOffset);
   }
@@ -621,6 +634,7 @@ class GraphicsContext {
     }
     _prepareInputs();
     _prepareTextures();
+    _prepareIndexBuffer();
     device.gl.drawArrays(_primitiveTopology, vertexOffset, numVertices);
   }
 }

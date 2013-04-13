@@ -48,7 +48,10 @@ class Mesh extends DeviceChild {
     , _vertexBuffers = vertexBuffers
     , _inputLayout = inputLayout
     , _indexBuffer = indexBuffer
-    , _primitiveType = primitiveType;
+    , _primitiveType = primitiveType
+  {
+    graphicsDevice._createMesh(this);
+  }
 
   //---------------------------------------------------------------------
   // Properties
@@ -65,6 +68,14 @@ class Mesh extends DeviceChild {
 
   // \TODO REMOVE or make better!
   dynamic vertexData;
+
+  //---------------------------------------------------------------------
+  // Public methods
+  //---------------------------------------------------------------------
+
+  void finalize() {
+    super.finalize();
+  }
 }
 
 class SpectreMeshAttribute {
