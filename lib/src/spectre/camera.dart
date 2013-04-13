@@ -80,6 +80,8 @@ class Camera {
 
   void copyNormalMatrixIntoArray(Float32Array nm) {
     mat4 m = makeViewMatrix(position, focusPosition, upDirection);
+    //m.invert();
+    //m.transpose();
     m.copyIntoArray(nm);
   }
 

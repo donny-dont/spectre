@@ -38,6 +38,7 @@ void main()
 	if (lambertFactor > 0.0)
 	{
 		diffuseMaterial = texture2D(uDiffuseSampler, texCoord);
+		diffuseMaterial = vec4(0.6, 0.6, 0.6, 1.0);
 		diffuseLight = kd;
 		
 		// In doom3, specular value comes from a texture 

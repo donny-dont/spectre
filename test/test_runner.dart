@@ -42,32 +42,42 @@ import 'viewport_test.dart' as viewport_test;
 import 'scalar_list_test.dart' as scalar_list_test;
 import 'vector2_list_test.dart' as vector2_list_test;
 import 'vector3_list_test.dart' as vector3_list_test;
+import 'vector4_list_test.dart' as vector4_list_test;
 
 void main() {
   useHtmlEnhancedConfiguration();
 
-  group('Blend tests', blend_test.main);
-  group('BlendOperation tests', blend_operation_test.main);
-  group('BlendState tests', blend_state_test.main);
-  group('CompareFunction tests', compare_function_test.main);
-  group('CullMode tests', cull_mode_test.main);
-  group('DdsFile tests', dds_file_test.main);
-  group('DepthState tests', depth_state_test.main);
-  group('FrontFace tests', front_face_test.main);
-  group('GraphicsContext tests', graphics_context_test.main);
-  group('Material tests', material_test.main);
-  group('RasterizerState tests', rasterizer_state_test.main);
-  group('Renderer tests', renderer_test.main);
-  group('SamplerState tests', sampler_state_test.main);
-  group('SurfaceFormat tests', surface_format_test.main);
-  group('TextureAddressMode tests', texture_address_mode_test.main);
-  group('TextureMagFilter tests', texture_mag_filter_test.main);
-  group('TextureMinFilter tests', texture_min_filter_test.main);
-  group('Viewport tests', viewport_test.main);
+  group('Spectre Library:', () {
+    group('Blend tests', blend_test.main);
+    group('BlendOperation tests', blend_operation_test.main);
+    group('BlendState tests', blend_state_test.main);
+    group('CompareFunction tests', compare_function_test.main);
+    group('CullMode tests', cull_mode_test.main);
+    group('DepthState tests', depth_state_test.main);
+    group('FrontFace tests', front_face_test.main);
+    group('GraphicsContext tests', graphics_context_test.main);
+    group('RasterizerState tests', rasterizer_state_test.main);
+    group('SamplerState tests', sampler_state_test.main);
+    group('SurfaceFormat tests', surface_format_test.main);
+    group('TextureAddressMode tests', texture_address_mode_test.main);
+    group('TextureMagFilter tests', texture_mag_filter_test.main);
+    group('TextureMinFilter tests', texture_min_filter_test.main);
+    group('Viewport tests', viewport_test.main);
+  });
+
+  group('Spectre Asset Pack Library:', () {
+    group('DdsFile tests', dds_file_test.main);
+  });
 
   group('Spectre Mesh Library:', () {
     group('ScalarList tests', scalar_list_test.main);
     group('Vector2List tests', vector2_list_test.main);
     group('Vector3List tests', vector3_list_test.main);
+    group('Vector4List tests', vector4_list_test.main);
+  });
+
+  group('Spectre Renderer Library:', () {
+    group('Material tests', material_test.main);
+    group('Renderer tests', renderer_test.main);
   });
 }

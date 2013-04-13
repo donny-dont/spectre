@@ -68,6 +68,7 @@ class SimpleGeometryScreen extends DemoScreen {
   Mesh _boxMesh;
   Mesh _sphereMesh;
   Mesh _cylinderMesh;
+  Mesh _planeMesh;
 
   SamplerState _samplerState;
   Texture2D _diffuseTexture;
@@ -145,6 +146,9 @@ class SimpleGeometryScreen extends DemoScreen {
   void _createMesh() {
     _debugDrawManager = new DebugDrawManager(_graphicsDevice);
 
+    // Create a plane mesh
+    _planeMesh = _createPlaneMesh();
+
     // Create a box mesh
     _boxMesh = _createBoxMesh();
 
@@ -166,6 +170,32 @@ class SimpleGeometryScreen extends DemoScreen {
     _samplerState = new SamplerState.linearClamp('SamplerState', _graphicsDevice);
   }
 
+  /// Creates a plane mesh for display.
+  Mesh _createPlaneMesh() {
+    // A box mesh can be created through a BoxGenerator.
+    //
+    // There are helper methods that can be used when creating a single mesh.
+    // When creating a large number of boxes a BoxGenerator should be created and
+    // used to create all the boxes.
+    //
+    // Create a unit cube centered at the origin.
+    vec2 extents = new vec2.raw(1.0, 1.0);
+    vec3 center  = new vec3.raw(0.0, 1.5, 0.0);
+
+    Mesh mesh = PlaneGenerator.createPlane(
+        'PlaneGeometry',
+        _graphicsDevice,
+        _createElements(),
+        extents: extents,
+        doubleSided: true,
+        center: center
+    );
+
+    _debugMesh(mesh);
+
+    return mesh;
+  }
+
   /// Creates a box mesh for display.
   Mesh _createBoxMesh() {
     // A box mesh can be created through a BoxGenerator.
@@ -178,23 +208,15 @@ class SimpleGeometryScreen extends DemoScreen {
     vec3 extents = new vec3.raw(1.0, 1.0, 1.0);
     vec3 center  = new vec3.raw(0.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
+    Mesh mesh = BoxGenerator.createBox(
+        'BoxGeometry',
+        _graphicsDevice,
+        _createElements(),
+        extents: extents,
+        center: center
+    );
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
-
-    Mesh mesh = BoxGenerator.createBox('BoxGeometry', _graphicsDevice, elements, extents, center);
-
-    Vector3Array positions = mesh.vertexData.elements['vPosition'];
-    Vector3Array normals = mesh.vertexData.elements['vNormal'];
-    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
-    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
-
-    debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
-    debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
+    _debugMesh(mesh);
 
     return mesh;
   }
@@ -211,23 +233,16 @@ class SimpleGeometryScreen extends DemoScreen {
     num radius = 0.5;
     vec3 center  = new vec3.raw(2.0, 0.0, 0.0);
 
-    InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
-    InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
+    Mesh mesh = SphereGenerator.createSphere(
+        'SphereGeometry',
+        _graphicsDevice,
+        _createElements(),
+        radius: radius,
+        latSegments: 32,
+        lonSegments: 32,
+        center: center);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
-
-    Mesh mesh = SphereGenerator.createSphere('SphereGeometry', _graphicsDevice, elements, radius, center);
-
-    Vector3Array positions = mesh.vertexData.elements['vPosition'];
-    Vector3Array normals = mesh.vertexData.elements['vNormal'];
-    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
-    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
-
-    debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
-    debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
+    _debugMesh(mesh);
 
     return mesh;
   }
@@ -246,25 +261,39 @@ class SimpleGeometryScreen extends DemoScreen {
     num height = 1.0;
     vec3 center  = new vec3.raw(-2.0, 0.0, 0.0);
 
+    Mesh mesh = CylinderGenerator.createCylinder(
+        'CylinderGeometry',
+        _graphicsDevice,
+        _createElements(),
+        topRadius: topRadius,
+        bottomRadius: bottomRadius,
+        height: height,
+        center: center
+    );
+
+    _debugMesh(mesh);
+
+    return mesh;
+  }
+
+  List<InputLayoutElement> _createElements() {
     InputLayoutElement positionElement = new InputLayoutElement(0, 2,  0, 56, GraphicsDevice.DeviceFormatFloat3);
     InputLayoutElement normalElement   = new InputLayoutElement(0, 1, 12, 56, GraphicsDevice.DeviceFormatFloat3);
     InputLayoutElement tangentElement  = new InputLayoutElement(0, 3, 24, 56, GraphicsDevice.DeviceFormatFloat3);
     InputLayoutElement binormalElement = new InputLayoutElement(0, 0, 36, 56, GraphicsDevice.DeviceFormatFloat3);
     InputLayoutElement texCoordElement = new InputLayoutElement(0, 4, 48, 56, GraphicsDevice.DeviceFormatFloat2);
 
-    List<InputLayoutElement> elements = [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
+    return [positionElement, normalElement, tangentElement, binormalElement, texCoordElement];
+  }
 
-    Mesh mesh = CylinderGenerator.createCylinder('CylinderGeometry', _graphicsDevice, elements, topRadius, bottomRadius, height, center);
-
-    Vector3Array positions = mesh.vertexData.elements['vPosition'];
-    Vector3Array normals = mesh.vertexData.elements['vNormal'];
-    Vector3Array tangents = mesh.vertexData.elements['vTangent'];
-    Vector3Array bitangents = mesh.vertexData.elements['vBitangent'];
+  void _debugMesh(Mesh mesh) {
+    Vector3List positions = mesh.vertexData.elements['vPosition'];
+    Vector3List normals = mesh.vertexData.elements['vNormal'];
+    Vector3List tangents = mesh.vertexData.elements['vTangent'];
+    Vector3List bitangents = mesh.vertexData.elements['vBitangent'];
 
     debugDrawMeshNormals(_debugDrawManager, positions, normals, new mat4.identity());
     debugDrawMeshTangents(_debugDrawManager, positions, tangents, bitangents, new mat4.identity());
-
-    return mesh;
   }
 
   //---------------------------------------------------------------------
@@ -408,6 +437,10 @@ class SimpleGeometryScreen extends DemoScreen {
 
     _graphicsContext.setSamplers(0, [ _samplerState, _samplerState ]);
     _graphicsContext.setTextures(0, [ _diffuseTexture, _normalTexture ]);
+
+    // Set and draw the plane mesh
+    _graphicsContext.setMeshNew(_planeMesh);
+    _graphicsContext.drawMeshNew(_planeMesh);
 
     // Set and draw the box mesh
     _graphicsContext.setMeshNew(_boxMesh);

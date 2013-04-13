@@ -17,7 +17,6 @@
   2. Altered source versions must be plainly marked as such, and must not be
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
-
 */
 
 library spectre_mesh;
@@ -28,18 +27,18 @@ import 'spectre.dart';
 import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
 
-part 'src/spectre_mesh/arrays.dart';
 part 'src/spectre_mesh/box_generator.dart';
 part 'src/spectre_mesh/cylinder_generator.dart';
 part 'src/spectre_mesh/debug_draw_mesh.dart';
 part 'src/spectre_mesh/mesh_generator.dart';
 part 'src/spectre_mesh/normal_data_builder.dart';
 part 'src/spectre_mesh/plane_generator.dart';
-part 'src/spectre_mesh/tangent_space_builder.dart';
-part 'src/spectre_mesh/vertex_data.dart';
-part 'src/spectre_mesh/vertex_data_builder.dart';
 part 'src/spectre_mesh/scalar_list.dart';
 part 'src/spectre_mesh/sphere_generator.dart';
 part 'src/spectre_mesh/strided_list.dart';
+part 'src/spectre_mesh/tangent_space_builder.dart';
 part 'src/spectre_mesh/vector2_list.dart';
 part 'src/spectre_mesh/vector3_list.dart';
+part 'src/spectre_mesh/vector4_list.dart';
+part 'src/spectre_mesh/vertex_data.dart';
+part 'src/spectre_mesh/vertex_data_builder.dart';

@@ -43,17 +43,17 @@ class PrimitiveType {
   //---------------------------------------------------------------------
 
   /// String representation of [PointList].
-  static const int PointList = WebGLRenderingContext.POINTS;
+  static const int PointList = WebGL.POINTS;
   /// String representation of [LineList].
-  static const int LineList = WebGLRenderingContext.LINES;
+  static const int LineList = WebGL.LINES;
   /// String representation of [LineStrip].
-  static const int LineStrip = WebGLRenderingContext.LINE_STRIP;
+  static const int LineStrip = WebGL.LINE_STRIP;
   /// String representation of [TriangleList].
-  static const int TriangleList = WebGLRenderingContext.TRIANGLES;
+  static const int TriangleList = WebGL.TRIANGLES;
   /// String representation of [TriangleStrip].
-  static const int TriangleStrip = WebGLRenderingContext.TRIANGLE_STRIP;
+  static const int TriangleStrip = WebGL.TRIANGLE_STRIP;
   ///
-  static const int TriangleFan = WebGLRenderingContext.TRIANGLE_FAN;
+  static const int TriangleFan = WebGL.TRIANGLE_FAN;
 
   //---------------------------------------------------------------------
   // Class methods

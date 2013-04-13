@@ -18,7 +18,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-library vector2_list_test;
+library vector4_list_test;
 
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_mesh.dart';
@@ -37,29 +37,31 @@ Float32Array createSequentialList(int count) {
 }
 
 void main() {
-  const int elementCount = 2;
-  const int bytesPerElement = Vector2List.BYTES_PER_ELEMENT;
+  const int elementCount = 4;
+  const int bytesPerElement = Vector4List.BYTES_PER_ELEMENT;
 
   test('no stride', () {
-    const int size = 2048;
+    const int size = 4096;
     const int listSize = size ~/ elementCount;
 
     Float32Array test = createSequentialList(size);
-    Vector2List list = new Vector2List.view(test.buffer);
+    Vector4List list = new Vector4List.view(test.buffer);
 
     expect(list.length, listSize);
 
     int testIndex = 0;
     for (int i = 0; i < listSize; ++i) {
-      vec2 element = list[i];
+      vec4 element = list[i];
 
       expect(element.x, test[testIndex++]);
       expect(element.y, test[testIndex++]);
+      expect(element.z, test[testIndex++]);
+      expect(element.w, test[testIndex++]);
     }
   });
 
   test('stride and offset', () {
-    const int size = 2048;
+    const int size = 4096;
     const int listSize = size ~/ elementCount;
 
     Float32Array test = createSequentialList(size);
@@ -69,15 +71,18 @@ void main() {
       int length = size ~/ (k * elementCount);
 
       for (int j = 0; j < k; ++j) {
-        Vector2List list = new Vector2List.view(array, j * bytesPerElement, k * bytesPerElement);
+        Vector4List list = new Vector4List.view(array, j * bytesPerElement, k * bytesPerElement);
 
         expect(list.length, length);
 
         for (int i = 0; i < length; ++i) {
-          vec2 value = list[i];
+          vec4 value = list[i];
           int testIndex = elementCount * ((k * i) + j);
+
           expect(value.x, test[testIndex++]);
-          expect(value.y, test[testIndex]);
+          expect(value.y, test[testIndex++]);
+          expect(value.z, test[testIndex++]);
+          expect(value.w, test[testIndex]);
         }
       }
     }

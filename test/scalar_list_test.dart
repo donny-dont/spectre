@@ -22,10 +22,11 @@ library scalar_list_test;
 
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_mesh.dart';
-import 'dart:scalarlist';
+import 'dart:typeddata';
+import 'dart:html';
 
-Float32List createSequentialList(int count) {
-  Float32List list = new Float32List(count);
+Float32Array createSequentialList(int count) {
+  Float32Array list = new Float32Array(count);
 
   for (int i = 0; i < count; ++i) {
     list[i] = i.toDouble();
@@ -38,8 +39,8 @@ void main() {
   test('no stride', () {
     const int size = 1024;
 
-    Float32List test = createSequentialList(size);
-    ScalarList list = new ScalarList.view(test.asByteArray());
+    Float32Array test = createSequentialList(size);
+    ScalarList list = new ScalarList.view(test.buffer);
 
     expect(list.length, test.length);
 
@@ -51,8 +52,8 @@ void main() {
   test('stride and offset', () {
     const int size = 1024;
 
-    Float32List test = createSequentialList(size);
-    ByteArray array = test.asByteArray();
+    Float32Array test = createSequentialList(size);
+    ArrayBuffer array = test.buffer;
 
     for (int k = 1; k < size; ++k) {
       int length = size ~/ k;

@@ -21,11 +21,11 @@
 part of spectre_mesh;
 
 class VertexData {
-  Map<String, VertexArray> _elements;
+  Map<String, StridedList> _elements;
   int _vertexCount;
 
   VertexData(Float32Array array, List<InputLayoutElement> elements) {
-    _elements = new Map<String, VertexArray>();
+    _elements = new Map<String, StridedList>();
 
     for (InputLayoutElement element in elements) {
       int count  = element.attributeFormat.count;
@@ -34,13 +34,13 @@ class VertexData {
 
       _vertexCount = array.length ~/ (stride >> 2);
 
-      VertexArray vertexArray;
+      StridedList stridedList;
 
       switch (count) {
-        case 1:  vertexArray = new Vector2Array.fromArray(array, offset, stride); break;
-        case 2:  vertexArray = new Vector2Array.fromArray(array, offset, stride); break;
-        case 3:  vertexArray = new Vector3Array.fromArray(array, offset, stride); break;
-        default: vertexArray = new Vector4Array.fromArray(array, offset, stride); break;
+        case 1:  stridedList = new  ScalarList.view(array.buffer, offset, stride); break;
+        case 2:  stridedList = new Vector2List.view(array.buffer, offset, stride); break;
+        case 3:  stridedList = new Vector3List.view(array.buffer, offset, stride); break;
+        default: stridedList = new Vector4List.view(array.buffer, offset, stride); break;
       }
 
       String elementName;
@@ -55,11 +55,11 @@ class VertexData {
       }
 
       //print('$elementName $count');
-      _elements[elementName] = vertexArray;
+      _elements[elementName] = stridedList;
     }
   }
 
-  Map<String, VertexArray> get elements => _elements;
+  Map<String, StridedList> get elements => _elements;
 
   int get vertexCount => _vertexCount;
 }

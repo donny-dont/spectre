@@ -36,7 +36,7 @@ class NormalDataBuilder {
   ///
   /// It is also assumed that the values within [normals] are all set to (0, 0, 0). If this
   /// is not the case the values within [normals] will be incorrect.
-  static void build(Vector3Array positions, Vector3Array normals, Uint16Array indices, [int vertexOffset = 0, int vertexCount, int indexOffset = 0, int indexCount]) {
+  static void build(Vector3List positions, Vector3List normals, Uint16Array indices, [int vertexOffset = 0, int vertexCount, int indexOffset = 0, int indexCount]) {
     // Temporary variables
     vec3 v0 = new vec3();
     vec3 v1 = new vec3();
