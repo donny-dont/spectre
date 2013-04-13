@@ -25,6 +25,8 @@ import 'dart:web_gl' as WebGL;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/mock.dart';
 
+class MockWebGLBuffer implements WebGL.Buffer { }
+
 class MockWebGLRenderingContext extends Mock implements WebGL.RenderingContext {
   MockWebGLRenderingContext() {
     when(callsTo('enable')).alwaysReturn(null);
