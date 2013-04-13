@@ -8,7 +8,7 @@ dependencies:
   asset_pack:
     git: https://github.com/johnmccutchan/asset_pack.git
   vector_math:
-    git: https://github.com/johnmccutchan/DartVectorMath.git
+    git: https://github.com/johnmccutchan/vector_math.git
 dev_dependencies:
   unittest: any
   browser: any
