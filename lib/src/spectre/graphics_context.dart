@@ -275,7 +275,7 @@ class GraphicsContext {
   }
 
   /// Sets a [VertexBuffer] to use on the pipeline at the specified [index].
-  void setVertexBuffer(VertexBuffer vertexBuffer, int index) {
+  void setVertexBuffer(int index, VertexBuffer vertexBuffer) {
     if (index >= _vertexBuffers.length) {
       throw new ArgumentError('Cannot bind to the requested index');
     }
@@ -315,7 +315,7 @@ class GraphicsContext {
     }
     setPrimitiveType(indexedMesh.primitiveTopology);
     setIndexBuffer(indexedMesh.indexArray);
-    setVertexBuffer(indexedMesh.vertexArray, 0);
+    setVertexBuffer(0, indexedMesh.vertexArray);
   }
 
   void setMesh(SingleArrayMesh mesh) {
@@ -324,7 +324,7 @@ class GraphicsContext {
     }
     setPrimitiveType(mesh.primitiveTopology);
     setIndexBuffer(null);
-    setVertexBuffer(mesh.vertexArray, 0);
+    setVertexBuffer(0, mesh.vertexArray);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
