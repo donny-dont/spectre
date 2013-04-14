@@ -218,7 +218,7 @@ void _drawSkinnedCharacter() {
   context.setRasterizerState(_skinnedRasterizerState);
   context.setDepthState(_skinnedDepthState);
   context.setIndexBuffer(_skinnedMesh.indexArray);
-  context.setVertexBuffers(_skinnedMesh.vertexArray);
+  context.setVertexBuffer(_skinnedMesh.vertexArray, 0);
   context.setInputLayout(_skinnedInputLayout);
 
   context.setTextures(0, [_assetManager['demoAssets.hellknight_body']]);
