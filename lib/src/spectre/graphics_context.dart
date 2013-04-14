@@ -71,6 +71,8 @@ class GraphicsContext {
 
   /// The [PrimitiveType] held in the buffers.
   int _primitiveType = PrimitiveType.TriangleList;
+  /// The currently bound vertex buffer.
+  VertexBuffer _boundVertexBuffer;
   /// The index buffer to bind to the pipeline.
   IndexBuffer _indexBuffer;
   /// The currently bound index buffer.

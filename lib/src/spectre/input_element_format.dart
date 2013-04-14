@@ -20,38 +20,38 @@
 
 part of spectre;
 
-class VertexElementFormat {
+class InputElementFormat {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------
 
   /// String representation of [Scalar].
-  static const String _scalarName = 'VertexElementFormat.Scalar';
+  static const String _scalarName = 'InputElementFormat.Scalar';
   /// String representation of [Vector2].
-  static const String _vector2Name = 'VertexElementFormat.Vector2';
+  static const String _vector2Name = 'InputElementFormat.Vector2';
   /// String representation of [Vector3].
-  static const String _vector3Name = 'VertexElementFormat.Vector3';
+  static const String _vector3Name = 'InputElementFormat.Vector3';
   /// String representation of [Vector4].
-  static const String _vector4Name = 'VertexElementFormat.Vector4';
+  static const String _vector4Name = 'InputElementFormat.Vector4';
 
   //---------------------------------------------------------------------
   // Enumerations
   //---------------------------------------------------------------------
 
   /// Single-component, 32-bit floating-point element.
-  static const int Scalar = 0;
+  static const int Scalar = 1;
   /// Two-component, 32-bit floating-point element.
-  static const int Vector2 = 1;
+  static const int Vector2 = 2;
   /// Three-component, 32-bit floating-point element.
-  static const int Vector3 = 2;
+  static const int Vector3 = 3;
   /// Three-component, 32-bit floating-point element.
-  static const int Vector4 = 3;
+  static const int Vector4 = 4;
 
   //---------------------------------------------------------------------
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [VertexElementFormat] enumeration.
+  /// Convert from a [String] name to the corresponding [InputElementFormat] enumeration.
   static int parse(String name) {
     switch (name) {
       case _scalarName : return Scalar;
@@ -64,7 +64,7 @@ class VertexElementFormat {
     return Scalar;
   }
 
-  /// Converts the [VertexElementFormat] enumeration to a [String].
+  /// Converts the [InputElementFormat] enumeration to a [String].
   static String stringify(int value) {
     switch (value) {
       case Scalar : return _scalarName;

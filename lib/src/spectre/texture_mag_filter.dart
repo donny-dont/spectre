@@ -60,10 +60,9 @@ class TextureMagFilter {
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [TextureMinFilter] enumeration.
+  /// Convert from a [String] name to the corresponding [TextureMagFilter] enumeration.
   static int parse(String name) {
     switch (name) {
-
       case _linearName         : return Linear;
       case _pointName          : return Point;
       case _pointMipPointName  : return PointMipPoint;
@@ -76,7 +75,7 @@ class TextureMagFilter {
     return Linear;
   }
 
-  /// Converts the [TextureMinFilter] enumeration to a [String].
+  /// Converts the [TextureMagFilter] enumeration to a [String].
   static String stringify(int value) {
     switch (value) {
       case Linear         : return _linearName;

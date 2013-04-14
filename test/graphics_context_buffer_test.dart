@@ -20,6 +20,10 @@
 
 part of graphics_context_test;
 
+//---------------------------------------------------------------------
+// GraphicsContext testing utility functions
+//---------------------------------------------------------------------
+
 void testInputLayouts() {
 
 }

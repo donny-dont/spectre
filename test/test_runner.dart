@@ -21,6 +21,10 @@
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';
 
+//---------------------------------------------------------------------
+// Spectre library tests
+//---------------------------------------------------------------------
+
 import 'blend_test.dart' as blend_test;
 import 'blend_operation_test.dart' as blend_operation_test;
 import 'blend_state_test.dart' as blend_state_test;
@@ -30,10 +34,10 @@ import 'dds_file_test.dart' as dds_file_test;
 import 'depth_state_test.dart' as depth_state_test;
 import 'front_face_test.dart' as front_face_test;
 import 'graphics_context_test.dart' as graphics_context_test;
-import 'material_test.dart' as material_test;
+import 'input_element_format_test.dart' as input_element_format_test;
+import 'input_element_usage_test.dart' as input_element_usage_test;
 import 'primitive_type_test.dart' as primitive_type_test;
 import 'rasterizer_state_test.dart' as rasterizer_state_test;
-import 'renderer_test.dart' as renderer_test;
 import 'sampler_state_test.dart' as sampler_state_test;
 import 'surface_format_test.dart' as surface_format_test;
 import 'texture_address_mode_test.dart' as texture_address_mode_test;
@@ -41,10 +45,21 @@ import 'texture_mag_filter_test.dart' as texture_mag_filter_test;
 import 'texture_min_filter_test.dart' as texture_min_filter_test;
 import 'viewport_test.dart' as viewport_test;
 
+//---------------------------------------------------------------------
+// Spectre mesh library tests
+//---------------------------------------------------------------------
+
 import 'scalar_list_test.dart' as scalar_list_test;
 import 'vector2_list_test.dart' as vector2_list_test;
 import 'vector3_list_test.dart' as vector3_list_test;
 import 'vector4_list_test.dart' as vector4_list_test;
+
+//---------------------------------------------------------------------
+// Spectre renderer library tests
+//---------------------------------------------------------------------
+
+import 'material_test.dart' as material_test;
+import 'renderer_test.dart' as renderer_test;
 
 void main() {
   useHtmlEnhancedConfiguration();
@@ -58,6 +73,8 @@ void main() {
     group('DepthState tests', depth_state_test.main);
     group('FrontFace tests', front_face_test.main);
     group('GraphicsContext tests', graphics_context_test.main);
+    group('InputElementFormat tests', input_element_format_test.main);
+    group('InputElementUsage tests', input_element_usage_test.main);
     group('PrimitiveType tests', primitive_type_test.main);
     group('RasterizerState tests', rasterizer_state_test.main);
     group('SamplerState tests', sampler_state_test.main);
