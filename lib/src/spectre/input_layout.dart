@@ -30,7 +30,7 @@ class InputLayoutElement {
                      this.attributeStride, this.attributeFormat);
 }
 */
-class InputLayout extends DeviceChild {
+class InputLayout extends GraphicsResource {
   final List<InputLayoutElement> elements = new List<InputLayoutElement>();
   /** A list of shader program attributes the mesh does not have. If this
    * list has any elements the input layout will not be [ready].

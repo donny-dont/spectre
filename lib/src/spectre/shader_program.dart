@@ -69,7 +69,7 @@ typedef UniformSetFunction(device, location, argument);
  * [ImmediateContext.setShaderProgram].
  *
  */
-class ShaderProgram extends DeviceChild {
+class ShaderProgram extends GraphicsResource {
   final Map<String, ShaderProgramUniform> uniforms =
       new Map<String, ShaderProgramUniform>();
   final Map<String, ShaderProgramAttribute> attributes =

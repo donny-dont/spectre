@@ -20,7 +20,7 @@
 
 part of spectre;
 
-class SpectreTexture extends DeviceChild {
+class SpectreTexture extends GraphicsResource {
   //static const int FormatR = WebGL.RED;
   //static const int FormatRG = WebGL.RG;
   static const int FormatRGB = WebGL.RGB;

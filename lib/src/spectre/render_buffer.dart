@@ -23,7 +23,7 @@ part of spectre;
 /** A [RenderBuffer] represents the storage for either a color, depth,
  * or stencil buffer render target attachment.
  */
-class RenderBuffer extends DeviceChild {
+class RenderBuffer extends GraphicsResource {
   static const int FormatRGB = WebGL.RGB565;
   static const int FormatRGBA = WebGL.RGBA4;
   static const int FormatDepth = WebGL.DEPTH_COMPONENT16;

@@ -20,7 +20,7 @@
 
 part of spectre;
 
-class SpectreShader extends DeviceChild {
+class SpectreShader extends GraphicsResource {
   final int _type;
   String _source = '';
   WebGL.Shader _shader;

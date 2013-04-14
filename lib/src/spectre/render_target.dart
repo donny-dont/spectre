@@ -26,16 +26,16 @@ part of spectre;
  * NOTE: To output into the system provided render target see
  * [RenderTarget.systemRenderTarget]
  */
-class RenderTarget extends DeviceChild {
+class RenderTarget extends GraphicsResource {
   final int _bindTarget = WebGL.FRAMEBUFFER;
   final int _bindingParam = WebGL.FRAMEBUFFER_BINDING;
 
   WebGL.Framebuffer _deviceFramebuffer;
-  DeviceChild _colorTarget;
-  DeviceChild _depthTarget;
-  DeviceChild get colorTarget => _colorTarget;
-  DeviceChild get depthTarget => _depthTarget;
-  DeviceChild get stencilTarget => null;
+  GraphicsResource _colorTarget;
+  GraphicsResource _depthTarget;
+  GraphicsResource get colorTarget => _colorTarget;
+  GraphicsResource get depthTarget => _depthTarget;
+  GraphicsResource get stencilTarget => null;
 
   static RenderTarget _systemRenderTarget;
   /** System provided rendering target */

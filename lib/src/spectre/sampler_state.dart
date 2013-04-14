@@ -21,7 +21,7 @@
 part of spectre;
 
 /// Contains sampler state, which determines how to sample texture data.
-class SamplerState extends DeviceChild {
+class SamplerState extends GraphicsResource {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------

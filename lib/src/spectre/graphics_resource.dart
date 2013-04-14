@@ -20,14 +20,13 @@
 
 part of spectre;
 
-/// A resource created by a device
-/// All resources have a [name]
-abstract class DeviceChild extends Disposable {
+/// A resource created by a [GraphicsDevice].
+abstract class GraphicsResource extends Disposable {
   final GraphicsDevice device;
   final String name;
   String toString() => name;
 
-  DeviceChild._internal(this.name, this.device) {
+  GraphicsResource._internal(this.name, this.device) {
     if (device == null) {
       throw new ArgumentError('device cannot be null');
     }

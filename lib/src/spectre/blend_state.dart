@@ -23,7 +23,7 @@ part of spectre;
 /// BlendState controls how output from your fragment shader is blended onto the framebuffer
 /// Create using [Device.createBlendState]
 /// Set using [ImmediateContext.setBlendState]
-class BlendState extends DeviceChild {
+class BlendState extends GraphicsResource {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------

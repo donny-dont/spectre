@@ -20,7 +20,7 @@
 
 part of spectre;
 
-class StencilState extends DeviceChild {
+class StencilState extends GraphicsResource {
   StencilState(String name, GraphicsDevice device)
       : super._internal(name, device);
 }

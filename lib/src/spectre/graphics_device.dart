@@ -72,7 +72,7 @@ class GraphicsDevice {
   ///
   /// Used to keep track of the resources created through the [GraphicsDevice].
   /// Each resource is referred to by its name.
-  final Set<DeviceChild> children = new Set<DeviceChild>();
+  final Set<GraphicsResource> children = new Set<GraphicsResource>();
 
   //---------------------------------------------------------------------
   // Construction
@@ -155,14 +155,14 @@ class GraphicsDevice {
   // GraphicsResource methods
   //---------------------------------------------------------------------
 
-  void _addChild(DeviceChild child) {
+  void _addChild(GraphicsResource child) {
     if (children.contains(child)) {
       throw new StateError('$child is already registered.');
     }
     children.add(child);
   }
 
-  void _removeChild(DeviceChild child) {
+  void _removeChild(GraphicsResource child) {
     if (children.contains(child) == false) {
       throw new StateError('$child is not registered');
     }

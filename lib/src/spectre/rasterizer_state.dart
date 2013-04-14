@@ -23,7 +23,7 @@ part of spectre;
 /// RasterizerState controls how the GPU rasterizer functions including primitive culling and width of rasterized lines
 /// Create using [Device.createRasterizerState]
 /// Set using [ImmediateContext.setRasterizerState]
-class RasterizerState extends DeviceChild {
+class RasterizerState extends GraphicsResource {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------

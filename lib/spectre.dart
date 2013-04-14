@@ -32,7 +32,6 @@ import 'dart:typeddata';
 import 'package:vector_math/vector_math.dart';
 import 'package:spectre/disposable.dart';
 
-part 'src/spectre/device_child.dart';
 part 'src/spectre/blend.dart';
 part 'src/spectre/blend_operation.dart';
 part 'src/spectre/blend_state.dart';
@@ -50,6 +49,7 @@ part 'src/spectre/graphics_context.dart';
 part 'src/spectre/graphics_device.dart';
 part 'src/spectre/graphics_device_capabilities.dart';
 part 'src/spectre/graphics_device_config.dart';
+part 'src/spectre/graphics_resource.dart';
 part 'src/spectre/index_buffer.dart';
 part 'src/spectre/input_layout.dart';
 part 'src/spectre/input_layout_element.dart';

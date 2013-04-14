@@ -23,7 +23,7 @@ part of spectre;
 /// The window dimensions of a render-target surface onto which a 3D volume projects.
 /// Create using [Device.createViewport]
 /// Set using [ImmediateContext.setViewport]
-class Viewport extends DeviceChild {
+class Viewport extends GraphicsResource {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------

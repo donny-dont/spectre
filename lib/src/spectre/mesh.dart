@@ -23,9 +23,10 @@ part of spectre;
 /// A container for mesh data.
 ///
 /// Made up of a [VertexBuffer], [InputLayout], [PrimitiveType], and optionally
-/// an [IndexBuffer]. Whenever possible prefer creating a [Mesh] and setting this
-/// to the [GraphicsContext] rather than setting each of the components individually.
-class Mesh extends DeviceChild {
+/// an [IndexBuffer]. Whenever possible prefer creating a [Mesh] and setting
+/// this to the [GraphicsContext] rather than setting each of the components
+/// individually.
+class Mesh extends GraphicsResource {
   //---------------------------------------------------------------------
   // Member variables
   //---------------------------------------------------------------------
@@ -108,7 +109,7 @@ class SpectreMeshAttribute {
   String toString() => '$name $componentType$componentCount $offset $stride';
 }
 
-abstract class SpectreMesh extends DeviceChild {
+abstract class SpectreMesh extends GraphicsResource {
   final Map<String, SpectreMeshAttribute> attributes =
       new Map<String, SpectreMeshAttribute>();
   int count = 0;

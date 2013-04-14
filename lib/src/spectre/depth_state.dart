@@ -23,7 +23,7 @@ part of spectre;
 /// Contains depth state for the device.
 /// Create using [Device.createDepthState]
 /// Set using [ImmediateContext.setDepthState]
-class DepthState extends DeviceChild {
+class DepthState extends GraphicsResource {
   //---------------------------------------------------------------------
   // Serialization names
   //---------------------------------------------------------------------

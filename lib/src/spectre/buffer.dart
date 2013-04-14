@@ -24,7 +24,7 @@ part of spectre;
  * A [SpectreBuffer] can only be constructed by constructing an [IndexBuffer]
  * or a [VertexBuffer].
  */
-class SpectreBuffer extends DeviceChild {
+class SpectreBuffer extends GraphicsResource {
   /** Hint that buffer data is used once and then discarded. */
   static const UsageStream = WebGL.STREAM_DRAW;
   /** Hint that buffer data is used few times and then discarded. */
