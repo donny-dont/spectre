@@ -22,12 +22,11 @@ part of spectre;
 
 /// The [GraphicsContext] configures the GPU pipeline and executes draw commands.
 class GraphicsContext {
-  static final int numVertexBuffers = 2;
   static final int numTextures = 3;
   final GraphicsDevice device;
 
   // Input Assembler
-  List<VertexBuffer> _vertexBufferHandles;
+  List<VertexBuffer> _vertexBuffers;
   List<int> _enabledVertexAttributeArrays;
   InputLayout _inputLayoutHandle;
   InputLayout _preparedInputLayoutHandle;
@@ -83,10 +82,18 @@ class GraphicsContext {
   //---------------------------------------------------------------------
 
   GraphicsContext(this.device) {
-    _vertexBufferHandles = new List<VertexBuffer>(numVertexBuffers);
     _samplerStateHandles = new List<SamplerState>(numTextures);
     _textureHandles = new List<SpectreTexture>(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
+
+    GraphicsDeviceCapabilities capabilities = device.capabilities;
+
+    // Create the array of vertex buffers to bind using the number of vertex
+    // attributes available. While unlikely it's possible that each attribute
+    // could be bound to a separate vertex buffer.
+    int maxVertexAttribs = capabilities.maxVertexAttribs;
+
+    _vertexBuffers = new List<VertexBuffer>(maxVertexAttribs);
 
     _initializeState();
     reset();
@@ -112,7 +119,10 @@ class GraphicsContext {
       _blendState.alphaSourceBlend,
       _blendState.alphaDestinationBlend
     );
-    device.gl.blendEquationSeparate(_blendState.colorBlendOperation, _blendState.alphaBlendOperation);
+    device.gl.blendEquationSeparate(
+        _blendState.colorBlendOperation,
+        _blendState.alphaBlendOperation
+    );
     device.gl.colorMask(
       _blendState.writeRenderTargetRed,
       _blendState.writeRenderTargetGreen,
@@ -143,7 +153,10 @@ class GraphicsContext {
     device.gl.frontFace(_rasterizerState.frontFace);
 
     device.gl.disable(WebGL.POLYGON_OFFSET_FILL);
-    device.gl.polygonOffset(_rasterizerState.depthBias, _rasterizerState.slopeScaleDepthBias);
+    device.gl.polygonOffset(
+        _rasterizerState.depthBias,
+        _rasterizerState.slopeScaleDepthBias
+    );
 
     device.gl.disable(WebGL.SCISSOR_TEST);
   }
@@ -176,7 +189,7 @@ class GraphicsContext {
     _enabledVertexAttributeArrays.clear();
 
     inputLayout.elements.forEach((element) {
-      VertexBuffer vb = _vertexBufferHandles[element.vboSlot];
+      VertexBuffer vb = _vertexBuffers[element.vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
         return;
@@ -197,7 +210,9 @@ class GraphicsContext {
   /// Prepares the [IndexBuffer] for binding to the pipeline.
   void _prepareIndexBuffer() {
     if (_indexBuffer != _boundIndexBuffer) {
-      WebGL.Buffer buffer = (_indexBuffer != null) ? _indexBuffer._deviceBuffer : null;
+      WebGL.Buffer buffer = (_indexBuffer != null) ? _indexBuffer._deviceBuffer
+                                                   : null;
+
       device.gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, buffer);
 
       _boundIndexBuffer = _indexBuffer;
@@ -233,9 +248,9 @@ class GraphicsContext {
     }
     _preparedInputLayoutHandle = null;
     _enabledVertexAttributeArrays.clear();
-    //_indexBufferHandle = null;
-    for (int i = 0; i < numVertexBuffers; i++) {
-      _vertexBufferHandles[i] = null;
+    _indexBuffer = null;
+    for (int i = 0; i < _vertexBuffers.length; i++) {
+      _vertexBuffers[i] = null;
     }
     _inputLayoutHandle = null;
     _shaderProgramHandle = null;
@@ -261,20 +276,33 @@ class GraphicsContext {
     _indexBuffer = indexBuffer;
   }
 
+  /// Sets a [VertexBuffer] to use on the pipeline at the specified [index].
+  void setVertexBuffer(VertexBuffer vertexBuffer, int index) {
+    if (index >= _vertexBuffers.length) {
+      throw new ArgumentError('Cannot bind to the requested index');
+    }
+
+    _vertexBuffers[index] = vertexBuffer;
+  }
+
   /// Sets the [VertexBuffer]s to use on the pipeline.
   ///
-  /// The value in [vertexBuffers] can refer to a a list of [VertexBuffer]s or a
-  /// single [VertexBuffer]. An [offset] can also be specified.
-  void setVertexBuffers(dynamic vertexBuffers, [int offset = 0]) {
-    if (vertexBuffers is List<VertexBuffer>) {
-      int limit = vertexBuffers.length + offset;
-      for (int i = offset; i < limit; i++) {
-        _vertexBufferHandles[i] = vertexBuffers[i - offset];
-      }
-    } else if (vertexBuffers is VertexBuffer) {
-      _vertexBufferHandles[offset] = vertexBuffers;
-    } else {
-      throw new ArgumentError('The value of vertexBuffers is not a List or VertexBuffer');
+  /// This call will unbind any vertex buffers that were previously bound to
+  /// the pipeline.
+  void setVertexBuffers(List<VertexBuffer> vertexBuffers) {
+    int bufferCount = vertexBuffers.length;
+    int maxBufferCount = _vertexBuffers.length;
+
+    if (bufferCount > maxBufferCount) {
+      throw new ArgumentError('Cannot bind all the provided vertex buffers');
+    }
+
+    for (int i = 0; i < bufferCount; ++i) {
+      _vertexBuffers[i] = vertexBuffers[i];
+    }
+
+    for (int i = bufferCount; i < maxBufferCount; ++i) {
+      _vertexBuffers[i] = null;
     }
   }
 
@@ -289,7 +317,7 @@ class GraphicsContext {
     }
     setPrimitiveType(indexedMesh.primitiveTopology);
     setIndexBuffer(indexedMesh.indexArray);
-    setVertexBuffers(indexedMesh.vertexArray);
+    setVertexBuffer(indexedMesh.vertexArray, 0);
   }
 
   void setMesh(SingleArrayMesh mesh) {
@@ -298,7 +326,7 @@ class GraphicsContext {
     }
     setPrimitiveType(mesh.primitiveTopology);
     setIndexBuffer(null);
-    setVertexBuffers(mesh.vertexArray);
+    setVertexBuffer(mesh.vertexArray, 0);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
@@ -330,7 +358,9 @@ class GraphicsContext {
       _viewport.height = viewport.height;
     }
 
-    if ((_viewport.minDepth != viewport.minDepth) || (_viewport.maxDepth != viewport.maxDepth)) {
+    if ((_viewport.minDepth != viewport.minDepth) ||
+        (_viewport.maxDepth != viewport.maxDepth))
+    {
       device.gl.depthRange(viewport.minDepth, viewport.maxDepth);
 
       _viewport.minDepth = viewport.minDepth;
@@ -340,8 +370,8 @@ class GraphicsContext {
 
   /// Sets the current [BlendState] to use on the pipeline.
   ///
-  /// If [blendState] is null all values of the pipeline associated with blending
-  /// will be reset to their defaults.
+  /// If [blendState] is null all values of the pipeline associated with
+  /// blending will be reset to their defaults.
   void setBlendState(BlendState blendState) {
     if (blendState == null) {
       setBlendState(_blendStateDefault);
@@ -403,7 +433,10 @@ class GraphicsContext {
       if ((_blendState.colorBlendOperation != blendState.colorBlendOperation) ||
           (_blendState.alphaBlendOperation != blendState.alphaBlendOperation))
       {
-        device.gl.blendEquationSeparate(blendState.colorBlendOperation, blendState.alphaBlendOperation);
+        device.gl.blendEquationSeparate(
+            blendState.colorBlendOperation,
+            blendState.alphaBlendOperation
+        );
 
         _blendState.colorBlendOperation = blendState.colorBlendOperation;
         _blendState.alphaBlendOperation = blendState.alphaBlendOperation;
@@ -449,7 +482,9 @@ class GraphicsContext {
       _depthState.depthBufferEnabled = depthState.depthBufferEnabled;
     }
 
-    if ((_depthState.depthBufferEnabled) && (_depthState.depthBufferFunction != depthState.depthBufferFunction)) {
+    if ((_depthState.depthBufferEnabled) &&
+        (_depthState.depthBufferFunction != depthState.depthBufferFunction))
+    {
       device.gl.depthFunc(depthState.depthBufferFunction);
 
       _depthState.depthBufferFunction = depthState.depthBufferFunction;
@@ -500,9 +535,10 @@ class GraphicsContext {
       }
     }
 
-    bool offsetEnabled = ((_rasterizerState.depthBias != 0.0) || (_rasterizerState.slopeScaleDepthBias != 0.0));
+    bool offsetEnabled = ((_rasterizerState.depthBias != 0.0) ||
+                          (_rasterizerState.slopeScaleDepthBias != 0.0));
 
-    if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0)) {
+    if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0.0)) {
       // Enable polygon offset
       if (!offsetEnabled) {
         device.gl.enable(WebGL.POLYGON_OFFSET_FILL);
@@ -512,7 +548,10 @@ class GraphicsContext {
       if ((_rasterizerState.depthBias           != rasterizerState.depthBias) ||
           (_rasterizerState.slopeScaleDepthBias != rasterizerState.slopeScaleDepthBias))
       {
-        device.gl.polygonOffset(rasterizerState.depthBias, rasterizerState.slopeScaleDepthBias);
+        device.gl.polygonOffset(
+            rasterizerState.depthBias,
+            rasterizerState.slopeScaleDepthBias
+        );
 
         _rasterizerState.depthBias           = rasterizerState.depthBias;
         _rasterizerState.slopeScaleDepthBias = rasterizerState.slopeScaleDepthBias;

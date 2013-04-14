@@ -470,7 +470,7 @@ class Application {
     // Each submesh is contained within the same vertex buffer object and index
     // buffer object. This means the VBO and IBO only needs to be set once
     SkinnedMesh mesh = _meshes[_meshIndex];
-    _graphicsContext.setVertexBuffers(mesh.vertexArray);
+    _graphicsContext.setVertexBuffer(mesh.vertexArray, 0);
     _graphicsContext.setIndexBuffer(mesh.indexArray);
     _graphicsContext.setInputLayout(_inputLayout);
     _graphicsContext.setPrimitiveType(PrimitiveType.TriangleList);
