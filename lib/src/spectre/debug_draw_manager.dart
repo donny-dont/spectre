@@ -142,7 +142,7 @@ class _DebugDrawLineManager {
     }
     _vboStorage = new Float32Array(maxVertices*DebugDrawVertexSize);
     _lineMesh = new SingleArrayMesh('_DebugDrawLineManager', device);
-    _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
+    _lineMesh.primitiveTopology = PrimitiveType.LineList;
     _lineMesh.vertexArray.allocate(_vboStorage.length*4,
                                    SpectreBuffer.UsageDynamic);
     _lineMesh.attributes['vPosition'] = new SpectreMeshAttribute('vPosition',

@@ -22,15 +22,11 @@ part of spectre;
 
 /// The [GraphicsContext] configures the GPU pipeline and executes draw commands.
 class GraphicsContext {
-  static final int PrimitiveTopologyTriangles = WebGL.TRIANGLES;
-  static final int PrimitiveTopologyLines = WebGL.LINES;
-  static final int PrimitiveTopologyPoints = WebGL.POINTS;
   static final int numVertexBuffers = 2;
   static final int numTextures = 3;
   final GraphicsDevice device;
 
   // Input Assembler
-  int _primitiveTopology;
   List<VertexBuffer> _vertexBufferHandles;
   List<int> _enabledVertexAttributeArrays;
   InputLayout _inputLayoutHandle;
@@ -73,6 +69,8 @@ class GraphicsContext {
   // Buffers
   //---------------------------------------------------------------------
 
+  /// The [PrimitiveType] held in the buffers.
+  int _primitiveType = PrimitiveType.TriangleList;
   /// The index buffer to bind to the pipeline.
   IndexBuffer _indexBuffer;
   /// The currently bound index buffer.
@@ -224,7 +222,7 @@ class GraphicsContext {
   /// Resets the cached GPU pipeline state
   void reset() {
     // TODO: Update GPU state
-    _primitiveTopology = 0;
+    _primitiveType = PrimitiveType.TriangleList;
     for (int index in _enabledVertexAttributeArrays) {
       if (index == 0) {
         continue;
@@ -251,9 +249,9 @@ class GraphicsContext {
     setRasterizerState(_rasterizerStateDefault);
   }
 
-  /// Configure the primitive type
-  void setPrimitiveTopology(int topology) {
-    _primitiveTopology = topology;
+  /// Configure the primitive type to draw.
+  void setPrimitiveType(int primitiveType) {
+    _primitiveType = primitiveType;
   }
 
   /// Sets the [IndexBuffer] to bind to the pipeline.
@@ -287,7 +285,7 @@ class GraphicsContext {
     if (indexedMesh == null) {
       return;
     }
-    setPrimitiveTopology(indexedMesh.primitiveTopology);
+    setPrimitiveType(indexedMesh.primitiveTopology);
     setIndexBuffer(indexedMesh.indexArray);
     setVertexBuffers(indexedMesh.vertexArray);
   }
@@ -296,7 +294,7 @@ class GraphicsContext {
     if (mesh == null) {
       return;
     }
-    setPrimitiveTopology(mesh.primitiveTopology);
+    setPrimitiveType(mesh.primitiveTopology);
     setIndexBuffer(null);
     setVertexBuffers(mesh.vertexArray);
   }
@@ -601,7 +599,7 @@ class GraphicsContext {
     _prepareInputs();
     _prepareTextures();
     _prepareIndexBuffer();
-    device.gl.drawElements(_primitiveTopology, numIndices,
+    device.gl.drawElements(_primitiveType, numIndices,
                            WebGL.UNSIGNED_SHORT, indexOffset);
   }
 
@@ -621,7 +619,7 @@ class GraphicsContext {
 
   void setMeshNew(Mesh mesh) {
     // \TODO Cache this information, VAO?
-    setPrimitiveTopology(mesh.primitiveType);
+    setPrimitiveType(mesh.primitiveType);
     setInputLayout(mesh.inputLayout);
     setIndexBuffer(mesh.indexBuffer);
     setVertexBuffers(mesh.vertexBuffers);
@@ -644,6 +642,6 @@ class GraphicsContext {
     _prepareInputs();
     _prepareTextures();
     _prepareIndexBuffer();
-    device.gl.drawArrays(_primitiveTopology, vertexOffset, numVertices);
+    device.gl.drawArrays(_primitiveType, vertexOffset, numVertices);
   }
 }

@@ -236,7 +236,7 @@ Float32Array _cameraTransform = new Float32Array(16);
 void _drawSkybox() {
   var context = graphicsDevice.context;
   context.setInputLayout(_skyboxInputLayout);
-  context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
+  context.setPrimitiveType(PrimitiveType.TriangleList);
   context.setShaderProgram(_skyboxShaderProgram);
   context.setTextures(0, [assetManager['demoAssets.space']]);
   context.setSamplers(0, [_skyboxSampler]);

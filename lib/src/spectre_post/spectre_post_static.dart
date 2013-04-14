@@ -233,8 +233,7 @@ void main() {
     // FIXME: Make the following dynamic:
     //_device.context.setUniform2f('texScale', 0.833, 0.46875);
     _device.context.setConstant('texScale', [1.0, 1.0]);
-    _device.context.setPrimitiveTopology(
-        GraphicsContext.PrimitiveTopologyTriangles);
+    _device.context.setPrimitiveType(PrimitiveType.TriangleList);
     _device.context.setRenderTarget(renderTargetHandle);
     _device.context.draw(6, 0);
   }
