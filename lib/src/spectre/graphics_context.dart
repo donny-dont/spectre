@@ -251,7 +251,7 @@ class GraphicsContext {
     setRasterizerState(_rasterizerStateDefault);
   }
 
-  /// Configure the primitive topology
+  /// Configure the primitive type
   void setPrimitiveTopology(int topology) {
     _primitiveTopology = topology;
   }
@@ -261,11 +261,20 @@ class GraphicsContext {
     _indexBuffer = indexBuffer;
   }
 
-  /// Set multiple VertexBuffers in [vertexBufferHandles] starting at [startSlot]
-  void setVertexBuffers(int startSlot, List<VertexBuffer> vertexBufferHandles) {
-    int limit = vertexBufferHandles.length + startSlot;
-    for (int i = startSlot; i < limit; i++) {
-      _vertexBufferHandles[i] = vertexBufferHandles[i-startSlot];
+  /// Sets the [VertexBuffer]s to use on the pipeline.
+  ///
+  /// The value in [vertexBuffers] can refer to a a list of [VertexBuffer]s or a
+  /// single [VertexBuffer]. An [offset] can also be specified.
+  void setVertexBuffers(dynamic vertexBuffers, [int offset = 0]) {
+    if (vertexBuffers is List<VertexBuffer>) {
+      int limit = vertexBuffers.length + offset;
+      for (int i = offset; i < limit; i++) {
+        _vertexBufferHandles[i] = vertexBuffers[i - offset];
+      }
+    } else if (vertexBuffers is VertexBuffer) {
+      _vertexBufferHandles[offset] = vertexBuffers;
+    } else {
+      throw new ArgumentError('The value of vertexBuffers is not a List or VertexBuffer');
     }
   }
 
@@ -280,7 +289,7 @@ class GraphicsContext {
     }
     setPrimitiveTopology(indexedMesh.primitiveTopology);
     setIndexBuffer(indexedMesh.indexArray);
-    setVertexBuffers(0, [indexedMesh.vertexArray]);
+    setVertexBuffers(indexedMesh.vertexArray);
   }
 
   void setMesh(SingleArrayMesh mesh) {
@@ -289,7 +298,7 @@ class GraphicsContext {
     }
     setPrimitiveTopology(mesh.primitiveTopology);
     setIndexBuffer(null);
-    setVertexBuffers(0, [mesh.vertexArray]);
+    setVertexBuffers(mesh.vertexArray);
   }
 
   /// Set ShaderProgram to [shaderProgramHandle]
@@ -615,7 +624,7 @@ class GraphicsContext {
     setPrimitiveTopology(mesh.primitiveType);
     setInputLayout(mesh.inputLayout);
     setIndexBuffer(mesh.indexBuffer);
-    setVertexBuffers(0, mesh.vertexBuffers);
+    setVertexBuffers(mesh.vertexBuffers);
   }
 
   void drawMeshNew(Mesh mesh) {

@@ -225,7 +225,7 @@ void main() {
       return;
     }
     pass.setup(_device, arguments);
-    _device.context.setVertexBuffers(0, [_arrayMesh.vertexArray]);
+    _device.context.setVertexBuffers(_arrayMesh.vertexArray);
     _device.context.setIndexBuffer(null);
     _device.context.setRasterizerState(_rasterizerState);
     _device.context.setDepthState(_depthState);
