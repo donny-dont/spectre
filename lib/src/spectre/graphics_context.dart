@@ -38,6 +38,17 @@ class GraphicsContext {
   RenderTarget _renderTargetHandle;
 
   //---------------------------------------------------------------------
+  // WebGL variables
+  //---------------------------------------------------------------------
+
+  /// The [WebGL.RenderingContext] to use.
+  WebGL.RenderingContext _gl;
+  /// The [WebGL.OesVertexArrayObject] extension.
+  ///
+  /// Used to interact with vertex array objects.
+  WebGL.OesVertexArrayObject _vao;
+
+  //---------------------------------------------------------------------
   // Default variables
   //---------------------------------------------------------------------
 
@@ -82,6 +93,9 @@ class GraphicsContext {
   //---------------------------------------------------------------------
 
   GraphicsContext(this.device) {
+    _gl  = device._gl;
+    _vao = device._vao;
+
     _samplerStateHandles = new List<SamplerState>(numTextures);
     _textureHandles = new List<SpectreTexture>(numTextures);
     _enabledVertexAttributeArrays = new List<int>();
@@ -105,31 +119,31 @@ class GraphicsContext {
     // Viewport setup
     _viewport = new Viewport('ViewportDefault', device);
 
-    device.gl.viewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height);
-    device.gl.depthRange(_viewport.minDepth, _viewport.maxDepth);
+    _gl.viewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height);
+    _gl.depthRange(_viewport.minDepth, _viewport.maxDepth);
 
     // BlendState setup
     _blendStateDefault = new BlendState.opaque('BlendStateDefault', device);
     _blendState = new BlendState.opaque('CurrentBlendState', device);
 
-    device.gl.disable(WebGL.BLEND);
-    device.gl.blendFuncSeparate(
+    _gl.disable(WebGL.BLEND);
+    _gl.blendFuncSeparate(
       _blendState.colorSourceBlend,
       _blendState.colorDestinationBlend,
       _blendState.alphaSourceBlend,
       _blendState.alphaDestinationBlend
     );
-    device.gl.blendEquationSeparate(
+    _gl.blendEquationSeparate(
         _blendState.colorBlendOperation,
         _blendState.alphaBlendOperation
     );
-    device.gl.colorMask(
+    _gl.colorMask(
       _blendState.writeRenderTargetRed,
       _blendState.writeRenderTargetGreen,
       _blendState.writeRenderTargetBlue,
       _blendState.writeRenderTargetAlpha
     );
-    device.gl.blendColor(
+    _gl.blendColor(
       _blendState.blendFactorRed,
       _blendState.blendFactorGreen,
       _blendState.blendFactorBlue,
@@ -140,25 +154,25 @@ class GraphicsContext {
     _depthStateDefault = new DepthState.depthWrite('DepthStateDefault', device);
     _depthState = new DepthState.depthWrite('CurrentDepthState', device);
 
-    device.gl.enable(WebGL.DEPTH_TEST);
-    device.gl.depthMask(_depthState.depthBufferWriteEnabled);
-    device.gl.depthFunc(_depthState.depthBufferFunction);
+    _gl.enable(WebGL.DEPTH_TEST);
+    _gl.depthMask(_depthState.depthBufferWriteEnabled);
+    _gl.depthFunc(_depthState.depthBufferFunction);
 
     // RasterizerState setup
     _rasterizerStateDefault = new RasterizerState.cullClockwise('RasterizerStateDefault', device);
     _rasterizerState = new RasterizerState.cullClockwise('CurrentRasterizerState', device);
 
-    device.gl.enable(WebGL.CULL_FACE);
-    device.gl.cullFace(_rasterizerState.cullMode);
-    device.gl.frontFace(_rasterizerState.frontFace);
+    _gl.enable(WebGL.CULL_FACE);
+    _gl.cullFace(_rasterizerState.cullMode);
+    _gl.frontFace(_rasterizerState.frontFace);
 
-    device.gl.disable(WebGL.POLYGON_OFFSET_FILL);
-    device.gl.polygonOffset(
+    _gl.disable(WebGL.POLYGON_OFFSET_FILL);
+    _gl.polygonOffset(
         _rasterizerState.depthBias,
         _rasterizerState.slopeScaleDepthBias
     );
 
-    device.gl.disable(WebGL.SCISSOR_TEST);
+    _gl.disable(WebGL.SCISSOR_TEST);
   }
 
   void _prepareInputs({bool debug: false}) {
@@ -184,7 +198,7 @@ class GraphicsContext {
       if (index == 0) {
         continue;
       }
-      device.gl.disableVertexAttribArray(index);
+      _gl.disableVertexAttribArray(index);
     }
     _enabledVertexAttributeArrays.clear();
 
@@ -194,9 +208,9 @@ class GraphicsContext {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
         return;
       }
-      device.gl.enableVertexAttribArray(element.attributeIndex);
+      _gl.enableVertexAttribArray(element.attributeIndex);
       vb._bind();
-      device.gl.vertexAttribPointer(element.attributeIndex,
+      _gl.vertexAttribPointer(element.attributeIndex,
         element.attributeFormat.count,
         element.attributeFormat.type,
         element.attributeFormat.normalized,
@@ -213,7 +227,7 @@ class GraphicsContext {
       WebGL.Buffer buffer = (_indexBuffer != null) ? _indexBuffer._deviceBuffer
                                                    : null;
 
-      device.gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, buffer);
+      _gl.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, buffer);
 
       _boundIndexBuffer = _indexBuffer;
     }
@@ -224,9 +238,9 @@ class GraphicsContext {
     for (int i = 0; i < numTextures; i++) {
       SamplerState sampler = _samplerStateHandles[i];
       SpectreTexture texture = _textureHandles[i];
-      device.gl.activeTexture(WebGL.TEXTURE0 + i);
-      device.gl.bindTexture(WebGL.TEXTURE_2D, null);
-      device.gl.bindTexture(WebGL.TEXTURE_CUBE_MAP, null);
+      _gl.activeTexture(WebGL.TEXTURE0 + i);
+      _gl.bindTexture(WebGL.TEXTURE_2D, null);
+      _gl.bindTexture(WebGL.TEXTURE_CUBE_MAP, null);
       if (sampler == null || texture == null) {
         continue;
       }
@@ -244,7 +258,7 @@ class GraphicsContext {
       if (index == 0) {
         continue;
       }
-      device.gl.disableVertexAttribArray(index);
+      _gl.disableVertexAttribArray(index);
     }
     _preparedInputLayoutHandle = null;
     _enabledVertexAttributeArrays.clear();
@@ -336,7 +350,7 @@ class GraphicsContext {
     }
     _shaderProgramHandle = shaderProgramHandle;
     ShaderProgram sp = shaderProgramHandle;
-    device.gl.useProgram(sp._program);
+    _gl.useProgram(sp._program);
   }
 
   /// Sets a [Viewport] identifying the portion of the render target to receive draw calls.
@@ -350,7 +364,7 @@ class GraphicsContext {
         (_viewport.width  != viewport.width) ||
         (_viewport.height != viewport.height))
     {
-      device.gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+      _gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
 
       _viewport.x      = viewport.x;
       _viewport.y      = viewport.y;
@@ -361,7 +375,7 @@ class GraphicsContext {
     if ((_viewport.minDepth != viewport.minDepth) ||
         (_viewport.maxDepth != viewport.maxDepth))
     {
-      device.gl.depthRange(viewport.minDepth, viewport.maxDepth);
+      _gl.depthRange(viewport.minDepth, viewport.maxDepth);
 
       _viewport.minDepth = viewport.minDepth;
       _viewport.maxDepth = viewport.maxDepth;
@@ -381,9 +395,9 @@ class GraphicsContext {
     // Disable/Enable blending if necessary
     if (_blendState.enabled != blendState.enabled) {
       if (blendState.enabled) {
-        device.gl.enable(WebGL.BLEND);
+        _gl.enable(WebGL.BLEND);
       } else {
-        device.gl.disable(WebGL.BLEND);
+        _gl.disable(WebGL.BLEND);
       }
 
       _blendState.enabled = blendState.enabled;
@@ -395,7 +409,7 @@ class GraphicsContext {
         (_blendState.writeRenderTargetBlue  != blendState.writeRenderTargetBlue)  ||
         (_blendState.writeRenderTargetAlpha != blendState.writeRenderTargetAlpha))
     {
-      device.gl.colorMask(
+      _gl.colorMask(
         blendState.writeRenderTargetRed,
         blendState.writeRenderTargetGreen,
         blendState.writeRenderTargetBlue,
@@ -416,7 +430,7 @@ class GraphicsContext {
           (_blendState.alphaSourceBlend      != blendState.alphaSourceBlend)      ||
           (_blendState.alphaDestinationBlend != blendState.alphaDestinationBlend))
       {
-        device.gl.blendFuncSeparate(
+        _gl.blendFuncSeparate(
           blendState.colorSourceBlend,
           blendState.colorDestinationBlend,
           blendState.alphaSourceBlend,
@@ -433,7 +447,7 @@ class GraphicsContext {
       if ((_blendState.colorBlendOperation != blendState.colorBlendOperation) ||
           (_blendState.alphaBlendOperation != blendState.alphaBlendOperation))
       {
-        device.gl.blendEquationSeparate(
+        _gl.blendEquationSeparate(
             blendState.colorBlendOperation,
             blendState.alphaBlendOperation
         );
@@ -448,7 +462,7 @@ class GraphicsContext {
           (_blendState.blendFactorBlue  != blendState.blendFactorBlue)  ||
           (_blendState.blendFactorAlpha != blendState.blendFactorAlpha))
       {
-        device.gl.blendColor(
+        _gl.blendColor(
           blendState.blendFactorRed,
           blendState.blendFactorGreen,
           blendState.blendFactorBlue,
@@ -474,9 +488,9 @@ class GraphicsContext {
 
     if (_depthState.depthBufferEnabled != depthState.depthBufferEnabled) {
       if (depthState.depthBufferEnabled) {
-        device.gl.enable(WebGL.DEPTH_TEST);
+        _gl.enable(WebGL.DEPTH_TEST);
       } else {
-        device.gl.disable(WebGL.DEPTH_TEST);
+        _gl.disable(WebGL.DEPTH_TEST);
       }
 
       _depthState.depthBufferEnabled = depthState.depthBufferEnabled;
@@ -485,13 +499,13 @@ class GraphicsContext {
     if ((_depthState.depthBufferEnabled) &&
         (_depthState.depthBufferFunction != depthState.depthBufferFunction))
     {
-      device.gl.depthFunc(depthState.depthBufferFunction);
+      _gl.depthFunc(depthState.depthBufferFunction);
 
       _depthState.depthBufferFunction = depthState.depthBufferFunction;
     }
 
     if (_depthState.depthBufferWriteEnabled != depthState.depthBufferWriteEnabled) {
-      device.gl.depthMask(depthState.depthBufferWriteEnabled);
+      _gl.depthMask(depthState.depthBufferWriteEnabled);
 
       _depthState.depthBufferWriteEnabled = depthState.depthBufferWriteEnabled;
     }
@@ -510,11 +524,11 @@ class GraphicsContext {
     // Disable/Enable culling if necessary
     if (_rasterizerState.cullMode != rasterizerState.cullMode) {
       if (rasterizerState.cullMode == CullMode.None) {
-        device.gl.disable(WebGL.CULL_FACE);
+        _gl.disable(WebGL.CULL_FACE);
 
         _rasterizerState.cullMode = rasterizerState.cullMode;
       } else if (_rasterizerState.cullMode == CullMode.None) {
-        device.gl.enable(WebGL.CULL_FACE);
+        _gl.enable(WebGL.CULL_FACE);
       }
     }
 
@@ -522,14 +536,14 @@ class GraphicsContext {
     if (rasterizerState.cullMode != CullMode.None) {
       // Modify the cull mode if necessary
       if (_rasterizerState.cullMode != rasterizerState.cullMode) {
-        device.gl.cullFace(rasterizerState.cullMode);
+        _gl.cullFace(rasterizerState.cullMode);
 
         _rasterizerState.cullMode = rasterizerState.cullMode;
       }
 
       // Modify the front face if necessary
       if (_rasterizerState.frontFace != rasterizerState.frontFace) {
-        device.gl.frontFace(rasterizerState.frontFace);
+        _gl.frontFace(rasterizerState.frontFace);
 
         _rasterizerState.frontFace = rasterizerState.frontFace;
       }
@@ -541,14 +555,14 @@ class GraphicsContext {
     if ((rasterizerState.depthBias != 0.0) || (rasterizerState.slopeScaleDepthBias != 0.0)) {
       // Enable polygon offset
       if (!offsetEnabled) {
-        device.gl.enable(WebGL.POLYGON_OFFSET_FILL);
+        _gl.enable(WebGL.POLYGON_OFFSET_FILL);
       }
 
       // Modify the polygon offset if necessary
       if ((_rasterizerState.depthBias           != rasterizerState.depthBias) ||
           (_rasterizerState.slopeScaleDepthBias != rasterizerState.slopeScaleDepthBias))
       {
-        device.gl.polygonOffset(
+        _gl.polygonOffset(
             rasterizerState.depthBias,
             rasterizerState.slopeScaleDepthBias
         );
@@ -559,7 +573,7 @@ class GraphicsContext {
     } else {
       // Disable polygon offset
       if (offsetEnabled) {
-        device.gl.disable(WebGL.POLYGON_OFFSET_FILL);
+        _gl.disable(WebGL.POLYGON_OFFSET_FILL);
 
         _rasterizerState.depthBias           = rasterizerState.depthBias;
         _rasterizerState.slopeScaleDepthBias = rasterizerState.slopeScaleDepthBias;
@@ -569,9 +583,9 @@ class GraphicsContext {
     // Disable/Enable scissor test if necessary
     if (_rasterizerState.scissorTestEnabled != rasterizerState.scissorTestEnabled) {
       if (rasterizerState.scissorTestEnabled) {
-        device.gl.enable(WebGL.SCISSOR_TEST);
+        _gl.enable(WebGL.SCISSOR_TEST);
       } else {
-        device.gl.disable(WebGL.SCISSOR_TEST);
+        _gl.disable(WebGL.SCISSOR_TEST);
       }
 
       _rasterizerState.scissorTestEnabled = rasterizerState.scissorTestEnabled;
@@ -604,18 +618,18 @@ class GraphicsContext {
   }
 
   void clearColorBuffer(num r, num g, num b, num a) {
-    device.gl.clearColor(r, g, b, a);
-    device.gl.clear(WebGL.COLOR_BUFFER_BIT);
+    _gl.clearColor(r, g, b, a);
+    _gl.clear(WebGL.COLOR_BUFFER_BIT);
   }
 
   void clearDepthBuffer(num depth) {
-    device.gl.clearDepth(depth);
-    device.gl.clear(WebGL.DEPTH_BUFFER_BIT);
+    _gl.clearDepth(depth);
+    _gl.clear(WebGL.DEPTH_BUFFER_BIT);
   }
 
   void clearStencilBuffer(int stencil) {
-    device.gl.clearStencil(stencil);
-    device.gl.clear(WebGL.STENCIL_BUFFER_BIT);
+    _gl.clearStencil(stencil);
+    _gl.clear(WebGL.STENCIL_BUFFER_BIT);
   }
 
   /// Sets a list of [textureHandles] starting at [texUnitOffset]
@@ -640,7 +654,7 @@ class GraphicsContext {
     _prepareInputs();
     _prepareTextures();
     _prepareIndexBuffer();
-    device.gl.drawElements(_primitiveType, numIndices,
+    _gl.drawElements(_primitiveType, numIndices,
                            WebGL.UNSIGNED_SHORT, indexOffset);
   }
 
@@ -683,6 +697,6 @@ class GraphicsContext {
     _prepareInputs();
     _prepareTextures();
     _prepareIndexBuffer();
-    device.gl.drawArrays(_primitiveType, vertexOffset, numVertices);
+    _gl.drawArrays(_primitiveType, vertexOffset, numVertices);
   }
 }
