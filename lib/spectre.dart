@@ -52,6 +52,7 @@ part 'src/spectre/graphics_device_capabilities.dart';
 part 'src/spectre/graphics_device_config.dart';
 part 'src/spectre/index_buffer.dart';
 part 'src/spectre/input_layout.dart';
+part 'src/spectre/input_layout_element.dart';
 part 'src/spectre/input_element_format.dart';
 part 'src/spectre/input_element_usage.dart';
 part 'src/spectre/logger.dart';

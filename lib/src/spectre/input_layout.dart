@@ -19,7 +19,7 @@
 */
 
 part of spectre;
-
+/*
 class InputLayoutElement {
   final int vboSlot;
    int attributeIndex;
@@ -29,7 +29,7 @@ class InputLayoutElement {
   InputLayoutElement(this.vboSlot, this.attributeIndex, this.attributeOffset,
                      this.attributeStride, this.attributeFormat);
 }
-
+*/
 class InputLayout extends DeviceChild {
   final List<InputLayoutElement> elements = new List<InputLayoutElement>();
   /** A list of shader program attributes the mesh does not have. If this
