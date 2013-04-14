@@ -120,6 +120,9 @@ class GraphicsDevice {
   // Properties
   //---------------------------------------------------------------------
 
+  // \TODO: REMOVE
+  WebGL.RenderingContext get gl => _gl;
+
   /// The [GraphicsContext] associated with the device.
   ///
   /// This functions as an immediate context meaning all calls are sent directly
@@ -128,7 +131,7 @@ class GraphicsDevice {
 
   /// The [GraphicsDeviceCapabilites] describing what GPU features are
   /// available.
-  GraphicsDeviceCapabilities capabilities => _capabilities;
+  GraphicsDeviceCapabilities get capabilities => _capabilities;
 
   /// The width of the drawing surface.
   int get surfaceWidth => _surface.width;
@@ -170,4 +173,15 @@ class GraphicsDevice {
   // Creation methods
   //---------------------------------------------------------------------
 
+  void _createMesh(Mesh mesh) {
+    if (_vao != null) {
+      print('Can create VAO!');
+    }
+  }
+
+  void _destroyMesh(Mesh mesh) {
+    if (_vao != null) {
+
+    }
+  }
 }
