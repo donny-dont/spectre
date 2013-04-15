@@ -76,6 +76,8 @@ class Mesh extends GraphicsResource {
 
   void finalize() {
     super.finalize();
+
+    device._destroyMesh(this);
   }
 }
 

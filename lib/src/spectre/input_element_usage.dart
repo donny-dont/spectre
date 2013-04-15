@@ -26,20 +26,20 @@ class InputElementUsage {
   // Serialization names
   //---------------------------------------------------------------------
 
-  /// String representation of [Binormal].
-  static const String _binormalName = 'InputElementUsage.Binormal';
-  /// String representation of [Color].
-  static const String _colorName = 'InputElementUsage.Color';
-  /// String representation of [Normal].
-  static const String _normalName = 'InputElementUsage.Normal';
-  /// String representation of [PointSize].
-  static const String _pointSizeName = 'InputElementUsage.PointSize';
   /// String representation of [Position].
   static const String _positionName = 'InputElementUsage.Position';
+  /// String representation of [Normal].
+  static const String _normalName = 'InputElementUsage.Normal';
   /// String representation of [Tangent].
   static const String _tangentName = 'InputElementUsage.Tangent';
+  /// String representation of [Binormal].
+  static const String _binormalName = 'InputElementUsage.Binormal';
   /// String representation of [TextureCoordinate].
   static const String _textureCoordinateName = 'InputElementUsage.TextureCoordinate';
+  /// String representation of [Color].
+  static const String _colorName = 'InputElementUsage.Color';
+  /// String representation of [PointSize].
+  static const String _pointSizeName = 'InputElementUsage.PointSize';
 
   //---------------------------------------------------------------------
   // Enumerations

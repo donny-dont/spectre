@@ -30,6 +30,56 @@ class InputLayoutElement {
                      this.attributeStride, this.attributeFormat);
 }
 */
+
+typedef int InputElementToIndex(InputLayoutElement);
+
+class InputLayout extends GraphicsResource {
+  static Map<String, int> defaultSemanticMapping = {
+      'POSITION0': 0,
+      'NORMAL0'  : 1,
+      'TANGENT0' : 2,
+      'BINORMAL0': 3,
+      'TEXCOORD0': 4,
+      'COLOR0'   : 5,
+      'PSIZE0'   : 6,
+      'TEXCOORD1': 7
+  };
+
+  List<InputLayoutElement> _elements;
+
+  InputLayout(String name,
+              GraphicsDevice device,
+              List<InputLayoutElement> elements,
+             [Map<String, int> mapping = defaultSemanticMapping])
+      : super._internal(name, device)
+  {
+    if (elements == null) {
+      throw new ArgumentError('The value of elements cannot be null');
+    }
+
+    int elementCount = elements.length;
+
+    if (elementCount == 0) {
+      throw new ArgumentError('No elements provided');
+    }
+
+    _elements = elements;
+
+    // Determine the attribute index from the mapping.
+    for (int i = 0; elementCount; ++i) {
+      InputLayoutElement element = _elements[i];
+      String semanticName = element._toSemanticName();
+
+      if (!mapping.containsKey(semanticName)) {
+        throw new ArgumentError('An element is not contained in the mapping');
+      }
+
+      element._vertexAttribIndex = mapping[semanticName];
+    }
+  }
+}
+
+/*
 class InputLayout extends GraphicsResource {
   final List<InputLayoutElement> elements = new List<InputLayoutElement>();
   /** A list of shader program attributes the mesh does not have. If this
@@ -98,3 +148,4 @@ class InputLayout extends GraphicsResource {
       : super._internal(name, device) {
   }
 }
+*/

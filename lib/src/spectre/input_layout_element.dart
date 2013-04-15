@@ -31,6 +31,8 @@ class InputLayoutElement {
   int _usageIndex;
   int _format;
   int _usage;
+  /// The actual attribute index within WebGL.
+  int _vertexAttribIndex;
 
   //---------------------------------------------------------------------
   // Construction
@@ -50,4 +52,28 @@ class InputLayoutElement {
   int get format => _format;
   int get usage => _usage;
   int get usageIndex => _usageIndex;
+
+  //---------------------------------------------------------------------
+  // Private methods
+  //---------------------------------------------------------------------
+
+  /// Converts the [InputLayoutElement] to a semantic name.
+  ///
+  /// A semantic name is used to map between the [InputLayout] and the vertex
+  /// attributes used in a [ShaderProgram]. This aligns to DirectX conventions.
+  String _toSemanticName() {
+    String semantic;
+
+    switch (usage) {
+      case InputElementUsage.Position         : semantic = 'POSITION'; break;
+      case InputElementUsage.Normal           : semantic = 'NORMAL'  ; break;
+      case InputElementUsage.Tangent          : semantic = 'TANGENT' ; break;
+      case InputElementUsage.Binormal         : semantic = 'BINORMAL'; break;
+      case InputElementUsage.TextureCoordinate: semantic = 'TEXCOORD'; break;
+      case InputElementUsage.Color            : semantic = 'COLOR'   ; break;
+      case InputElementUsage.PointSize        : semantic = 'PSIZE'   ; break;
+    }
+
+    return '${semantic}${usageIndex}';
+  }
 }
