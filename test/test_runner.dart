@@ -39,9 +39,15 @@ import 'texture_mag_filter_test.dart' as texture_mag_filter_test;
 import 'texture_min_filter_test.dart' as texture_min_filter_test;
 import 'viewport_test.dart' as viewport_test;
 
+import 'spectre_asset_pack/shader_format_test.dart' as shader_format_test;
+import 'spectre_asset_pack/program_format_test.dart' as program_format_test;
+
 void main() {
   useHtmlEnhancedConfiguration();
 
+  group('ShaderFormat tests', shader_format_test.main);
+  group('ProgramFormat tests', program_format_test.main);
+/*
   group('Blend tests', blend_test.main);
   group('BlendOperation tests', blend_operation_test.main);
   group('BlendState tests', blend_state_test.main);
@@ -60,4 +66,5 @@ void main() {
   group('TextureMagFilter tests', texture_mag_filter_test.main);
   group('TextureMinFilter tests', texture_min_filter_test.main);
   group('Viewport tests', viewport_test.main);
+*/
 }

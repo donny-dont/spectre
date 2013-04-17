@@ -36,3 +36,7 @@ part 'src/spectre_asset_pack/mesh.dart';
 part 'src/spectre_asset_pack/shader.dart';
 part 'src/spectre_asset_pack/spectre_asset_pack.dart';
 part 'src/spectre_asset_pack/texture.dart';
+
+part 'src/spectre_asset_pack/formats/opengl_transmission_format.dart';
+part 'src/spectre_asset_pack/formats/program_format.dart';
+part 'src/spectre_asset_pack/formats/shader_format.dart';
