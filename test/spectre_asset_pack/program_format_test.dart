@@ -21,6 +21,7 @@
 library program_format_test;
 
 import 'package:unittest/unittest.dart';
+import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 import 'dart:json' as Json;
 
@@ -33,7 +34,18 @@ String referenceString =
 {
   "name":"referenceProgram",
   "attributes": [
-
+    {
+      "semantic":"POSITION",
+      "symbol":"vPosition"
+    },
+    {
+      "semantic":"COLOR",
+      "symbol":"vColor"
+    },
+    {
+      "semantic":"COLOR_2",
+      "symbol":"vColor2"
+    }
   ],
   "vertexShader":"vertShader",
   "fragmentShader":"fragShader"
@@ -42,6 +54,25 @@ String referenceString =
 
 void verifyReferences(ProgramFormat value) {
   expect(value.name, 'referenceProgram');
+
+  // Test the attributes
+  ProgramAttribute position = value.attributes[0];
+
+  expect(position.symbol    , 'vPosition');
+  expect(position.usage     , InputElementUsage.Position);
+  expect(position.usageIndex, 0);
+
+  ProgramAttribute color0 = value.attributes[1];
+
+  expect(color0.symbol    , 'vColor');
+  expect(color0.usage     , InputElementUsage.Color);
+  expect(color0.usageIndex, 0);
+
+  ProgramAttribute color2 = value.attributes[2];
+
+  expect(color2.symbol    , 'vColor2');
+  expect(color2.usage     , InputElementUsage.Color);
+  expect(color2.usageIndex, 2);
 
   // Test vertex shader
   ShaderFormat vertex = value.vertexShader;
@@ -67,7 +98,26 @@ String sourceString =
 {
   "name":"sourceProgram",
   "attributes": [
-
+    {
+      "semantic":"POSITION",
+      "symbol":"vPosition"
+    },
+    {
+      "semantic":"NORMAL",
+      "symbol":"vNormal"
+    },
+    {
+      "semantic":"TANGENT",
+      "symbol":"vTangent"
+    },
+    {
+      "semantic":"TEXCOORD",
+      "symbol":"vTexCoord0"
+    },
+    {
+      "semantic":"TEXCOORD_1",
+      "symbol":"vTexCoord1"
+    }
   ],
   "vertexShader": {
     "name":"vertShader",
@@ -82,6 +132,37 @@ String sourceString =
 
 void verifySources(ProgramFormat value) {
   expect(value.name, 'sourceProgram');
+
+  // Test the attributes
+  ProgramAttribute position = value.attributes[0];
+
+  expect(position.symbol    , 'vPosition');
+  expect(position.usage     , InputElementUsage.Position);
+  expect(position.usageIndex, 0);
+
+  ProgramAttribute normal = value.attributes[1];
+
+  expect(normal.symbol    , 'vNormal');
+  expect(normal.usage     , InputElementUsage.Normal);
+  expect(normal.usageIndex, 0);
+
+  ProgramAttribute tangent = value.attributes[2];
+
+  expect(tangent.symbol    , 'vTangent');
+  expect(tangent.usage     , InputElementUsage.Tangent);
+  expect(tangent.usageIndex, 0);
+
+  ProgramAttribute texCoord0 = value.attributes[3];
+
+  expect(texCoord0.symbol    , 'vTexCoord0');
+  expect(texCoord0.usage     , InputElementUsage.TextureCoordinate);
+  expect(texCoord0.usageIndex, 0);
+
+  ProgramAttribute texCoord1 = value.attributes[4];
+
+  expect(texCoord1.symbol    , 'vTexCoord1');
+  expect(texCoord1.usage     , InputElementUsage.TextureCoordinate);
+  expect(texCoord1.usageIndex, 1);
 
   // Test vertex shader
   ShaderFormat vertex = value.vertexShader;

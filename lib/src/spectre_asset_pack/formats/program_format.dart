@@ -30,6 +30,11 @@ class ProgramFormat extends OpenGLTransmissionFormat {
   // Member variables
   //---------------------------------------------------------------------
 
+  /// The [ProgramAttribute]s associated with the [ShaderProgram].
+  ///
+  /// The semantics specified allow mapping of an [InputLayoutElement] to a
+  /// specific vertex attribute within the [ShaderProgram].
+  List<ProgramAttribute> _attributes;
   /// The [VertexShader] to attach to the [ShaderProgram].
   ShaderFormat _vertexShader;
   /// The [FragmentShader] to attach to the [ShaderProgram].
@@ -47,6 +52,18 @@ class ProgramFormat extends OpenGLTransmissionFormat {
   ProgramFormat.fromJson(Map json)
       : super._fromJson(json)
   {
+    List attributes = json['attributes'];
+
+    if (attributes == null) {
+      throw new ArgumentError('No attribute data is provided');
+    }
+
+    int attributeCount = attributes.length;
+    _attributes = new List<ProgramAttribute>(attributeCount);
+
+    for (int i = 0; i < attributeCount; ++i) {
+      _attributes[i] = new ProgramAttribute.fromJson(attributes[i]);
+    }
 
     // Parse the shader data
     _vertexShader   = _parseShader(json['vertexShader']);
@@ -71,6 +88,12 @@ class ProgramFormat extends OpenGLTransmissionFormat {
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
+
+  /// The [ProgramAttribute]s associated with the [ShaderProgram].
+  ///
+  /// The semantics specified allow mapping of an [InputLayoutElement] to a
+  /// specific vertex attribute within the [ShaderProgram].
+  List<ProgramAttribute> get attributes => _attributes;
 
   /// The [VertexShader] to attach to the [ShaderProgram].
   ShaderFormat get vertexShader => _vertexShader;
