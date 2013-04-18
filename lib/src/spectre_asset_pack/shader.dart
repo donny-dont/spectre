@@ -38,7 +38,7 @@ class VertexShaderImporter extends AssetImporter {
       print('Compiled vertex shader ${asset.name}: ${vs.compileLog}');
 
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(VertexShader imported) {
@@ -64,7 +64,7 @@ class FragmentShaderImporter extends AssetImporter {
       fs.compile();
       print('Compiled fragment shader ${asset.name}: ${fs.compileLog}');
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(FragmentShader imported) {
@@ -85,7 +85,7 @@ class _TextListLoader extends AssetLoader {
       try {
         parsed = JSON.parse(text);
       } catch (e) {
-        return new Future.immediate(null);
+        return new Future.value(null);
       }
       List<Future<String>> futureTexts = new List();
       parsed.forEach((String textSrc) {
@@ -139,7 +139,7 @@ class ShaderProgramImporter extends AssetImporter {
         sp.link();
       }
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(ShaderProgram imported) {
