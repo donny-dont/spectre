@@ -116,7 +116,7 @@ class MeshImporter extends AssetImporter {
         }
       } catch (_) {}
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(SpectreMesh imported) {

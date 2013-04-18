@@ -41,7 +41,7 @@ class Tex2DImporter extends AssetImporter {
       // logic. For now, always generate them.
       asset.imported.generateMipmap();
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(dynamic imported) {
@@ -82,7 +82,7 @@ class TexCubeImporter extends AssetImporter {
         texCube.generateMipmap();
       }
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(dynamic imported) {
@@ -102,7 +102,7 @@ class _ImagePackLoader extends AssetLoader {
       try {
         parsed = JSON.parse(text);
       } catch (e) {
-        return new Future.immediate(null);
+        return new Future.value(null);
       }
       var futureImages = new List<Future<ImageElement>>();
       parsed.forEach((String imgSrc) {
