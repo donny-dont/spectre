@@ -65,7 +65,7 @@ class MeshImporter extends AssetImporter {
     return mesh;
   }
 
-  SpectreMesh _processMeshes(Asset asset, List meshes) {
+  SpectreMesh _processMeshes(Asset asset, List meshes, AssetPackTrace tracer) {
     final String name = asset.name;
     SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
     var vertexArray = new Float32Array.fromList(meshes[0]['vertices']);
@@ -94,7 +94,7 @@ class MeshImporter extends AssetImporter {
     assert(false);
   }
 
-  Future<Asset> import(dynamic payload, Asset asset) {
+  Future<Asset> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload is String) {
       try {
         Map parsed = JSON.parse(payload);
@@ -114,9 +114,11 @@ class MeshImporter extends AssetImporter {
         if (mesh != null) {
           asset.imported = mesh;
         }
-      } catch (_) {}
+      } on FormatException catch (e) {
+        tracer.assetImportError(asset, e.message);
+      }
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(SpectreMesh imported) {
