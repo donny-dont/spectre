@@ -3,7 +3,7 @@
     "loadArguments":{},
     "name":"normalMapShader",
     "url":"/normal_map.shader",
-    "type":"shaderProgram",
+    "type":"gltfShaderProgram",
     "importArguments":{}
   },
   "config":{
