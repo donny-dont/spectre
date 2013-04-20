@@ -89,24 +89,24 @@ void renderFrame(GameLoop gameLoop) {
   renderer.render(layers, renderables, camera);
 
   // Add three lines, one for each axis.
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(10.0, 0.0, 0.0),
-                           new vec4.raw(1.0, 0.0, 0.0, 1.0));
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(0.0, 10.0, 0.0),
-                           new vec4.raw(0.0, 1.0, 0.0, 1.0));
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(0.0, 0.0, 10.0),
-                           new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(10.0, 0.0, 0.0),
+                           new vec4(1.0, 0.0, 0.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(0.0, 10.0, 0.0),
+                           new vec4(0.0, 1.0, 0.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(0.0, 0.0, 10.0),
+                           new vec4(0.0, 0.0, 1.0, 1.0));
   debugDrawManager.addSphere(new vec3(20.0, 20.0, 20.0), 20.0,
                              new vec4(0.0, 1.0, 0.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
-    debugDrawManager.addCircle(new vec3.raw(0.0, 0.0, 0.0),
-                               new vec3.raw(0.0, 1.0, 0.0),
+    debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+                               new vec3(0.0, 1.0, 0.0),
                                2.0,
-                               new vec4.raw(1.0, 1.0, 1.0, 1.0),
+                               new vec4(1.0, 1.0, 1.0, 1.0),
                                duration:5.0);
   }
   // Prepare the debug draw manager for rendering
@@ -285,8 +285,8 @@ main() {
     _setupSkybox();
     // Setup camera.
     camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-    camera.position = new vec3.raw(2.0, 2.0, 2.0);
-    camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+    camera.position = new vec3(2.0, 2.0, 2.0);
+    camera.focusPosition = new vec3(1.0, 1.0, 1.0);
     _makeMaterial();
     _buildCubes();
     // Setup layers.

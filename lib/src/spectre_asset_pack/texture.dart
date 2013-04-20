@@ -34,7 +34,7 @@ class Tex2DImporter extends AssetImporter {
     return tex2d;
   }
 
-  Future<dynamic> import(dynamic payload, Asset asset) {
+  Future<dynamic> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload is ImageElement) {
       asset.imported.uploadElement(payload);
       // TODO (johnmccutchan): Support an import argument specifying mipmap
@@ -61,7 +61,7 @@ class TexCubeImporter extends AssetImporter {
     asset.imported = new TextureCube(asset.name, device);
   }
 
-  Future<dynamic> import(dynamic payload, Asset asset) {
+  Future<dynamic> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload is List<ImageElement>) {
       assert(payload.length == 6);  //  6 sides.
       if (payload[0] != null &&
@@ -93,15 +93,16 @@ class TexCubeImporter extends AssetImporter {
 }
 
 class _ImagePackLoader extends AssetLoader {
-  Future<dynamic> load(Asset asset) {
+  Future<dynamic> load(Asset asset, AssetPackTrace tracer) {
     TextLoader loader = new TextLoader();
     ImageLoader imgLoader = new ImageLoader();
-    Future<String> futureText = loader.load(asset);
+    Future<String> futureText = loader.load(asset, tracer);
     return futureText.then((text) {
       List parsed;
       try {
         parsed = JSON.parse(text);
-      } catch (e) {
+      } on FormatException catch (e) {
+        tracer.assetImportError(asset, e.message);
         return new Future.value(null);
       }
       var futureImages = new List<Future<ImageElement>>();
@@ -109,7 +110,7 @@ class _ImagePackLoader extends AssetLoader {
         Asset imgRequest = new Asset(null, imgSrc, asset.baseUrl, imgSrc,
                                      asset.type, null, asset.loaderArguments,
                                      null, asset.importerArguments);
-        Future futureImg = imgLoader.load(imgRequest);
+        Future futureImg = imgLoader.load(imgRequest, tracer);
         futureImages.add(futureImg);
       });
       return Future.wait(futureImages);

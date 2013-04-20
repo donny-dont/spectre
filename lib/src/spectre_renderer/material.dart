@@ -133,7 +133,7 @@ class Material {
     projectionViewMatrix.multiply(viewMatrix);
     mat4 viewRotationMatrix = makeViewMatrix(new vec3.zero(),
                                              camera.frontDirection,
-                                             new vec3.raw(0.0, 1.0, 0.0));
+                                             new vec3(0.0, 1.0, 0.0));
     mat4 projectionViewRotationMatrix = camera.projectionMatrix;
     projectionViewRotationMatrix.multiply(viewRotationMatrix);
     MaterialConstant constant;

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,9 +34,9 @@ class Camera {
   }
 
   Camera() {
-    position = new vec3.raw(0.0, 0.0, 0.0);
-    focusPosition = new vec3.raw(0.0, 0.0, -1.0);
-    upDirection = new vec3.raw(0.0, 1.0, 0.0);
+    position = new vec3(0.0, 0.0, 0.0);
+    focusPosition = new vec3(0.0, 0.0, -1.0);
+    upDirection = new vec3(0.0, 1.0, 0.0);
 
     FOV = 0.785398163; // 2*45 degrees
     zNear = 1.0;
