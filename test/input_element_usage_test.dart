@@ -80,13 +80,20 @@ void main() {
   });
 
   test('isValid', () {
-    expect(InputElementUsage.isValid(InputElementUsage.Position)         , true);
-    expect(InputElementUsage.isValid(InputElementUsage.Normal)           , true);
-    expect(InputElementUsage.isValid(InputElementUsage.Tangent)          , true);
-    expect(InputElementUsage.isValid(InputElementUsage.Binormal)         , true);
-    expect(InputElementUsage.isValid(InputElementUsage.TextureCoordinate), true);
-    expect(InputElementUsage.isValid(InputElementUsage.Color)            , true);
-    expect(InputElementUsage.isValid(InputElementUsage.PointSize)        , true);
+    expect(InputElementUsage.isValid(InputElementUsage.Position),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.Normal),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.Tangent),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.Binormal),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.TextureCoordinate),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.Color),
+                                     true);
+    expect(InputElementUsage.isValid(InputElementUsage.PointSize),
+                                     true);
 
     expect(InputElementUsage.isValid(-1), false);
   });

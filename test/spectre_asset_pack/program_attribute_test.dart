@@ -26,6 +26,10 @@ import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 import 'dart:json' as Json;
 
+ProgramAttribute createProgramAttribute(String value) {
+  return new ProgramAttribute.fromJson(Json.parse(value));
+}
+
 void testValues() {
   List names = [
       ['POSITION', InputElementUsage.Position],
@@ -40,16 +44,20 @@ void testValues() {
     String semantic = value[0];
     int usage = value[1];
 
-    String noIndexString = '{"semantic":"${semantic}","symbol":"vAttrib"}';
-    ProgramAttribute noIndex = new ProgramAttribute.fromJson(Json.parse(noIndexString));
+    String noIndexString =
+        '{"semantic":"${semantic}","symbol":"vAttrib"}';
+
+    ProgramAttribute noIndex = createProgramAttribute(noIndexString);
 
     expect(noIndex.symbol    , 'vAttrib');
     expect(noIndex.usage     , usage);
     expect(noIndex.usageIndex, 0);
 
     for (int i = 0; i < 8; ++i) {
-      String withIndexString = '{"semantic":"${semantic}_${i}","symbol":"vAttrib"}';
-      ProgramAttribute withIndex = new ProgramAttribute.fromJson(Json.parse(withIndexString));
+      String withIndexString =
+          '{"semantic":"${semantic}_${i}","symbol":"vAttrib"}';
+
+      ProgramAttribute withIndex = createProgramAttribute(withIndexString);
 
       expect(withIndex.symbol    , 'vAttrib');
       expect(withIndex.usage     , usage);
@@ -63,28 +71,28 @@ void testExceptions() {
   String noSemantic = '{"symbol":"vPosition"}';
 
   expect(() {
-    ProgramAttribute format = new ProgramAttribute.fromJson(Json.parse(noSemantic));
+    ProgramAttribute format = createProgramAttribute(noSemantic);
   }, throwsArgumentError);
 
   // Should throw if no symbol is provided
   String noSymbol = '{"semantic":"POSITION"}';
 
   expect(() {
-    ProgramAttribute format = new ProgramAttribute.fromJson(Json.parse(noSymbol));
+    ProgramAttribute format = createProgramAttribute(noSymbol);
   }, throwsArgumentError);
 
   // Should throw if the semantic is not supported
   String invalidSemantic = '{"semantic":"INVALID","symbol":"vInvalid"}';
 
   expect(() {
-    ProgramAttribute format = new ProgramAttribute.fromJson(Json.parse(invalidSemantic));
+    ProgramAttribute format = createProgramAttribute(invalidSemantic);
   }, throwsArgumentError);
 
   // Should throw if the usage index is invalid
   String invalidIndex = '{"semantic":"TEXCOORD_A","symbol":"vTexCoordA"}';
 
   expect(() {
-    ProgramAttribute format = new ProgramAttribute.fromJson(Json.parse(invalidIndex));
+    ProgramAttribute format = createProgramAttribute(invalidIndex);
   }, throwsFormatException);
 }
 
