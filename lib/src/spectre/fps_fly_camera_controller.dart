@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -70,7 +70,7 @@ class FpsFlyCameraController extends CameraController {
       return;
     }
     scale = scale * dt * floatVelocity;
-    vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
+    vec3 upDirection = new vec3(0.0, 1.0, 0.0);
     upDirection.scale(scale);
     cam.focusPosition.add(upDirection);
     cam.position.add(upDirection);
@@ -90,7 +90,7 @@ class FpsFlyCameraController extends CameraController {
     scale = scale * dt * strafeVelocity;
     vec3 frontDirection = cam.frontDirection;
     frontDirection.normalize();
-    vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
+    vec3 upDirection = new vec3(0.0, 1.0, 0.0);
     vec3 strafeDirection = frontDirection.cross(upDirection);
     strafeDirection.scale(scale);
     cam.focusPosition.add(strafeDirection);
@@ -120,7 +120,7 @@ class FpsFlyCameraController extends CameraController {
   void _RotateView(num dt, Camera cam) {
     vec3 frontDirection = cam.frontDirection;
     frontDirection.normalize();
-    vec3 upDirection = new vec3.raw(0.0, 1.0, 0.0);
+    vec3 upDirection = new vec3(0.0, 1.0, 0.0);
     vec3 strafeDirection = frontDirection.cross(upDirection);
     strafeDirection.normalize();
 
@@ -144,7 +144,7 @@ class FpsFlyCameraController extends CameraController {
   }
 
   void _RotateEyeAndLook(num delta_angle, vec3 axis, Camera cam) {
-    quat q = new quat(axis, delta_angle);
+    quat q = new quat.axisAngle(axis, delta_angle);
     vec3 frontDirection = cam.frontDirection;
     frontDirection.normalize();
     q.rotate(frontDirection);

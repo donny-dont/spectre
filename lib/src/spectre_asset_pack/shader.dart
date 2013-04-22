@@ -30,7 +30,7 @@ class VertexShaderImporter extends AssetImporter {
     asset.imported = vs;
   }
 
-  Future<dynamic> import(dynamic payload, Asset asset) {
+  Future<dynamic> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload is String) {
       VertexShader vs = asset.imported;
       vs.source = payload;
@@ -38,7 +38,7 @@ class VertexShaderImporter extends AssetImporter {
       print('Compiled vertex shader ${asset.name}: ${vs.compileLog}');
 
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(VertexShader imported) {
@@ -57,14 +57,14 @@ class FragmentShaderImporter extends AssetImporter {
     FragmentShader fs = new FragmentShader(asset.name, device);
     asset.imported = fs;
   }
-  Future<dynamic> import(dynamic payload, Asset asset) {
+  Future<dynamic> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload is String) {
       FragmentShader fs = asset.imported;
       fs.source = payload;
       fs.compile();
       print('Compiled fragment shader ${asset.name}: ${fs.compileLog}');
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(FragmentShader imported) {
@@ -77,21 +77,22 @@ class FragmentShaderImporter extends AssetImporter {
 }
 
 class _TextListLoader extends AssetLoader {
-  Future<dynamic> load(Asset asset) {
+  Future<dynamic> load(Asset asset, AssetPackTrace tracer) {
     TextLoader loader = new TextLoader();
-    Future<String> futureText = loader.load(asset);
+    Future<String> futureText = loader.load(asset, tracer);
     return futureText.then((text) {
       List parsed;
       try {
         parsed = JSON.parse(text);
-      } catch (e) {
-        return new Future.immediate(null);
+      } on FormatException catch (e) {
+        tracer.assetImportError(asset, e.message);
+        return new Future.value(null);
       }
       List<Future<String>> futureTexts = new List();
       parsed.forEach((String textSrc) {
         Asset textRequest = new Asset(null, textSrc, asset.baseUrl, textSrc,
                                       asset.type, null, {}, null, {});
-        var futureText = loader.load(textRequest);
+        var futureText = loader.load(textRequest, tracer);
         futureTexts.add(futureText);
       });
       return Future.wait(futureTexts);
@@ -115,7 +116,7 @@ class ShaderProgramImporter extends AssetImporter {
     asset.imported = sp;
   }
 
-  Future<dynamic> import(dynamic payload, Asset asset) {
+  Future<dynamic> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     ShaderProgram sp = asset.imported;
     if (payload is List && payload.length == 2) {
       String vertexShaderSource = payload[0];
@@ -139,7 +140,7 @@ class ShaderProgramImporter extends AssetImporter {
         sp.link();
       }
     }
-    return new Future.immediate(asset);
+    return new Future.value(asset);
   }
 
   void delete(ShaderProgram imported) {

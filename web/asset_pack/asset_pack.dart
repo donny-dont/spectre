@@ -52,24 +52,24 @@ void renderFrame(GameLoop gameLoop) {
   // Set the viewport
   _graphicsContext.setViewport(_viewport);
   // Add three lines, one for each axis.
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(10.0, 0.0, 0.0),
-                            new vec4.raw(1.0, 0.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 10.0, 0.0),
-                            new vec4.raw(0.0, 1.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 0.0, 10.0),
-                            new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(10.0, 0.0, 0.0),
+                            new vec4(1.0, 0.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 10.0, 0.0),
+                            new vec4(0.0, 1.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 0.0, 10.0),
+                            new vec4(0.0, 0.0, 1.0, 1.0));
   _debugDrawManager.addSphere(new vec3(20.0, 20.0, 20.0), 20.0,
                               new vec4(0.0, 1.0, 0.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
-    _debugDrawManager.addCircle(new vec3.raw(0.0, 0.0, 0.0),
-                                new vec3.raw(0.0, 1.0, 0.0),
+    _debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+                                new vec3(0.0, 1.0, 0.0),
                                 2.0,
-                                new vec4.raw(1.0, 1.0, 1.0, 1.0),
+                                new vec4(1.0, 1.0, 1.0, 1.0),
                                 duration:5.0);
   }
 
@@ -159,11 +159,11 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   origin[2] = matrices[id][14] * _skeletonScale;
   int childOffset = mesh.boneChildrenOffsets[id];
   if (id == 0) {
-    _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
-        new vec4.raw(1.0, 0.0, 1.0, 1.0));
+    _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
+        new vec4(1.0, 0.0, 1.0, 1.0));
   } else {
-  _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
-                             new vec4.raw(0.0, 1.0, 1.0, 1.0));
+  _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
+                             new vec4(0.0, 1.0, 1.0, 1.0));
   }
   if (depth >= _depthGuard) {
     return;
@@ -174,11 +174,11 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
     end[0] = matrices[childId][12] * _skeletonScale;
     end[1] = matrices[childId][13] * _skeletonScale;
     end[2] = matrices[childId][14] * _skeletonScale;
-    _debugDrawManager.addLine(new vec3.raw(origin[0],
+    _debugDrawManager.addLine(new vec3(origin[0],
                                            origin[1],
                                            origin[2]),
-                              new vec3.raw(end[0], end[1], end[2]),
-                              new vec4.raw(1.0, 1.0, 1.0, 1.0));
+                              new vec3(end[0], end[1], end[2]),
+                              new vec4(1.0, 1.0, 1.0, 1.0));
     _drawSkinnedBones(mesh, childId, depth+1);
     childOffset++;
   }
@@ -278,8 +278,8 @@ main() {
 
   // Create the camera
   camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  camera.position = new vec3.raw(2.0, 2.0, 2.0);
-  camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+  camera.position = new vec3(2.0, 2.0, 2.0);
+  camera.focusPosition = new vec3(1.0, 1.0, 1.0);
 
   _assetManager = new AssetManager();
   registerSpectreWithAssetManager(_graphicsDevice, _assetManager);

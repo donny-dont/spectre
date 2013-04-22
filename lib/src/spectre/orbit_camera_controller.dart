@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,26 +27,26 @@ class OrbitCameraController extends CameraController {
   num accumDX = 0.0;
   num accumDY = 0.0;
   num accumDZ = 0.0;
-  
+
   num yaw = 0.0;
   num pitch = 0.0;
   num radius = 100.0;
-  
+
   num minYaw = -Math.PI * 0.25;
   num maxYaw = Math.PI * 0.33;
   num minRadius = 50.0;
   num maxRadius = 250.0;
-  
+
   num momentumDuration = 0.650;
-  
+
   bool hasMomentum = true;
   bool hasFriction = true;
-  
-  vec2 _momentum = new vec2();
+
+  vec2 _momentum = new vec2.zero();
   num _momentumTime = 0;
 
   OrbitCameraController() {
-    
+
   }
 
   void updateCamera(num dt, Camera cam) {
@@ -56,20 +56,20 @@ class OrbitCameraController extends CameraController {
 
       accumDX = 0;
       accumDY = 0;
-      
+
       _momentumTime = 0;
     }
-    
+
     if(accumDZ !=0) {
       _ZoomView(dt, accumDZ);
       accumDZ = 0;
     }
-    
+
     _RotateView(dt, cam, _momentum.x, _momentum.y);
-    
+
     _ApplyFriction(dt);
   }
-  
+
   void _ZoomView(num dt, num zoomDelta) {
     radius = (radius + zoomDelta).clamp(minRadius, maxRadius);
     // TODO: Exponential zoom?
@@ -79,8 +79,8 @@ class OrbitCameraController extends CameraController {
   void _RotateView(num dt, Camera cam, num yawDelta, num pitchDelta) {
     yaw += yawDelta;
     pitch = (pitch + pitchDelta).clamp(minYaw, maxYaw);
-    
-    vec3 offset = new vec3.raw(
+
+    vec3 offset = new vec3(
       radius * cos(yaw) * cos(pitch),
       radius * sin(pitch),
       radius * sin(yaw) * cos(pitch)
@@ -88,31 +88,31 @@ class OrbitCameraController extends CameraController {
 
     cam.position = cam.focusPosition + offset;
   }
-  
+
   void _ApplyFriction(num dt) {
     if(!hasMomentum) {
       _momentum.x = 0.0;
       _momentum.y = 0.0;
       return;
     }
-    
+
     if(!hasFriction) {
       return;
     }
-    
+
     num momentumLen = _momentum.length;
     if(momentumLen == 0.0) {
       return;
     }
-    
+
     _momentumTime += dt;
-    
+
     if(_momentumTime >= momentumDuration) {
       _momentum.x = 0.0;
       _momentum.y = 0.0;
       return;
     }
-    
+
     momentumLen -= momentumLen * (_momentumTime / momentumDuration);
     _momentum.normalize();
     _momentum.scale(momentumLen);
