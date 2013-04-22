@@ -1,5 +1,6 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:typeddata';
 import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop.dart';
 import 'package:asset_pack/asset_pack.dart';
@@ -119,7 +120,7 @@ void _setupSkybox() {
   _skyboxRasterizerState.cullMode = CullMode.None;
 }
 
-Float32Array _cameraTransform = new Float32Array(16);
+Float32List _cameraTransform = new Float32List(16);
 
 void _drawSkybox() {
   var context = _graphicsDevice.context;
