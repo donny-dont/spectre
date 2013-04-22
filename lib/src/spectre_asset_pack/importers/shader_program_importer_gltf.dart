@@ -20,8 +20,8 @@
 
 part of spectre_asset_pack;
 
-/// Importer for [ShaderProgram]s.
-class ShaderProgramImporterRedux extends AssetImporter {
+/// Importer for [ShaderProgram]s using the OpenGL Transmission Format.
+class ShaderProgramImporterGLTF extends AssetImporter {
   //---------------------------------------------------------------------
   // Member variables
   //---------------------------------------------------------------------
@@ -33,8 +33,8 @@ class ShaderProgramImporterRedux extends AssetImporter {
   // Construction
   //---------------------------------------------------------------------
 
-  /// Creates an instance of the [MeshImporter] class.
-  ShaderProgramImporterRedux(GraphicsDevice graphicsDevice)
+  /// Creates an instance of the [ShaderProgramImporterGLTF] class.
+  ShaderProgramImporterGLTF(GraphicsDevice graphicsDevice)
       : _graphicsDevice = graphicsDevice;
 
   //---------------------------------------------------------------------
@@ -48,8 +48,8 @@ class ShaderProgramImporterRedux extends AssetImporter {
     asset.imported = program;
   }
 
-  /// Imports the [Mesh] into Spectre.
-  Future<Asset> import(dynamic payload, Asset asset, AssetPackTrace ) {
+  /// Imports the [ShaderProgram] into Spectre.
+  Future<Asset> import(dynamic payload, Asset asset, AssetPackTrace tracer) {
     if (payload != null) {
       try {
         ProgramFormat format = new ProgramFormat.fromJson(payload);
@@ -60,7 +60,6 @@ class ShaderProgramImporterRedux extends AssetImporter {
         VertexShader vertex = new VertexShader(vertexFormat.name, _graphicsDevice);
         vertex.source = vertexFormat.source;
         vertex.compile();
-        print(vertex.compileLog);
 
         // Get the fragment shader
         ShaderFormat fragmentFormat = format.fragmentShader;
@@ -68,7 +67,6 @@ class ShaderProgramImporterRedux extends AssetImporter {
         FragmentShader fragment = new FragmentShader(fragmentFormat.name, _graphicsDevice);
         fragment.source = fragmentFormat.source;
         fragment.compile();
-        print(fragment.compileLog);
 
         // Add to the program
         ShaderProgram program = asset.imported;
@@ -76,10 +74,14 @@ class ShaderProgramImporterRedux extends AssetImporter {
         program.vertexShader = vertex;
         program.fragmentShader = fragment;
         program.link();
-      } catch (e) {
-
+      } on ArgumentError catch (e) {
+        tracer.assetImportError(asset, e.message);
+      } catch (_) {
+        tracer.assetImportError(asset, 'An unknown error occurred');
       }
     }
+
+    tracer.assetImportEnd(asset);
 
     return new Future.value(asset);
   }

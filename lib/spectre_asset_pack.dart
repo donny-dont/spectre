@@ -45,4 +45,4 @@ part 'src/spectre_asset_pack/formats/program_format.dart';
 part 'src/spectre_asset_pack/formats/semantic_format.dart';
 part 'src/spectre_asset_pack/formats/shader_format.dart';
 
-part 'src/spectre_asset_pack/importers/shader_program_importer.dart';
+part 'src/spectre_asset_pack/importers/shader_program_importer_gltf.dart';

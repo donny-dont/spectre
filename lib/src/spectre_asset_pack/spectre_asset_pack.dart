@@ -45,5 +45,5 @@ void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
   assetManager.importers['shaderProgram'] =
       new ShaderProgramImporter(graphicsDevice);
   assetManager.importers['gltfShaderProgram'] =
-      new ShaderProgramImporterRedux(graphicsDevice);
+      new ShaderProgramImporterGLTF(graphicsDevice);
 }
