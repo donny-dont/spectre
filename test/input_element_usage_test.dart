@@ -35,27 +35,47 @@ void main() {
   });
 
   test('stringify', () {
-    expect(InputElementUsage.stringify(InputElementUsage.Position)         , 'InputElementUsage.Position');
-    expect(InputElementUsage.stringify(InputElementUsage.Normal)           , 'InputElementUsage.Normal');
-    expect(InputElementUsage.stringify(InputElementUsage.Tangent)          , 'InputElementUsage.Tangent');
-    expect(InputElementUsage.stringify(InputElementUsage.Binormal)         , 'InputElementUsage.Binormal');
-    expect(InputElementUsage.stringify(InputElementUsage.TextureCoordinate), 'InputElementUsage.TextureCoordinate');
-    expect(InputElementUsage.stringify(InputElementUsage.Color)            , 'InputElementUsage.Color');
-    expect(InputElementUsage.stringify(InputElementUsage.PointSize)        , 'InputElementUsage.PointSize');
+    expect(InputElementUsage.stringify(InputElementUsage.Position),
+                                      'InputElementUsage.Position');
+    expect(InputElementUsage.stringify(InputElementUsage.Normal),
+                                      'InputElementUsage.Normal');
+    expect(InputElementUsage.stringify(InputElementUsage.Tangent),
+                                      'InputElementUsage.Tangent');
+    expect(InputElementUsage.stringify(InputElementUsage.Binormal),
+                                      'InputElementUsage.Binormal');
+    expect(InputElementUsage.stringify(InputElementUsage.TextureCoordinate),
+                                      'InputElementUsage.TextureCoordinate');
+    expect(InputElementUsage.stringify(InputElementUsage.Color),
+                                      'InputElementUsage.Color');
+    expect(InputElementUsage.stringify(InputElementUsage.PointSize),
+                                      'InputElementUsage.PointSize');
 
-    expect(() { InputElementUsage.stringify(-1); }, throwsA(new isInstanceOf<AssertionError>()));
+    expect(
+        () { InputElementUsage.stringify(-1); },
+        throwsA(new isInstanceOf<AssertionError>())
+    );
   });
 
   test('parse', () {
-    expect(InputElementUsage.parse('InputElementUsage.Position')         , InputElementUsage.Position);
-    expect(InputElementUsage.parse('InputElementUsage.Normal')           , InputElementUsage.Normal);
-    expect(InputElementUsage.parse('InputElementUsage.Tangent')          , InputElementUsage.Tangent);
-    expect(InputElementUsage.parse('InputElementUsage.Binormal')         , InputElementUsage.Binormal);
-    expect(InputElementUsage.parse('InputElementUsage.TextureCoordinate'), InputElementUsage.TextureCoordinate);
-    expect(InputElementUsage.parse('InputElementUsage.Color')            , InputElementUsage.Color);
-    expect(InputElementUsage.parse('InputElementUsage.PointSize')        , InputElementUsage.PointSize);
+    expect(InputElementUsage.parse('InputElementUsage.Position'),
+                                    InputElementUsage.Position);
+    expect(InputElementUsage.parse('InputElementUsage.Normal'),
+                                    InputElementUsage.Normal);
+    expect(InputElementUsage.parse('InputElementUsage.Tangent'),
+                                    InputElementUsage.Tangent);
+    expect(InputElementUsage.parse('InputElementUsage.Binormal'),
+                                    InputElementUsage.Binormal);
+    expect(InputElementUsage.parse('InputElementUsage.TextureCoordinate'),
+                                    InputElementUsage.TextureCoordinate);
+    expect(InputElementUsage.parse('InputElementUsage.Color'),
+                                    InputElementUsage.Color);
+    expect(InputElementUsage.parse('InputElementUsage.PointSize'),
+                                    InputElementUsage.PointSize);
 
-    expect(() { InputElementUsage.parse('NotValid'); }, throwsA(new isInstanceOf<AssertionError>()));
+    expect(
+        () { InputElementUsage.parse('NotValid'); },
+        throwsA(new isInstanceOf<AssertionError>())
+    );
   });
 
   test('isValid', () {

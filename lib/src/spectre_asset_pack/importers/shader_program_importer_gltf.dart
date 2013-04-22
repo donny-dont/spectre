@@ -57,14 +57,22 @@ class ShaderProgramImporterGLTF extends AssetImporter {
         // Get the vertex shader
         ShaderFormat vertexFormat = format.vertexShader;
 
-        VertexShader vertex = new VertexShader(vertexFormat.name, _graphicsDevice);
+        VertexShader vertex = new VertexShader(
+            vertexFormat.name,
+            _graphicsDevice
+        );
+
         vertex.source = vertexFormat.source;
         vertex.compile();
 
         // Get the fragment shader
         ShaderFormat fragmentFormat = format.fragmentShader;
 
-        FragmentShader fragment = new FragmentShader(fragmentFormat.name, _graphicsDevice);
+        FragmentShader fragment = new FragmentShader(
+            fragmentFormat.name,
+            _graphicsDevice
+        );
+
         fragment.source = fragmentFormat.source;
         fragment.compile();
 

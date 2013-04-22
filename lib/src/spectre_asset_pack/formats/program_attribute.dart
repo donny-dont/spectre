@@ -22,8 +22,9 @@ part of spectre_asset_pack;
 
 /// Defines a [ShaderProgram] asset to load.
 ///
-/// This corresponds roughly to the shader specification within the OpenGL
-/// Transmission Format (glTF) [https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#program]
+/// This corresponds roughly to the shader specification within the [OpenGL
+/// Transmission Format (glTF)]
+/// (https://github.com/KhronosGroup/glTF/blob/master/specification/README.md#program)
 /// which ignores the uniform variables field.
 class ProgramAttribute {
   //---------------------------------------------------------------------

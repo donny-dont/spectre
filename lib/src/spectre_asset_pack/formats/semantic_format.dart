@@ -24,8 +24,8 @@ part of spectre_asset_pack;
 ///
 /// Semantics are used to resolve an [InputLayout] and a [ShaderProgram]'s
 /// attribute indices. This corresponds to the semantics specification within
-/// the OpenGL Transmission Format (glTF)
-/// [https://github.com/KhronosGroup/glTF/tree/master/specification#semantics]
+/// the [OpenGL Transmission Format (glTF)]
+/// (https://github.com/KhronosGroup/glTF/tree/master/specification#semantics)
 class _SemanticFormat {
   //---------------------------------------------------------------------
   // Member variables

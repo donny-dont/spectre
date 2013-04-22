@@ -20,6 +20,10 @@
 
 part of spectre_asset_pack;
 
+/// Function signature for creating an [OpenGLTransmissionFormat] from a [Map].
+///
+/// Used when parsing a list of [OpenGLTransmissionFormat]s. The function
+/// should just call the fromJson constructor of the format.
 typedef OpenGLTransmissionFormat _CreateFormat(Map value);
 
 /// Base class for OpenGL Transmission format readers.
