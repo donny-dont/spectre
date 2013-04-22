@@ -1,9 +1,10 @@
 Author:
 
 John McCutchan <john@johnmccutchan.com>
+Don Olmstead <don.j.olmstead@gmail.com>
+
 
 Contributors:
 
 Adam Singer github.com/financeCoding
 Brandon Jones github.com/toji
-Don Olmstead github.com/donny-dont
