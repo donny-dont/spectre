@@ -20,7 +20,8 @@
 
 part of spectre;
 
-/// Defines the winding used to determine whether a triangle is front or back facing.
+/// Defines the winding used to determine whether a triangle is front or back
+/// facing.
 class FrontFace {
   //---------------------------------------------------------------------
   // Serialization names
@@ -37,7 +38,8 @@ class FrontFace {
 
   /// Triangles are considered front-facing if its vertices are clockwise.
   static const int Clockwise = WebGL.CW;
-  /// Triangles are considered front-facing if its vertices are counter-clockwise.
+  /// Triangles are considered front-facing if its vertices are
+  /// counter-clockwise.
   static const int CounterClockwise = WebGL.CCW;
 
   //---------------------------------------------------------------------
