@@ -20,9 +20,8 @@
 
 part of spectre;
 
-/// RasterizerState controls how the GPU rasterizer functions including primitive culling and width of rasterized lines
-/// Create using [Device.createRasterizerState]
-/// Set using [ImmediateContext.setRasterizerState]
+/// RasterizerState controls how the GPU rasterizer functions including
+/// primitive culling and width of rasterized lines.
 class RasterizerState extends DeviceChild {
   //---------------------------------------------------------------------
   // Serialization names
@@ -44,23 +43,28 @@ class RasterizerState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Spcifies what triangles are culled based on its direction.
+  ///
   /// The default value is [CullMode.Back].
   int _cullMode = CullMode.Back;
   /// Specifies the winding of a front facing polygon.
+  ///
   /// The default value is [FrontFace.CounterClockwise].
   int _frontFace = FrontFace.CounterClockwise;
   /// The depth bias for polygons.
-  /// This is the amount of bias to apply to the depth of a primitive to alleviate depth testing
-  /// problems for primitives of similar depth.
+  /// This is the amount of bias to apply to the depth of a primitive to
+  /// alleviate depth testing problems for primitives of similar depth.
+  ///
   /// The default value is 0.
   double _depthBias = 0.0;
   /// A bias value that takes into account the slope of a polygon.
+  ///
   /// This bias value is applied to coplanar primitives to reduce aliasing and other rendering
   /// artifacts caused by z-fighting.
+  ///
   /// The default is 0.
   double _slopeScaleDepthBias = 0.0;
   /// Whether scissor testing is enabled.
-  /// ScissorTestEnable  Enables or disables scissor testing.
+  ///
   /// The default is false.
   bool _scissorTestEnabled = false;
 
@@ -72,7 +76,9 @@ class RasterizerState extends DeviceChild {
   RasterizerState(String name, GraphicsDevice device)
     : super._internal(name, device);
 
-  /// Initializes an instance of the [RasterizerState] class with settings for culling primitives with clockwise winding order.
+  /// Initializes an instance of the [RasterizerState] class with settings for
+  /// culling primitives with clockwise winding order.
+  ///
   /// The state object has the following settings.
   ///     cullMode = CullMode.Back;
   ///     frontFace = FrontFace.CounterClockwise;
@@ -81,7 +87,9 @@ class RasterizerState extends DeviceChild {
     , _cullMode = CullMode.Back
     , _frontFace = FrontFace.CounterClockwise;
 
-  /// Initializes an instance of the [RasterizerState] class with settings for culling primitives with counter-clockwise winding order.
+  /// Initializes an instance of the [RasterizerState] class with settings for
+  /// culling primitives with counter-clockwise winding order.
+  ///
   /// The state object has the following settings.
   ///     cullMode = CullMode.Back;
   ///     frontFace = Clockwise;
@@ -90,7 +98,9 @@ class RasterizerState extends DeviceChild {
     , _cullMode = CullMode.Back
     , _frontFace = FrontFace.Clockwise;
 
-  /// Initializes an instance of the [RasterizerState] class with settings for not culling any primitives.
+  /// Initializes an instance of the [RasterizerState] class with settings for
+  /// not culling any primitives.
+  ///
   /// The state object has the following settings.
   ///     cullMode = CullMode.None;
   ///     frontFace = FrontFace.CounterClockwise;
@@ -104,45 +114,57 @@ class RasterizerState extends DeviceChild {
   //---------------------------------------------------------------------
 
   /// Spcifies what triangles are culled based on its direction.
+  ///
   /// The default value is [CullMode.Back].
-  /// Throws [ArgumentError] if the [value] is not an enumeration within [CullMode].
+  ///
+  /// Throws [ArgumentError] if the [value] is not an enumeration within
+  /// [CullMode].
   int get cullMode => _cullMode;
   set cullMode(int value) {
     if (!CullMode.isValid(value)) {
-      throw new ArgumentError('cullMode must be an enumeration within CullMode.');
+      throw new ArgumentError('cullMode must be an enumeration within '
+                              'CullMode.');
     }
 
     _cullMode = value;
   }
 
   /// Specifies the winding of a front facing polygon.
+  ///
   /// The default value is [FrontFace.CounterClockwise].
-  /// Throws [ArgumentError] if the [value] is not an enumeration within [FrontFace].
+  ///
+  /// Throws [ArgumentError] if the [value] is not an enumeration within
+  /// [FrontFace].
   int get frontFace => _frontFace;
   set frontFace(int value) {
     if (!FrontFace.isValid(value)) {
-      throw new ArgumentError('frontFace must be an enumeration within FrontFace.');
+      throw new ArgumentError('frontFace must be an enumeration within '
+                              'FrontFace.');
     }
 
     _frontFace = value;
   }
 
   /// The depth bias for polygons.
-  /// This is the amount of bias to apply to the depth of a primitive to alleviate depth testing
-  /// problems for primitives of similar depth.
+  ///
+  /// This is the amount of bias to apply to the depth of a primitive to
+  /// alleviate depth testing problems for primitives of similar depth.
+  ///
   /// The default value is 0.
   double get depthBias => _depthBias;
   set depthBias(double value) { _depthBias = value; }
 
   /// A bias value that takes into account the slope of a polygon.
-  /// This bias value is applied to coplanar primitives to reduce aliasing and other rendering
-  /// artifacts caused by z-fighting.
+  ///
+  /// This bias value is applied to coplanar primitives to reduce aliasing and
+  /// other rendering artifacts caused by z-fighting.
+  ///
   /// The default is 0.
   double get slopeScaleDepthBias => _slopeScaleDepthBias;
   set slopeScaleDepthBias(double value) { _slopeScaleDepthBias = value; }
 
   /// Whether scissor testing is enabled.
-  /// ScissorTestEnable  Enables or disables scissor testing.
+  ///
   /// The default is false.
   bool get scissorTestEnabled => _scissorTestEnabled;
   set scissorTestEnabled(bool value) { _scissorTestEnabled = value; }
