@@ -20,9 +20,8 @@
 
 part of spectre;
 
-/// The window dimensions of a render-target surface onto which a 3D volume projects.
-/// Create using [Device.createViewport]
-/// Set using [ImmediateContext.setViewport]
+/// The window dimensions of a render-target surface onto which a 3D volume
+/// projects.
 class Viewport extends DeviceChild {
   //---------------------------------------------------------------------
   // Serialization names
@@ -45,9 +44,11 @@ class Viewport extends DeviceChild {
   // Member variables
   //---------------------------------------------------------------------
 
-  /// The x-coordinate of the upper left corner of the viewport on the render-target surface.
+  /// The x-coordinate of the upper left corner of the viewport on the
+  /// render-target surface.
   int _x = 0;
-  /// The y-coordinate of the upper left corner of the viewport on the render-target surface.
+  /// The y-coordinate of the upper left corner of the viewport on the
+  /// render-target surface.
   int _y = 0;
   /// The width of the viewport on the render-target surface, in pixels.
   int _width = 640;
@@ -67,23 +68,30 @@ class Viewport extends DeviceChild {
     : super._internal(name, device);
 
   /// Creates an instance of the [Viewport] class.
+  ///
   /// The rectangular bounding box is specified.
-  Viewport.bounds(String name, GraphicsDevice device, int this._x, int this._y, int this._width, int this._height)
+  Viewport.bounds(String name,
+                  GraphicsDevice device,
+                  int this._x, int this._y,
+                  int this._width, int this._height)
     : super._internal(name, device);
 
   //---------------------------------------------------------------------
   // Properties
   //---------------------------------------------------------------------
 
-  /// The x-coordinate of the upper left corner of the viewport on the render-target surface.
+  /// The x-coordinate of the upper left corner of the viewport on the
+  /// render-target surface.
   int get x => _x;
   set x(int value) { _x = value; }
 
-  /// The y-coordinate of the upper left corner of the viewport on the render-target surface.
+  /// The y-coordinate of the upper left corner of the viewport on the
+  /// render-target surface.
   int get y => _y ;
   set y(int value) { _y = value; }
 
   /// The width of the viewport on the render-target surface, in pixels.
+  ///
   /// Throws [ArgumentError] if [value] is not a positive number.
   int get width => _width;
   set width(int value) {
@@ -95,6 +103,7 @@ class Viewport extends DeviceChild {
   }
 
   /// The height of the viewport on the render-target surface, in pixels.
+  ///
   /// Throws [ArgumentError] if [value] is not a positive number.
   int get height => _height;
   set height(int value) {
@@ -106,7 +115,8 @@ class Viewport extends DeviceChild {
   }
 
   /// The minimum depth of the viewport.
-  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
+  ///
+  /// Throws [ArgumentError] if [value] is not in the range \[0, 1\].
   double get minDepth => _minDepth;
   set minDepth(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
@@ -121,7 +131,8 @@ class Viewport extends DeviceChild {
   double get aspectRatio => width / height;
 
   /// The maximum depth of the viewport.
-  /// Throws [ArgumentError] if [value] is not in the range [0, 1].
+  ///
+  /// Throws [ArgumentError] if [value] is not in the range \[0, 1\].
   double get maxDepth => _maxDepth;
   set maxDepth(double value) {
     if ((value >= 0.0) && (value <= 1.0)) {
