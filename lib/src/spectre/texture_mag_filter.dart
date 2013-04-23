@@ -60,7 +60,8 @@ class TextureMagFilter {
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [TextureMinFilter] enumeration.
+  /// Convert from a [String] name to the corresponding [TextureMinFilter]
+  /// enumeration.
   static int parse(String name) {
     switch (name) {
 
