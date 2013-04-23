@@ -27,6 +27,7 @@ library skeletal_animation_cpu;
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
+import 'dart:typeddata';
 import 'package:vector_math/vector_math.dart';
 import 'package:game_loop/game_loop.dart';
 import 'package:asset_pack/asset_pack.dart';
@@ -129,12 +130,12 @@ class Application {
   OrbitCameraController _cameraController;
   /// The Model-View-Projection matrix.
   mat4 _modelViewProjectionMatrix;
-  /// [Float32Array] storage for the Model-View matrix.
-  Float32Array _modelViewMatrixArray;
-  /// [Float32Array] storage for the Model-View-Projection matrix.
-  Float32Array _modelViewProjectionMatrixArray;
-  /// [Float32Array] storage for the normal matrix.
-  Float32Array _normalMatrixArray;
+  /// [Float32List] storage for the Model-View matrix.
+  Float32List _modelViewMatrixArray;
+  /// [Float32List] storage for the Model-View-Projection matrix.
+  Float32List _modelViewProjectionMatrixArray;
+  /// [Float32List] storage for the normal matrix.
+  Float32List _normalMatrixArray;
 
   //---------------------------------------------------------------------
   // Mesh drawing variables
@@ -264,10 +265,10 @@ class Application {
     // Create the mat4 holding the Model-View-Projection matrix
     _modelViewProjectionMatrix = new mat4.zero();
 
-    // Create the Float32Arrays that store the constant values for the matrices
-    _modelViewMatrixArray = new Float32Array(16);
-    _modelViewProjectionMatrixArray = new Float32Array(16);
-    _normalMatrixArray = new Float32Array(16);
+    // Create the Float32Lists that store the constant values for the matrices
+    _modelViewMatrixArray = new Float32List(16);
+    _modelViewProjectionMatrixArray = new Float32List(16);
+    _normalMatrixArray = new Float32List(16);
   }
 
   /// Load the resources held in the .pack files.
@@ -421,14 +422,14 @@ class Application {
     // is because the model matrix is currently the identity matrix. The model
     // has no rotation, no scaling, and is sitting at (0, 0, 0).
 
-    // Copy the Model-View-Projection matrix into a Float32Array so it can be
+    // Copy the Model-View-Projection matrix into a Float32List so it can be
     // passed in as a constant to the ShaderProgram.
     _modelViewProjectionMatrix.copyIntoArray(_modelViewProjectionMatrixArray);
 
-    // Copy the View matrix from the camera into the Float32Array.
+    // Copy the View matrix from the camera into the Float32List.
     _camera.copyViewMatrixIntoArray(_modelViewMatrixArray);
 
-    // Copy the Normal matrix from the camera into the Float32Array.
+    // Copy the Normal matrix from the camera into the Float32List.
     _camera.copyNormalMatrixIntoArray(_normalMatrixArray);
 
     _debugDrawManager.addCircle(new vec3(0.0, 4.0, 0.0),

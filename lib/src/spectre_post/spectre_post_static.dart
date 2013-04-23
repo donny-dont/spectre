@@ -46,7 +46,7 @@ class SpectrePost {
       _passes = new Map<String, SpectrePostPass>();
       _arrayMesh = new SingleArrayMesh('SpectrePost.Mesh', _device);
       const int numFloats = 6 * (3+2);
-      Float32Array verts = new Float32Array(6*(3+2));
+      Float32List verts = new Float32List(6*(3+2));
       int index = 0;
       num depth = -1.0;
       // Triangle 1

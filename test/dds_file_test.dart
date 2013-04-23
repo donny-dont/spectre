@@ -23,6 +23,7 @@ library dds_file_test;
 import 'dart:async';
 import 'dart:html';
 import 'dart:math' as Math;
+import 'dart:typeddata';
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 
@@ -386,7 +387,7 @@ void main() {
 
         expect(texture.byteLength, textureSize[i]);
 
-        Uint32Array values = new Uint32Array.fromBuffer(texture);
+        Uint32List values = new Uint32List.fromBuffer(texture);
         int length = values.length;
 
         for (int x = 0; x < length; ++x) {
@@ -397,7 +398,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -427,7 +428,7 @@ void main() {
 
         expect(texture.byteLength, textureSize[i]);
 
-        Uint16Array values = new Uint16Array.fromBuffer(texture);
+        Uint16List values = new Uint16List.fromBuffer(texture);
         int length = values.length;
 
         for (int x = 0; x < length; ++x) {
@@ -468,7 +469,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -502,7 +503,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -535,7 +536,7 @@ void main() {
 
           expect(texture.byteLength, textureSize[i]);
 
-          Uint32Array values = new Uint32Array.fromBuffer(texture);
+          Uint32List values = new Uint32List.fromBuffer(texture);
           int length = values.length;
 
           for (int x = 0; x < length; ++x) {
@@ -547,7 +548,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -584,7 +585,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -628,7 +629,7 @@ void main() {
 
         expect(texture.byteLength, textureSize[i]);
 
-        Uint32Array values = new Uint32Array.fromBuffer(texture);
+        Uint32List values = new Uint32List.fromBuffer(texture);
 
         int index = 0;
 
@@ -647,7 +648,7 @@ void main() {
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 }
