@@ -36,7 +36,8 @@ class InputElementUsage {
   /// String representation of [Binormal].
   static const String _binormalName = 'InputElementUsage.Binormal';
   /// String representation of [TextureCoordinate].
-  static const String _textureCoordinateName = 'InputElementUsage.TextureCoordinate';
+  static const String _textureCoordinateName =
+      'InputElementUsage.TextureCoordinate';
   /// String representation of [Color].
   static const String _colorName = 'InputElementUsage.Color';
   /// String representation of [PointSize].
@@ -65,7 +66,8 @@ class InputElementUsage {
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [InputElementUsage] enumeration.
+  /// Convert from a [String] name to the corresponding [InputElementUsage]
+  /// enumeration.
   static int parse(String name) {
     switch (name) {
       case _positionName         : return Position;

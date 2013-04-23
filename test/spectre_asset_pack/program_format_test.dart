@@ -188,14 +188,18 @@ void verifySources(ProgramFormat value) {
 // ProgramFormat tests
 //---------------------------------------------------------------------
 
+ProgramFormat createProgramFormat(String value) {
+  return new ProgramFormat.fromJson(Json.parse(value));
+}
+
 void testValues() {
   // Check for a ShaderProgram using references to vertex and fragment shaders
-  ProgramFormat reference = new ProgramFormat.fromJson(Json.parse(referenceString));
+  ProgramFormat reference = createProgramFormat(referenceString);
 
   verifyReferences(reference);
 
   // Check for a ShaderProgram with inline vertex and fragment shaders
-  ProgramFormat source = new ProgramFormat.fromJson(Json.parse(sourceString));
+  ProgramFormat source = createProgramFormat(sourceString);
 
   verifySources(source);
 }
@@ -212,7 +216,7 @@ void testExceptions() {
 ''';
 
   expect(() {
-    ShaderFormat format = new ShaderFormat.fromJson(Json.parse(noName));
+    ShaderFormat format = createProgramFormat(noName);
   }, throwsArgumentError);
 
   // Should throw if no vertex shader is provided
@@ -226,7 +230,7 @@ void testExceptions() {
 ''';
 
   expect(() {
-    ProgramFormat format = new ProgramFormat.fromJson(Json.parse(noVertex));
+    ProgramFormat format = createProgramFormat(noVertex);
   }, throwsArgumentError);
 
   // Should throw if an invalid shader is provided
@@ -241,7 +245,7 @@ void testExceptions() {
 ''';
 
   expect(() {
-    ProgramFormat format = new ProgramFormat.fromJson(Json.parse(invalidShader));
+    ProgramFormat format = createProgramFormat(invalidShader);
   }, throwsArgumentError);
 
   // Should throw if the names are not unique

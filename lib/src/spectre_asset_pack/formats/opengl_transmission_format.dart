@@ -44,12 +44,14 @@ class OpenGLTransmissionFormat {
   // Construction
   //---------------------------------------------------------------------
 
-  /// Creates an instance of the [OpenGLTransmissionFormat] where the data is in another instance.
+  /// Creates an instance of the [OpenGLTransmissionFormat] where the data is
+  /// in another instance.
   OpenGLTransmissionFormat._reference(String name)
       : _isReference = true
       , _name = name;
 
-  /// Creates an instance of the [OpenGLTransmissionFormat] class from JSON data.
+  /// Creates an instance of the [OpenGLTransmissionFormat] class from JSON
+  /// data.
   OpenGLTransmissionFormat._fromJson(Map json)
       : _isReference = false
   {
@@ -83,7 +85,7 @@ class OpenGLTransmissionFormat {
 
   /// Parses a list containing a subclass of [OpenGLTransmissionFormat].
   ///
-  /// Uses the [creation] function to populate a [Map] containing the values
+  /// Uses the [create] function to populate a [Map] containing the values
   /// where the [name] is the key value.
   static Map _parseList(List values, _CreateFormat create) {
     Map formats = new Map();

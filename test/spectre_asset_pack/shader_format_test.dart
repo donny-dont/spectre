@@ -65,14 +65,18 @@ void verifyUseSource(ShaderFormat value) {
 // ShaderFormat tests
 //---------------------------------------------------------------------
 
+ShaderFormat createShaderFormat(String value) {
+  return new ShaderFormat.fromJson(Json.parse(value));
+}
+
 void testValues() {
   // Check for a Shader using a data uri
-  ShaderFormat path = new ShaderFormat.fromJson(Json.parse(usePathString));
+  ShaderFormat path = createShaderFormat(usePathString);
 
   verifyUsePath(path);
 
   // Check for a Shader using source code
-  ShaderFormat source = new ShaderFormat.fromJson(Json.parse(useSourceString));
+  ShaderFormat source = createShaderFormat(useSourceString);
 
   verifyUseSource(source);
 }
@@ -82,14 +86,14 @@ void testExceptions() {
   String noName = '{"path":"aShader.vert"}';
 
   expect(() {
-    ShaderFormat format = new ShaderFormat.fromJson(Json.parse(noName));
+    ShaderFormat format = createShaderFormat(noName);
   }, throwsArgumentError);
 
   // Should throw if no data is provided
   String noSource = '{"name":"shader"}';
 
   expect(() {
-    ShaderFormat format = new ShaderFormat.fromJson(Json.parse(noSource));
+    ShaderFormat format = createShaderFormat(noSource);
   }, throwsArgumentError);
 
   // Should throw if both source code and a data uri are provided
@@ -99,7 +103,7 @@ void testExceptions() {
 ''';
 
   expect(() {
-    ShaderFormat format = new ShaderFormat.fromJson(Json.parse(bothSourcePaths));
+    ShaderFormat format = createShaderFormat(bothSourcePaths);
   }, throwsArgumentError);
 
   // Should throw if the names are not unique
