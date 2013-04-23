@@ -20,7 +20,8 @@
 
 part of spectre;
 
-/// Defines modes for addressing texels using texture coordinates outside of the typical range of 0.0 to 1.0.
+/// Defines modes for addressing texels using texture coordinates outside of
+/// the typical range of 0.0 to 1.0.
 class TextureAddressMode {
   //---------------------------------------------------------------------
   // Serialization names
@@ -37,24 +38,28 @@ class TextureAddressMode {
   // Enumerations
   //---------------------------------------------------------------------
 
-  /// Texture coordinates outside the range [0.0, 1.0] are set to the texture color at 0.0 or 1.0, respectively.
+  /// Texture coordinates outside the range [0.0, 1.0] are set to the texture
+  /// color at 0.0 or 1.0, respectively.
   static const int Clamp = WebGL.CLAMP_TO_EDGE;
-  /// Similar to Wrap, except that the texture is flipped at every integer junction.
+  /// Similar to Wrap, except that the texture is flipped at every integer
+  /// junction.
   ///
-  /// For values between 0 and 1, for example, the texture is addressed normally; between 1 and 2, the texture is
-  /// flipped (mirrored); between 2 and 3, the texture is normal again, and so on.
+  /// For values between 0 and 1, for example, the texture is addressed
+  /// normally; between 1 and 2, the texture is flipped (mirrored); between 2
+  /// and 3, the texture is normal again, and so on.
   static const int Mirror = WebGL.MIRRORED_REPEAT;
   /// Tile the texture at every integer junction.
   ///
-  /// For example, for u values between 0 and 3, the texture is repeated three times;
-  /// no mirroring is performed.
+  /// For example, for u values between 0 and 3, the texture is repeated three
+  /// times; no mirroring is performed.
   static const int Wrap = WebGL.REPEAT;
 
   //---------------------------------------------------------------------
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [TextureAddressMode] enumeration.
+  /// Convert from a [String] name to the corresponding [TextureAddressMode]
+  /// enumeration.
   static int parse(String name) {
     if (name == _clampName) {
       return Clamp;
