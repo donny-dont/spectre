@@ -28,7 +28,7 @@ class SamplerState extends DeviceChild {
 
   /// Serialization name for [addressU].
   static const String _addressUName = 'addressU';
-  /// Serialization name for [wrapV].
+  /// Serialization name for [addressV].
   static const String _addressVName = 'addressV';
   /// Serialization name for [minFilter].
   static const String _minFilterName = 'minFilter';
@@ -62,7 +62,8 @@ class SamplerState extends DeviceChild {
   SamplerState(String name, GraphicsDevice device)
     : super._internal(name, device);
 
-  /// Initializes an instance of [SamplerState] with anisotropic filtering and texture coordinate clamping.
+  /// Initializes an instance of [SamplerState] with anisotropic filtering and
+  /// texture coordinate clamping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Clamp;
@@ -74,7 +75,8 @@ class SamplerState extends DeviceChild {
     , _addressV = TextureAddressMode.Clamp
     , _maxAnisotropy = 4.0;
 
-  /// Initializes an instance of [SamplerState] with anisotropic filtering and texture coordinate wrapping.
+  /// Initializes an instance of [SamplerState] with anisotropic filtering and
+  /// texture coordinate wrapping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Wrap;
@@ -86,7 +88,8 @@ class SamplerState extends DeviceChild {
     , _addressV = TextureAddressMode.Wrap
     , _maxAnisotropy = 4.0;
 
-  /// Initializes an instance of [SamplerState] with linear filtering and texture coordinate clamping.
+  /// Initializes an instance of [SamplerState] with linear filtering and
+  /// texture coordinate clamping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Clamp;
@@ -100,7 +103,8 @@ class SamplerState extends DeviceChild {
     , _minFilter = TextureMinFilter.Linear
     , _magFilter = TextureMagFilter.Linear;
 
-  /// Initializes an instance of [SamplerState] with linear filtering and texture coordinate wrapping.
+  /// Initializes an instance of [SamplerState] with linear filtering and
+  /// texture coordinate wrapping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Wrap;
@@ -114,7 +118,8 @@ class SamplerState extends DeviceChild {
     , _minFilter = TextureMinFilter.Linear
     , _magFilter = TextureMagFilter.Linear;
 
-  /// Initializes an instance of [SamplerState] with point filtering and texture coordinate clamping.
+  /// Initializes an instance of [SamplerState] with point filtering and texture
+  /// coordinate clamping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Clamp;
@@ -128,7 +133,8 @@ class SamplerState extends DeviceChild {
     , _minFilter = TextureMinFilter.Point
     , _magFilter = TextureMagFilter.Point;
 
-  /// Initializes an instance of [SamplerState] with point filtering and texture coordinate wrapping.
+  /// Initializes an instance of [SamplerState] with point filtering and texture
+  /// coordinate wrapping.
   ///
   /// The state object has the following settings.
   ///     addressU = TextureAddressMode.Wrap;
@@ -150,7 +156,8 @@ class SamplerState extends DeviceChild {
   int get addressU => _addressU;
   set addressU(int value) {
     if (!TextureAddressMode.isValid(value)) {
-      throw new ArgumentError('addressU must be an enumeration within TextureAddressMode.');
+      throw new ArgumentError('addressU must be an enumeration within '
+                              'TextureAddressMode.');
     }
 
     _addressU = value;
@@ -160,7 +167,8 @@ class SamplerState extends DeviceChild {
   int get addressV => _addressV;
   set addressV(int value) {
     if (!TextureAddressMode.isValid(value)) {
-      throw new ArgumentError('addressU must be an enumeration within TextureAddressMode.');
+      throw new ArgumentError('addressU must be an enumeration within '
+                              'TextureAddressMode.');
     }
 
     _addressV = value;
@@ -168,11 +176,13 @@ class SamplerState extends DeviceChild {
 
   /// The minification filter to use.
   ///
-  /// Throws [ArgumentError] if the [value] is not an enumeration within [TextureMinFilter].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within
+  /// [TextureMinFilter].
   int get minFilter => _minFilter;
   set minFilter(int value) {
     if (!TextureMinFilter.isValid(value)) {
-      throw new ArgumentError('minFilter must be an enumeration within TextureMinFilter.');
+      throw new ArgumentError('minFilter must be an enumeration within '
+                              'TextureMinFilter.');
     }
 
     _minFilter = value;
@@ -180,14 +190,17 @@ class SamplerState extends DeviceChild {
 
   /// The magnification filter to use.
   ///
-  /// If the [Texture] does not contain mipmaps, such as non-power of two textures,
-  /// then the only valid values are [Texture.Linear] and [Texture.Point].
+  /// If the [Texture] does not contain mipmaps, such as non-power of two
+  /// textures, then the only valid values are [TextureMagFilter.Linear] and
+  /// [TextureMagFilter.Point].
   ///
-  /// Throws [ArgumentError] if the [value] is not an enumeration within [TextureMinFilter].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within
+  /// [TextureMagFilter].
   int get magFilter => _magFilter;
   set magFilter(int value) {
     if (!TextureMagFilter.isValid(value)) {
-      throw new ArgumentError('magFilter must be an enumeration within TextureMagFilter.');
+      throw new ArgumentError('magFilter must be an enumeration within '
+                              'TextureMagFilter.');
     }
 
     _magFilter = value;
@@ -197,8 +210,9 @@ class SamplerState extends DeviceChild {
   ///
   /// Anisotropic filtering is only available through an extension to WebGL.
   /// The maximum acceptable value is dependent on the graphics hardware, and
-  /// can be queried within [GraphicsDeviceCapabilites]. When setting the value
-  /// the anisotropy level will be capped to the range 1 < [GraphicsDeviceCapabilities.maxAnisotropyLevel]
+  /// can be queried within [GraphicsDeviceCapabilities]. When setting the value
+  /// the anisotropy level will be capped to the range 1 <
+  /// [GraphicsDeviceCapabilities.maxAnisotropyLevel]
   ///
   /// Throws [ArgumentError] if [value] is not a positive number.
   double get maxAnisotropy => _maxAnisotropy;
