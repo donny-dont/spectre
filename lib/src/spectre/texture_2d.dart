@@ -21,9 +21,8 @@
 part of spectre;
 
 /// Texture2D defines the storage for a 2D texture including Mipmaps
-/// Create using [Device.createTexture2D]
-/// Set using [immediateContext.setTextures]
-/// NOTE: Unlike OpenGL, Spectre textures do not describe how they are sampled
+///
+/// Unlike WebGL, Spectre textures do not describe how they are sampled.
 class Texture2D extends SpectreTexture {
   bool _loadError = false;
 
@@ -122,7 +121,8 @@ class Texture2D extends SpectreTexture {
   /// A call to this method will only generate mipmap data if the
   /// texture is a power of two. If not then this call is ignored.
   void generateMipmap() {
-    if (SpectreTexture._isPowerOfTwo(_width) && SpectreTexture._isPowerOfTwo(_height)) {
+    if (SpectreTexture._isPowerOfTwo(_width) &&
+        SpectreTexture._isPowerOfTwo(_height)) {
       var oldBind = _pushBind();
       _generateMipmap();
       _popBind(oldBind);

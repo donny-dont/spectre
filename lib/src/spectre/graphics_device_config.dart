@@ -22,13 +22,15 @@ part of spectre;
 
 /// Specifies the configuration of the [GraphicsDevice].
 ///
-/// When creating a [WebGLRenderingContext] there are various options that can be
-/// passed in to specify the configuration. These options can only be specified when the
-/// [GraphicsDevice] is created. Afterwards they cannot be modified.
+/// When creating a [WebGL.RenderingContext] there are various options that can
+/// be passed in to specify the configuration. These options can only be
+/// specified when the [GraphicsDevice] is created. Afterwards they cannot be
+/// modified.
 ///
-/// It should be noted that the underlying WebGL implementation takes these values as a
-/// suggestion. If the underlying hardware does not support the configuration it will be ignored.
-/// After creating the [GraphicsDevice] the [GraphicsDeviceCapabilities] should be queried directly.
+/// It should be noted that the underlying WebGL implementation takes these
+/// values as a suggestion. If the underlying hardware does not support the
+/// configuration it will be ignored. After creating the [GraphicsDevice] the
+/// [GraphicsDeviceCapabilities] should be queried directly.
 ///
 ///     GraphicsDeviceConfig config = new GraphicsDeviceConfig();
 ///     config.stencilBuffer = true;
@@ -49,7 +51,7 @@ class GraphicsDeviceConfig {
 
   /// Creates an instance of the [GraphicsDeviceConfig] class.
   ///
-  /// The default values of [WebGLContextAttributes] are used.
+  /// The default values of [WebGL.ContextAttributes] are used.
   ///
   ///    GraphicsDeviceConfig config = new GraphicsDeviceConfig();
   ///    config.stencil = false;
