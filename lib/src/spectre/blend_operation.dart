@@ -38,22 +38,26 @@ class BlendOperation {
 
   /// The result is the destination added to the source.
   ///
-  ///     Result = (Source Color * Source Blend) + (Destination Color * Destination Blend)
+  ///     Result = (Source Color * Source Blend) +
+  ///              (Destination Color * Destination Blend)
   static const int Add = WebGL.FUNC_ADD;
   /// The result is the source subtracted from the destination.
   ///
-  ///     Result = (Destination Color * Destination Blend) - (Source Color * Source Blend)
+  ///     Result = (Destination Color * Destination Blend) -
+  ///              (Source Color * Source Blend)
   static const int ReverseSubtract = WebGL.FUNC_REVERSE_SUBTRACT;
   /// The result is the destination subtracted from the source.
   ///
-  ///     Result = (Source Color * Source Blend) - (Destination Color * Destination Blend)
+  ///     Result = (Source Color * Source Blend) -
+  ///              (Destination Color * Destination Blend)
   static const int Subtract = WebGL.FUNC_SUBTRACT;
 
   //---------------------------------------------------------------------
   // Class methods
   //---------------------------------------------------------------------
 
-  /// Convert from a [String] name to the corresponding [BlendOperation] enumeration.
+  /// Convert from a [String] name to the corresponding [BlendOperation]
+  /// enumeration.
   static int parse(String name) {
     if (name == _addName) {
       return Add;
