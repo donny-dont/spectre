@@ -58,8 +58,8 @@ class RasterizerState extends DeviceChild {
   double _depthBias = 0.0;
   /// A bias value that takes into account the slope of a polygon.
   ///
-  /// This bias value is applied to coplanar primitives to reduce aliasing and other rendering
-  /// artifacts caused by z-fighting.
+  /// This bias value is applied to coplanar primitives to reduce aliasing and
+  /// other rendering artifacts caused by z-fighting.
   ///
   /// The default is 0.
   double _slopeScaleDepthBias = 0.0;
