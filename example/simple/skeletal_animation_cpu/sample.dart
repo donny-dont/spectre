@@ -29,7 +29,7 @@ import 'dart:math' as Math;
 import 'dart:async';
 import 'dart:typeddata';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
@@ -520,8 +520,8 @@ class Application {
 Application _application;
 /// Instance of the [ApplicationControls].
 ApplicationControls _applicationControls;
-/// Instance of the [GameLoop] controlling the application flow.
-GameLoop _gameLoop;
+/// Instance of the [GameLoopHtml] controlling the application flow.
+GameLoopHtml _gameLoop;
 /// Identifier of the [CanvasElement] the application is rendering to.
 final String _canvasId = '#backBuffer';
 
@@ -540,14 +540,14 @@ void onRender(GameLoop gameLoop) {
 }
 
 /// Callback for when the canvas is resized.
-void onResize(GameLoop gameLoop) {
+void onResize(GameLoopHtml gameLoop) {
   _application.onResize(gameLoop.width, gameLoop.height);
 }
 
 /// Callback for when the pointer lock changes.
 ///
 /// Used to show/hide the options UI.
-void onPointerLockChange(GameLoop gameLoop) {
+void onPointerLockChange(GameLoopHtml gameLoop) {
   if (gameLoop.pointerLock.locked) {
     _applicationControls.hide();
   } else {
@@ -568,7 +568,7 @@ void main() {
 
   // Hook up the game loop
   // The loop isn't started until the start method is called.
-  _gameLoop = new GameLoop(canvas);
+  _gameLoop = new GameLoopHtml(canvas);
 
   _gameLoop.onResize = onResize;
   _gameLoop.onUpdate = onFrame;

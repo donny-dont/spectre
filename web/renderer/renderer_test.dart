@@ -2,7 +2,7 @@ import 'dart:html';
 import 'dart:math';
 import 'dart:typeddata';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
@@ -24,7 +24,7 @@ final String _canvasId = '#frontBuffer';
 GraphicsDevice graphicsDevice;
 GraphicsContext graphicsContext;
 DebugDrawManager debugDrawManager;
-GameLoop gameLoop;
+GameLoopHtml gameLoop;
 AssetManager assetManager;
 Renderer renderer;
 final List<Layer> layers = new List<Layer>();
@@ -64,7 +64,7 @@ Map renderer_config = {
  ]
 };
 
-void gameFrame(GameLoop gameLoop) {
+void gameFrame(GameLoopHtml gameLoop) {
   double dt = gameLoop.dt;
   cameraController.forwardVelocity = 25.0;
   cameraController.strafeVelocity = 25.0;
@@ -115,7 +115,7 @@ void renderFrame(GameLoop gameLoop) {
 }
 
 // Handle resizes
-void resizeFrame(GameLoop gameLoop) {
+void resizeFrame(GameLoopHtml gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.client.width;
@@ -277,7 +277,7 @@ main() {
   registerSpectreWithAssetManager(graphicsDevice, assetManager);
   renderer = new Renderer(canvas, graphicsDevice, assetManager);
   renderer.fromJson(renderer_config);
-  gameLoop = new GameLoop(canvas);
+  gameLoop = new GameLoopHtml(canvas);
   gameLoop.onUpdate = gameFrame;
   gameLoop.onRender = renderFrame;
   gameLoop.onResize = resizeFrame;
