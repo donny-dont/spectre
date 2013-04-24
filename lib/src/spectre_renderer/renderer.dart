@@ -266,7 +266,7 @@ class Renderer {
 
   void _buildFullscreenMesh() {
     _fullscreenMesh = new SingleArrayMesh('Renderer.FullscreenMesh', device);
-    Float32Array fullscreenVertexArray = new Float32Array(12);
+    Float32List fullscreenVertexArray = new Float32List(12);
     // Vertex 0
     fullscreenVertexArray[0] = -1.0;
     fullscreenVertexArray[1] = -1.0;

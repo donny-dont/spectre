@@ -75,7 +75,7 @@ class DdsFile {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    Uint32Array reader = new Uint32Array.fromBuffer(_buffer);
+    Uint32List reader = new Uint32List.fromBuffer(_buffer);
 
     // Check the magic number
     if (reader[0] != _magicNumber) {
@@ -98,7 +98,8 @@ class DdsFile {
 
     // See if the extended header is present
     if (_pixelFormat.characterCode == DdsPixelFormat._dx10CharacterCode) {
-      if (_buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
+      if (_buffer.byteLength <=
+          DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
         throw new ArgumentError('Invalid DDS file');
       }
 
@@ -407,7 +408,7 @@ class DdsHeader {
 
   /// Creates an instance of the [DdsHeader] class.
   DdsHeader._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+    Uint32List reader = new Uint32List.fromBuffer(buffer, _byteOffset);
 
     _size              = reader[0];
     _flags             = reader[1];
@@ -590,7 +591,7 @@ class DdsPixelFormat {
 
   /// Creates an instance of the [DdsPixelFormat] class.
   DdsPixelFormat._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+    Uint32List reader = new Uint32List.fromBuffer(buffer, _byteOffset);
 
     _size          = reader[0];
     _flags         = reader[1];
@@ -759,7 +760,7 @@ class DdsExtendedHeader {
 
   /// Creates an instance of the [DdsPixelFormat] class.
   DdsExtendedHeader._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+    Uint32List reader = new Uint32List.fromBuffer(buffer, _byteOffset);
 
     _resourceFormat = reader[0];
     _dimension = reader[1];

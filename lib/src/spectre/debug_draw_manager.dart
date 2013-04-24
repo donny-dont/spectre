@@ -132,7 +132,7 @@ class _DebugDrawLineManager {
   SingleArrayMesh _lineMesh;
   InputLayout _lineMeshInputLayout;
 
-  Float32Array _vboStorage;
+  Float32List _vboStorage;
 
   _DebugDrawLineManager(this.device, int maxVertices,
                         ShaderProgram shaderProgram) {
@@ -140,7 +140,7 @@ class _DebugDrawLineManager {
       // Keep an even number of vertices.
       maxVertices += 1;
     }
-    _vboStorage = new Float32Array(maxVertices*DebugDrawVertexSize);
+    _vboStorage = new Float32List(maxVertices*DebugDrawVertexSize);
     _lineMesh = new SingleArrayMesh('_DebugDrawLineManager', device);
     _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
     _lineMesh.vertexArray.allocate(_vboStorage.length*4,
@@ -223,7 +223,7 @@ class DebugDrawManager {
   _DebugDrawLineManager _depthEnabledLines;
   _DebugDrawLineManager _depthDisabledLines;
 
-  Float32Array _cameraMatrix = new Float32Array(16);
+  Float32List _cameraMatrix = new Float32List(16);
 
   final GraphicsDevice device;
 

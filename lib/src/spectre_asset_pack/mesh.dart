@@ -33,8 +33,8 @@ class MeshImporter extends AssetImporter {
   SpectreMesh _processMesh(Asset asset, Map json) {
     final String name = asset.name;
     SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
-    var vertexArray = new Float32Array.fromList(json['vertices']);
-    var indexArray = new Uint16Array.fromList(json['indices']);
+    var vertexArray = new Float32List.fromList(json['vertices']);
+    var indexArray = new Uint16List.fromList(json['indices']);
     mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
     mesh.indexArray.uploadData(indexArray, SpectreBuffer.UsageStatic);
     mesh.count = indexArray.length;
@@ -68,8 +68,8 @@ class MeshImporter extends AssetImporter {
   SpectreMesh _processMeshes(Asset asset, List meshes, AssetPackTrace tracer) {
     final String name = asset.name;
     SingleArrayIndexedMesh mesh = new SingleArrayIndexedMesh(name, device);
-    var vertexArray = new Float32Array.fromList(meshes[0]['vertices']);
-    var indexArray = new Uint16Array.fromList(meshes[0]['indices']);
+    var vertexArray = new Float32List.fromList(meshes[0]['vertices']);
+    var indexArray = new Uint16List.fromList(meshes[0]['indices']);
     mesh.vertexArray.uploadData(vertexArray, SpectreBuffer.UsageStatic);
     mesh.indexArray.uploadData(indexArray, SpectreBuffer.UsageStatic);
     mesh.count = indexArray.length;

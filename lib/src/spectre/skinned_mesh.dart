@@ -364,7 +364,7 @@ class SkinnedMesh extends SpectreMesh {
   }
 
   Float32List baseVertexData; // The unanimated reference data.
-  Float32Array vertexData; // The animated vertex data.
+  Float32List vertexData; // The animated vertex data.
   int _floatsPerVertex;
   final Float32List globalInverseTransform = new Float32List(16);
 
@@ -470,8 +470,6 @@ class SkinnedMesh extends SpectreMesh {
 
     Stopwatch sw = new Stopwatch();
     sw.start();
-    // 80 ms
-
     for (int v = 0; v < numVertices; v++) {
       // Zero vertices.
       vertex[0] = 0.0;
@@ -481,17 +479,6 @@ class SkinnedMesh extends SpectreMesh {
       for (int i = 4; i < _floatsPerVertex; i++) {
         vertex[i] = baseVertexData[vertexBase+i];
       }
-      /*
-       * // 30 ms
-      vertexData[vertexBase+0] = 0.0;
-      vertexData[vertexBase+1] = 0.0;
-      vertexData[vertexBase+2] = 0.0;
-      vertexData[vertexBase+3] = 0.0;
-      for (int i = 4; i < _floatsPerVertex; i++) {
-        vertexData[vertexBase+i] = baseVertexData[vertexBase+i];
-      }
-      */
-
       int skinningDataOffset = vertexSkinningOffsets[v];
       Float32ListHelpers.zero(m);
       while (boneData[skinningDataOffset] != -1) {
@@ -511,7 +498,7 @@ class SkinnedMesh extends SpectreMesh {
       vertexBase += _floatsPerVertex;
     }
     sw.stop();
-    //print(sw.elapsedMilliseconds);
+    print(sw.elapsedMicroseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
 }
@@ -591,14 +578,14 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   meshes.forEach((m) {
     importMesh(mesh, m);
   });
-  mesh.vertexData = new Float32Array.fromList(json['vertices']);
+  mesh.vertexData = new Float32List.fromList(json['vertices'].map((e) => e.toDouble()).toList());
   mesh.baseVertexData = new Float32List(mesh.vertexData.length);
   for (int i = 0; i < mesh.vertexData.length; i++) {
     mesh.baseVertexData[i] = mesh.vertexData[i];
   }
   mesh.vertexArray.uploadData(mesh.vertexData,
                               SpectreBuffer.UsageDynamic);
-  mesh.indexArray.uploadData(new Uint16Array.fromList(json['indices']),
+  mesh.indexArray.uploadData(new Uint16List.fromList(json['indices']),
                              SpectreBuffer.UsageStatic);
   // static mesh ends.
 
