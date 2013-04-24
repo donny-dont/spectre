@@ -58,7 +58,7 @@ void main() {
   test('construction', () {
     // Default constructor
     DepthState defaultState = new DepthState('DepthStateDefault', _graphicsDevice);
-    testConstructor(defaultState, true, false);
+    testConstructor(defaultState, true, true);
     expect(() { DepthState constructWithNull = new DepthState('DepthStateNull', null); }, throwsArgumentError);
 
     // DepthState.depthWrite
@@ -99,7 +99,7 @@ void main() {
     expect(depthStateEqual(depthState0, depthState1), true);
 
     depthState0.depthBufferWriteEnabled = true;
-    expect(depthStateEqual(depthState0, depthState1), false);
+    expect(depthStateEqual(depthState0, depthState1), true);
     depthState1.depthBufferWriteEnabled = depthState0.depthBufferWriteEnabled;
     expect(depthStateEqual(depthState0, depthState1), true);
 

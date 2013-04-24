@@ -25,7 +25,7 @@
 library spectre_post;
 
 import 'dart:html';
-import 'dart:typeddata';
+import 'dart:typed_data';
 import 'spectre.dart';
 
 part 'src/spectre_post/spectre_post_pass.dart';

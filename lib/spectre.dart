@@ -28,7 +28,7 @@ import 'dart:web_gl' as WebGL;
 import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:math' as Math;
-import 'dart:typeddata';
+import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 import 'package:spectre/disposable.dart';
 
