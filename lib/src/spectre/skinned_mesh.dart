@@ -115,6 +115,14 @@ class Float32ListHelpers {
         a[3] = a[3] * len;
     }
   }
+
+  static void zeroSIMD(Float32x4List out) {
+    out[0] = new Float32x4.zero();
+    out[1] = new Float32x4.zero();
+    out[2] = new Float32x4.zero();
+    out[3] = new Float32x4.zero();
+  }
+
   static void zero(Float32List out) {
     out[0] = 0.0;
     out[1] = 0.0;
@@ -232,6 +240,19 @@ class Float32ListHelpers {
     out[3] += (m[3] * x + m[7] * y + m[11] * z + m[15] * w);
   }
 
+  static void transformSIMD(Float32x4List out, Float32x4List a, int ii,
+                            Float32x4List m4) {
+    Float32x4 v = a[ii];
+    Float32x4 xxxx = v.xxxx;
+    out[0] += xxxx * m4[0];
+    Float32x4 yyyy = v.yyyy;
+    out[0] += yyyy * m4[1];
+    Float32x4 zzzz = v.zzzz;
+    out[0] += zzzz * m4[2];
+    Float32x4 wwww = v.wwww;
+    out[0] += wwww * m4[3];
+  }
+
   static void addScale44(out, input, scale) {
     out[0] += input[0] * scale;
     out[1] += input[1] * scale;
@@ -249,6 +270,14 @@ class Float32ListHelpers {
     out[13] += input[13] * scale;
     out[14] += input[14] * scale;
     out[15] += input[15] * scale;
+  }
+
+  static void addScale44SIMD(Float32x4List out, Float32x4List input,
+                             Float32x4 scale) {
+    out[0] += input[0] * scale;
+    out[1] += input[1] * scale;
+    out[2] += input[2] * scale;
+    out[3] += input[3] * scale;
   }
 }
 
@@ -365,6 +394,8 @@ class SkinnedMesh extends SpectreMesh {
 
   Float32List baseVertexData; // The unanimated reference data.
   Float32List vertexData; // The animated vertex data.
+  Float32x4List baseVertexData4;
+  Float32x4List vertexData4;
   int _floatsPerVertex;
   final Float32List globalInverseTransform = new Float32List(16);
 
@@ -384,6 +415,7 @@ class SkinnedMesh extends SpectreMesh {
   final List<Float32List> localBoneTransforms = new List<Float32List>();
   final List<Float32List> globalBoneTransforms = new List<Float32List>();
   final List<Float32List> skinningBoneTransforms = new List<Float32List>();
+  final List<Float32x4List> skinningBoneTransforms4 = new List<Float32x4List>();
 
   // boneChildren[i] will be -1 when no more children.
   Int16List boneChildrenIds;
@@ -412,6 +444,7 @@ class SkinnedMesh extends SpectreMesh {
     parentTransform[15] = 1.0;
     _updateGlobalBoneTransforms(0, parentTransform);
     _updateSkinningBoneTransforms();
+    //_updateVerticesSIMD();
     _updateVertices();
   }
 
@@ -501,6 +534,42 @@ class SkinnedMesh extends SpectreMesh {
     print(sw.elapsedMicroseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
+
+  // Transform baseVertexData into vertexData based on bone hierarchy.
+  final Float32x4List m4 = new Float32x4List(4);
+  final Float32x4List vertex4 = new Float32x4List(3);
+
+  void _updateVerticesSIMD() {
+    int numVertices = baseVertexData.length~/_floatsPerVertex;
+    int vertexBase = 0;
+    Stopwatch sw = new Stopwatch();
+    sw.start();
+
+    for (int v = 0; v < numVertices; v++) {
+      vertex4[0] = new Float32x4.zero();
+      vertex4[1] = baseVertexData4[vertexBase+1];
+      vertex4[2] = baseVertexData4[vertexBase+2];
+      int skinningDataOffset = vertexSkinningOffsets[v];
+      Float32ListHelpers.zeroSIMD(m4);
+      while (boneData[skinningDataOffset] != -1) {
+        final int boneId = boneData[skinningDataOffset];
+        final double weight = weightData[skinningDataOffset];
+        Float32x4 weight4 = new Float32x4(weight, weight, weight, weight);
+        Float32ListHelpers.addScale44SIMD(m4,
+                                          skinningBoneTransforms4[boneId],
+                                          weight4);
+        skinningDataOffset++;
+      }
+      Float32ListHelpers.transformSIMD(vertex4, baseVertexData4, vertexBase, m4);
+      vertexData4[vertexBase] = vertex4[0];
+      vertexData4[vertexBase+1] = vertex4[1];
+      vertexData4[vertexBase+2] = vertex4[2];
+      vertexBase += _floatsPerVertex ~/ 4;
+    }
+    sw.stop();
+    print(sw.elapsedMicroseconds);
+    vertexArray.uploadSubData(0, vertexData);
+  }
 }
 
 void importMesh(SkinnedMesh mesh, Map json) {
@@ -579,7 +648,9 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     importMesh(mesh, m);
   });
   mesh.vertexData = new Float32List.fromList(json['vertices'].map((e) => e.toDouble()).toList());
+  mesh.vertexData4 = new Float32x4List.view(mesh.vertexData);
   mesh.baseVertexData = new Float32List(mesh.vertexData.length);
+  mesh.baseVertexData4 = new Float32x4List.view(mesh.baseVertexData);
   for (int i = 0; i < mesh.vertexData.length; i++) {
     mesh.baseVertexData[i] = mesh.vertexData[i];
   }
@@ -615,6 +686,10 @@ SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
     mesh.globalBoneTransforms.add(new Float32List(16));
     mesh.skinningBoneTransforms.add(new Float32List(16));
   });
+  for (int i = 0; i < mesh.skinningBoneTransforms.length; i++) {
+    mesh.skinningBoneTransforms4.add(
+        new Float32x4List.view(mesh.skinningBoneTransforms[i]));
+  }
   mesh.boneParents = new Int16List(bones.length);
   mesh.boneChildrenOffsets = new Int16List(bones.length);
   mesh.boneChildrenIds = new Int16List(numChildren);
