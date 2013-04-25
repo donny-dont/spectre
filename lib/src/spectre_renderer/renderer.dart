@@ -40,13 +40,7 @@ class Renderer {
   Viewport _frontBufferViewport;
   Viewport get frontBufferViewport => _frontBufferViewport;
 
-  VertexShader _blitVertexShader;
-  FragmentShader _blitFragmentShader;
-  ShaderProgram _blitShaderProgram;
-
-  VertexShader _blurVertexShader;
-  FragmentShader _blurFragmentShader;
-  ShaderProgram _blurShaderProgram;
+  MaterialShader _blitMaterialShader;
 
   BlendState _clearBlendState;
   DepthState _clearDepthState;
@@ -220,7 +214,7 @@ class Renderer {
   /// Draws a single triangle covering the entire viewport. Useful for
   /// doing full screen passes.
   void renderFullscreenMesh(Material material) {
-    _fullscreenMeshInputLayout.shaderProgram = material.shader;
+    _fullscreenMeshInputLayout.shaderProgram = material.shader.shader;
     device.context.setInputLayout(_fullscreenMeshInputLayout);
     device.context.setMesh(_fullscreenMesh);
     device.context.drawMesh(_fullscreenMesh);
@@ -303,66 +297,9 @@ class Renderer {
     _fullscreenMeshInputLayout.mesh = _fullscreenMesh;
   }
 
-  void _buildFullscreenBlurMaterial() {
-    _blurVertexShader = new VertexShader('starfield', device);
-    _blurFragmentShader = new FragmentShader('starfield', device);
-    _blurShaderProgram = new ShaderProgram('starfield', device);
-    _blurShaderProgram.vertexShader = _blurVertexShader;
-    _blurShaderProgram.fragmentShader = _blurFragmentShader;
-    _blurVertexShader.source = '''
-precision highp float;
-attribute vec2 vPosition;
-attribute vec2 vTexCoord;
-varying vec2 samplePoint;
-
-uniform float time;
-uniform vec2 cursor;
-uniform vec2 renderTargetResolution;
-
-void main() {
-    vec4 vPosition4 = vec4(vPosition.x, vPosition.y, 1.0, 1.0);
-    gl_Position = vPosition4;
-    samplePoint = vTexCoord;
-}
-''';
-    _blurFragmentShader.source = '''
-    precision mediump float;
-
-          const float blurSize = 1.0/512.0;
-
-          varying vec2 samplePoint;
-          uniform sampler2D source;
-
-          void main() {
-   vec4 sum = texture2D(source, vec2(samplePoint.x - 4.0*blurSize, samplePoint.y)) * 0.05;
-   sum += texture2D(source, vec2(samplePoint.x - 3.0*blurSize, samplePoint.y)) * 0.09;
-   sum += texture2D(source, vec2(samplePoint.x - 2.0*blurSize, samplePoint.y)) * 0.12;
-   sum += texture2D(source, vec2(samplePoint.x - blurSize, samplePoint.y)) * 0.15;
-   sum += texture2D(source, vec2(samplePoint.x, samplePoint.y)) * 0.16;
-   sum += texture2D(source, vec2(samplePoint.x + blurSize, samplePoint.y)) * 0.15;
-   sum += texture2D(source, vec2(samplePoint.x + 2.0*blurSize, samplePoint.y)) * 0.12;
-   sum += texture2D(source, vec2(samplePoint.x + 3.0*blurSize, samplePoint.y)) * 0.09;
-   sum += texture2D(source, vec2(samplePoint.x + 4.0*blurSize, samplePoint.y)) * 0.05;
-
-   gl_FragColor = sum;
-    }''';
-    print(_blurFragmentShader.compileLog);
-    _blurShaderProgram.link();
-    Material starFieldMaterial = new Material('blur',
-                                              _blurShaderProgram,
-                                              this);
-    var asset = _fullscreenEffectsPack.registerAsset('blur', 'material',
-                                                     '', '', {}, {});
-    asset.imported = starFieldMaterial;
-  }
-
   void _buildFullscreenBlitMaterial() {
-    _blitVertexShader = new VertexShader('blit', device);
-    _blitFragmentShader = new FragmentShader('blit', device);
-    _blitShaderProgram = new ShaderProgram('blit', device);
-    _blitShaderProgram.vertexShader = _blitVertexShader;
-    _blitShaderProgram.fragmentShader = _blitFragmentShader;
-    _blitVertexShader.source = '''
+    _blitMaterialShader = new MaterialShader('blit', this);
+    _blitMaterialShader.vertexShader = '''
 precision highp float;
 attribute vec2 vPosition;
 attribute vec2 vTexCoord;
@@ -378,7 +315,7 @@ void main() {
   samplePoint = vTexCoord;
 }
 ''';
-    _blitFragmentShader.source = '''
+    _blitMaterialShader.fragmentShader = '''
 precision mediump float;
 
 uniform float time;
@@ -392,8 +329,7 @@ void main() {
   gl_FragColor = texture2D(source, samplePoint);
 }
 ''';
-    _blitShaderProgram.link();
-    Material blitMaterial = new Material('blit fullscreen', _blitShaderProgram,
+    Material blitMaterial = new Material('blit fullscreen', _blitMaterialShader,
                                          this);
     var asset = _fullscreenEffectsPack.registerAsset('blit', 'material', '', '',
                                                      {}, {});
@@ -404,7 +340,6 @@ void main() {
     NPOTSampler = new SamplerState.linearClamp('Renderer.NPOTSampler', device);
     _buildFullscreenMesh();
     _buildFullscreenBlitMaterial();
-    _buildFullscreenBlurMaterial();
   }
 
   Renderer(this.frontBuffer, this.device, this.assetManager) {

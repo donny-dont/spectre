@@ -25,26 +25,37 @@ class MaterialShader extends Disposable {
   final Renderer renderer;
   ShaderProgram _shader;
   ShaderProgram get shader => _shader;
-  /// Constants
-  final Map<String, MaterialConstant> constants =
-      new Map<String, MaterialConstant>();
-  /// Textures
-  final Map<String, MaterialTexture> textures =
-      new Map<String, MaterialTexture>();
 
-  MaterialShader(this.name, this.renderer);
+  final List<SpectreTexture> textures = new List<SpectreTexture>();
+  final List<SamplerState> samplers = new List<SamplerState>();
+
+  set vertexShader(String source) {
+    _shader.vertexShader.source = source;
+    _shader.vertexShader.compile();
+    _shader.link();
+  }
+  set fragmentShader(String source) {
+    _shader.fragmentShader.source = source;
+    _shader.fragmentShader.compile();
+    _shader.link();
+  }
+
+  MaterialShader(this.name, this.renderer) {
+    _shader = new ShaderProgram(name, renderer.device);
+    _shader.vertexShader = new VertexShader(name, renderer.device);
+    _shader.fragmentShader = new FragmentShader(name, renderer.device);
+  }
 
   void finalize() {
-    if (shader != null) {
-      shader.dispose();
+    if (_shader != null) {
+      _shader.vertexShader.dispose();
+      _shader.fragmentShader.dispose();
+      _shader.dispose();
     }
   }
 
   void _applyConstant(String name, MaterialConstant constant) {
   }
-
-  final List<SpectreTexture> _textureTable = new List<SpectreTexture>();
-  final List<SamplerState> _samplerTable = new List<SamplerState>();
 
   void _applyTexture(String name, MaterialTexture texture) {
   }

@@ -161,14 +161,8 @@ void _buildCubes() {
 }
 
 void _makeMaterial() {
-  var shaderProgram = new ShaderProgram('simpleTexture', graphicsDevice);
-  var vertexShader = new VertexShader('simpleTexture', graphicsDevice);
-  var fragmentShader = new FragmentShader('simpleTexture', graphicsDevice);
-  Material material = new Material('simpleTexture', shaderProgram, renderer);
-  material.depthState.depthBufferWriteEnabled = true;
-  shaderProgram.vertexShader = vertexShader;
-  shaderProgram.fragmentShader = fragmentShader;
-  vertexShader.source = '''
+  MaterialShader materialShader = new MaterialShader('simpleTexture', renderer);
+  materialShader.vertexShader = '''
 precision highp float;
 
 attribute vec3 POSITION;
@@ -200,7 +194,7 @@ void main() {
     gl_Position = M*vPosition4;
 }
 ''';
-  fragmentShader.source = '''
+  materialShader.fragmentShader = '''
 precision mediump float;
 
 varying vec3 surfaceNormal;
@@ -222,10 +216,9 @@ void main() {
     gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ''';
-  print(fragmentShader.compileLog);
-  shaderProgram.link();
-  assert(shaderProgram.linked);
-  material.link();
+  Material material = new Material('simpleTexture', materialShader, renderer);
+  material.depthState.depthBufferWriteEnabled = true;
+
   var asset = assetManager['demoAssets'].registerAsset('simpleTexture',
                                                        'shader', '', '', {},
                                                        {});
