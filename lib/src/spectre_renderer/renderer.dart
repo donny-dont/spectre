@@ -80,7 +80,7 @@ class Renderer {
       throw new ArgumentError('Invalid target description.');
     }
     Texture2D buffer = new Texture2D(name, device);
-    buffer.uploadPixelArray(width, height, null);
+    buffer.uploadPixelArray(width, height, new Uint8List(width*height*4));
     colorBuffers[name] = buffer;
     var asset =
         _rendererPack.registerAsset(name, 'ColorBuffer', '', '', {}, {});
