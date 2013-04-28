@@ -19,15 +19,3 @@
 */
 
 part of spectre_renderer;
-
-/** Register the [javelin] renderer with the [asset_pack] asset manager. */
-bool _registered = false;
-void registerJavelinRendererWithAssetManager(Renderer renderer,
-                                             AssetManager assetManager) {
-  if (_registered == true) {
-    return;
-  }
-  _registered = true;
-  // Texture loader.
-  // Material loader.
-}

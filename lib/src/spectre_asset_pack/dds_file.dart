@@ -256,7 +256,7 @@ class DdsFile {
           fromIndex += padding;
         }
 
-        return copyTo.buffer;
+        return copyTo;
       }
     }
   }
