@@ -180,10 +180,12 @@ class SamplerState extends DeviceChild {
 
   /// The magnification filter to use.
   ///
-  /// If the [Texture] does not contain mipmaps, such as non-power of two textures,
-  /// then the only valid values are [Texture.Linear] and [Texture.Point].
+  /// If the [SpectreTexture] does not contain mipmaps, such as non-power of
+  /// two textures, then the only valid values are Texture.Linear and
+  /// Texture.Point.
   ///
-  /// Throws [ArgumentError] if the [value] is not an enumeration within [TextureMinFilter].
+  /// Throws [ArgumentError] if the [value] is not an enumeration within
+  /// [TextureMinFilter].
   int get magFilter => _magFilter;
   set magFilter(int value) {
     if (!TextureMagFilter.isValid(value)) {
