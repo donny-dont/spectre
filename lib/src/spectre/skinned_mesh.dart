@@ -430,7 +430,7 @@ class SkinnedMesh extends SpectreMesh {
     _currentAnimation = animations[name];
   }
 
-  void update(double dt) {
+  void update(double dt, bool useSimd) {
     assert(_currentAnimation != null);
     _currentTime += dt * _currentAnimation._timeScale;
     // Wrap.
@@ -444,8 +444,11 @@ class SkinnedMesh extends SpectreMesh {
     parentTransform[15] = 1.0;
     _updateGlobalBoneTransforms(0, parentTransform);
     _updateSkinningBoneTransforms();
-    //_updateVerticesSIMD();
-    _updateVertices();
+    if (useSimd) {
+      _updateVerticesSIMD();  
+    } else {
+      _updateVertices();
+    }
   }
 
   void _updateSkinningBoneTransforms() {
@@ -494,13 +497,13 @@ class SkinnedMesh extends SpectreMesh {
     }
   }
 
+  final Float32List m = new Float32List(16);
+  final Float32List vertex = new Float32List(12);
+  
   // Transform baseVertexData into vertexData based on bone hierarchy.
   void _updateVertices() {
     int numVertices = baseVertexData.length~/_floatsPerVertex;
     int vertexBase = 0;
-    Float32List m = new Float32List(16);
-    Float32List vertex = new Float32List(_floatsPerVertex);
-
     Stopwatch sw = new Stopwatch();
     sw.start();
     for (int v = 0; v < numVertices; v++) {
@@ -531,7 +534,7 @@ class SkinnedMesh extends SpectreMesh {
       vertexBase += _floatsPerVertex;
     }
     sw.stop();
-    print(sw.elapsedMicroseconds);
+    //print(sw.elapsedMicroseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
 
@@ -554,7 +557,7 @@ class SkinnedMesh extends SpectreMesh {
       while (boneData[skinningDataOffset] != -1) {
         final int boneId = boneData[skinningDataOffset];
         final double weight = weightData[skinningDataOffset];
-        Float32x4 weight4 = new Float32x4(weight, weight, weight, weight);
+        Float32x4 weight4 = new Float32x4.splat(weight);
         Float32ListHelpers.addScale44SIMD(m4,
                                           skinningBoneTransforms4[boneId],
                                           weight4);
@@ -567,7 +570,7 @@ class SkinnedMesh extends SpectreMesh {
       vertexBase += _floatsPerVertex ~/ 4;
     }
     sw.stop();
-    print(sw.elapsedMicroseconds);
+    //print(sw.elapsedMicroseconds);
     vertexArray.uploadSubData(0, vertexData);
   }
 }
