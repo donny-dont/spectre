@@ -206,7 +206,7 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  //_skinnedMesh.update(1.0/60.0, true);
+  _skinnedMesh.update(1.0/60.0, true);
   _drawSkinnedBones(_skinnedMesh, 0, 0);
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
@@ -257,7 +257,6 @@ void _drawSkinnedCharacter() {
 
 main() {
   final String baseUrl = "${window.location.href.substring(0, window.location.href.length - "asset_pack.html".length)}";
-  print(baseUrl);
   CanvasElement canvas = query(_canvasId);
   assert(canvas != null);
 

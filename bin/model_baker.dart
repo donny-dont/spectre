@@ -35,7 +35,7 @@ class ModelBone {
   final Float32List localTransform = new Float32List(16);
   final Float32List offsetTransform = new Float32List(16);
   final ModelBone parent;
-  final int boneIndex;
+  int boneIndex;
   final List<ModelBone> children = new List<ModelBone>();
   ModelBone(this.name, this.parent, this.boneIndex) {
     // Identity Matrix.
@@ -275,6 +275,46 @@ class ModelBaker {
     }
   }
   
+  bool noAnimation(ModelBone bone) {
+    if (bone.animationBone == true) {
+      return false;
+    }
+    for (int i = 0; i < bone.children.length; i++) {
+      bool r = noAnimation(bone.children[i]);
+      if (!r) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  pruneBones(ModelBone node) {
+    List toPrune = new List();
+    for (int i = 0; i < node.children.length; i++) {
+      if (noAnimation(node.children[i])) {
+        toPrune.add(node.children[i]);
+      }
+      pruneBones(node.children[i]);
+    }
+    toPrune.forEach((p) {
+      //print('Pruning ${p.name}');
+      node.children.remove(p);
+      boneTable.remove(p.name);
+    });
+  }
+  
+  int _reflowIndexCounter = -1;
+  void reflow() {
+    _reflowIndexCounter = -1;
+    reflowNode(root);
+  }
+  void reflowNode(ModelBone node) {
+    node.boneIndex = _reflowIndexCounter++;
+    for (int i = 0; i < node.children.length; i++) {
+      reflowNode(node.children[i]);
+    }
+  }
+  
   buildVertexStreams() {
     List meshList = inputMesh['meshes'];
     if (meshes == null) {
@@ -375,6 +415,9 @@ class ModelBaker {
     clear();
     buildBones();
     fillOffsetTransforms();
+    pruneBones(root);
+    reflow();
+    //root.dump(0);
     buildVertexStreams();
     buildAttributes();
     buildVertexBuffer();
