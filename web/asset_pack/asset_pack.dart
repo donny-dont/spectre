@@ -155,6 +155,9 @@ double _skeletonScale = 1.0;
 void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
   List<double> origin = [0.0, 0.0, 0.0];
   final matrices = mesh.globalBoneTransforms;
+  if (matrices.length == 0) {
+    return;
+  }
   origin[0] = matrices[id][12] * _skeletonScale;
   origin[1] = matrices[id][13] * _skeletonScale;
   origin[2] = matrices[id][14] * _skeletonScale;
@@ -188,8 +191,9 @@ void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
 void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager['demoAssets.litdiffuse'];
   assert(_skinnedShaderProgram.linked == true);
-  _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
-                                   _assetManager['demoAssets.hellknight']);
+  //_skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight']);
+  _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight2']);
+                                   
   _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -202,7 +206,7 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  _skinnedMesh.update(1.0/60.0, true);
+  //_skinnedMesh.update(1.0/60.0, true);
   _drawSkinnedBones(_skinnedMesh, 0, 0);
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);

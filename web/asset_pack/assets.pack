@@ -285,6 +285,18 @@
 
     }
   },
+  "hellknight2":{
+    "loadArguments":{
+
+    },
+    "name":"hellknight2",
+    "url":"/json/hellknight2.json",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+
   "hellknight_body":{
     "loadArguments":{
 

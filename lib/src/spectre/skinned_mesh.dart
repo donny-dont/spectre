@@ -628,6 +628,43 @@ class SkinnedVertex {
   SkinnedVertex(this.vertexId);
 }
 
+SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
+  SkinnedMesh mesh = new SkinnedMesh(name, device);
+  
+  // TODO: FIX THIS.
+  mesh.globalInverseTransform[0] = 1.0;
+  mesh.globalInverseTransform[5] = 1.0;
+  mesh.globalInverseTransform[10] = 1.0;
+  mesh.globalInverseTransform[15] = 1.0;
+  
+  List attributes = json['attributes'];
+  // static mesh data begins.
+  attributes.forEach((a) {
+    importAttribute(mesh, a);
+  });
+  mesh._floatsPerVertex = attributes[0]['stride']~/4;;
+  
+  List vertices = json['vertices'];
+  mesh.vertexData = new Float32List.fromList(json['vertices'].map((e) => e.toDouble()).toList());
+  mesh.vertexData4 = new Float32x4List.view(mesh.vertexData);
+  mesh.baseVertexData = new Float32List(mesh.vertexData.length);
+  mesh.baseVertexData4 = new Float32x4List.view(mesh.baseVertexData);
+  for (int i = 0; i < mesh.vertexData.length; i++) {
+    mesh.baseVertexData[i] = mesh.vertexData[i];
+  }
+  mesh.vertexArray.uploadData(mesh.vertexData,
+                              SpectreBuffer.UsageDynamic);
+  List indices = json['indices'];
+  mesh.indexArray.uploadData(new Uint16List.fromList(json['indices']),
+                             SpectreBuffer.UsageStatic);
+  List meshes = json['meshes'];
+  meshes.forEach((m) {
+    importMesh(mesh, m);
+  });
+  List bones = json['bones'];
+  return mesh;
+}
+
 SkinnedMesh importSkinnedMesh(String name, GraphicsDevice device, Map json) {
   SkinnedMesh mesh = new SkinnedMesh(name, device);
   List attributes = json['attributes'];
