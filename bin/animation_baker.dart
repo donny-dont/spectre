@@ -57,11 +57,19 @@ class BoneScaleAnimation {
 
 class BoneAnimation {
   final String name;
+  final List<BonePositionAnimation> positions = 
+      new List<BonePositionAnimation>();
+  final List<BoneRotationAnimation> rotations = 
+      new List<BoneRotationAnimation>();
+  final List<BoneScaleAnimation> scales = new List<BoneScaleAnimation>();
+  BoneAnimation(this.name);
 }
 
 class AnimationBaker {
   final Map input;
   final Map output = new Map();
+  final Map<String, BoneAnimation> animations =
+      new Map<String, BoneAnimation>();
   AnimationBaker(this.input);
 
   clear() {
@@ -76,7 +84,6 @@ class AnimationBaker {
     output['name'] = 'nameme';
     output['duration'] = input['duration'];
     output['ticksPerSecond'] = input['tickspersecond'];
-    
   }
 }
 
