@@ -32,16 +32,28 @@ class BonePositionAnimation {
     position[1] = values[1].toDouble();
     position[2] = values[2].toDouble();
   }
+  Map toJson() {
+    Map r = new Map();
+    r['time'] = tick;
+    r['value'] = position;
+    return r;
+  }
 }
 
 class BoneRotationAnimation {
   final int tick;
   final Float32List rotation = new Float32List(4);
   BoneRotationAnimation(this.tick, List values) {
-    rotation[0] = values[0].toDouble();
-    rotation[1] = values[1].toDouble();
-    rotation[2] = values[2].toDouble();
-    rotation[3] = values[3].toDouble();
+    rotation[0] = values[1].toDouble();
+    rotation[1] = values[2].toDouble();
+    rotation[2] = values[3].toDouble();
+    rotation[3] = values[0].toDouble();
+  }
+  Map toJson() {
+    Map r = new Map();
+    r['time'] = tick;
+    r['value'] = rotation;
+    return r;
   }
 }
 
@@ -53,6 +65,12 @@ class BoneScaleAnimation {
     scale[1] = values[1].toDouble();
     scale[2] = values[2].toDouble();
   }
+  Map toJson() {
+    Map r = new Map();
+    r['time'] = tick;
+    r['value'] = scale;
+    return r;
+  }
 }
 
 class BoneAnimation {
@@ -63,16 +81,84 @@ class BoneAnimation {
       new List<BoneRotationAnimation>();
   final List<BoneScaleAnimation> scales = new List<BoneScaleAnimation>();
   BoneAnimation(this.name);
+  
+  Map toJson() {
+    Map r = new Map();
+    r['name'] = name;
+    r['positions'] = positions;
+    r['rotations'] = rotations;
+    r['scales'] = scales;
+    return r;
+  }
+}
+
+class SkeletalAnimation {
+  final String name;
+  final int duration;
+  final int ticksPerSecond;
+  final Map<String, BoneAnimation> bones = new Map<String, BoneAnimation>();
+  SkeletalAnimation(this.name, this.duration, this.ticksPerSecond);
+  
+  Map toJson() {
+    Map r = new Map();
+    r['name'] = name;
+    r['duration'] = duration;
+    r['ticksPerSecond'] = ticksPerSecond;
+    r['boneAnimations'] = bones.values.toList();
+    return r;
+  }
 }
 
 class AnimationBaker {
   final Map input;
-  final Map output = new Map();
-  final Map<String, BoneAnimation> animations =
-      new Map<String, BoneAnimation>();
+  final Map<String, SkeletalAnimation> animations =
+      new Map<String, SkeletalAnimation>();
   AnimationBaker(this.input);
 
   clear() {
+    output.clear();
+  }
+  
+  bakeBoneAnimation(SkeletalAnimation skeleton, Map input) {
+    String boneName = input['name'];
+    BoneAnimation boneAnimation = new BoneAnimation(boneName);
+    skeleton.bones[boneName] = boneAnimation;
+    List positionKeys = input['positionkeys'];
+    List rotationkeys = input['rotationkeys'];
+    List scaleKeys = input['scalekeys'];
+    if (positionKeys != null) {
+      for (int i = 0; i < positionKeys.length; i++) {
+        int tick = positionKeys[i][0];
+        List positions = positionKeys[i][1];
+        boneAnimation.positions.add(new BonePositionAnimation(tick, positions));
+      }  
+    }
+    if (rotationkeys != null) {
+      for (int i = 0; i < rotationkeys.length; i++) {
+        int tick = rotationkeys[i][0];
+        List rotations = rotationkeys[i][1];
+        boneAnimation.rotations.add(new BoneRotationAnimation(tick, rotations));
+      }  
+    }
+    if (scaleKeys != null) {
+      for (int i = 0; i < scaleKeys.length; i++) {
+        int tick = scaleKeys[i][0];
+        List scales = scaleKeys[i][1];
+        boneAnimation.scales.add(new BoneScaleAnimation(tick, scales));
+      }
+    }
+  }
+  
+  bakeAnimation(Map input) {
+    String name = input['name'];
+    int duration = input['duration'];
+    int ticksPerSecond = input['tickspersecond'];
+    SkeletalAnimation animation = new SkeletalAnimation(name, duration,
+                                                        ticksPerSecond);
+    animations[name] = animation;
+    input['channels'].forEach((channel) {
+      bakeBoneAnimation(animation, channel);
+    });
   }
   
   bake() {
@@ -80,10 +166,9 @@ class AnimationBaker {
     if (animations == null) {
       throw new ArgumentError('Input has no animations.');
     }
-    
-    output['name'] = 'nameme';
-    output['duration'] = input['duration'];
-    output['ticksPerSecond'] = input['tickspersecond'];
+    animations.forEach((animation) {
+      bakeAnimation(animation);
+    });
   }
 }
 
@@ -93,5 +178,5 @@ main() {
   Map inputAnimation = JSON.parse(inputString);
   AnimationBaker ab = new AnimationBaker(inputAnimation);
   ab.bake();
-  print(JSON.stringify(ab.output));
+  print(JSON.stringify(ab.animations.values.toList()));
 }

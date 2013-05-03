@@ -374,7 +374,7 @@ class Application {
   // Properties
   //---------------------------------------------------------------------
 
-  int instanceCount = 10;
+  int instanceCount = 6;
   bool useSimd = true;
   
   /// The index of the [SkinnedMesh] to draw.
@@ -428,9 +428,9 @@ class Application {
     }
     updateSw.stop();
     if (useSimd) {
-      print('SIMD: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');  
+      //print('SIMD: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');  
     } else {
-      print('DOUBLE: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
+      //print('DOUBLE: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
     }
     
 

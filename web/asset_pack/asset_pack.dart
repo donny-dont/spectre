@@ -193,7 +193,7 @@ void _setupSkinnedCharacter() {
   assert(_skinnedShaderProgram.linked == true);
   //_skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight']);
   _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight2']);
-                                   
+  importAnimation(_skinnedMesh, _assetManager['demoAssets.idle2'][0]);                                   
   _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -225,6 +225,7 @@ void _drawSkinnedCharacter() {
   context.setIndexBuffer(_skinnedMesh.indexArray);
   context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
   context.setInputLayout(_skinnedInputLayout);
+
 
   context.setTextures(0, [_assetManager['demoAssets.hellknight_body']]);
   if (true) {

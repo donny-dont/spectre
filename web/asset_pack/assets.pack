@@ -296,6 +296,18 @@
 
     }
   },
+  "idle2":{
+    "loadArguments":{
+
+    },
+    "name":"idle2",
+    "url":"/json/idle2.json",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+
 
   "hellknight_body":{
     "loadArguments":{
