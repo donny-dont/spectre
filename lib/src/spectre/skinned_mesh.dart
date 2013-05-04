@@ -275,89 +275,13 @@ class Float32ListHelpers {
   }
 }
 
-class _AnimationBoneData {
-  // 1 float per key data
-  Float32List _positionTimes;
-  // 4 floats per key data
-  Float32List _positions;
-  // 1 float per key data
-  Float32List _scaleTimes;
-  // 4 floats pey key data
-  Float32List _scales;
-  // 1 float per key data
-  Float32List _rotationTimes;
-  // 4 floats per key data
-  Float32List _rotations;
-
-  void _loadPositions(List positions) {
-    _positionTimes = new Float32List(positions.length);
-    _positions = new Float32List(positions.length*4);
-    for (int i = 0; i < _positionTimes.length; i++) {
-      _positionTimes[i] = positions[i]['time'].toDouble();
-      _positions[i*4+0] = positions[i]['value'][0].toDouble();
-      _positions[i*4+1] = positions[i]['value'][1].toDouble();
-      _positions[i*4+2] = positions[i]['value'][2].toDouble();
-      _positions[i*4+3] = 1.0;
-    }
-  }
-
-  void _loadRotations(List rotations) {
-    _rotationTimes = new Float32List(rotations.length);
-    _rotations = new Float32List(rotations.length*4);
-    for (int i = 0; i < _rotationTimes.length; i++) {
-      _rotationTimes[i] = rotations[i]['time'].toDouble();
-      _rotations[i*4+0] = rotations[i]['value'][0].toDouble();
-      _rotations[i*4+1] = rotations[i]['value'][1].toDouble();
-      _rotations[i*4+2] = rotations[i]['value'][2].toDouble();
-      _rotations[i*4+3] = rotations[i]['value'][3].toDouble();
-    }
-  }
-
-  void _loadScales(List scales) {
-    _scaleTimes = new Float32List(scales.length);
-    _scales = new Float32List(scales.length*4);
-    for (int i = 0; i < _scaleTimes.length; i++) {
-      _scaleTimes[i] = scales[i]['time'].toDouble();
-      _scales[i*4+0] = scales[i]['value'][0].toDouble();
-      _scales[i*4+1] = scales[i]['value'][1].toDouble();
-      _scales[i*4+2] = scales[i]['value'][2].toDouble();
-      _scales[i*4+3] = 1.0;
-    }
-  }
-
-  _AnimationBoneData(List positions, List rotations, List scales) {
-    _loadPositions(positions);
-    _loadRotations(rotations);
-    _loadScales(scales);
-  }
-
-  int _findTime(Float32List timeList, double t) {
-    for (int i = 0; i < timeList.length-1; i++) {
-      if (t < timeList[i+1]) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  int _findPositionIndex(double t) {
-    return _findTime(_positionTimes, t) << 2;
-  }
-  int _findScaleIndex(double t) {
-    return _findTime(_scaleTimes, t) << 2;
-  }
-  int _findRotationIndex(double t) {
-    return _findTime(_rotationTimes, t) << 2;
-  }
-}
-
 class Animation {
   final String name;
-  final List<_AnimationBoneData> _boneData;
+  final List<BoneAnimation> _boneData;
   Animation(this.name, final int length) :
-      _boneData = new List<_AnimationBoneData>(length) {
+      _boneData = new List<BoneAnimation>(length) {
   }
-  _AnimationBoneData getDataForBone(int boneIndex) {
+  BoneAnimation getDataForBone(int boneIndex) {
     if (boneIndex >= _boneData.length) {
       return null;
     }
@@ -375,7 +299,7 @@ class SkinnedMesh extends SpectreMesh {
   IndexBuffer get indexArray => _deviceIndexBuffer;
   VertexBuffer get vertexArray => _deviceVertexBuffer;
   final List<Map> meshes = new List<Map>();
-  
+
   SkinnedMesh(String name, GraphicsDevice device) :
       super(name, device) {
     _deviceVertexBuffer = new VertexBuffer(name, device);
@@ -433,14 +357,14 @@ class SkinnedMesh extends SpectreMesh {
   void update(double dt, bool useSimd) {
     assert(_currentAnimation != null);
     _currentTime += dt * _currentAnimation._timeScale;
-    
+
     // Wrap.
     if (_currentAnimation.runTime == 0.0) {
       _currentTime = 0.0;
     } else {
       while (_currentTime >= _currentAnimation.runTime) {
         _currentTime -= _currentAnimation.runTime;
-      }  
+      }
     }
     Float32List parentTransform = new Float32List(16);
     parentTransform[0] = 1.0;
@@ -450,7 +374,7 @@ class SkinnedMesh extends SpectreMesh {
     _updateGlobalBoneTransforms(0, parentTransform);
     _updateSkinningBoneTransforms();
     if (useSimd) {
-      _updateVerticesSIMD();  
+      _updateVerticesSIMD();
     } else {
       _updateVertices();
     }
@@ -477,19 +401,9 @@ class SkinnedMesh extends SpectreMesh {
     final Float32List nodeTransform = _scratchMatrix;
     final Float32List globalTransform = globalBoneTransforms[boneIndex];
 
-    _AnimationBoneData boneData = _currentAnimation.getDataForBone(boneIndex);
+    BoneAnimation boneData = _currentAnimation.getDataForBone(boneIndex);
     if (boneData != null) {
-      final Float32List positions = boneData._positions;
-      final Float32List rotations = boneData._rotations;
-      final Float32List scales = boneData._scales;
-      int positionIndex = boneData._findPositionIndex(_currentTime);
-      int rotationIndex = boneData._findRotationIndex(_currentTime);
-      int scaleIndex = boneData._findScaleIndex(_currentTime);
-      assert(positionIndex >= 0);
-      assert(rotationIndex >= 0);
-      Float32ListHelpers.rotateTranslate(nodeTransform,
-                                         positions, positionIndex,
-                                         rotations, rotationIndex);
+      boneData.setBoneMatrixAtTime(_currentTime, nodeTransform);
     } else {
       Float32ListHelpers.copy(nodeTransform, localBoneTransforms[boneIndex]);
     }
@@ -504,7 +418,7 @@ class SkinnedMesh extends SpectreMesh {
 
   final Float32List m = new Float32List(16);
   final Float32List vertex = new Float32List(12);
-  
+
   // Transform baseVertexData into vertexData based on bone hierarchy.
   void _updateVertices() {
     int numVertices = baseVertexData.length~/_floatsPerVertex;
@@ -598,9 +512,7 @@ void importAnimationFrames(Animation animation, int boneId, Map ba) {
   List rotations = ba['rotations'];
   List scales = ba['scales'];
 
-  _AnimationBoneData boneData = new _AnimationBoneData(positions,
-                                                       rotations,
-                                                       scales);
+  BoneAnimation boneData = new BoneAnimation('', positions, rotations, scales);
   animation._boneData[boneId] = boneData;
 }
 
@@ -636,20 +548,20 @@ class SkinnedVertex {
 
 SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
   SkinnedMesh mesh = new SkinnedMesh(name, device);
-  
+
   // TODO: FIX THIS.
   mesh.globalInverseTransform[0] = 1.0;
   mesh.globalInverseTransform[6] = -1.0;
   mesh.globalInverseTransform[9] = 1.0;
   mesh.globalInverseTransform[15] = 1.0;
-  
+
   List attributes = json['attributes'];
   // static mesh data begins.
   attributes.forEach((a) {
     importAttribute(mesh, a);
   });
   mesh._floatsPerVertex = attributes[0]['stride']~/4;;
-  
+
   List vertices = json['vertices'];
   mesh.vertexData4 = new Float32x4List(json['vertices'].length~/4);
   mesh.baseVertexData4 = new Float32x4List(mesh.vertexData4.length);
@@ -669,7 +581,7 @@ SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
     importMesh(mesh, m);
   });
   List bones = json['boneTable'];
-  
+
   // bone hierarchy begins.
   int numChildren = 0;
   bones.forEach((b) {
@@ -693,7 +605,7 @@ SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
     for (int i = 0; i < 16; i++) {
       mesh.localBoneTransforms[id][i] = transform[i].toDouble();
     }
-    
+
     Float32ListHelpers.transpose44(mesh.localBoneTransforms[id]);
     mesh.globalBoneTransforms.add(new Float32List(16));
     var skinningBoneTransform = new Float32x4List(4);
@@ -741,7 +653,7 @@ SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
     // Verify children count.
     assert(children.length == childCount);
   });
-  
+
   {
     Map perVertexWeights = json['vertexWeight'];
     List sortedVertexIndexes = perVertexWeights.keys.toList();

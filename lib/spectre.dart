@@ -72,5 +72,7 @@ part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';
 part 'src/spectre/viewport.dart';
 part 'src/spectre/mesh.dart';
+part 'src/spectre/skeleton.dart';
+part 'src/spectre/skeleton_animation.dart';
 part 'src/spectre/skinned_mesh.dart';
 part 'src/spectre/vertex_attribute.dart';
