@@ -130,7 +130,7 @@ class FpsFlyCameraController extends CameraController {
     accumDY = 0;
 
     final num f_dot_up = frontDirection.dot(upDirection);
-    final num pitchAngle = acos(f_dot_up);
+    final num pitchAngle = Math.acos(f_dot_up);
     final num minPitchAngle = 0.785398163;
     final num maxPitchAngle = 2.35619449;
     final num pitchDegrees = degrees(pitchAngle);

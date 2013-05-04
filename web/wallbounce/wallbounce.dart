@@ -67,7 +67,7 @@ bool _ballIntersectsLineSegment(vec2 _a, vec2 _b) {
   // Make ballPosition relative to the line segment
   vec2 p = ballPosition - _a;
   vec2 delta = _b-_a;
-  double t = dot(p, delta) / delta.length2;
+  double t = dot2(p, delta) / delta.length2;
   if (t < 0.0 || t > 1.0) {
     return false;
   }

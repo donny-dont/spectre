@@ -70,20 +70,29 @@ class OrbitCameraController extends CameraController {
     _ApplyFriction(dt);
   }
 
+  double _clamp(double v, double min, double max) {
+    if (v > maxRadius) {
+      return maxRadius;
+    }
+    if (v < minRadius) {
+      return minRadius;
+    }
+    return v;
+  }
+  
   void _ZoomView(num dt, num zoomDelta) {
-    radius = (radius + zoomDelta).clamp(minRadius, maxRadius);
+    radius = _clamp(radius + zoomDelta, minRadius, maxRadius);
     // TODO: Exponential zoom?
     // TODO: Incorporate dt
   }
 
   void _RotateView(num dt, Camera cam, num yawDelta, num pitchDelta) {
     yaw += yawDelta;
-    pitch = (pitch + pitchDelta).clamp(minYaw, maxYaw);
-
+    pitch = _clamp(pitch + pitchDelta, minYaw, maxYaw);
     vec3 offset = new vec3(
-      radius * cos(yaw) * cos(pitch),
-      radius * sin(pitch),
-      radius * sin(yaw) * cos(pitch)
+      radius * Math.cos(yaw) * Math.cos(pitch),
+      radius * Math.sin(pitch),
+      radius * Math.sin(yaw) * Math.cos(pitch)
     );
 
     cam.position = cam.focusPosition + offset;
