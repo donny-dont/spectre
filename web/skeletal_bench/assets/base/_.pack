@@ -2,14 +2,14 @@
   "normalMapShader":{
     "loadArguments":{},
     "name":"normalMapShader",
-    "url":"/normal_map.shader",
+    "url":"normal_map.shader",
     "type":"shaderProgram",
     "importArguments":{}
   },
   "config":{
     "loadArguments":{},
     "name":"config",
-    "url":"/models.config",
+    "url":"models.config",
     "type":"config",
     "importArguments":{}
   }

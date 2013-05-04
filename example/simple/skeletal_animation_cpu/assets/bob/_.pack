@@ -2,99 +2,99 @@
   "config":{
     "loadArguments":{},
     "name":"config",
-    "url":"/model.config",
+    "url":"model.config",
     "type":"config",
     "importArguments":{}
   },
   "mesh":{
     "loadArguments":{},
     "name":"mesh",
-    "url":"/bob.mesh",
+    "url":"bob.mesh",
     "type":"json",
-    "importArguments":{}  
+    "importArguments":{}
   },
   "bodyDiffuse": {
     "loadArguments":{},
     "name":"bodyDiffuse",
-    "url":"/body_diffuse.png",
+    "url":"body_diffuse.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "bodyNormal": {
     "loadArguments":{},
     "name":"bodyNormal",
-    "url":"/body_normal.png",
+    "url":"body_normal.png",
     "type":"tex2d",
-    "importArguments":{}   
-  },  
+    "importArguments":{}
+  },
   "bodySpecular": {
     "loadArguments":{},
     "name":"bodySpecular",
-    "url":"/body_specular.png",
+    "url":"body_specular.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "faceDiffuse": {
     "loadArguments":{},
     "name":"faceDiffuse",
-    "url":"/face_diffuse.png",
+    "url":"face_diffuse.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "faceNormal": {
     "loadArguments":{},
     "name":"faceNormal",
-    "url":"/face_normal.png",
+    "url":"face_normal.png",
     "type":"tex2d",
-    "importArguments":{}   
-  },  
+    "importArguments":{}
+  },
   "faceSpecular": {
     "loadArguments":{},
     "name":"faceSpecular",
-    "url":"/face_specular.png",
+    "url":"face_specular.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "helmetDiffuse": {
     "loadArguments":{},
     "name":"helmetDiffuse",
-    "url":"/helmet_diffuse.png",
+    "url":"helmet_diffuse.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "helmetSpecular": {
     "loadArguments":{},
     "name":"helmetSpecular",
-    "url":"/helmet_specular.png",
+    "url":"helmet_specular.png",
     "type":"tex2d",
-    "importArguments":{}   
-  },  
+    "importArguments":{}
+  },
   "grillDiffuse": {
     "loadArguments":{},
     "name":"grillDiffuse",
-    "url":"/grill_diffuse.png",
+    "url":"grill_diffuse.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "grillSpecular": {
     "loadArguments":{},
     "name":"grillSpecular",
-    "url":"/grill_specular.png",
+    "url":"grill_specular.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "roundDiffuse": {
     "loadArguments":{},
     "name":"roundDiffuse",
-    "url":"/round_diffuse.png",
+    "url":"round_diffuse.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   },
   "roundSpecular": {
     "loadArguments":{},
     "name":"roundSpecular",
-    "url":"/round_specular.png",
+    "url":"round_specular.png",
     "type":"tex2d",
-    "importArguments":{}   
+    "importArguments":{}
   }
 }

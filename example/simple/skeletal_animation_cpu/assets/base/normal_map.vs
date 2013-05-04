@@ -19,6 +19,7 @@ uniform mat4 uModelViewMatrix;
 uniform mat4 uModelViewProjectionMatrix;
 /// The normal matrix
 uniform mat4 uNormalMatrix;
+uniform mat4 uModelMatrix;
 
 //---------------------------------------------------------------------
 // Varying variables
@@ -36,11 +37,11 @@ varying vec3 normal;
 void main()
 {
   vec4 vPosition4 = vec4(vPosition, 1.0);
-  position = vec3(uModelViewMatrix * vPosition4);
+  position = vec3(uModelViewMatrix * uModelMatrix * vPosition4);
   
   texCoord = vTexCoord0;
   
   normal = normalize(mat3(uNormalMatrix) * vNormal);
   
-  gl_Position = uModelViewProjectionMatrix * vPosition4;
+  gl_Position = uModelViewProjectionMatrix * uModelMatrix * vPosition4;
 }

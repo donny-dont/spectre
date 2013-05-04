@@ -89,8 +89,10 @@ class _TextListLoader extends AssetLoader {
         return new Future.value(null);
       }
       List<Future<String>> futureTexts = new List();
+      var baseUri = new Uri(asset.url);
       parsed.forEach((String textSrc) {
-        Asset textRequest = new Asset(null, textSrc, asset.baseUrl, textSrc,
+        var url = baseUri.resolve(textSrc).toString();
+        Asset textRequest = new Asset(null, textSrc, url,
                                       asset.type, null, {}, null, {});
         var futureText = loader.load(textRequest, tracer);
         futureTexts.add(futureText);

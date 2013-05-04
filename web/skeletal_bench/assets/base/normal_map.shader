@@ -1,4 +1,4 @@
 [
-"/normal_map.vs",
-"/normal_map.fs"
+"normal_map.vs",
+"normal_map.fs"
 ]

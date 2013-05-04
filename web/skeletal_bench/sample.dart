@@ -281,7 +281,7 @@ class Application {
   /// Load the resources held in the .pack files.
   void _loadResources() {
     // Load the base pack
-    _assetManager.loadPack('base', 'assets/base.pack').then((assetPack) {
+    _assetManager.loadPack('base', 'assets/base/_.pack').then((assetPack) {
       // Get the ShaderProgram
       //
       // Any uniforms that are constant throughout running the program

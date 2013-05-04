@@ -292,7 +292,8 @@ main() {
   _gameLoop.onUpdate = gameFrame;
   _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
-  _assetManager.loadPack('demoAssets', '$baseUrl/assets.pack').then((assetPack) {
+  _assetManager.loadPack('demoAssets',
+                         '$baseUrl/assets/_.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
     _setupSkinnedCharacter();

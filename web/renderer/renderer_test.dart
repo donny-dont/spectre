@@ -220,7 +220,7 @@ void main() {
   material.depthState.depthBufferWriteEnabled = true;
 
   var asset = assetManager['demoAssets'].registerAsset('simpleTexture',
-                                                       'shader', '', '', {},
+                                                       'shader', '', {},
                                                        {});
   asset.imported = material;
 }
@@ -274,7 +274,7 @@ main() {
   gameLoop.onUpdate = gameFrame;
   gameLoop.onRender = renderFrame;
   gameLoop.onResize = resizeFrame;
-  assetManager.loadPack('demoAssets', 'assets.pack').then((assetPack) {
+  assetManager.loadPack('demoAssets', 'assets/_.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
     // Setup camera.

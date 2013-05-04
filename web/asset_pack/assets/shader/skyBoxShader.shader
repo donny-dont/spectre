@@ -1,4 +1,4 @@
 [
-"/shader/skyBoxVertexShader.glsl",
-"/shader/skyBoxFragmentShader.glsl"
+"skyBoxVertexShader.glsl",
+"skyBoxFragmentShader.glsl"
 ]

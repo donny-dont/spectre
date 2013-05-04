@@ -77,7 +77,7 @@ class Renderer {
     buffer.uploadPixelArray(width, height, new Uint8List(width*height*4));
     colorBuffers[name] = buffer;
     var asset =
-        _rendererPack.registerAsset(name, 'ColorBuffer', '', '', {}, {});
+        _rendererPack.registerAsset(name, 'ColorBuffer', '', {}, {});
     asset.imported = buffer;
   }
 
@@ -92,7 +92,7 @@ class Renderer {
     buffer.allocateStorage(width, height, RenderBuffer.FormatDepth);
     depthBuffers[name] = buffer;
     var asset =
-        _rendererPack.registerAsset(name, 'DepthBuffer', '', '', {}, {});
+        _rendererPack.registerAsset(name, 'DepthBuffer', '',  {}, {});
     asset.imported = buffer;
   }
 
@@ -115,7 +115,7 @@ class Renderer {
     renderTarget.colorTarget = colorBuffer;
     renderTarget.depthTarget = depthBuffer;
     renderTargets[name]= renderTarget;
-    var asset = _rendererPack.registerAsset(name, 'RenderTarget', '', '', {},
+    var asset = _rendererPack.registerAsset(name, 'RenderTarget', '', {},
                                             {});
     asset.imported = renderTarget;
   }
@@ -132,7 +132,7 @@ class Renderer {
     _frontBufferViewport.height = frontBuffer.height;
     renderTargets['frontBuffer'] = RenderTarget.systemRenderTarget;
     if (_rendererPack['frontBuffer'] == null) {
-      var asset = _rendererPack.registerAsset('frontBuffer', 'RenderTarget', '',
+      var asset = _rendererPack.registerAsset('frontBuffer', 'RenderTarget', 
                                               '', {}, {});
       asset.imported =  RenderTarget.systemRenderTarget;
     }
@@ -331,7 +331,7 @@ void main() {
 ''';
     Material blitMaterial = new Material('blit fullscreen', _blitMaterialShader,
                                          this);
-    var asset = _fullscreenEffectsPack.registerAsset('blit', 'material', '', '',
+    var asset = _fullscreenEffectsPack.registerAsset('blit', 'material', '',
                                                      {}, {});
     asset.imported = blitMaterial;
   }
