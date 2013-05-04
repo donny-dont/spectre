@@ -20,21 +20,10 @@
 
 part of spectre;
 
-class InputLayoutElement {
-  final int vboSlot;
-  final int attributeIndex;
-  final int attributeOffset;
-  final int attributeStride;
-  final DeviceFormat attributeFormat;
-  InputLayoutElement(this.vboSlot, this.attributeIndex, this.attributeOffset,
-                     this.attributeStride, this.attributeFormat);
-}
-
 class InputLayout extends DeviceChild {
-  final List<InputLayoutElement> elements = new List<InputLayoutElement>();
-  /** A list of shader program attributes the mesh does not have. If this
-   * list has any elements the input layout will not be [ready].
-   */
+  /** List of active attributes. */
+  final List<VertexAttribute> attributes = new List<VertexAttribute>();
+  /** List of attributes expected by the shader but missing from the mesh. */
   final List<ShaderProgramAttribute> missingAttributes =
       new List<ShaderProgramAttribute>();
 
@@ -61,7 +50,7 @@ class InputLayout extends DeviceChild {
                     missingAttributes.length == 0;
 
   void _refresh() {
-    elements.clear();
+    attributes.clear();
     missingAttributes.clear();
 
     if (_shaderProgram == null || _mesh == null) {
@@ -83,13 +72,13 @@ class InputLayout extends DeviceChild {
       if (meshAttribute == null) {
         missingAttributes.add(shaderProgramAttribute);
       } else {
-        InputLayoutElement element = new InputLayoutElement(
+        VertexAttribute element = new VertexAttribute(
             0,
             shaderProgramAttribute.location,
             meshAttribute.offset,
             meshAttribute.stride,
-            meshAttribute.deviceFormat);
-        elements.add(element);
+            meshAttribute.deviceFormat, false);
+        attributes.add(element);
       }
     });
   }
