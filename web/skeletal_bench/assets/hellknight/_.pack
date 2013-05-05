@@ -13,6 +13,13 @@
     "type":"json",
     "importArguments":{}
   },
+  "anim": {
+    "loadArguments":{},
+    "name":"anim",
+    "url":"idle2.anim",
+    "type":"json",
+    "importArguments":{}
+  },
   "bodyDiffuse": {
     "loadArguments":{},
     "name":"bodyDiffuse",

@@ -307,6 +307,27 @@
 
     }
   },
+  "markusmesh":{
+    "loadArguments":{
+
+    },
+    "url":"json/markus.mesh",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+  "markusanim":{
+    "loadArguments":{
+
+    },
+    "url":"json/markus.anim",
+    "type":"json",
+    "importArguments":{
+
+    }
+  },
+
 
 
   "hellknight_body":{

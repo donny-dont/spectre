@@ -316,7 +316,6 @@ class Application {
         // compilation so just query the actual values.
         int diffuseIndex  = _shaderProgram.samplers['uDiffuse'].textureUnit;
         int specularIndex = _shaderProgram.samplers['uSpecular'].textureUnit;
-
         for (int i = 0; i < modelCount; ++i) {
           // Get the matching AssetPack
           Map modelRequest = models[i];
@@ -327,7 +326,8 @@ class Application {
           _applicationControls.addModel(modelPack['config']['name'], 'assets/${modelName}/icon.png');
 
           // Import the mesh
-          _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack['mesh']);
+          _meshes[i] = importSkinnedMesh2('${modelName}_Mesh', _graphicsDevice, modelPack['mesh']);
+          importAnimation(_meshes[i], modelPack['anim'][0]);
 
           // Get the textures to use on the mesh.
           //

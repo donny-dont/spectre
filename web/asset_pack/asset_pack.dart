@@ -152,48 +152,41 @@ RasterizerState _skinnedRasterizerState;
 DepthState _skinnedDepthState;
 int _depthGuard = 100;
 double _skeletonScale = 1.0;
-void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
+
+void _drawSkinnedBones(Bone bone, PosedSkeleton posedSkeleton) {
   List<double> origin = [0.0, 0.0, 0.0];
-  final matrices = mesh.globalBoneTransforms;
-  if (matrices.length == 0) {
-    return;
-  }
-  origin[0] = matrices[id][12] * _skeletonScale;
-  origin[1] = matrices[id][13] * _skeletonScale;
-  origin[2] = matrices[id][14] * _skeletonScale;
-  int childOffset = mesh.boneChildrenOffsets[id];
-  if (id == 0) {
+  int boneIndex = bone.boneIndex;
+  final matrix = posedSkeleton.globalTransforms[boneIndex];
+  origin[0] = matrix[12] * _skeletonScale;
+  origin[1] = matrix[13] * _skeletonScale;
+  origin[2] = matrix[14] * _skeletonScale;
+  if (boneIndex == 0) {
     _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
         new vec4(1.0, 0.0, 1.0, 1.0));
   } else {
   _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
                              new vec4(0.0, 1.0, 1.0, 1.0));
   }
-  if (depth >= _depthGuard) {
-    return;
-  }
-  while (mesh.boneChildrenIds[childOffset] != -1) {
+  bone.children.forEach((childBone) {
     List<double> end = [0.0, 0.0, 0.0];
-    int childId = mesh.boneChildrenIds[childOffset];
-    end[0] = matrices[childId][12] * _skeletonScale;
-    end[1] = matrices[childId][13] * _skeletonScale;
-    end[2] = matrices[childId][14] * _skeletonScale;
+    int childId = childBone.boneIndex;
+    end[0] = posedSkeleton.globalTransforms[childId][12] * _skeletonScale;
+    end[1] = posedSkeleton.globalTransforms[childId][13] * _skeletonScale;
+    end[2] = posedSkeleton.globalTransforms[childId][14] * _skeletonScale;
     _debugDrawManager.addLine(new vec3(origin[0],
                                            origin[1],
                                            origin[2]),
                               new vec3(end[0], end[1], end[2]),
                               new vec4(1.0, 1.0, 1.0, 1.0));
-    _drawSkinnedBones(mesh, childId, depth+1);
-    childOffset++;
-  }
+    _drawSkinnedBones(childBone, posedSkeleton);
+  });
 }
 
 void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager['demoAssets.litdiffuse'];
   assert(_skinnedShaderProgram.linked == true);
-  //_skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight']);
   _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight2']);
-  importAnimation(_skinnedMesh, _assetManager['demoAssets.idle2'][0]);                                   
+  importAnimation(_skinnedMesh, _assetManager['demoAssets.idle2'][0]);
   _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -207,7 +200,8 @@ void _setupSkinnedCharacter() {
 
 void _drawSkinnedCharacter() {
   _skinnedMesh.update(1.0/60.0, true);
-  _drawSkinnedBones(_skinnedMesh, 0, 0);
+  _drawSkinnedBones(_skinnedMesh.skeleton.boneList[0],
+                    _skinnedMesh.posedSkeleton);
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);

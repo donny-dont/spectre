@@ -199,7 +199,7 @@ class Application {
     modelMatrix[5] = 1.0;
     modelMatrix[10] = 1.0;
     modelMatrix[15] = 1.0;
-    
+
     // Start loading the resources
     _loadResources();
   }
@@ -334,7 +334,8 @@ class Application {
           _applicationControls.addModel(modelPack['config']['name'], 'assets/${modelName}/icon.png');
 
           // Import the mesh
-          _meshes[i] = importSkinnedMesh('${modelName}_Mesh', _graphicsDevice, modelPack['mesh']);
+          _meshes[i] = importSkinnedMesh2('${modelName}_Mesh', _graphicsDevice, modelPack['mesh']);
+          importAnimation(_meshes[i], modelPack['anim'][0]);
 
           // Get the textures to use on the mesh.
           //
@@ -376,7 +377,7 @@ class Application {
 
   int instanceCount = 6;
   bool useSimd = true;
-  
+
   /// The index of the [SkinnedMesh] to draw.
   int get meshIndex => _meshIndex;
   set meshIndex(int value) { _meshIndex = value; }
@@ -406,8 +407,8 @@ class Application {
     } else if (keyboard.pressed(Keyboard.D)) {
       useSimd = true;
       print('using SIMD: $useSimd');
-    } 
-    
+    }
+
     if (keyboard.pressed(Keyboard.UP)) {
       instanceCount++;
       print('Instances $instanceCount');
@@ -416,7 +417,7 @@ class Application {
       instanceCount--;
       print('Instances $instanceCount');
     }
-    
+
     _debugDrawManager.update(dt);
 
     updateSw.reset();
@@ -428,11 +429,11 @@ class Application {
     }
     updateSw.stop();
     if (useSimd) {
-      //print('SIMD: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');  
+      //print('SIMD: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
     } else {
       //print('DOUBLE: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
     }
-    
+
 
     Mouse mouse = _gameLoop.mouse;
 
@@ -477,7 +478,7 @@ class Application {
                                 8.0, new vec4(1.0, 0.0, 0.0, 1.0));
     _debugDrawManager.addAxes(new mat4.identity(), 3.0);
   }
-  
+
   /// Renders the scene.
   void onRender() {
     // Clear the color and depth buffer
@@ -527,7 +528,7 @@ class Application {
         modelMatrix[14] = 0.0;
       }
       modelMatrix[13] = -40.0;
-      
+
       _graphicsContext.setConstant('uModelMatrix', modelMatrix);
       // Draw each part of the mesh
       int meshCount = mesh.meshes.length;
@@ -537,9 +538,9 @@ class Application {
         Map meshData = mesh.meshes[i];
         _graphicsContext.setTextures(0, meshTextures[i]);
         _graphicsContext.drawIndexed(meshData['count'], meshData['offset']);
-      }  
+      }
     }
-    
+
 
     // Render debugging information if requested
     if (_drawDebugInformation) {

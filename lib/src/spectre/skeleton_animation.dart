@@ -23,6 +23,7 @@ part of spectre;
 /// Key frame animation data for a single bone in a skeleton.
 class BoneAnimation {
   final String boneName;
+  final int boneIndex;
 
   Float32List get positionTimes => _positionTimes;
   Float32List get positionValues => _positionValues;
@@ -40,8 +41,8 @@ class BoneAnimation {
 
   /// Construct bone animation with [boneName]. Animation key frames
   /// will be loaded from [positions], [rotations], and [scales].
-  BoneAnimation(this.boneName, List<Map> positions, List<Map> rotations,
-                List<Map> scales) {
+  BoneAnimation(this.boneName, this.boneIndex, List<Map> positions,
+                List<Map> rotations, List<Map> scales) {
     updatePositions(positions);
     updateRotations(rotations);
     updateScales(scales);
@@ -110,7 +111,7 @@ class BoneAnimation {
     _rotationValues[3] = 1.0;
   }
 
-  /// Builds bone animation data from key frames in [positions].
+  /// Builds bone animation data from key frames in [rotations].
   void updateRotations(List<Map> rotations) {
     if (rotations == null || rotations.length == 0) {
       setNoRotationAnimation();
@@ -150,7 +151,7 @@ class BoneAnimation {
     _scaleValues[3] = 1.0;
   }
 
-  /// Builds bone animation data from key frames in [scale].
+  /// Builds bone animation data from key frames in [scales].
   void updateScales(List<Map> scales) {
     if (scales == null || scales.length == 0) {
       setNoScaleAnimation();
@@ -188,7 +189,7 @@ class BoneAnimation {
     return _findTime(_rotationTimes, t) << 2;
   }
 
-  /// Set bone matrix [transform] to correspond to bone animation at time [t].
+  /// Set [boneMatrix] to correspond to bone animation at time [t].
   /// Does not interpolate between key frames.
   void setBoneMatrixAtTime(double t, Float32List boneMatrix) {
     int positionIndex = _findPositionIndex(t);
@@ -250,7 +251,10 @@ class SkeletonAnimation {
   final String name;
   final Map<String, BoneAnimation> boneAnimations =
       new Map<String, BoneAnimation>();
-  SkeletonAnimation(this.name);
+  final List<BoneAnimation> boneList;
+  SkeletonAnimation(this.name, int length) :
+    boneList = new List<BoneAnimation>(length);
+
   double runTime = 0.0;
   double timeScale = 1.0/24.0;
 
