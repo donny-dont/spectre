@@ -125,7 +125,7 @@ class AnimationBaker {
     skeleton.bones[boneName] = boneAnimation;
     List positionKeys = input['positionkeys'];
     List rotationkeys = input['rotationkeys'];
-    List scaleKeys = input['scalekeys'];
+    List scaleKeys = input['scalingkeys'];
     if (positionKeys != null) {
       for (int i = 0; i < positionKeys.length; i++) {
         int tick = positionKeys[i][0];
