@@ -25,11 +25,16 @@ class Bone {
   final String boneName;
   final Float32List localTransform = new Float32List(16);
   final Float32List offsetTransform = new Float32List(16);
+  Float32x4List localTransformSIMD;
+  Float32x4List offsetTransformSIMD;
   final List<Bone> children = new List<Bone>();
   Bone _parent;
   int _boneIndex = -1;
 
   Bone(this.boneName, List<num> local, List<num> offset) {
+    localTransformSIMD = new Float32x4List.view(localTransform.buffer);
+    offsetTransformSIMD = new Float32x4List.view(offsetTransform.buffer);
+    
     if (local != null) {
       for (int i = 0; i < 16; i++) {
         localTransform[i] = local[i].toDouble();
@@ -65,10 +70,14 @@ class Bone {
 class Skeleton {
   final String name;
   final Float32List globalOffsetTransform = new Float32List(16);
+  Float32x4List globalOffsetTransformSIMD;
   final List<Bone> boneList;
   final Map<String, Bone> bones = new Map<String, Bone>();
   Skeleton(this.name, int length) :
-      boneList = new List<Bone>(length);
+      boneList = new List<Bone>(length) {
+    globalOffsetTransformSIMD = new Float32x4List.view(globalOffsetTransform.buffer);
+  }
+      
 }
 
 /// Skeleton ready to be used for skinning.
@@ -177,6 +186,70 @@ class SimpleSkeletonPoser implements SkeletonPoser {
     parentTransform[5] = 1.0;
     parentTransform[10] = 1.0;
     parentTransform[15] = 1.0;
+    updateGlobalTransform(skeleton.boneList[0], parentTransform, animation,
+                          posedSkeleton, t);
+    updateSkinningTransform(posedSkeleton, skeleton);
+  }
+}
+
+class SIMDSkeletonPoser implements SkeletonPoser {
+  final Float32x4List _scratchMatrix = new Float32x4List(4);
+  
+  void mul44SIMD(Float32x4List out, Float32x4List a, Float32x4List b) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+
+    out[0] = b0.xxxx*a0 + b0.yyyy*a1 + b0.zzzz*a2 + b0.wwww*a3;
+    out[1] = b1.xxxx*a0 + b1.yyyy*a1 + b1.zzzz*a2 + b1.wwww*a3;
+    out[2] = b2.xxxx*a0 + b2.yyyy*a1 + b2.zzzz*a2 + b2.wwww*a3;
+    out[3] = b3.xxxx*a0 + b3.yyyy*a1 + b3.zzzz*a2 + b3.wwww*a3;
+  }
+  
+  void updateGlobalTransform(
+                             Bone bone,
+                             Float32x4List parentTransform,
+                             SkeletonAnimation animation,
+                             PosedSkeleton posedSkeleton,
+                             double t) {
+    int boneIndex = bone._boneIndex;
+    final Float32x4List nodeTransform = _scratchMatrix;
+    final Float32x4List globalTransform =
+        posedSkeleton.globalTransformsSIMD[boneIndex];
+    BoneAnimation boneData = animation.boneList[boneIndex];
+    if (boneData != null) {
+      boneData.setBoneMatrixAtTimeSIMD(t, nodeTransform);
+    } else {
+      for (int i = 0; i < 4; i++) {
+        nodeTransform[i] = bone.localTransformSIMD[i];
+      }
+    }
+    mul44SIMD(globalTransform, parentTransform, nodeTransform);
+    for (int i = 0; i < bone.children.length; i++) {
+      Bone childBone = bone.children[i];
+      updateGlobalTransform(childBone, globalTransform, animation,
+                            posedSkeleton, t);
+    }
+  }
+
+  void updateSkinningTransform(PosedSkeleton posedSkeleton, Skeleton skeleton) {
+    for (int i = 0; i < skeleton.boneList.length; i++) {
+      final Float32x4List globalTransform = posedSkeleton.globalTransformsSIMD[i];
+      final Float32x4List skinningTransform = posedSkeleton.skinningTransformsSIMD[i];
+      final Float32x4List offsetTransform = skeleton.boneList[i].offsetTransformSIMD;
+      mul44SIMD(skinningTransform, globalTransform, offsetTransform);
+      mul44SIMD(skinningTransform, skeleton.globalOffsetTransformSIMD,
+            skinningTransform);
+    }
+  }
+
+  pose(Skeleton skeleton, SkeletonAnimation animation,
+      PosedSkeleton posedSkeleton, double t) {
+    Float32x4List parentTransform = new Float32x4List(4);
+    parentTransform[0] = new Float32x4(1.0, 0.0, 0.0, 0.0);
+    parentTransform[1] = new Float32x4(0.0, 1.0, 0.0, 0.0);
+    parentTransform[2] = new Float32x4(0.0, 0.0, 1.0, 0.0);
+    parentTransform[3] = new Float32x4(0.0, 0.0, 0.0, 1.0);
+
     updateGlobalTransform(skeleton.boneList[0], parentTransform, animation,
                           posedSkeleton, t);
     updateSkinningTransform(posedSkeleton, skeleton);
