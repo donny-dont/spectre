@@ -391,10 +391,6 @@ SkinnedMesh importSkinnedMesh2(String name, GraphicsDevice device, Map json) {
     mesh.skeleton.boneList[index] = bone;
     mesh.skeleton.boneList[index]._boneIndex = index;
     mesh.skeleton.bones[boneName] = bone;
-    // TODO(johnmccutchan): Do this in the baker.
-    Float32ListHelpers.transpose44(bone.localTransform);
-    // TODO(johnmccutchan): Do this in the baker.
-    Float32ListHelpers.transpose44(bone.offsetTransform);
   });
   // Bone hierarchy.
   bones.forEach((b) {

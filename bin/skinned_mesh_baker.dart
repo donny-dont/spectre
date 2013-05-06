@@ -23,6 +23,7 @@ library mesh_baker;
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:json' as JSON;
+import 'package:vector_math/vector_math.dart';
 
 copyMatrix(List<double> dst, List src) {
   for (int i = 0; i < 16; i++) {
@@ -74,7 +75,7 @@ class ModelBone {
     for (int i = 0; i < depth; i++) {
       indent += ' ';
     }
-    print('$indent $name $animationBone $boneIndex $localTransform $offsetTransform');
+    print('$indent $name $animationBone $boneIndex');
     children.forEach((c) => c.dump(depth+1));
   }
 }
@@ -229,6 +230,10 @@ class ModelBaker {
 
   buildBoneNode(Map nodeDescription, ModelBone node) {
     copyMatrix(node.localTransform, nodeDescription['transformation']);
+    mat4 LT = new mat4.zero();
+    LT.copyFromArray(node.localTransform);
+    LT.transpose();
+    LT.copyIntoArray(node.localTransform);
     List children = nodeDescription['children'];
     if (children == null) {
       return;
@@ -271,6 +276,10 @@ class ModelBaker {
         }
         bone.animationBone = true;
         copyMatrix(bone.offsetTransform, bones[b]['offsetmatrix']);
+        mat4 OT = new mat4.zero();
+        OT.copyFromArray(bone.offsetTransform);
+        OT.transpose();
+        OT.copyIntoArray(bone.offsetTransform);
       }
     }
   }
