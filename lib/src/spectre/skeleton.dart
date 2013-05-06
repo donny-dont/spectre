@@ -76,12 +76,18 @@ class PosedSkeleton {
   final Skeleton skeleton;
   final List<Float32List> globalTransforms;
   final List<Float32List> skinningTransforms;
+  final List<Float32x4List> globalTransforms4;
+  final List<Float32x4List> skinningTransforms4;
   PosedSkeleton(this.skeleton, int length) :
     globalTransforms = new List<Float32List>(length),
-    skinningTransforms = new List<Float32List>(length) {
+    skinningTransforms = new List<Float32List>(length),
+    globalTransforms4 = new List<Float32x4List>(length),
+    skinningTransforms4 = new List<Float32x4List>(length) {
     for (int i = 0; i < length; i++) {
       globalTransforms[i] = new Float32List(16);
+      globalTransforms4[i] = new Float32x4List.view(globalTransforms[i]);
       skinningTransforms[i] = new Float32List(16);
+      skinningTransforms4[i] = new Float32x4List.view(skinningTransforms[i]);
     }
   }
 }

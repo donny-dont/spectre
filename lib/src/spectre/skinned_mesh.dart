@@ -201,7 +201,11 @@ class SkinnedMesh extends SpectreMesh {
     SimpleSkeletonPoser skeletonPoser = new SimpleSkeletonPoser();
     skeletonPoser.pose(skeleton, _currentAnimation, posedSkeleton,
                        _currentTime);
-    _updateVertices();
+    if (useSimd) {
+      _updateVerticesSIMD();
+    } else {
+      _updateVertices();
+    }
   }
 
   final Float32List m = new Float32List(16);
@@ -265,7 +269,7 @@ class SkinnedMesh extends SpectreMesh {
         final int boneId = boneData[skinningDataOffset];
         final double weight = weightData[skinningDataOffset];
         Float32x4 weight4 = new Float32x4.splat(weight);
-        Float32x4List boneMatrix = skinningBoneTransforms4[boneId];
+        Float32x4List boneMatrix = posedSkeleton.skinningTransforms4[boneId];
         m4[0] += boneMatrix[0] * weight4;
         m4[1] += boneMatrix[1] * weight4;
         m4[2] += boneMatrix[2] * weight4;
