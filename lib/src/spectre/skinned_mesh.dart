@@ -198,7 +198,7 @@ class SkinnedMesh extends SpectreMesh {
         _currentTime -= _currentAnimation.runTime;
       }
     }
-    SimpleSkeletonPoser skeletonPoser = new SimpleSkeletonPoser();
+    SkeletonPoser skeletonPoser = new SIMDSkeletonPoser();
     skeletonPoser.pose(skeleton, _currentAnimation, posedSkeleton,
                        _currentTime);
     _updateVertices();
