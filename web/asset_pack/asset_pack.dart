@@ -185,8 +185,8 @@ void _drawSkinnedBones(Bone bone, PosedSkeleton posedSkeleton) {
 void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager['demoAssets.litdiffuse'];
   assert(_skinnedShaderProgram.linked == true);
-  _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight2']);
-  importAnimation(_skinnedMesh, _assetManager['demoAssets.idle2'][0]);
+  _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight']);
+  importAnimation(_skinnedMesh, _assetManager['demoAssets.chest'][0]);
   _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;

@@ -279,49 +279,37 @@
 
     },
     "name":"hellknight",
-    "url":"json/hellknight.json",
+    "url":"json/hellknight.mesh",
     "type":"json",
     "importArguments":{
 
     }
   },
-  "hellknight2":{
-    "loadArguments":{
-
-    },
-    "name":"hellknight2",
-    "url":"json/hellknight2.json",
-    "type":"json",
-    "importArguments":{
-
-    }
-  },
-  "idle2":{
+  "chest":{
     "loadArguments":{
 
     },
     "name":"idle2",
-    "url":"json/idle2.json",
+    "url":"json/chest.anim",
     "type":"json",
     "importArguments":{
 
     }
   },
-  "markusmesh":{
+  "minifigure":{
     "loadArguments":{
-
     },
-    "url":"json/markus.mesh",
+    "url":"json/minifigure.mesh",
     "type":"json",
     "importArguments":{
 
     }
   },
-  "markusanim":{
+  "sneak":{
     "loadArguments":{
 
     },
-    "url":"json/markus.anim",
+    "url":"json/sneak.anim",
     "type":"json",
     "importArguments":{
 
