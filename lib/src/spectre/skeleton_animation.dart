@@ -38,6 +38,18 @@ class BoneAnimation {
   Float32List _rotationValues;
   Float32List _scaleTimes;
   Float32List _scaleValues;
+  
+  Float32x4List positionValues4;
+  Float32x4List rotationValues4;
+  Float32x4List scaleValues4;
+  
+  final Float32List _positionMatrix = new Float32List(16);
+  final Float32List _rotationMatrix = new Float32List(16);
+  final Float32List _scaleMatrix = new Float32List(16);
+  
+  Float32x4List _positionMatrix4;
+  Float32x4List _rotationMatrix4;
+  Float32x4List _scaleMatrix4;
 
   /// Construct bone animation with [boneName]. Animation key frames
   /// will be loaded from [positions], [rotations], and [scales].
@@ -46,6 +58,14 @@ class BoneAnimation {
     updatePositions(positions);
     updateRotations(rotations);
     updateScales(scales);
+    
+    positionValues4 = new Float32x4List.view(_positionValues.buffer);
+    rotationValues4 = new Float32x4List.view(_rotationValues.buffer);
+    scaleValues4 = new Float32x4List.view(_scaleValues.buffer);
+    
+    _positionMatrix4 = new Float32x4List.view(_positionMatrix.buffer);
+    _rotationMatrix4 = new Float32x4List.view(_rotationMatrix.buffer);
+    _scaleMatrix4 = new Float32x4List.view(_scaleMatrix.buffer);
   }
 
   /// Makes bone have no position animation.
@@ -188,10 +208,7 @@ class BoneAnimation {
   int _findRotationIndex(double t) {
     return _findTime(_rotationTimes, t) << 2;
   }
-
-  final Float32List _positionMatrix = new Float32List(16);
-  final Float32List _rotationMatrix = new Float32List(16);
-  final Float32List _scaleMatrix = new Float32List(16);
+  
   void mul44(Float32List out, Float32List a, Float32List b) {
     var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
         a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
@@ -222,109 +239,88 @@ class BoneAnimation {
     out[14] = b0*a02 + b1*a12 + b2*a22 + b3*a32;
     out[15] = b0*a03 + b1*a13 + b2*a23 + b3*a33;
   }
+  
+  void mul44SIMD(Float32x4List out, Float32x4List a, Float32x4List b) {
+    var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
+        b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
 
-  /// Set [boneMatrix] to correspond to bone animation at time [t].
-  /// Does not interpolate between key frames.
-  void setBoneMatrixAtTime(double t, Float32List boneMatrix) {
+    out[0] = b0.xxxx*a0 + b0.yyyy*a1 + b0.zzzz*a2 + b0.wwww*a3;
+    out[1] = b1.xxxx*a0 + b1.yyyy*a1 + b1.zzzz*a2 + b1.wwww*a3;
+    out[2] = b2.xxxx*a0 + b2.yyyy*a1 + b2.zzzz*a2 + b2.wwww*a3;
+    out[3] = b3.xxxx*a0 + b3.yyyy*a1 + b3.zzzz*a2 + b3.wwww*a3;
+  }
+  
+  void buildTransformMatricesAtTime(double t) {
     int positionIndex = _findPositionIndex(t);
     int rotationIndex = _findRotationIndex(t);
     int scaleIndex = _findScaleIndex(t);
     assert(positionIndex >= 0);
     assert(rotationIndex >= 0);
     assert(scaleIndex >= 0);
+    
+    double sx = _scaleValues[scaleIndex+0];
+    double sy = _scaleValues[scaleIndex+1];
+    double sz = _scaleValues[scaleIndex+2];
 
-    // Build transform matrix.
-    if (false) {
-      // Fast path....
-      // Doesn't handle scaling correctly.
-      double x = _rotationValues[rotationIndex+0];
-      double y = _rotationValues[rotationIndex+1];
-      double z = _rotationValues[rotationIndex+2];
-      double w = _rotationValues[rotationIndex+3];
-      double x2 = x + x;
-      double y2 = y + y;
-      double z2 = z + z;
+    _scaleMatrix[0] = sx;
+    _scaleMatrix[5] = sy;
+    _scaleMatrix[10] = sz;
+    _scaleMatrix[15] = 1.0;
 
-      double xx = x * x2;
-      double xy = x * y2;
-      double xz = x * z2;
-      double yy = y * y2;
-      double yz = y * z2;
-      double zz = z * z2;
-      double wx = w * x2;
-      double wy = w * y2;
-      double wz = w * z2;
+    _positionMatrix[0] = 1.0;
+    _positionMatrix[5] = 1.0;
+    _positionMatrix[10] = 1.0;
+    _positionMatrix[12] = _positionValues[positionIndex+0];
+    _positionMatrix[13] = _positionValues[positionIndex+1];
+    _positionMatrix[14] = _positionValues[positionIndex+2];
+    _positionMatrix[15] = 1.0;
 
-      double sx = _scaleValues[scaleIndex+0];
-      double sy = _scaleValues[scaleIndex+1];
-      double sz = _scaleValues[scaleIndex+2];
+    double x = _rotationValues[rotationIndex+0];
+    double y = _rotationValues[rotationIndex+1];
+    double z = _rotationValues[rotationIndex+2];
+    double w = _rotationValues[rotationIndex+3];
+    double x2 = x + x;
+    double y2 = y + y;
+    double z2 = z + z;
 
-      boneMatrix[0] = (1.0 - (yy + zz)) * sx;
-      boneMatrix[1] = xy + wz;
-      boneMatrix[2] = xz - wy;
-      boneMatrix[3] = 0.0;
-      boneMatrix[4] = xy - wz;
-      boneMatrix[5] = (1.0 - (xx + zz)) * sy;
-      boneMatrix[6] = yz + wx;
-      boneMatrix[7] = 0.0;
-      boneMatrix[8] = xz + wy;
-      boneMatrix[9] = yz - wx;
-      boneMatrix[10] = (1.0 - (xx + yy)) * sz;
-      boneMatrix[11] = 0.0;
-      boneMatrix[12] = _positionValues[positionIndex+0];
-      boneMatrix[13] = _positionValues[positionIndex+1];
-      boneMatrix[14] = _positionValues[positionIndex+2];
-      boneMatrix[15] = 1.0;
-    } else {
-      double sx = _scaleValues[scaleIndex+0];
-      double sy = _scaleValues[scaleIndex+1];
-      double sz = _scaleValues[scaleIndex+2];
+    double xx = x * x2;
+    double xy = x * y2;
+    double xz = x * z2;
+    double yy = y * y2;
+    double yz = y * z2;
+    double zz = z * z2;
+    double wx = w * x2;
+    double wy = w * y2;
+    double wz = w * z2;
 
-      _scaleMatrix[0] = sx;
-      _scaleMatrix[5] = sy;
-      _scaleMatrix[10] = sz;
-      _scaleMatrix[15] = 1.0;
+    _rotationMatrix[0] = 1.0 - (yy + zz);
+    _rotationMatrix[1] = xy + wz;
+    _rotationMatrix[2] = xz - wy;
+    _rotationMatrix[4] = xy - wz;
+    _rotationMatrix[5] = 1.0 - (xx + zz);
+    _rotationMatrix[6] = yz + wx;
+    _rotationMatrix[8] = xz + wy;
+    _rotationMatrix[9] = yz - wx;
+    _rotationMatrix[10] = 1.0 - (xx + yy);
+    _rotationMatrix[15] = 1.0;
+  }
 
-      _positionMatrix[0] = 1.0;
-      _positionMatrix[5] = 1.0;
-      _positionMatrix[10] = 1.0;
-      _positionMatrix[12] = _positionValues[positionIndex+0];
-      _positionMatrix[13] = _positionValues[positionIndex+1];
-      _positionMatrix[14] = _positionValues[positionIndex+2];
-      _positionMatrix[15] = 1.0;
+  /// Set [boneMatrix] to correspond to bone animation at time [t].
+  /// Does not interpolate between key frames.
+  void setBoneMatrixAtTime(double t, Float32List boneMatrix) {
+    buildTransformMatricesAtTime(t);
 
-      double x = _rotationValues[rotationIndex+0];
-      double y = _rotationValues[rotationIndex+1];
-      double z = _rotationValues[rotationIndex+2];
-      double w = _rotationValues[rotationIndex+3];
-      double x2 = x + x;
-      double y2 = y + y;
-      double z2 = z + z;
-
-      double xx = x * x2;
-      double xy = x * y2;
-      double xz = x * z2;
-      double yy = y * y2;
-      double yz = y * z2;
-      double zz = z * z2;
-      double wx = w * x2;
-      double wy = w * y2;
-      double wz = w * z2;
-
-      _rotationMatrix[0] = 1.0 - (yy + zz);
-      _rotationMatrix[1] = xy + wz;
-      _rotationMatrix[2] = xz - wy;
-      _rotationMatrix[4] = xy - wz;
-      _rotationMatrix[5] = 1.0 - (xx + zz);
-      _rotationMatrix[6] = yz + wx;
-      _rotationMatrix[8] = xz + wy;
-      _rotationMatrix[9] = yz - wx;
-      _rotationMatrix[10] = 1.0 - (xx + yy);
-      _rotationMatrix[15] = 1.0;
-
-      mul44(boneMatrix, _scaleMatrix, _rotationMatrix);
-      mul44(boneMatrix, _positionMatrix, boneMatrix);
-    }
+    mul44(boneMatrix, _scaleMatrix, _rotationMatrix);
+    mul44(boneMatrix, _positionMatrix, boneMatrix);
+  }
+  
+  /// Set [boneMatrix] to correspond to bone animation at time [t].
+  /// Does not interpolate between key frames.
+  void setBoneMatrixAtTimeSIMD(double t, Float32x4List boneMatrix) {
+    buildTransformMatricesAtTime(t);
+    
+    mul44SIMD(boneMatrix, _scaleMatrix4, _rotationMatrix4);
+    mul44SIMD(boneMatrix, _positionMatrix4, boneMatrix);
   }
 
   /// Set bone matrix [transform] to correspond to bone animation at time [t].

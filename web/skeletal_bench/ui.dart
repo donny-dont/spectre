@@ -30,6 +30,10 @@ class ApplicationControls {
   static String _controlContainerId = '#ui_wrap';
   /// Identifier for the container holding the model selection.
   static String _modelSelectionId = '#model_selection';
+/// Identifier for the show skeleton checkbox.
+  static String _poseSimdId = '#pose_simd';
+/// Identifier for the show skeleton checkbox.
+  static String _skinSimdId = '#skin_simd';
   /// Identifier for the show skeleton checkbox.
   static String _showSkeletonId = '#show_skeleton';
   /// Classname for an option
@@ -59,15 +63,21 @@ class ApplicationControls {
     _controlContainer = query(_controlContainerId);
     _modelSelection = query(_modelSelectionId);
 
-    print('Children: ${_modelSelection.children.length}');
-
+    // Hook up the show skeleton button
+    InputElement poseSimd = query(_poseSimdId);
+    poseSimd.onChange.listen((_) {
+      _application.useSimdPosing = poseSimd.checked;
+    });
+    
+    // Hook up the show skeleton button
+    InputElement skinSimd = query(_skinSimdId);
+    skinSimd.onChange.listen((_) {
+      _application.useSimdSkinning = skinSimd.checked;
+    });
+    
     // Hook up the show skeleton button
     InputElement showSkeleton = query(_showSkeletonId);
-
-    DivElement showSkeletonParent = showSkeleton.parent;
-    showSkeletonParent.onClick.listen((_) {
-      _toggleCheckboxArea(showSkeleton, showSkeletonParent);
-
+    showSkeleton.onChange.listen((_) {
       _application.drawDebugInformation = showSkeleton.checked;
     });
   }

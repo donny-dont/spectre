@@ -376,7 +376,8 @@ class Application {
   //---------------------------------------------------------------------
 
   int instanceCount = 6;
-  bool useSimd = true;
+  bool useSimdPosing = true;
+  bool useSimdSkinning = true;
 
   /// The index of the [SkinnedMesh] to draw.
   int get meshIndex => _meshIndex;
@@ -402,11 +403,11 @@ class Application {
     Keyboard keyboard = _gameLoop.keyboard;
 
     if (keyboard.pressed(Keyboard.S)) {
-      useSimd = false;
-      print('using SIMD: $useSimd');
+      useSimdSkinning = false;
+      print('using SIMD Skinning: useSimdSkinning');
     } else if (keyboard.pressed(Keyboard.D)) {
-      useSimd = true;
-      print('using SIMD: $useSimd');
+      useSimdSkinning = true;
+      print('using SIMD Skinning: useSimdSkinning');
     }
 
     if (keyboard.pressed(Keyboard.UP)) {
@@ -423,12 +424,12 @@ class Application {
     updateSw.reset();
     updateSw.start();
     // Update the mesh
-    _meshes[_meshIndex].update(dt, useSimd);
+    _meshes[_meshIndex].update(dt, useSimdPosing, useSimdSkinning);
     for (int i = 0; i < instanceCount-1; i++) {
-      _meshes[_meshIndex].update(0.0, useSimd);
+      _meshes[_meshIndex].update(0.0, useSimdPosing, useSimdSkinning);
     }
     updateSw.stop();
-    if (useSimd) {
+    if (useSimdSkinning) {
       //print('SIMD: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
     } else {
       //print('DOUBLE: ${updateSw.elapsedMilliseconds} ${updateSw.elapsedMicroseconds~/instanceCount}');
