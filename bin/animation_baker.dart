@@ -174,13 +174,12 @@ class AnimationBaker {
 
 main() {
   List<String> arguments = new Options().arguments;
-  if (arguments.length != 2) {
+  if (arguments.length < 1) {
     print('Invalid number of arguments.');
-    print('dart animation_baker.dart <input file> <output file>');
+    print('dart animation_baker.dart <input file> [output file]');
     return;
   }
   String inputFilename = arguments[0];
-  String outputFilename = arguments[1];
   File f = new File(inputFilename);
   String inputString;
   try {
@@ -199,7 +198,6 @@ main() {
   }
   AnimationBaker ab = new AnimationBaker(inputAnimation);
   ab.bake();
-  f = new File(outputFilename);
   String output;
   try {
     output = JSON.stringify(ab.animations.values.toList());
@@ -207,10 +205,16 @@ main() {
     print('Internal error. Could not generate output. Please file a bug. - $e');
     return;
   }
-  try {
-    f.writeAsStringSync(output);
-  } catch (e) {
-    print('Could not write to output: $outputFilename - $e');
-    return;
+  if (arguments.length >= 2) {
+    String outputFilename = arguments[1];
+    f = new File(outputFilename);
+    try {
+      f.writeAsStringSync(output);
+    } catch (e) {
+      print('Could not write to output: $outputFilename - $e');
+      return;
+    }
+  } else {
+    print(output);
   }
 }
