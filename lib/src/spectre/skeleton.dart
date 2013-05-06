@@ -25,15 +25,15 @@ class Bone {
   final String boneName;
   final Float32List localTransform = new Float32List(16);
   final Float32List offsetTransform = new Float32List(16);
-  Float32x4List localTransformSIMD;
-  Float32x4List offsetTransformSIMD;
+  Float32x4List localTransform4;
+  Float32x4List offsetTransform4;
   final List<Bone> children = new List<Bone>();
   Bone _parent;
   int _boneIndex = -1;
 
   Bone(this.boneName, List<num> local, List<num> offset) {
-    localTransformSIMD = new Float32x4List.view(localTransform.buffer);
-    offsetTransformSIMD = new Float32x4List.view(offsetTransform.buffer);
+    localTransform4 = new Float32x4List.view(localTransform.buffer);
+    offsetTransform4 = new Float32x4List.view(offsetTransform.buffer);
     
     if (local != null) {
       for (int i = 0; i < 16; i++) {
@@ -70,12 +70,12 @@ class Bone {
 class Skeleton {
   final String name;
   final Float32List globalOffsetTransform = new Float32List(16);
-  Float32x4List globalOffsetTransformSIMD;
+  Float32x4List globalOffsetTransform4;
   final List<Bone> boneList;
   final Map<String, Bone> bones = new Map<String, Bone>();
   Skeleton(this.name, int length) :
       boneList = new List<Bone>(length) {
-    globalOffsetTransformSIMD = new Float32x4List.view(globalOffsetTransform.buffer);
+    globalOffsetTransform4 = new Float32x4List.view(globalOffsetTransform.buffer);
   }
       
 }
@@ -214,13 +214,13 @@ class SIMDSkeletonPoser implements SkeletonPoser {
     int boneIndex = bone._boneIndex;
     final Float32x4List nodeTransform = _scratchMatrix;
     final Float32x4List globalTransform =
-        posedSkeleton.globalTransformsSIMD[boneIndex];
+        posedSkeleton.globalTransforms4[boneIndex];
     BoneAnimation boneData = animation.boneList[boneIndex];
     if (boneData != null) {
       boneData.setBoneMatrixAtTimeSIMD(t, nodeTransform);
     } else {
       for (int i = 0; i < 4; i++) {
-        nodeTransform[i] = bone.localTransformSIMD[i];
+        nodeTransform[i] = bone.localTransform4[i];
       }
     }
     mul44SIMD(globalTransform, parentTransform, nodeTransform);
@@ -233,11 +233,11 @@ class SIMDSkeletonPoser implements SkeletonPoser {
 
   void updateSkinningTransform(PosedSkeleton posedSkeleton, Skeleton skeleton) {
     for (int i = 0; i < skeleton.boneList.length; i++) {
-      final Float32x4List globalTransform = posedSkeleton.globalTransformsSIMD[i];
-      final Float32x4List skinningTransform = posedSkeleton.skinningTransformsSIMD[i];
-      final Float32x4List offsetTransform = skeleton.boneList[i].offsetTransformSIMD;
+      final Float32x4List globalTransform = posedSkeleton.globalTransforms4[i];
+      final Float32x4List skinningTransform = posedSkeleton.skinningTransforms4[i];
+      final Float32x4List offsetTransform = skeleton.boneList[i].offsetTransform4;
       mul44SIMD(skinningTransform, globalTransform, offsetTransform);
-      mul44SIMD(skinningTransform, skeleton.globalOffsetTransformSIMD,
+      mul44SIMD(skinningTransform, skeleton.globalOffsetTransform4,
             skinningTransform);
     }
   }

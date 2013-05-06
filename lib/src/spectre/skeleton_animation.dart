@@ -39,17 +39,17 @@ class BoneAnimation {
   Float32List _scaleTimes;
   Float32List _scaleValues;
   
-  Float32x4List positionValuesSIMD;
-  Float32x4List rotationValuesSIMD;
-  Float32x4List scaleValuesSIMD;
+  Float32x4List positionValues4;
+  Float32x4List rotationValues4;
+  Float32x4List scaleValues4;
   
   final Float32List _positionMatrix = new Float32List(16);
   final Float32List _rotationMatrix = new Float32List(16);
   final Float32List _scaleMatrix = new Float32List(16);
   
-  Float32x4List _positionMatrixSIMD;
-  Float32x4List _rotationMatrixSIMD;
-  Float32x4List _scaleMatrixSIMD;
+  Float32x4List _positionMatrix4;
+  Float32x4List _rotationMatrix4;
+  Float32x4List _scaleMatrix4;
 
   /// Construct bone animation with [boneName]. Animation key frames
   /// will be loaded from [positions], [rotations], and [scales].
@@ -59,13 +59,13 @@ class BoneAnimation {
     updateRotations(rotations);
     updateScales(scales);
     
-    positionValuesSIMD = new Float32x4List.view(_positionValues.buffer);
-    rotationValuesSIMD = new Float32x4List.view(_rotationValues.buffer);
-    scaleValuesSIMD = new Float32x4List.view(_scaleValues.buffer);
+    positionValues4 = new Float32x4List.view(_positionValues.buffer);
+    rotationValues4 = new Float32x4List.view(_rotationValues.buffer);
+    scaleValues4 = new Float32x4List.view(_scaleValues.buffer);
     
-    _positionMatrixSIMD = new Float32x4List.view(_positionMatrix.buffer);
-    _rotationMatrixSIMD = new Float32x4List.view(_rotationMatrix.buffer);
-    _scaleMatrixSIMD = new Float32x4List.view(_scaleMatrix.buffer);
+    _positionMatrix4 = new Float32x4List.view(_positionMatrix.buffer);
+    _rotationMatrix4 = new Float32x4List.view(_rotationMatrix.buffer);
+    _scaleMatrix4 = new Float32x4List.view(_scaleMatrix.buffer);
   }
 
   /// Makes bone have no position animation.
@@ -319,8 +319,8 @@ class BoneAnimation {
   void setBoneMatrixAtTimeSIMD(double t, Float32x4List boneMatrix) {
     buildTransformMatricesAtTime(t);
     
-    mul44SIMD(boneMatrix, _scaleMatrixSIMD, _rotationMatrixSIMD);
-    mul44SIMD(boneMatrix, _positionMatrixSIMD, boneMatrix);
+    mul44SIMD(boneMatrix, _scaleMatrix4, _rotationMatrix4);
+    mul44SIMD(boneMatrix, _positionMatrix4, boneMatrix);
   }
 
   /// Set bone matrix [transform] to correspond to bone animation at time [t].
