@@ -185,8 +185,11 @@ class SkinnedMesh extends SpectreMesh {
   set currentAnimation(String name) {
     _currentAnimation = animations[name];
   }
+  
+  SkeletonPoser skeletonPoser = new SimpleSkeletonPoser();
+  SkeletonPoser skeletonPoserSIMD = new SIMDSkeletonPoser();
 
-  void update(double dt, bool useSimd) {
+  void update(double dt, bool useSimdPosing, bool useSimdSkinning) {
     assert(_currentAnimation != null);
     _currentTime += dt * _currentAnimation.timeScale;
 
@@ -198,10 +201,16 @@ class SkinnedMesh extends SpectreMesh {
         _currentTime -= _currentAnimation.runTime;
       }
     }
-    SkeletonPoser skeletonPoser = new SIMDSkeletonPoser();
-    skeletonPoser.pose(skeleton, _currentAnimation, posedSkeleton,
-                       _currentTime);
-    if (useSimd) {
+    
+    if(useSimdPosing) {
+      skeletonPoserSIMD.pose(skeleton, _currentAnimation, posedSkeleton,
+          _currentTime);
+    } else {
+      skeletonPoser.pose(skeleton, _currentAnimation, posedSkeleton,
+          _currentTime);
+    }
+    
+    if (useSimdSkinning) {
       _updateVerticesSIMD();
     } else {
       _updateVertices();

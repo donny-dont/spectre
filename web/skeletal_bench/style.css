@@ -85,7 +85,7 @@ h2 {
   height:32px;
 }
 
-.option > div {
+.option > div, .option > label {
   line-height:32px;
   margin-left:5px;
   font-weight:bold;
