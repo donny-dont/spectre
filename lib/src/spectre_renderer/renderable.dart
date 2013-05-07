@@ -85,7 +85,7 @@ class Renderable {
   void _link() {
     _inputLayout.mesh = _mesh;
     if (_material != null) {
-      _inputLayout.shaderProgram = _material.shader;
+      _inputLayout.shaderProgram = _material.shader.shader;
     }
   }
 

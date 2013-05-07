@@ -22,8 +22,10 @@ library spectre_renderer;
 
 import 'dart:html';
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 import 'package:asset_pack/asset_pack.dart';
+import 'package:spectre/disposable.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_post.dart';
 
@@ -33,6 +35,7 @@ part 'src/spectre_renderer/fullscreen_layer.dart';
 part 'src/spectre_renderer/layer.dart';
 part 'src/spectre_renderer/material.dart';
 part 'src/spectre_renderer/material_constant.dart';
+part 'src/spectre_renderer/material_shader.dart';
 part 'src/spectre_renderer/material_texture.dart';
 part 'src/spectre_renderer/renderable.dart';
 part 'src/spectre_renderer/renderer.dart';

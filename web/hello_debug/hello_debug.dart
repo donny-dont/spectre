@@ -2,7 +2,7 @@ import 'dart:html';
 import 'dart:math';
 import 'package:spectre/spectre.dart';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 
 final String _canvasId = '#backbuffer';
 
@@ -10,7 +10,7 @@ GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
 DebugDrawManager _debugDrawManager;
 
-GameLoop _gameLoop;
+GameLoopHtml _gameLoop;
 
 Viewport _viewport;
 Camera _camera;
@@ -33,22 +33,22 @@ void renderFrame(GameLoop gameLoop) {
   // Set the viewport
   _graphicsContext.setViewport(_viewport);
   // Add three lines, one for each axis.
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(10.0, 0.0, 0.0),
-                            new vec4.raw(1.0, 0.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 10.0, 0.0),
-                            new vec4.raw(0.0, 1.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 0.0, 10.0),
-                            new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(10.0, 0.0, 0.0),
+                            new vec4(1.0, 0.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 10.0, 0.0),
+                            new vec4(0.0, 1.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 0.0, 10.0),
+                            new vec4(0.0, 0.0, 1.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
-    _debugDrawManager.addCircle(new vec3.raw(0.0, 0.0, 0.0),
-                                new vec3.raw(0.0, 1.0, 0.0),
+    _debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+                                new vec3(0.0, 1.0, 0.0),
                                 2.0,
-                                new vec4.raw(1.0, 1.0, 1.0, 1.0),
+                                new vec4(1.0, 1.0, 1.0, 1.0),
                                 duration:5.0);
   }
   // Prepare the debug draw manager for rendering
@@ -58,7 +58,7 @@ void renderFrame(GameLoop gameLoop) {
 }
 
 // Handle resizes
-void resizeFrame(GameLoop gameLoop) {
+void resizeFrame(GameLoopHtml gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.client.width;
@@ -98,10 +98,10 @@ main() {
   // Create the camera
   _camera = new Camera();
   _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  _camera.position = new vec3.raw(2.0, 2.0, 2.0);
-  _camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+  _camera.position = new vec3(2.0, 2.0, 2.0);
+  _camera.focusPosition = new vec3(1.0, 1.0, 1.0);
 
-  _gameLoop = new GameLoop(canvas);
+  _gameLoop = new GameLoopHtml(canvas);
   _gameLoop.onUpdate = gameFrame;
   _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;

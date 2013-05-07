@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Spectre Sample: Skeletal Animation (CPU)</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id="ui_wrap">
+      <div id="ui">
+        <div class="ui_group">
+          <h2>Models</h2>
+          <div id="model_selection"></div>
+        </div>
+        <div class="ui_group">
+          <h2>Animation</h2>
+          <div class="option">
+            <input id="pose_simd" type="checkbox" checked="true"/>
+            <label for="pose_simd">SIMD Posing</label>
+          </div>
+          <div class="option">
+            <input id="skin_simd" type="checkbox" checked="true"/>
+            <label for="skin_simd">SIMD Skininng</label>
+          </div>
+          <div class="option">
+            <input id="show_skeleton" type="checkbox" checked="true"/>
+            <label for="show_skeleton">Show skeleton</label>
+          </div>
+        </div>
+        <div class="ui_group bottom">
+          <h2>Controls</h2>
+          <div class="control_info">
+            <div class="input">W,A,S,D</div>
+            <div class="input_explanation">Movement</div>
+          </div>
+          <div class="control_info">
+            <div class="input">Escape</div>
+            <div class="input_explanation">Release mouse pointer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <canvas id="backBuffer"></canvas>
+    <div id="logo"></div>
+    <script type="application/dart" src="sample.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>

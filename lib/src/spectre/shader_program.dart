@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -390,7 +390,7 @@ $_linkLog''');
   }
 
   void _setUniform1f(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniform1fv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -404,7 +404,7 @@ $_linkLog''');
   }
 
   void _setUniform2f(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniform2fv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -415,7 +415,7 @@ $_linkLog''');
   }
 
   void _setUniform3f(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniform3fv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -426,7 +426,7 @@ $_linkLog''');
   }
 
   void _setUniform4f(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniform4fv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -438,7 +438,7 @@ $_linkLog''');
   }
 
   void _setUniform1i(GraphicsDevice device, var index, var argument) {
-    if (argument is Int32Array) {
+    if (argument is Int32List) {
       device.gl.uniform1iv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -452,7 +452,7 @@ $_linkLog''');
   }
 
   void _setUniform2i(GraphicsDevice device, var index, var argument) {
-    if (argument is Int32Array) {
+    if (argument is Int32List) {
       device.gl.uniform2iv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -463,7 +463,7 @@ $_linkLog''');
   }
 
   void _setUniform3i(GraphicsDevice device, var index, var argument) {
-    if (argument is Int32Array) {
+    if (argument is Int32List) {
       device.gl.uniform3iv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -474,7 +474,7 @@ $_linkLog''');
   }
 
   void _setUniform4i(GraphicsDevice device, var index, var argument) {
-    if (argument is Int32Array) {
+    if (argument is Int32List) {
       device.gl.uniform4iv(index, argument);
       return;
     } else if (argument is List<num>) {
@@ -486,7 +486,7 @@ $_linkLog''');
   }
 
   void _setUniformMatrix2(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniformMatrix2fv(index, false, argument);
       return;
     }
@@ -494,7 +494,7 @@ $_linkLog''');
   }
 
   void _setUniformMatrix3(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniformMatrix3fv(index, false, argument);
       return;
     }
@@ -502,7 +502,7 @@ $_linkLog''');
   }
 
   void _setUniformMatrix4(GraphicsDevice device, var index, var argument) {
-    if (argument is Float32Array) {
+    if (argument is Float32List) {
       device.gl.uniformMatrix4fv(index, false, argument);
       return;
     }

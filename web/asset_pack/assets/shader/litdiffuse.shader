@@ -1,4 +1,4 @@
 [
-"/shader/litdiffuseVertexShader.glsl",
-"/shader/litdiffuseFragmentShader.glsl"
+"litdiffuseVertexShader.glsl",
+"litdiffuseFragmentShader.glsl"
 ]

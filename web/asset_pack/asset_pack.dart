@@ -1,7 +1,8 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
@@ -12,7 +13,7 @@ GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
 DebugDrawManager _debugDrawManager;
 
-GameLoop _gameLoop;
+GameLoopHtml _gameLoop;
 AssetManager _assetManager;
 
 Viewport _viewport;
@@ -21,7 +22,7 @@ final cameraController = new FpsFlyCameraController();
 double _lastTime;
 bool _circleDrawn = false;
 
-void gameFrame(GameLoop gameLoop) {
+void gameFrame(GameLoopHtml gameLoop) {
   double dt = gameLoop.dt;
   cameraController.forwardVelocity = 25.0;
   cameraController.strafeVelocity = 25.0;
@@ -52,24 +53,24 @@ void renderFrame(GameLoop gameLoop) {
   // Set the viewport
   _graphicsContext.setViewport(_viewport);
   // Add three lines, one for each axis.
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(10.0, 0.0, 0.0),
-                            new vec4.raw(1.0, 0.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 10.0, 0.0),
-                            new vec4.raw(0.0, 1.0, 0.0, 1.0));
-  _debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                            new vec3.raw(0.0, 0.0, 10.0),
-                            new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(10.0, 0.0, 0.0),
+                            new vec4(1.0, 0.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 10.0, 0.0),
+                            new vec4(0.0, 1.0, 0.0, 1.0));
+  _debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                            new vec3(0.0, 0.0, 10.0),
+                            new vec4(0.0, 0.0, 1.0, 1.0));
   _debugDrawManager.addSphere(new vec3(20.0, 20.0, 20.0), 20.0,
                               new vec4(0.0, 1.0, 0.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
-    _debugDrawManager.addCircle(new vec3.raw(0.0, 0.0, 0.0),
-                                new vec3.raw(0.0, 1.0, 0.0),
+    _debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+                                new vec3(0.0, 1.0, 0.0),
                                 2.0,
-                                new vec4.raw(1.0, 1.0, 1.0, 1.0),
+                                new vec4(1.0, 1.0, 1.0, 1.0),
                                 duration:5.0);
   }
 
@@ -82,7 +83,7 @@ void renderFrame(GameLoop gameLoop) {
 }
 
 // Handle resizes
-void resizeFrame(GameLoop gameLoop) {
+void resizeFrame(GameLoopHtml gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.client.width;
@@ -119,7 +120,7 @@ void _setupSkybox() {
   _skyboxRasterizerState.cullMode = CullMode.None;
 }
 
-Float32Array _cameraTransform = new Float32Array(16);
+Float32List _cameraTransform = new Float32List(16);
 
 void _drawSkybox() {
   var context = _graphicsDevice.context;
@@ -151,44 +152,41 @@ RasterizerState _skinnedRasterizerState;
 DepthState _skinnedDepthState;
 int _depthGuard = 100;
 double _skeletonScale = 1.0;
-void _drawSkinnedBones(SkinnedMesh mesh, int id, int depth) {
+
+void _drawSkinnedBones(Bone bone, PosedSkeleton posedSkeleton) {
   List<double> origin = [0.0, 0.0, 0.0];
-  final matrices = mesh.globalBoneTransforms;
-  origin[0] = matrices[id][12] * _skeletonScale;
-  origin[1] = matrices[id][13] * _skeletonScale;
-  origin[2] = matrices[id][14] * _skeletonScale;
-  int childOffset = mesh.boneChildrenOffsets[id];
-  if (id == 0) {
-    _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
-        new vec4.raw(1.0, 0.0, 1.0, 1.0));
+  int boneIndex = bone.boneIndex;
+  final matrix = posedSkeleton.globalTransforms[boneIndex];
+  origin[0] = matrix[12] * _skeletonScale;
+  origin[1] = matrix[13] * _skeletonScale;
+  origin[2] = matrix[14] * _skeletonScale;
+  if (boneIndex == 0) {
+    _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
+        new vec4(1.0, 0.0, 1.0, 1.0));
   } else {
-  _debugDrawManager.addCross(new vec3.raw(origin[0], origin[1], origin[2]),
-                             new vec4.raw(0.0, 1.0, 1.0, 1.0));
+  _debugDrawManager.addCross(new vec3(origin[0], origin[1], origin[2]),
+                             new vec4(0.0, 1.0, 1.0, 1.0));
   }
-  if (depth >= _depthGuard) {
-    return;
-  }
-  while (mesh.boneChildrenIds[childOffset] != -1) {
+  bone.children.forEach((childBone) {
     List<double> end = [0.0, 0.0, 0.0];
-    int childId = mesh.boneChildrenIds[childOffset];
-    end[0] = matrices[childId][12] * _skeletonScale;
-    end[1] = matrices[childId][13] * _skeletonScale;
-    end[2] = matrices[childId][14] * _skeletonScale;
-    _debugDrawManager.addLine(new vec3.raw(origin[0],
+    int childId = childBone.boneIndex;
+    end[0] = posedSkeleton.globalTransforms[childId][12] * _skeletonScale;
+    end[1] = posedSkeleton.globalTransforms[childId][13] * _skeletonScale;
+    end[2] = posedSkeleton.globalTransforms[childId][14] * _skeletonScale;
+    _debugDrawManager.addLine(new vec3(origin[0],
                                            origin[1],
                                            origin[2]),
-                              new vec3.raw(end[0], end[1], end[2]),
-                              new vec4.raw(1.0, 1.0, 1.0, 1.0));
-    _drawSkinnedBones(mesh, childId, depth+1);
-    childOffset++;
-  }
+                              new vec3(end[0], end[1], end[2]),
+                              new vec4(1.0, 1.0, 1.0, 1.0));
+    _drawSkinnedBones(childBone, posedSkeleton);
+  });
 }
 
 void _setupSkinnedCharacter() {
   _skinnedShaderProgram = _assetManager['demoAssets.litdiffuse'];
   assert(_skinnedShaderProgram.linked == true);
-  _skinnedMesh = importSkinnedMesh('skinned', _graphicsDevice,
-                                   _assetManager['demoAssets.hellknight']);
+  _skinnedMesh = importSkinnedMesh2('skinned', _graphicsDevice, _assetManager['demoAssets.hellknight']);
+  importAnimation(_skinnedMesh, _assetManager['demoAssets.chest'][0]);
   _skinnedInputLayout = new InputLayout('skinned.il', _graphicsDevice);
   _skinnedInputLayout.mesh = _skinnedMesh;
   _skinnedInputLayout.shaderProgram = _skinnedShaderProgram;
@@ -201,8 +199,9 @@ void _setupSkinnedCharacter() {
 }
 
 void _drawSkinnedCharacter() {
-  _skinnedMesh.update(1.0/60.0);
-  _drawSkinnedBones(_skinnedMesh, 0, 0);
+  _skinnedMesh.update(1.0/60.0, true);
+  _drawSkinnedBones(_skinnedMesh.skeleton.boneList[0],
+                    _skinnedMesh.posedSkeleton);
   var context = _graphicsDevice.context;
   context.setPrimitiveTopology(GraphicsContext.PrimitiveTopologyTriangles);
   context.setShaderProgram(_skinnedShaderProgram);
@@ -220,6 +219,7 @@ void _drawSkinnedCharacter() {
   context.setIndexBuffer(_skinnedMesh.indexArray);
   context.setVertexBuffers(0, [_skinnedMesh.vertexArray]);
   context.setInputLayout(_skinnedInputLayout);
+
 
   context.setTextures(0, [_assetManager['demoAssets.hellknight_body']]);
   if (true) {
@@ -252,7 +252,6 @@ void _drawSkinnedCharacter() {
 
 main() {
   final String baseUrl = "${window.location.href.substring(0, window.location.href.length - "asset_pack.html".length)}";
-  print(baseUrl);
   CanvasElement canvas = query(_canvasId);
   assert(canvas != null);
 
@@ -278,16 +277,17 @@ main() {
 
   // Create the camera
   camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  camera.position = new vec3.raw(2.0, 2.0, 2.0);
-  camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+  camera.position = new vec3(2.0, 2.0, 2.0);
+  camera.focusPosition = new vec3(1.0, 1.0, 1.0);
 
   _assetManager = new AssetManager();
   registerSpectreWithAssetManager(_graphicsDevice, _assetManager);
-  _gameLoop = new GameLoop(canvas);
+  _gameLoop = new GameLoopHtml(canvas);
   _gameLoop.onUpdate = gameFrame;
   _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;
-  _assetManager.loadPack('demoAssets', '$baseUrl/assets.pack').then((assetPack) {
+  _assetManager.loadPack('demoAssets',
+                         '$baseUrl/assets/_.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
     _setupSkinnedCharacter();

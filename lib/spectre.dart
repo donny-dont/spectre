@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@ import 'dart:web_gl' as WebGL;
 import 'dart:json' as JSON;
 import 'dart:async';
 import 'dart:math' as Math;
-import 'dart:typeddata';
+import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 import 'package:spectre/disposable.dart';
 
@@ -71,4 +71,7 @@ part 'src/spectre/vertex_buffer.dart';
 part 'src/spectre/vertex_shader.dart';
 part 'src/spectre/viewport.dart';
 part 'src/spectre/mesh.dart';
+part 'src/spectre/skeleton.dart';
+part 'src/spectre/skeleton_animation.dart';
 part 'src/spectre/skinned_mesh.dart';
+part 'src/spectre/vertex_attribute.dart';

@@ -1,7 +1,8 @@
 import 'dart:html';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 import 'package:asset_pack/asset_pack.dart';
 import 'package:spectre/spectre.dart';
 import 'package:spectre/spectre_asset_pack.dart';
@@ -23,7 +24,7 @@ final String _canvasId = '#frontBuffer';
 GraphicsDevice graphicsDevice;
 GraphicsContext graphicsContext;
 DebugDrawManager debugDrawManager;
-GameLoop gameLoop;
+GameLoopHtml gameLoop;
 AssetManager assetManager;
 Renderer renderer;
 final List<Layer> layers = new List<Layer>();
@@ -63,7 +64,7 @@ Map renderer_config = {
  ]
 };
 
-void gameFrame(GameLoop gameLoop) {
+void gameFrame(GameLoopHtml gameLoop) {
   double dt = gameLoop.dt;
   cameraController.forwardVelocity = 25.0;
   cameraController.strafeVelocity = 25.0;
@@ -89,24 +90,24 @@ void renderFrame(GameLoop gameLoop) {
   renderer.render(layers, renderables, camera);
 
   // Add three lines, one for each axis.
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(10.0, 0.0, 0.0),
-                           new vec4.raw(1.0, 0.0, 0.0, 1.0));
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(0.0, 10.0, 0.0),
-                           new vec4.raw(0.0, 1.0, 0.0, 1.0));
-  debugDrawManager.addLine(new vec3.raw(0.0, 0.0, 0.0),
-                           new vec3.raw(0.0, 0.0, 10.0),
-                           new vec4.raw(0.0, 0.0, 1.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(10.0, 0.0, 0.0),
+                           new vec4(1.0, 0.0, 0.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(0.0, 10.0, 0.0),
+                           new vec4(0.0, 1.0, 0.0, 1.0));
+  debugDrawManager.addLine(new vec3(0.0, 0.0, 0.0),
+                           new vec3(0.0, 0.0, 10.0),
+                           new vec4(0.0, 0.0, 1.0, 1.0));
   debugDrawManager.addSphere(new vec3(20.0, 20.0, 20.0), 20.0,
                              new vec4(0.0, 1.0, 0.0, 1.0));
   if (_circleDrawn == false) {
     _circleDrawn = true;
     // Draw a circle that lasts for 5 seconds.
-    debugDrawManager.addCircle(new vec3.raw(0.0, 0.0, 0.0),
-                               new vec3.raw(0.0, 1.0, 0.0),
+    debugDrawManager.addCircle(new vec3(0.0, 0.0, 0.0),
+                               new vec3(0.0, 1.0, 0.0),
                                2.0,
-                               new vec4.raw(1.0, 1.0, 1.0, 1.0),
+                               new vec4(1.0, 1.0, 1.0, 1.0),
                                duration:5.0);
   }
   // Prepare the debug draw manager for rendering
@@ -114,7 +115,7 @@ void renderFrame(GameLoop gameLoop) {
 }
 
 // Handle resizes
-void resizeFrame(GameLoop gameLoop) {
+void resizeFrame(GameLoopHtml gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.client.width;
@@ -160,14 +161,8 @@ void _buildCubes() {
 }
 
 void _makeMaterial() {
-  var shaderProgram = new ShaderProgram('simpleTexture', graphicsDevice);
-  var vertexShader = new VertexShader('simpleTexture', graphicsDevice);
-  var fragmentShader = new FragmentShader('simpleTexture', graphicsDevice);
-  Material material = new Material('simpleTexture', shaderProgram, renderer);
-  material.depthState.depthBufferWriteEnabled = true;
-  shaderProgram.vertexShader = vertexShader;
-  shaderProgram.fragmentShader = fragmentShader;
-  vertexShader.source = '''
+  MaterialShader materialShader = new MaterialShader('simpleTexture', renderer);
+  materialShader.vertexShader = '''
 precision highp float;
 
 attribute vec3 POSITION;
@@ -199,7 +194,7 @@ void main() {
     gl_Position = M*vPosition4;
 }
 ''';
-  fragmentShader.source = '''
+  materialShader.fragmentShader = '''
 precision mediump float;
 
 varying vec3 surfaceNormal;
@@ -221,17 +216,16 @@ void main() {
     gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ''';
-  print(fragmentShader.compileLog);
-  shaderProgram.link();
-  assert(shaderProgram.linked);
-  material.link();
+  Material material = new Material('simpleTexture', materialShader, renderer);
+  material.depthState.depthBufferWriteEnabled = true;
+
   var asset = assetManager['demoAssets'].registerAsset('simpleTexture',
-                                                       'shader', '', '', {},
+                                                       'shader', '', {},
                                                        {});
   asset.imported = material;
 }
 
-Float32Array _cameraTransform = new Float32Array(16);
+Float32List _cameraTransform = new Float32List(16);
 
 void _drawSkybox() {
   var context = graphicsDevice.context;
@@ -276,17 +270,17 @@ main() {
   registerSpectreWithAssetManager(graphicsDevice, assetManager);
   renderer = new Renderer(canvas, graphicsDevice, assetManager);
   renderer.fromJson(renderer_config);
-  gameLoop = new GameLoop(canvas);
+  gameLoop = new GameLoopHtml(canvas);
   gameLoop.onUpdate = gameFrame;
   gameLoop.onRender = renderFrame;
   gameLoop.onResize = resizeFrame;
-  assetManager.loadPack('demoAssets', 'assets.pack').then((assetPack) {
+  assetManager.loadPack('demoAssets', 'assets/_.pack').then((assetPack) {
     // All assets are loaded.
     _setupSkybox();
     // Setup camera.
     camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-    camera.position = new vec3.raw(2.0, 2.0, 2.0);
-    camera.focusPosition = new vec3.raw(1.0, 1.0, 1.0);
+    camera.position = new vec3(2.0, 2.0, 2.0);
+    camera.focusPosition = new vec3(1.0, 1.0, 1.0);
     _makeMaterial();
     _buildCubes();
     // Setup layers.

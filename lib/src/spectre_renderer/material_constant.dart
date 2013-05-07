@@ -32,21 +32,21 @@ class MaterialConstant {
   dynamic _constructValue(String type) {
     switch (type) {
       case 'float':
-        return new Float32Array(1);
+        return new Float32List(1);
       case 'vec2':
-        return new Float32Array(2);
+        return new Float32List(2);
       case 'vec3':
-        return new Float32Array(3);
+        return new Float32List(3);
       case 'vec4':
-        return new Float32Array(4);
+        return new Float32List(4);
       case 'mat3':
-        var v = new Float32Array(9);
+        var v = new Float32List(9);
         v[0] = 1.0;
         v[4] = 1.0;
         v[8] = 1.0;
         return v;
       case 'mat4':
-        var v = new Float32Array(16);
+        var v = new Float32List(16);
         v[0] = 1.0;
         v[5] = 1.0;
         v[10] = 1.0;

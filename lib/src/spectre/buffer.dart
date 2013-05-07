@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -64,7 +64,7 @@ class SpectreBuffer extends DeviceChild {
   }
 
   void _uploadData(dynamic data, int usage) {
-    _size = data.byteLength;
+    _size = data.lengthInBytes;
     _usage = usage;
     device.gl.bufferData(_bindTarget, data, usage);
   }
@@ -90,8 +90,8 @@ class SpectreBuffer extends DeviceChild {
     if (data == null) {
       throw new ArgumentError('data cannot be null.');
     }
-    if (offset + data.byteLength > _size) {
-      throw new RangeError('data is too large ${offset + data.byteLength} > ${_size}');
+    if (offset + data.lengthInBytes > _size) {
+      throw new RangeError('data is too large ${offset + data.lengthInBytes} > ${_size}');
     }
     var oldBind = _pushBind();
     _uploadSubData(offset, data);

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -101,10 +101,10 @@ bool materialEquals(Material a, Material b) {
 
 void testMaterialConstruct() {
   expect(() {
-    Material mateiral = new Material(_renderer, 'null shader', null);
+    Material mateiral = new Material('null shader', null, _renderer);
   }, throws);
   ShaderProgram sp = new ShaderProgram('unlinked program', _graphicsDevice);
-  Material material = new Material(_renderer, 'unlinked shader', sp);
+  Material material = new Material('unlinked shader', sp, _renderer);
   expect(0, material.constants.length);
   expect(0, material.textures.length);
   sp.vertexShader = new VertexShader('vs', _graphicsDevice);

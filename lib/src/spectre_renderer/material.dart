@@ -24,7 +24,7 @@ part of spectre_renderer;
 class Material {
   final String name;
   final Renderer renderer;
-  final ShaderProgram shader;
+  final MaterialShader shader;
   /// Key shader constant variable.
   final Map<String, MaterialConstant> constants =
       new Map<String, MaterialConstant>();
@@ -73,7 +73,7 @@ class Material {
     device.context.setBlendState(_blendState);
     device.context.setRasterizerState(_rasterizerState);
     device.context.setDepthState(_depthState);
-    device.context.setShaderProgram(shader);
+    device.context.setShaderProgram(shader.shader);
     constants.forEach((k, v) {
       device.context.setConstant(k, v.value);
     });
@@ -87,8 +87,8 @@ class Material {
   }
 
   void _setupTextureSamplerTable() {
-    _textures.length = shader.samplers.length;
-    _samplers.length = shader.samplers.length;
+    _textures.length = shader.shader.samplers.length;
+    _samplers.length = shader.shader.samplers.length;
     for (int i = 0; i < shader.samplers.length; i++) {
       _textures[i] = null;
       _samplers[i] = null;
@@ -110,11 +110,11 @@ class Material {
   void _link() {
     _setupTextureSamplerTable();
     constants.clear();
-    shader.uniforms.forEach((k, v) {
+    shader.shader.uniforms.forEach((k, v) {
       constants[k] = new MaterialConstant(k, v.type);
     });
     textures.clear();
-    shader.samplers.forEach((k, v) {
+    shader.shader.samplers.forEach((k, v) {
       textures[k] = new MaterialTexture(renderer, k, '', v.textureUnit);
     });
   }
@@ -133,7 +133,7 @@ class Material {
     projectionViewMatrix.multiply(viewMatrix);
     mat4 viewRotationMatrix = makeViewMatrix(new vec3.zero(),
                                              camera.frontDirection,
-                                             new vec3.raw(0.0, 1.0, 0.0));
+                                             new vec3(0.0, 1.0, 0.0));
     mat4 projectionViewRotationMatrix = camera.projectionMatrix;
     projectionViewRotationMatrix.multiply(viewRotationMatrix);
     MaterialConstant constant;

@@ -21,12 +21,12 @@
 
 part of spectre_asset_pack;
 
-/** Register the [spectre] graphics device with the [asset_pack]
+/** Register the spectre graphics device with the asset_pack library.
  * asset manager. After calling this function, the asset manager
  * will be able to load meshes, textures, and shaders.
  */
 void registerSpectreWithAssetManager(GraphicsDevice graphicsDevice,
-                                         AssetManager assetManager) {
+                                     AssetManager assetManager) {
   assetManager.loaders['mesh'] = new TextLoader();
   assetManager.loaders['tex2d'] = new ImageLoader();
   assetManager.loaders['texCube'] = new _ImagePackLoader();

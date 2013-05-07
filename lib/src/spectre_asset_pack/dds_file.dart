@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -44,7 +44,7 @@ class DdsFile {
   //---------------------------------------------------------------------
 
   /// The buffer holding the file contents.
-  ArrayBuffer _buffer;
+  Uint8List _buffer;
   /// The offset to the data section of the file.
   int _dataOffset = 0;
   /// The [DdsResourceFormat] for the DDS file.
@@ -67,15 +67,15 @@ class DdsFile {
   /// The contents of the DDS file in its entirery are within [buffer]. During
   /// construction an [ArgumentError] will be thrown if the [buffer] does not contain
   /// a valid DDS file.
-  DdsFile(ArrayBuffer buffer) {
+  DdsFile(Uint8List buffer) {
     _buffer = buffer;
 
     // The header, including magic number, is 128 bytes of data
-    if (_buffer.byteLength <= DdsExtendedHeader._byteOffset) {
+    if (_buffer.length <= DdsExtendedHeader._byteOffset) {
       throw new ArgumentError('Invalid DDS file');
     }
 
-    Uint32Array reader = new Uint32Array.fromBuffer(_buffer);
+    Uint32List reader = new Uint32List.view(_buffer);
 
     // Check the magic number
     if (reader[0] != _magicNumber) {
@@ -98,7 +98,8 @@ class DdsFile {
 
     // See if the extended header is present
     if (_pixelFormat.characterCode == DdsPixelFormat._dx10CharacterCode) {
-      if (_buffer.byteLength <= DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
+      if (_buffer.length <=
+          DdsExtendedHeader._byteOffset + DdsExtendedHeader._structSize) {
         throw new ArgumentError('Invalid DDS file');
       }
 
@@ -196,7 +197,7 @@ class DdsFile {
   //---------------------------------------------------------------------
 
   /// Gets the pixel data from the texture at the given [index] with the requested mipmap [level].
-  ArrayBuffer getPixelData(int index, int level) {
+  Uint8List getPixelData(int index, int level) {
     if (_resourceFormat == DdsResourceFormat.Unknown) {
       throw new ArgumentError('File contains an unknown resource format');
     }
@@ -219,7 +220,7 @@ class DdsFile {
     if (DdsResourceFormat.isBlockCompressed(_resourceFormat)) {
       int blockSize = (_resourceFormat == DdsResourceFormat.UnormBc1) || (_resourceFormat == DdsResourceFormat.SrgbUnormBc1) ? 8 : 16;
 
-      return _buffer.slice(offset, offset + (currentDepth * _getCompressedSize(currentWidth, currentHeight, blockSize)));
+      return _buffer.sublist(offset, offset + (currentDepth * _getCompressedSize(currentWidth, currentHeight, blockSize)));
     } else {
       int stride = _getStride(currentWidth, _resourceFormat);
 
@@ -235,10 +236,10 @@ class DdsFile {
       // If there is no padding the array can be sliced. Otherwise each individual
       // row must be copied one at a time
       if (padding == 0) {
-        return _buffer.slice(offset, offset + (currentDepth * sliceSize));
+        return _buffer.sublist(offset, offset + (currentDepth * sliceSize));
       } else {
-        Uint8Array copyTo = new Uint8Array(currentDepth * sliceSize);
-        Uint8Array copyFrom = new Uint8Array.fromBuffer(_buffer, offset);
+        Uint8List copyTo = new Uint8List(currentDepth * sliceSize);
+        Uint8List copyFrom = new Uint8List.view(_buffer, offset);
         int toIndex = 0;
         int fromIndex = 0;
 
@@ -255,7 +256,7 @@ class DdsFile {
           fromIndex += padding;
         }
 
-        return copyTo.buffer;
+        return copyTo;
       }
     }
   }
@@ -406,8 +407,8 @@ class DdsHeader {
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsHeader] class.
-  DdsHeader._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsHeader._internal(Uint8List buffer) {
+    Uint32List reader = new Uint32List.view(buffer, _byteOffset);
 
     _size              = reader[0];
     _flags             = reader[1];
@@ -589,8 +590,8 @@ class DdsPixelFormat {
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsPixelFormat] class.
-  DdsPixelFormat._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsPixelFormat._internal(Uint8List buffer) {
+    Uint32List reader = new Uint32List.view(buffer, _byteOffset);
 
     _size          = reader[0];
     _flags         = reader[1];
@@ -758,8 +759,8 @@ class DdsExtendedHeader {
   //---------------------------------------------------------------------
 
   /// Creates an instance of the [DdsPixelFormat] class.
-  DdsExtendedHeader._internal(ArrayBuffer buffer) {
-    Uint32Array reader = new Uint32Array.fromBuffer(buffer, _byteOffset);
+  DdsExtendedHeader._internal(Uint8List buffer) {
+    Uint32List reader = new Uint32List.view(buffer, _byteOffset);
 
     _resourceFormat = reader[0];
     _dimension = reader[1];

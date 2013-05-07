@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -132,7 +132,7 @@ class _DebugDrawLineManager {
   SingleArrayMesh _lineMesh;
   InputLayout _lineMeshInputLayout;
 
-  Float32Array _vboStorage;
+  Float32List _vboStorage;
 
   _DebugDrawLineManager(this.device, int maxVertices,
                         ShaderProgram shaderProgram) {
@@ -140,7 +140,7 @@ class _DebugDrawLineManager {
       // Keep an even number of vertices.
       maxVertices += 1;
     }
-    _vboStorage = new Float32Array(maxVertices*DebugDrawVertexSize);
+    _vboStorage = new Float32List(maxVertices*DebugDrawVertexSize);
     _lineMesh = new SingleArrayMesh('_DebugDrawLineManager', device);
     _lineMesh.primitiveTopology = GraphicsContext.PrimitiveTopologyLines;
     _lineMesh.vertexArray.allocate(_vboStorage.length*4,
@@ -223,7 +223,7 @@ class DebugDrawManager {
   _DebugDrawLineManager _depthEnabledLines;
   _DebugDrawLineManager _depthDisabledLines;
 
-  Float32Array _cameraMatrix = new Float32Array(16);
+  Float32List _cameraMatrix = new Float32List(16);
 
   final GraphicsDevice device;
 
@@ -308,16 +308,16 @@ class DebugDrawManager {
         num v = y / latSegments;
         num v2 = (y+1) / latSegments;
 
-        vertex = new vec3.raw(
-            radius * cos(u * twoPi) * sin(v * Math.PI),
-            radius * cos(v * Math.PI),
-            radius * sin(u * twoPi) * sin(v * Math.PI)
+        vertex = new vec3(
+            radius * Math.cos(u * twoPi) * Math.sin(v * Math.PI),
+            radius * Math.cos(v * Math.PI),
+            radius * Math.sin(u * twoPi) * Math.sin(v * Math.PI)
         ) + center;
 
-        upperVertex = new vec3.raw(
-            radius * cos(u * twoPi) * sin(v2 * Math.PI),
-            radius * cos(v2 * Math.PI),
-            radius * sin(u * twoPi) * sin(v2 * Math.PI)
+        upperVertex = new vec3(
+            radius * Math.cos(u * twoPi) * Math.sin(v2 * Math.PI),
+            radius * Math.cos(v2 * Math.PI),
+            radius * Math.sin(u * twoPi) * Math.sin(v2 * Math.PI)
         ) + center;
 
         if(lastVertex != null) {
@@ -357,15 +357,15 @@ class DebugDrawManager {
     num _step = twoPi/numSegments;
 
     alpha = startAngle;
-    double cosScale = cos(alpha) * radius;
-    double sinScale = sin(alpha) * radius;
+    double cosScale = Math.cos(alpha) * radius;
+    double sinScale = Math.sin(alpha) * radius;
     double lastX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
     double lastY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
     double lastZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
 
     for (alpha = startAngle; alpha <= stopAngle+_step; alpha += _step) {
-      cosScale = cos(alpha) * radius;
-      sinScale = sin(alpha) * radius;
+      cosScale = Math.cos(alpha) * radius;
+      sinScale = Math.sin(alpha) * radius;
       double pX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
       double pY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
       double pZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
@@ -399,8 +399,8 @@ class DebugDrawManager {
     double lastZ = center.z + _circle_u.z * radius;
 
     for (alpha = 0.0; alpha <= twoPi; alpha += _step) {
-      double cosScale = cos(alpha) * radius;
-      double sinScale = sin(alpha) * radius;
+      double cosScale = Math.cos(alpha) * radius;
+      double sinScale = Math.sin(alpha) * radius;
       double pX = center.x + cosScale * _circle_u.x + sinScale * _circle_v.x;
       double pY = center.y + cosScale * _circle_u.y + sinScale * _circle_v.y;
       double pZ = center.z + cosScale * _circle_u.z + sinScale * _circle_v.z;
@@ -425,30 +425,30 @@ class DebugDrawManager {
                {num duration: 0.0, bool depthEnabled: true}) {
     var lineManager = depthEnabled ? _depthEnabledLines : _depthDisabledLines;
 
-    vec4 origin = new vec4.raw(0.0, 0.0, 0.0, 1.0);
+    vec4 origin = new vec4(0.0, 0.0, 0.0, 1.0);
     num size_90p = 0.9 * size;
     num size_10p = 0.1 * size;
 
     vec4 color;
 
-    vec4 X = new vec4.raw(size, 0.0, 0.0, 1.0);
-    vec4 X_head_0 = new vec4.raw(size_90p, size_10p, 0.0, 1.0);
-    vec4 X_head_1 = new vec4.raw(size_90p, -size_10p, 0.0, 1.0);
-    vec4 X_head_2 = new vec4.raw(size_90p, 0.0, size_10p, 1.0);
-    vec4 X_head_3 = new vec4.raw(size_90p, 0.0, -size_10p, 1.0);
+    vec4 X = new vec4(size, 0.0, 0.0, 1.0);
+    vec4 X_head_0 = new vec4(size_90p, size_10p, 0.0, 1.0);
+    vec4 X_head_1 = new vec4(size_90p, -size_10p, 0.0, 1.0);
+    vec4 X_head_2 = new vec4(size_90p, 0.0, size_10p, 1.0);
+    vec4 X_head_3 = new vec4(size_90p, 0.0, -size_10p, 1.0);
 
-    vec4 Y = new vec4.raw(0.0, size, 0.0, 1.0);
-    vec4 Y_head_0 = new vec4.raw(size_10p, size_90p, 0.0, 1.0);
-    vec4 Y_head_1 = new vec4.raw(-size_10p, size_90p, 0.0, 1.0);
-    vec4 Y_head_2 = new vec4.raw(0.0, size_90p, size_10p, 1.0);
-    vec4 Y_head_3 = new vec4.raw(0.0, size_90p, -size_10p, 1.0);
+    vec4 Y = new vec4(0.0, size, 0.0, 1.0);
+    vec4 Y_head_0 = new vec4(size_10p, size_90p, 0.0, 1.0);
+    vec4 Y_head_1 = new vec4(-size_10p, size_90p, 0.0, 1.0);
+    vec4 Y_head_2 = new vec4(0.0, size_90p, size_10p, 1.0);
+    vec4 Y_head_3 = new vec4(0.0, size_90p, -size_10p, 1.0);
 
 
-    vec4 Z = new vec4.raw(0.0, 0.0, size, 1.0);
-    vec4 Z_head_0 = new vec4.raw(size_10p, 0.0, size_90p, 1.0);
-    vec4 Z_head_1 = new vec4.raw(-size_10p, 0.0, size_90p, 1.0);
-    vec4 Z_head_2 = new vec4.raw(0.0, size_10p, size_90p, 1.0);
-    vec4 Z_head_3 = new vec4.raw(0.0, -size_10p, size_90p, 1.0);
+    vec4 Z = new vec4(0.0, 0.0, size, 1.0);
+    vec4 Z_head_0 = new vec4(size_10p, 0.0, size_90p, 1.0);
+    vec4 Z_head_1 = new vec4(-size_10p, 0.0, size_90p, 1.0);
+    vec4 Z_head_2 = new vec4(0.0, size_10p, size_90p, 1.0);
+    vec4 Z_head_3 = new vec4(0.0, -size_10p, size_90p, 1.0);
 
     origin = xform * origin;
 
@@ -458,7 +458,7 @@ class DebugDrawManager {
     X_head_2 = xform * X_head_2;
     X_head_3 = xform * X_head_3;
 
-    color = new vec4.raw(1.0, 0.0, 0.0, 1.0);
+    color = new vec4(1.0, 0.0, 0.0, 1.0);
     lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
         duration);
     lineManager.lines._addLine(origin.xyz, X.xyz);
@@ -474,7 +474,7 @@ class DebugDrawManager {
     Y_head_2 = xform * Y_head_2;
     Y_head_3 = xform * Y_head_3;
 
-    color = new vec4.raw(0.0, 1.0, 0.0, 1.0);
+    color = new vec4(0.0, 1.0, 0.0, 1.0);
     lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
         duration);
     lineManager.lines._addLine(origin.xyz, Y.xyz);
@@ -490,7 +490,7 @@ class DebugDrawManager {
     Z_head_2 = xform * Z_head_2;
     Z_head_3 = xform * Z_head_3;
 
-    color = new vec4.raw(0.0, 0.0, 1.0, 1.0);
+    color = new vec4(0.0, 0.0, 1.0, 1.0);
     lineManager.lines.startLineObject(color.r, color.g, color.b, color.a,
         duration);
     lineManager.lines._addLine(origin.xyz, Z.xyz);

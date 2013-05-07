@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,6 +23,7 @@ library dds_file_test;
 import 'dart:async';
 import 'dart:html';
 import 'dart:math' as Math;
+import 'dart:typed_data';
 import 'package:unittest/unittest.dart';
 import 'package:spectre/spectre_asset_pack.dart';
 
@@ -210,7 +211,7 @@ int getDdsResourceFormat(String name) {
   return DdsResourceFormat.Unknown;
 }
 
-Future<ArrayBuffer> getFile(String url) {
+Future<Uint8List> getFile(String url) {
   Completer completer = new Completer();
 
   // Make HTTP request
@@ -382,22 +383,22 @@ void main() {
       int levels = textureSize.length;
 
       for (int i = 0; i < levels; ++i) {
-        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+        Uint8List texture = ddsFile.getPixelData(0, i);
 
-        expect(texture.byteLength, textureSize[i]);
+        expect(texture.length, textureSize[i]);
 
-        Uint32Array values = new Uint32Array.fromBuffer(texture);
+        Uint32List values = new Uint32List.view(texture);
         int length = values.length;
 
         for (int x = 0; x < length; ++x) {
           expect(values[x], color);
         }
 
-        read += texture.byteLength;
+        read += texture.length;
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -423,11 +424,11 @@ void main() {
       int levels = textureSize.length;
 
       for (int i = 0; i < levels; ++i) {
-        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+        Uint8List texture = ddsFile.getPixelData(0, i);
 
-        expect(texture.byteLength, textureSize[i]);
+        expect(texture.length, textureSize[i]);
 
-        Uint16Array values = new Uint16Array.fromBuffer(texture);
+        Uint16List values = new Uint16List.view(texture);
         int length = values.length;
 
         for (int x = 0; x < length; ++x) {
@@ -460,15 +461,15 @@ void main() {
       int levels = textureSize.length;
 
       for (int i = 0; i < levels; ++i) {
-        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+        Uint8List texture = ddsFile.getPixelData(0, i);
 
-        expect(texture.byteLength, textureSize[i]);
+        expect(texture.length, textureSize[i]);
 
-        read += texture.byteLength;
+        read += texture.length;
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -494,15 +495,15 @@ void main() {
       int levels = textureSize.length;
 
       for (int i = 0; i < levels; ++i) {
-        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+        Uint8List texture = ddsFile.getPixelData(0, i);
 
-        expect(texture.byteLength, textureSize[i]);
+        expect(texture.length, textureSize[i]);
 
-        read += texture.byteLength;
+        read += texture.length;
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -531,23 +532,23 @@ void main() {
 
       for (int j = 0; j < 6; ++j) {
         for (int i = 0; i < levels; ++i) {
-          ArrayBuffer texture = ddsFile.getPixelData(j, i);
+          Uint8List texture = ddsFile.getPixelData(j, i);
 
-          expect(texture.byteLength, textureSize[i]);
+          expect(texture.length, textureSize[i]);
 
-          Uint32Array values = new Uint32Array.fromBuffer(texture);
+          Uint32List values = new Uint32List.view(texture);
           int length = values.length;
 
           for (int x = 0; x < length; ++x) {
             expect(values[x], colors[j]);
           }
 
-          read += texture.byteLength;
+          read += texture.length;
         }
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -575,16 +576,16 @@ void main() {
 
       for (int j = 0; j < 6; ++j) {
         for (int i = 0; i < levels; ++i) {
-          ArrayBuffer texture = ddsFile.getPixelData(j, i);
+          Uint8List texture = ddsFile.getPixelData(j, i);
 
-          expect(texture.byteLength, textureSize[i]);
+          expect(texture.length, textureSize[i]);
 
-          read += texture.byteLength;
+          read += texture.length;
         }
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 
@@ -624,11 +625,11 @@ void main() {
       int depth  = ddsFile.depth;
 
       for (int i = 0; i < levels; ++i) {
-        ArrayBuffer texture = ddsFile.getPixelData(0, i);
+        Uint8List texture = ddsFile.getPixelData(0, i);
 
-        expect(texture.byteLength, textureSize[i]);
+        expect(texture.length, textureSize[i]);
 
-        Uint32Array values = new Uint32Array.fromBuffer(texture);
+        Uint32List values = new Uint32List.view(texture);
 
         int index = 0;
 
@@ -643,11 +644,11 @@ void main() {
         height = Math.max(1, height ~/ 2);
         depth  = Math.max(1, depth  ~/ 2);
 
-        read += texture.byteLength;
+        read += texture.length;
       }
 
       // Verify that all bytes were read
-      expect(read, buffer.byteLength);
+      expect(read, buffer.lengthInBytes);
     }));
   });
 }

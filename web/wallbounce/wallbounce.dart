@@ -2,7 +2,7 @@ import 'dart:html';
 import 'dart:math' as Math;
 import 'package:spectre/spectre.dart';
 import 'package:vector_math/vector_math.dart';
-import 'package:game_loop/game_loop.dart';
+import 'package:game_loop/game_loop_html.dart';
 
 final String _canvasId = '#backbuffer';
 
@@ -10,7 +10,7 @@ GraphicsDevice _graphicsDevice;
 GraphicsContext _graphicsContext;
 DebugDrawManager _debugDrawManager;
 
-GameLoop _gameLoop;
+GameLoopHtml _gameLoop;
 
 Viewport _viewport;
 Camera _camera;
@@ -67,7 +67,7 @@ bool _ballIntersectsLineSegment(vec2 _a, vec2 _b) {
   // Make ballPosition relative to the line segment
   vec2 p = ballPosition - _a;
   vec2 delta = _b-_a;
-  double t = dot(p, delta) / delta.length2;
+  double t = dot2(p, delta) / delta.length2;
   if (t < 0.0 || t > 1.0) {
     return false;
   }
@@ -112,23 +112,23 @@ void renderFrame(GameLoop gameLoop) {
   /* Draw playing area */
   // Top & Bottom
   for (int i = 0; i < 2; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(1.0, 0.0, 0.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(1.0, 0.0, 0.0, 1.0));
   }
 
   // Ends
   for (int i = 2; i < 4; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(1.0, 1.0, 1.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(1.0, 1.0, 1.0, 1.0));
   }
 
   // Other
   for (int i = 4; i < lineStart.length; i++) {
-    vec3 s = new vec3.raw(lineStart[i].x, lineStart[i].y, 0.0);
-    vec3 e = new vec3.raw(lineEnd[i].x, lineEnd[i].y, 0.0);
-    _debugDrawManager.addLine(s, e, new vec4.raw(0.0, 0.0, 1.0, 1.0));
+    vec3 s = new vec3(lineStart[i].x, lineStart[i].y, 0.0);
+    vec3 e = new vec3(lineEnd[i].x, lineEnd[i].y, 0.0);
+    _debugDrawManager.addLine(s, e, new vec4(0.0, 0.0, 1.0, 1.0));
   }
 
   // Draw ball
@@ -145,7 +145,7 @@ void renderFrame(GameLoop gameLoop) {
 }
 
 // Handle resizes
-void resizeFrame(GameLoop gameLoop) {
+void resizeFrame(GameLoopHtml gameLoop) {
   CanvasElement canvas = gameLoop.element;
   // Set the canvas width and height to match the dom elements
   canvas.width = canvas.client.width;
@@ -186,10 +186,10 @@ main() {
   // Create the camera
   _camera = new Camera();
   _camera.aspectRatio = canvas.width.toDouble()/canvas.height.toDouble();
-  _camera.position = new vec3.raw(0.0, 0.0, -2.5);
-  _camera.focusPosition = new vec3.raw(0.0, 0.0, 0.0);
+  _camera.position = new vec3(0.0, 0.0, -2.5);
+  _camera.focusPosition = new vec3(0.0, 0.0, 0.0);
 
-  _gameLoop = new GameLoop(canvas);
+  _gameLoop = new GameLoopHtml(canvas);
   _gameLoop.onUpdate = gameFrame;
   _gameLoop.onRender = renderFrame;
   _gameLoop.onResize = resizeFrame;

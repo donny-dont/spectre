@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -126,7 +126,8 @@ class Texture2D extends SpectreTexture {
   /// A call to this method will only generate mipmap data if the
   /// texture is a power of two. If not then this call is ignored.
   void generateMipmap() {
-    if (SpectreTexture._isPowerOfTwo(_width) && SpectreTexture._isPowerOfTwo(_height)) {
+    if (SpectreTexture._isPowerOfTwo(_width) &&
+        SpectreTexture._isPowerOfTwo(_height)) {
       var oldBind = _pushBind();
       _generateMipmap();
       _popBind(oldBind);

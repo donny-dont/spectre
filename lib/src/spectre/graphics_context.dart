@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2013 Spectre Authors
+  Copyright (C) 2013 John McCutchan
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -167,7 +167,7 @@ class GraphicsContext {
     }
     _enabledVertexAttributeArrays.clear();
 
-    inputLayout.elements.forEach((element) {
+    inputLayout.attributes.forEach((element) {
       VertexBuffer vb = _vertexBufferHandles[element.vboSlot];
       if (vb == null) {
         spectreLog.Error('Prepare for draw referenced a null vertex buffer object');
